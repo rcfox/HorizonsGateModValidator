@@ -27,10 +27,15 @@ jobs:
       - name: Build
         run: npm run build:bundle
 
+      - name: Copy public contents to deployment directory
+        run: |
+          mkdir -p _site
+          cp -r public/* _site/
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./public
+          path: ./_site
 
   deploy:
     needs: build
