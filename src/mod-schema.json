@@ -1,0 +1,8166 @@
+{
+  "schema": {
+    "TerrainType": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "IDnum",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "texture",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "sprite",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "buildSelectSprite",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "buildMarkerText",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "defaultSpriteOffset",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "heightMod",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "heightMod_actor",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "sideSprite",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "sideSpriteYMod",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "spriteXOffsetMult",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "spriteYOffsetMult",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "spriteXOffsetModulo",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "spriteYOffsetModulo",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "spriteXOffsetWaveApex",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "color",
+          "type": "Color",
+          "csType": "Color"
+        },
+        {
+          "name": "checkerboardColor",
+          "type": "Color",
+          "csType": "Color"
+        },
+        {
+          "name": "spriteType",
+          "type": "SpriteType",
+          "csType": "SpriteType"
+        },
+        {
+          "name": "terrainGroup",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "treatAsSameGroup",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "terrainElement",
+          "type": "Element",
+          "csType": "Element"
+        },
+        {
+          "name": "light",
+          "type": "Light",
+          "csType": "Light"
+        },
+        {
+          "name": "blockLoE",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "blockLoS",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "blockLight",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "blockLightEdgeAdjust",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "moveCost",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "blockWalking",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "blockJumping",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canJumpOverFromAngle",
+          "type": "List<integer>",
+          "csType": "List<int>"
+        },
+        {
+          "name": "canSwimIn",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canFlyOver",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canTeleportOver",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "reflective",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "showBackground",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "transparent",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "typeToDrawUnderThisTile",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "drawOffsetTileUnderThisTileX",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "drawOffsetTileUnderThisTileY",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "pR",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "pG",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "pB",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "staticPalettes",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "pRi",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "pGi",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "pBi",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "depthMod",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "depthMod_typeUnder",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "rotation",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "flip",
+          "type": "SpriteEffects",
+          "csType": "SpriteEffects"
+        },
+        {
+          "name": "reactions",
+          "type": "List<ElementReaction>",
+          "csType": "List<ElementReaction>"
+        },
+        {
+          "name": "reactionsCauseTerrainFX",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "R",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "G",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "B",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "R_checkerboard",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "G_checkerboard",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "B_checkerboard",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "Light": {
+      "category": "nested",
+      "fields": [
+        {
+          "name": "color",
+          "type": "Color",
+          "csType": "Color"
+        },
+        {
+          "name": "size",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "flicker",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "flip",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "offset",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "texture",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "alpha",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "red",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "green",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "blue",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "X",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "Y",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "ElementReaction": {
+      "category": "nested",
+      "fields": [
+        {
+          "name": "element",
+          "type": "List<Element>",
+          "csType": "List<Element>"
+        },
+        {
+          "name": "actorValues",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "newID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spawnItem",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "applyElement",
+          "type": "List<Element>",
+          "csType": "List<Element>"
+        },
+        {
+          "name": "action",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "damageMultiplier",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "healMultiplier",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "quantityMod",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "quantityMod_rand",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "quantitySetTo",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "fx",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "aiRatingMod",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "aiRatingModForHostilesOnly",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "delayUntilCanReactAgain",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "ActorValue": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "icon",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "prefixIcon",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "effectDescriptionExtraText",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "bubbleIcon",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "minimum",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "maximum",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "defaultValue",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "harmfulMagnitude",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "animationOnHarmful",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "affectsActors",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canAffectIncapped",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "showDamageNumbers",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "showDamageNumbersMagnitude",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "showDamageNumbersSign",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "showDamageNumbersIcon",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "showDamageNumbersElements",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "showDamageNumbersIconInTooltips",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "damageNumberColor_Positive",
+          "type": "Color",
+          "csType": "Color"
+        },
+        {
+          "name": "damageNumberColor_Negative",
+          "type": "Color",
+          "csType": "Color"
+        },
+        {
+          "name": "actorPaletteOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "actorPaletteOverrideDuration",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "elementReactionModifiesDuration",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canBeRemovedByNonspecificAVEffectRemoval",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "removedByNegativeMagnitude",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "activeEffects",
+          "type": "List<ActorValueEffect>",
+          "csType": "List<ActorValueEffect>"
+        },
+        {
+          "name": "reactions",
+          "type": "List<ElementReaction>",
+          "csType": "List<ElementReaction>"
+        },
+        {
+          "name": "recordInActorData",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "showEvaluationInfo",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "allowDecimalValues",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "percentage",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "XPCostBase",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "XPCostIncrement",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "XPCostMultiplier",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "XPCostFloorToNearest",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "maxXPCost",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "AIValue",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "AIValueMod",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "castActionOnDurationEnd",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "executeActionOnDurationEnd",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "rankOrXPAV",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "ActorValueEffect": {
+      "category": "nested",
+      "fields": [
+        {
+          "name": "sourceAVAffecter",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "sourceType",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "iconText",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "actorValue",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "magnitude",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "formulaMod",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "durationIsWorldtimeDays",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "showNoDescription",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "hideAllEffects",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "stacksWithSelf",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canBeRemovedByNonspecificAVEffectRemoval",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "critical",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "ActorType": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "defaultSprite",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spriteDepthOffset",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "previewSprite",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "baseSpriteExtraHeight",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "baseSpriteExtraWidth",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "adjustSpriteX",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "adjustSpriteY",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "adjustStatusEffectsX",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "statusEffectAdjust",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "statusEffectAboveAdjust",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "offsetFromRollpinYLimit",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "ignoreRollpinScaling",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "alwaysDrawActor",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "lockFacingRotTo",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "noFacingRotRows",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "facingRotIsActualRot",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "include45DegStance",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "alwaysRoundFacingTo90",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "restrictedTurningInCombat",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "showAlertIcon",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "depthMod",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "randomNames",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "playerUsable",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "playerUnlockable",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "weight",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "powerLevelMod",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "powerLevelMult",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "XPMult",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "XPDecayPerKillMult",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "bodyStructure",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "multiPartCollisions",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "extendTailWhenSpawnedOnlyIfAestheticTail",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "extraBodyHurtboxes",
+          "type": "List<Vector2>",
+          "csType": "List<Vector2>"
+        },
+        {
+          "name": "extraBodyHurtboxes_protected",
+          "type": "List<bool>",
+          "csType": "List<bool>"
+        },
+        {
+          "name": "disappearOnDeath",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "disappearOnDeath_dropItems",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "unrevivable",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "rotatedCorpse",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "directionless",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "drawShadow",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "cannotStartCombat",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canUseItems",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "fearless",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canSeeStats",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canSeeStatsTravelMode",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canSeeNameTravelMode",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canSeeActEval",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canSpawnWithClass",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "randomSkinPaletteOnSpawn",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "tailPartsRespectGrid",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "dieWhenCrewless",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "bigCollisions",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "humanoid",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "tameable",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "movementType",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "movementSpeed",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "light",
+          "type": "Light",
+          "csType": "Light"
+        },
+        {
+          "name": "constantAvEffects",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "ruinAvEffects",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "idleAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "walkAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "jumpAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "climbAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "painAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dodgeAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "blockAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "chargeAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "castAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spellcastAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "swingAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "sleepAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "stunAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "frozenAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "drownAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "criticalAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "deadAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "specialAnim_prefix",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "fxSpeech",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "fxOnPhysicalHPDmg",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "fxOnOtherHPDmg",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "fxOnDeath",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "spawnFX_frame4",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "spawnFX_frame100",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "unarmedAction",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "unarmedPower",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "innateActions",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "skinPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "clothPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "armorPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "defaultFaction",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "defaultCombatTeam",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "defaultHostile",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "aggressiveness",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "bravery",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "honor",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "intelligence",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "defaultAI",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "canBeMounted",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "mountedForceAnim",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "mountedAdjustYMod",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "mountedAdjustDepthMod",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "mountedAdjustDepthMod_fRot90",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "mountedAdjustDepthMod_fRot_0_180",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "distBetweenTailParts",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "nonRotatingTailPartsUseFacingRotFlip",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "journalID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "inventorySize",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "defaultValues",
+          "type": "Dictionary<string, float>",
+          "csType": "Dictionary<string, float>"
+        },
+        {
+          "name": "valuesDictOverrides",
+          "type": "Dictionary<string, string>",
+          "csType": "Dictionary<string, string>"
+        },
+        {
+          "name": "defaultBodyPartSprites",
+          "type": "Dictionary<string, string>",
+          "csType": "Dictionary<string, string>"
+        },
+        {
+          "name": "bodyPartSprites",
+          "type": "Dictionary<string, List<string>>",
+          "csType": "Dictionary<string, List<string>>"
+        },
+        {
+          "name": "skinPalettes",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "defaultSupportAbilities",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "ruinModeSupportAbility",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "partSpritesThatTakePriorityOverClass",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "detectionAoE",
+          "type": "AreaOfEffect",
+          "csType": "AreaOfEffect"
+        },
+        {
+          "name": "reactions",
+          "type": "List<ElementReaction>",
+          "csType": "List<ElementReaction>"
+        },
+        {
+          "name": "defaultDialogNode",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_speechFont",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryCombat_overconfident_fight",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryCombat_overconfident_peace",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryCombat_confident_fight",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryCombat_confident_peace",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryCombat_uneasy_fight",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryCombat_uneasy_flee",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryCombat_scared_flee",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryPeace_overconfident_fight",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryPeace_overconfident_peace",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryPeace_confident_fight",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryPeace_confident_peace",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryPeace_uneasy_fight",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryPeace_uneasy_peace",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryPeace_scared_peace",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryPeace_scared_flee",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryBribe_overconfident_fight",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryBribe_overconfident_peace",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryBribe_overconfident_bribe",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryBribe_confident_peace",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryBribe_confident_bribe",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryBribe_uneasy_bribe",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialog_tryBribe_scared_bribe",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryCombat_overconfident_fight",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryCombat_overconfident_peace",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryCombat_confident_fight",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryCombat_confident_peace",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryCombat_uneasy_fight",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryCombat_uneasy_flee",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryCombat_scared_flee",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryPeace_overconfident_fight",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryPeace_overconfident_peace",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryPeace_confident_fight",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryPeace_confident_peace",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryPeace_uneasy_fight",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryPeace_uneasy_peace",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryPeace_scared_peace",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryPeace_scared_flee",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryBribe_overconfident_fight",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryBribe_overconfident_peace",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryBribe_overconfident_bribe",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryBribe_confident_peace",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryBribe_confident_bribe",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryBribe_uneasy_bribe",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "anim_tryBribe_scared_bribe",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "iAmABoat",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "minimumCrew",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "value",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "shipTileWidth",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "shipOffsetYMainMenu",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "boardingAnimationShake",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "AreaOfEffect": {
+      "category": "nested",
+      "fields": [
+        {
+          "name": "shape",
+          "type": "AoEShapeType",
+          "csType": "AoEShapeType"
+        },
+        {
+          "name": "minRange",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "maxRange",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "maxRangeBonus",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "needsLoS",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "needsLoE",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "faction",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "canBypassElementRestriction",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "restrictedToTerrainElement",
+          "type": "Element",
+          "csType": "Element"
+        },
+        {
+          "name": "horizMax",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "maxTurningRadius",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "turnPerMove",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "aoeCasterAsOrigin",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "airborne",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "arc",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canSwim",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "swimOnly",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canFloatMidair",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "darkOnly",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canSelectActors",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canSelectAllies",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canSelectEnemies",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "blockedByAllies",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "blockedByEnemies",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canSelectStackedActors",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "teleporting",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "bypassAll",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "occupyAll",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "ignoreMovementCost",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "ignoreWind",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "maxMoveCostOccupiable",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "furthestPossibleOnly",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "maxRangeAddDistanceFromCaster",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "ignoreCannotTarget",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "forcedRot",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "coneAngle",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "coneAngle_exclude1",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "coneAngle_exclude1_offset",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "coneAngle_exclude2",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "coneAngle_exclude2_offset",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "fReq",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "ItemType": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "itemCategory",
+          "type": "ItemCategory",
+          "csType": "ItemCategory"
+        },
+        {
+          "name": "special",
+          "type": "HashSet<specialProperty>",
+          "csType": "HashSet<specialProperty>"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "texture",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "textureIDnum",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "sprite",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "spriteWhenHeld",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "IDnum",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "combineID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "power",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "timer",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "depthMod",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "action",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "pR",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "pG",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "pB",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "effects",
+          "type": "List<ActorValueEffect>",
+          "csType": "List<ActorValueEffect>"
+        },
+        {
+          "name": "effects_inWeapon",
+          "type": "List<ActorValueEffect>",
+          "csType": "List<ActorValueEffect>"
+        },
+        {
+          "name": "effects_inArmor",
+          "type": "List<ActorValueEffect>",
+          "csType": "List<ActorValueEffect>"
+        },
+        {
+          "name": "spawnFX",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spawnFXColor",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "drawSprite",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "element",
+          "type": "Element",
+          "csType": "Element"
+        },
+        {
+          "name": "weight",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "volume",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "value",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "throwDamageMod",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "stackable",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "blockLoE",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "blockLoS",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "blockWalking",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "blockJumping",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "light",
+          "type": "List<Light>",
+          "csType": "List<Light>"
+        },
+        {
+          "name": "combineWith",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "toMake",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "consumeOnCombine",
+          "type": "List<bool>",
+          "csType": "List<bool>"
+        },
+        {
+          "name": "requiredForCombining",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "combineSound",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "cantFitInTileWith",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "journalID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "reactions",
+          "type": "List<ElementReaction>",
+          "csType": "List<ElementReaction>"
+        },
+        {
+          "name": "reactions_inWeapon",
+          "type": "List<ElementReaction>",
+          "csType": "List<ElementReaction>"
+        },
+        {
+          "name": "reactions_inArmor",
+          "type": "List<ElementReaction>",
+          "csType": "List<ElementReaction>"
+        },
+        {
+          "name": "invisible",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "ignoreDarkness",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "spriteScaleMult",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "alpha",
+          "type": "byte",
+          "csType": "byte"
+        },
+        {
+          "name": "inheritTerrainPaletteR",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "inheritTerrainPaletteG",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "inheritTerrainPaletteB",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "roof",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "roofFaded",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "invisibleUnderRoofs",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "fullTileRoof",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "itemsOnSameTileAreRaised",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "actorsOnSameTileAreRaised",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "raiseItemsDepth",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "raiseTileDepth",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "raiseItemsDepthMax",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "ignoreBeingRaised",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "ignoreHeight",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "shopTile",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "defaultQuantity",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "defaultQuantity_rand",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "Animation": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "bodyPartKeyframes",
+          "type": "Dictionary<string, List<Keyframe>>",
+          "csType": "Dictionary<string, List<Keyframe>>"
+        },
+        {
+          "name": "keyframes",
+          "type": "List<Keyframe>",
+          "csType": "List<Keyframe>"
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "speedMod_rand",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "applyFrameToAllParts",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "flicker",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "drawShadow",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "durationUntilAttackKeyframe",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "durationUntilAfterAttackKeyframe",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "attackKeyframe",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "flipArms",
+          "type": "boolean",
+          "csType": "boolean",
+          "virtual": true,
+          "source": "DataManager"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "Keyframe": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "frame",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "offset",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "directionalOffset",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "targetOffsetMult",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "jostleMult",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "facingRotOffset",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "facingRotOverride",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "rotOffset",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "endTime",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "canStopHere",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "depthMod",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "fx",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "flip",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "retractIntoTail",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "retractTail",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "sheatheWeapon",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFromIndex",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true,
+          "source": "DataManager"
+        },
+        {
+          "name": "bodyPart",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager"
+        },
+        {
+          "name": "replaceIndex",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true,
+          "source": "DataManager"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "Item": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "IDnum",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "quantity",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "movement",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "offset",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "rot",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "buried",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "broken",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "specialInfoTC",
+          "type": "TileCoord",
+          "csType": "TileCoord"
+        },
+        {
+          "name": "container",
+          "type": "Container",
+          "csType": "Container"
+        },
+        {
+          "name": "cantReactAgainTimer",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "highlight",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "index_temp",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "q",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true
+        },
+        {
+          "name": "r",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "oX",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "oY",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "bu",
+          "type": "boolean",
+          "csType": "boolean",
+          "virtual": true
+        },
+        {
+          "name": "br",
+          "type": "boolean",
+          "csType": "boolean",
+          "virtual": true
+        },
+        {
+          "name": "timer",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "specialX",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true
+        },
+        {
+          "name": "specialY",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "containerID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager"
+        },
+        {
+          "name": "containedIn",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager"
+        },
+        {
+          "name": "cSlot",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true,
+          "source": "DataManager"
+        },
+        {
+          "name": "x",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true,
+          "source": "DataManager"
+        },
+        {
+          "name": "y",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true,
+          "source": "DataManager"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "JournalEntry": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "category",
+          "type": "JournalCategory",
+          "csType": "JournalCategory"
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "text",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "halfPage",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "rarity",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "rewardMod",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "DialogNode": {
+      "category": "instance",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "nextNodeID",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "nextNodeID_fReq",
+          "type": "List<Formula>",
+          "csType": "List<Formula>"
+        },
+        {
+          "name": "speakerOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "portraitIcon",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "portraitIconFrames",
+          "type": "List<integer>",
+          "csType": "List<int>"
+        },
+        {
+          "name": "dialogFX",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "statements",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "animations",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "dialogOptions",
+          "type": "List<DialogOption>",
+          "csType": "List<DialogOption>"
+        },
+        {
+          "name": "specialEffect",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "DialogOption": {
+      "category": "nested",
+      "fields": [
+        {
+          "name": "text",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "tooltip",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "animation",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "color",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "formulaReq",
+          "type": "List<Formula>",
+          "csType": "List<Formula>"
+        },
+        {
+          "name": "nodeToConnectTo",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "glyph",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "includeSymbol",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "newLineOfOptions",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "bottomOption",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "escOption",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "specialEffect",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "specialNumValue",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "DialogNodeOverride": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialogNodeID_toOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "fReq",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "priority",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "completeOverride",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "overrideSpecialEffects",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "specialEffect",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "Actor": {
+      "category": "instance",
+      "fields": [
+        {
+          "name": "statusEffectAnimFrames",
+          "type": "const int",
+          "csType": "const int"
+        },
+        {
+          "name": "statusEffectSlowAnimFrames",
+          "type": "const int",
+          "csType": "const int"
+        },
+        {
+          "name": "showHPTimer",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "sprite",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "skinPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "clothPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "armorPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "unarmoredPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "controllable",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "useAIevenWhenControllable",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "incapacitated",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canAttractAttention",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "playerCanOpenInv",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "fearless",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "unkillable",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canManipCorpse",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canApplyDifficultyMods",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "male",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "givesXP",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canDespawn",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "alreadyKOdOnce",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "alreadyLostMaxHPThisCombat",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canEditAppearance",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canLootCorpse",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canControlFullyIfControllable",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "actualRot",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "favoredHand",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "dialogNodeID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "statementPrefix",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "movementType",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "movementSpeed",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "faction",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "factionBoss",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "combatTeam",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "combatMusicOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "idleAnimOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "animator",
+          "type": "Animator",
+          "csType": "Animator"
+        },
+        {
+          "name": "dontInterruptAnimationWithAnimateIdle_timer",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "ai_lua",
+          "type": "LuaRunner",
+          "csType": "LuaRunner"
+        },
+        {
+          "name": "aiVarX",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "aiVarY",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "aiVarX2",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "aiVarY2",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "turnsSpentUnableToMove",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "_aiTarget",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "aggressiveness",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "bravery",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "honor",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "intelligence",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "aiRating_bonusToNotMoving",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "aiRating_priorityMult",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "ai_extraTime",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "actorTypeID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "actorClass",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "secondaryClass",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "actorClass3",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "actorClass4",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "position",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "offset",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "movementInputs",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "movement",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "pform_veloc",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "destination",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "state",
+          "type": "ActorState",
+          "csType": "ActorState"
+        },
+        {
+          "name": "movementAoE",
+          "type": "AreaOfEffect",
+          "csType": "AreaOfEffect"
+        },
+        {
+          "name": "inventory",
+          "type": "Container",
+          "csType": "Container"
+        },
+        {
+          "name": "gateItems",
+          "type": "Container",
+          "csType": "Container"
+        },
+        {
+          "name": "numRanksBought",
+          "type": "Dictionary<string, float>",
+          "csType": "Dictionary<string, float>"
+        },
+        {
+          "name": "chosenAbilityOfEachClass",
+          "type": "Dictionary<string, string>",
+          "csType": "Dictionary<string, string>"
+        },
+        {
+          "name": "activeEffects",
+          "type": "List<ActorValueEffect>",
+          "csType": "List<ActorValueEffect>"
+        },
+        {
+          "name": "damageTaken",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "timesKOd",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "totalXP",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "lastHPDamageTaken",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "lastHPDamageTaken_timer",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "lastHPDamageTaken_turnNumber",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "mountedOn",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "mountedBy",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "crew",
+          "type": "List<Actor>",
+          "csType": "List<Actor>"
+        },
+        {
+          "name": "bodyParts",
+          "type": "Dictionary<string, BodyPart>",
+          "csType": "Dictionary<string, BodyPart>"
+        },
+        {
+          "name": "partSpritesThatTakePriorityOverClass",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "keepWeaponsUnsheathedTimer",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "keepWeaponsSheathedTimer",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "supportAbilities",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "difficultyModeSupportAbilAdded",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "actions_timesUsed",
+          "type": "Dictionary<string, float>",
+          "csType": "Dictionary<string, float>"
+        },
+        {
+          "name": "invisibleTimer",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "combatLabel",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "combatLabel_color",
+          "type": "Color",
+          "csType": "Color"
+        },
+        {
+          "name": "_skinPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "_clothPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "_armorPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "hostile",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "facingRot",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "aiTarget",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "positionTC",
+          "type": "TileCoord",
+          "csType": "TileCoord"
+        },
+        {
+          "name": "destinationTC",
+          "type": "TileCoord",
+          "csType": "TileCoord"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "ActorState": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "canSwap",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "busyTimer",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "path",
+          "type": "List<TileCoord>",
+          "csType": "List<TileCoord>"
+        },
+        {
+          "name": "facingRotAfterFinishedMoving",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "childActors",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "nextAction",
+          "type": "ActionExecution",
+          "csType": "ActionExecution"
+        },
+        {
+          "name": "queuedAiActions",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "Fleet": {
+      "category": "instance",
+      "fields": [
+        {
+          "name": "boats",
+          "type": "List<Actor>",
+          "csType": "List<Actor>"
+        },
+        {
+          "name": "controllable",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "useStandardFleetAI",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "faction",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "goingToWaypoint",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "goal",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "cargo",
+          "type": "Container",
+          "csType": "Container"
+        },
+        {
+          "name": "commodoreID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "merchant",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "elite",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "turnsSpentStuck",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "Container": {
+      "category": "nested",
+      "fields": [
+        {
+          "name": "maxWeight",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "maxVolume",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "infiniteStock",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "shopContainer",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "buyContainer",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "style",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "bgColor",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "canOnlyContainItemsWithThisProperty",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "capacity",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true
+        },
+        {
+          "name": "itemN",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "pattern": true
+        },
+        {
+          "name": "qN",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "pattern": true
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "Location": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "xy",
+          "type": "TileCoord",
+          "csType": "TileCoord"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneThisLocationIsIn",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneDescTitle",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "locationItem",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "externalSong",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "tooltipIcons",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "tags",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "enterable",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "port",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "discovered",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "discoverable",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "discoveryFameMod",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "discoverable_fReq",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "showNameAsAPopupOnEntering",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "namePopup_texture",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "minimapIcon",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "minimapIcon_override",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "useWorldtimeZoneDarkness",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "adjustDarknessR",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "adjustDarknessG",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "adjustDarknessB",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "wealthLevel",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "marketRate",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "marketRate_newDay_change",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "cargo",
+          "type": "Container",
+          "csType": "Container"
+        },
+        {
+          "name": "stash",
+          "type": "Container",
+          "csType": "Container"
+        },
+        {
+          "name": "tradeGood_itemTypeID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "cafeFood_itemTypeID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "itemType_quantity",
+          "type": "Dictionary<string, float>",
+          "csType": "Dictionary<string, float>"
+        },
+        {
+          "name": "itemType_quantity_unlockable",
+          "type": "Dictionary<string, List<float>>",
+          "csType": "Dictionary<string, List<float>>"
+        },
+        {
+          "name": "itemType_formula_unlockable",
+          "type": "Dictionary<string, List<string>>",
+          "csType": "Dictionary<string, List<string>>"
+        },
+        {
+          "name": "auto_spawnDataID",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "shipwright_boatTypes",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "faction_favor",
+          "type": "Dictionary<string, float>",
+          "csType": "Dictionary<string, float>"
+        },
+        {
+          "name": "questTypes",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "questGoals",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "questRewards",
+          "type": "List<integer>",
+          "csType": "List<int>"
+        },
+        {
+          "name": "dialogNodeID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "x",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true
+        },
+        {
+          "name": "y",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "GameState": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "known",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "saveName",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "currentZoneName",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "playerActorID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "gameTime",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "worldTime",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "worldTime_daytimer",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "worldTime_days",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "worldTime_sinceZoneChange",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "windRot",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "currentWeather",
+          "type": "WeatherType",
+          "csType": "WeatherType"
+        },
+        {
+          "name": "crewMorale",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "mainPlayerActorID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "partyActors",
+          "type": "List<Actor>",
+          "csType": "List<Actor>"
+        },
+        {
+          "name": "partyActors_missing",
+          "type": "List<Actor>",
+          "csType": "List<Actor>"
+        },
+        {
+          "name": "partyActors_barracks",
+          "type": "List<Actor>",
+          "csType": "List<Actor>"
+        },
+        {
+          "name": "partyActors_overboard",
+          "type": "List<Actor>",
+          "csType": "List<Actor>"
+        },
+        {
+          "name": "partyActors_corpse",
+          "type": "List<Actor>",
+          "csType": "List<Actor>"
+        },
+        {
+          "name": "partyActors_dead",
+          "type": "List<Actor>",
+          "csType": "List<Actor>"
+        },
+        {
+          "name": "reservedActorIDs",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "landingParty",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "knownClasses",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "knownJournalEntries",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "journalEntries_sold",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "journalNote",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "locations",
+          "type": "Dictionary<string, Dictionary<string, Location>>",
+          "csType": "Dictionary<string, Dictionary<string, Location>>"
+        },
+        {
+          "name": "actionsOfPartyActors",
+          "type": "Dictionary<string, List<string>>",
+          "csType": "Dictionary<string, List<string>>"
+        },
+        {
+          "name": "partyActorsClassBookmarks",
+          "type": "Dictionary<string, List<string>>",
+          "csType": "Dictionary<string, List<string>>"
+        },
+        {
+          "name": "globalVars",
+          "type": "Dictionary<string, string>",
+          "csType": "Dictionary<string, string>"
+        },
+        {
+          "name": "globalVars_worldTimeAssigned",
+          "type": "Dictionary<string, float>",
+          "csType": "Dictionary<string, float>"
+        },
+        {
+          "name": "triggersFlaggedAsDone",
+          "type": "Dictionary<string, List<int>>",
+          "csType": "Dictionary<string, List<int>>"
+        },
+        {
+          "name": "zonesVisited_lastWorldTime",
+          "type": "Dictionary<string, float>",
+          "csType": "Dictionary<string, float>"
+        },
+        {
+          "name": "killsOfActorType",
+          "type": "Dictionary<string, float>",
+          "csType": "Dictionary<string, float>"
+        },
+        {
+          "name": "recentlyUsedRandomNames",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "ticsUntilHelpGemIsUsable",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "helpGemEnabled",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "helpGemUnlocked",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "hiddenUI",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "stashInventory",
+          "type": "Container",
+          "csType": "Container"
+        },
+        {
+          "name": "cargoInventory",
+          "type": "Container",
+          "csType": "Container"
+        },
+        {
+          "name": "money",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "AIPlan_ratingThresholdMod",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "AIMaxTimePerTurnMod",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "playerXPMultiplier",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "enemyStatsMultiplier",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "playerBonusMove",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "enemySpawnPowerMod",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "travelDifficulty",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true
+        },
+        {
+          "name": "canSaveOutsidePort",
+          "type": "boolean",
+          "csType": "boolean",
+          "virtual": true
+        },
+        {
+          "name": "timedHitsMode",
+          "type": "boolean",
+          "csType": "boolean",
+          "virtual": true
+        },
+        {
+          "name": "stashListMode",
+          "type": "boolean",
+          "csType": "boolean",
+          "virtual": true
+        },
+        {
+          "name": "cargoListMode",
+          "type": "boolean",
+          "csType": "boolean",
+          "virtual": true
+        },
+        {
+          "name": "openStashCargoPosX",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "openStashCargoPosY",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "openPlayerInventoryPosX",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "openPlayerInventoryPosY",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "openCrewInventoryPosX",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "openCrewInventoryPosY",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true
+        },
+        {
+          "name": "noteN",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "pattern": true
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "ModInfo": {
+      "category": "nested",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "nameWithoutSpecialChars",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "workshopMod",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "Trigger": {
+      "category": "nested",
+      "fields": [
+        {
+          "name": "numID",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "aliasID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "topLeft",
+          "type": "List<TileCoord>",
+          "csType": "List<TileCoord>"
+        },
+        {
+          "name": "btmRight",
+          "type": "List<TileCoord>",
+          "csType": "List<TileCoord>"
+        },
+        {
+          "name": "triggerEffects",
+          "type": "List<TriggerEffect>",
+          "csType": "List<TriggerEffect>"
+        },
+        {
+          "name": "triggerOnPlayerActorOnly",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "onlyExecuteOnce",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "travelModeOnly",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "triggerImmediatelyOnEnteringZone",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "triggeredByElement",
+          "type": "List<Element>",
+          "csType": "List<Element>"
+        },
+        {
+          "name": "triggerForEveryStepInArea",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "disableOnZoneEntry",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "reqFormula",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "fReq",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "TriggerEffect": {
+      "category": "nested",
+      "fields": [
+        {
+          "name": "sValue",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "sValue2",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "fValue",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "xValue",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "yValue",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "bValue1",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "bValue2",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "delay",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "fReq",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "taskString",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "XYRefersToThisZone",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "effectID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "sValue1",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "numID",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true,
+          "source": "DataManager"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "ActorClass": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "icon",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "selectableClass",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "actorValueXP",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "journalID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "paletteActionR",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "paletteActionG",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "paletteActionB",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "paletteUI",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "actions",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "relevantStats",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "avEffects",
+          "type": "List<ActorValueEffect>",
+          "csType": "List<ActorValueEffect>"
+        },
+        {
+          "name": "supportAbilities",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "ruinModeSupportAbility",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "bodyPartSprites",
+          "type": "Dictionary<string, string>",
+          "csType": "Dictionary<string, string>"
+        },
+        {
+          "name": "requiredStat",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "requiredAmt",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "reactions",
+          "type": "List<ElementReaction>",
+          "csType": "List<ElementReaction>"
+        },
+        {
+          "name": "fReq",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "bodyPartN",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "pattern": true
+        },
+        {
+          "name": "bodyPartSpriteN",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "pattern": true
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "Action": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "icon",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "tooltip",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "rankUpTooltip",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "tooltipIcons",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "tooltipTopRight",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "icon_pR",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "icon_pG",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "icon_pB",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "XPCostUnlock",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "XPCostRankUp",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "XPCostRankUpIncrement",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "XPCost",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "chargeTime",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "mpCost",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "cooldown",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "primaryAvNum",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "maxRank",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "canExceedMaxRankBy",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "canHaveAbilityTablet",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "fReq",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "numTargets",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "minDistanceBetweenTargets",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "maxDistanceBetweenTargets",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "FXChangesWithWeaponHand",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "AIRatingBias",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "AIRatingBias_rand",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "AIRatingMult",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "autolearnedByAI",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "harmful",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "attractAttention",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "roundFacingTo90",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "applyWeaponBuffs",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "special",
+          "type": "List<specialProperty>",
+          "csType": "List<specialProperty>"
+        },
+        {
+          "name": "requiredWeaponElement",
+          "type": "Element",
+          "csType": "Element"
+        },
+        {
+          "name": "checkOffhandRequirement",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "aoe",
+          "type": "AreaOfEffect",
+          "csType": "AreaOfEffect"
+        },
+        {
+          "name": "avAffecters",
+          "type": "List<ActorValueAffecter>",
+          "csType": "List<ActorValueAffecter>"
+        },
+        {
+          "name": "FXOnCaster",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "FXOnTarget",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "FXOnCasterColor",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "FXOnTargetColor",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "queueAnotherAction",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "fReq_queueAnotherAction",
+          "type": "List<Formula>",
+          "csType": "List<Formula>"
+        },
+        {
+          "name": "casterAnimation",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "casterAnimationDependsOnWeaponHand",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "casterAnimationDependsOnFacingRot",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "casterAnimationSpeed",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "casterAnimationLoops",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "ActorValueAffecter": {
+      "category": "nested",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "actorValue",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "element",
+          "type": "List<Element>",
+          "csType": "List<Element>"
+        },
+        {
+          "name": "magnitude",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "duration",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "durationIsWorldtimeDays",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "chance",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "weaponAvAffecter",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "removeTheseElementsFromWeaponAvAffecter",
+          "type": "List<Element>",
+          "csType": "List<Element>"
+        },
+        {
+          "name": "showWeaponAvAffecterFX",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "addAsWeaponAvAffecter",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "useMyAoEWhenAddingAsWeaponAvAffecter",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "harmful",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "hideAllEffects",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "visibleEvaluations",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "visibleMiss",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "prefixIcon",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "forActEvalPurposesOnly",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "hideActEval",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "stacksWithSelf",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "useCasterAsOriginForDirectionalEffects",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "useSeparateChanceRoll",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "requiresPreviousAVHit",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "rotOverride",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "rankRequired",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "fReq",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "aoe",
+          "type": "AreaOfEffect",
+          "csType": "AreaOfEffect"
+        },
+        {
+          "name": "affectIntangible",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "applyElementToTile",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "affectGlobalAvAffecterInfo",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "FXOnTarget",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "FXOnTile",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "FXOnHit",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "FXOnMiss",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "FXOnTargetColor",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "FXOnTileColor",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "FXOnHitColor",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "FXOnMissColor",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "FXOnTargetTime",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "FXOnTileTime",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "FXOnHitTime",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "FXOnMissTime",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "SupportAbility": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "tooltip",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "rankUpTooltip",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "tooltipIcons",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "tooltipTopRight",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "icon",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "XPCostUnlock",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "XPCostRankUp",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "XPCostRankUpIncrement",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "XPCostRankUpMultiplier",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "maxRank",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "canBeGivenToAI",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "reactions",
+          "type": "List<ElementReaction>",
+          "csType": "List<ElementReaction>"
+        },
+        {
+          "name": "effects",
+          "type": "List<ActorValueEffect>",
+          "csType": "List<ActorValueEffect>"
+        },
+        {
+          "name": "emitFxWhileMoving",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "fxEvery4Frames",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "supportAbilsToReplace",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "supportAbilReplaceAliasID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "LevelData": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "worldSizeX",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "worldSizeY",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "chanceOfForwardPath",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "pathSize_inner",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "minZoneSizeX",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "maxZoneSizeX",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "minZoneSizeY",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "maxZoneSizeY",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "zoneData",
+          "type": "Zone",
+          "csType": "Zone"
+        },
+        {
+          "name": "triggers",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "setPieces",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "setPiecesChanceToReroll",
+          "type": "List<Formula>",
+          "csType": "List<Formula>"
+        },
+        {
+          "name": "minSetPiecesPerRoom",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "maxSetPiecesPerRoom",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "chooseCenterPiecesInOrder",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "centerPieces",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "centerPiecesChanceToReroll",
+          "type": "List<Formula>",
+          "csType": "List<Formula>"
+        },
+        {
+          "name": "centerPieceChance_normal",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "centerPieceChance_deadEnd",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "centerPieceChance_1stRoom",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "addGuaranteedSetPiecesFirst",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "guaranteedSetPieces",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "mandatorySetPieces",
+          "type": "Dictionary<string, List<string>>",
+          "csType": "Dictionary<string, List<string>>"
+        },
+        {
+          "name": "mandatoryCenterPieces",
+          "type": "Dictionary<string, List<string>>",
+          "csType": "Dictionary<string, List<string>>"
+        },
+        {
+          "name": "cannotHaveMandatorySetOrCenterPieces",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "intialExitIsAReturnPath",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "extraSetPieceTries",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "minWallThickness",
+          "type": "List<integer>",
+          "csType": "List<int>"
+        },
+        {
+          "name": "maxWallThickness",
+          "type": "List<integer>",
+          "csType": "List<int>"
+        },
+        {
+          "name": "minWallFlatStretch",
+          "type": "List<integer>",
+          "csType": "List<int>"
+        },
+        {
+          "name": "wallChanceToZig",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "wallChanceToZag",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "wallType",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "wallTypeBottom",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "defaultTile",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "wallType_exit",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "wallTypeBottom_exit",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "defaultTile_exit",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "minExitWidth",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "maxExitWidth",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "exitCurveAverageDepth",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "exitCurveVariation",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "exitExtendInwardDistMod",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "extraPureBlackBorder",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "extraPureBlackBorder_terrainTypeOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spawnItems_onWall_chance",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "spawnItems_onWall",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "spawnItems_onWall_chanceToReroll",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "spawnItems_nearWall_chance",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "spawnItems_nearWall",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "spawnItems_nearWall_chanceToReroll",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "spawnItems_nearCenter_chance",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "spawnItems_nearCenter",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "spawnItems_nearCenter_chanceToReroll",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "canSpawnItemsWithinSetPieces",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "otherLevelData",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "otherLevelData_chance",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "otherLevelData_chance_deadEnd",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "carvePath_betweenExits_terrainTypeID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "carvePath_betweenExits_straight_minLength",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "carvePath_betweenExits_turn_minLength",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "carvePath_betweenExits_width",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "carvePath_betweenExits_chanceToTurn",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "carvePath_fromExitToCenterPiece_terrainTypeID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "carvePath_fromExitToCenterPiece_straight_minLength",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "carvePath_fromExitToCenterPiece_turn_minLength",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "carvePath_fromExitToCenterPiece_width",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "carvePath_fromExitToCenterPiece_chanceToTurn",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "centeredExits",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "specialSpawns",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "borderTheseTiles",
+          "type": "Dictionary<string, string>",
+          "csType": "Dictionary<string, string>"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "SetPiece": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneName",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "canOverlapWalls",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canOverwriteWallBtms",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canOverwriteWalls",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "alwaysPlaceNoMatterWhat",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "replaceItems",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "minDistFromXWalls",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "maxDistFromXWalls",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "minDistFromYWalls",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "maxDistFromYWalls",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "onlySpawnOnIncrementsX",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "onlySpawnOnIncrementsY",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "onlyAssessMaxYDistFromTopWall",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canBeRotated",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canBeFlippedX",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canBeFlippedY",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "sizeX",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "sizeY",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "fReq",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "useLevelDataTerrainTypes",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "setXPosPercent",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "setYPosPercent",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "addSPAfterCarvingPaths",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "usableInBuildMode",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "SpawnData": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "minActors",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "maxActors",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "maxDifferentTypes",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "actorTypesMins",
+          "type": "Dictionary<string, integer>",
+          "csType": "Dictionary<string, int>"
+        },
+        {
+          "name": "actorTypesMaxes",
+          "type": "Dictionary<string, integer>",
+          "csType": "Dictionary<string, int>"
+        },
+        {
+          "name": "actorClassesMins",
+          "type": "Dictionary<string, integer>",
+          "csType": "Dictionary<string, int>"
+        },
+        {
+          "name": "actorClassesMaxes",
+          "type": "Dictionary<string, integer>",
+          "csType": "Dictionary<string, int>"
+        },
+        {
+          "name": "actorTypesChanceToReroll",
+          "type": "Dictionary<string, float>",
+          "csType": "Dictionary<string, float>"
+        },
+        {
+          "name": "actorClassesChanceToReroll",
+          "type": "Dictionary<string, float>",
+          "csType": "Dictionary<string, float>"
+        },
+        {
+          "name": "extraSpawnDataIDs",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "extraSpawnDataMins",
+          "type": "List<integer>",
+          "csType": "List<int>"
+        },
+        {
+          "name": "extraSpawnDataMaxes",
+          "type": "List<integer>",
+          "csType": "List<int>"
+        },
+        {
+          "name": "extraSpawnDataChances",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "spawnExtraSpawnDataInOrder",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "valuesDictOverrides",
+          "type": "Dictionary<string, string>",
+          "csType": "Dictionary<string, string>"
+        },
+        {
+          "name": "mandatoryItemsPerActor_actorTypeID",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "mandatoryItemsPerActor_itemID",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "optionalItemsPerActor_actorTypeID",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "optionalItemsPerActor_itemID",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "optionalItemsChanceToBeNothing",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "availableWeapons",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "availableArmors",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "forbiddenAbilities",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "forcedSupportAbilities",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "fleetCargo",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "fleetCargo_chanceToAdd",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "bonusAVs",
+          "type": "Dictionary<string, float>",
+          "csType": "Dictionary<string, float>"
+        },
+        {
+          "name": "minOptionalLootPerActor",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "maxOptionalLootPerActor",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "minGoldPerActor",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "maxGoldPerActor",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "bodyPartSpriteOverride",
+          "type": "Dictionary<string, string>",
+          "csType": "Dictionary<string, string>"
+        },
+        {
+          "name": "clothPaletteOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "skinPaletteOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "factionOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "aiOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialogOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "statementPrefixOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "dialogOverride_appendNum_max",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "musicOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "facingRotOverride",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "braveryMult",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "hostile",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canDespawn",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canManipCorpse",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "noPassives",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "random10percentHPMPBoost",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "spawnAsBarracksRecruit",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "spawnFX",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "SpecialSpawn": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "offsetsToCheck",
+          "type": "List<TileCoord>",
+          "csType": "List<TileCoord>"
+        },
+        {
+          "name": "IDsToCheckFor",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "elementToCheckFor",
+          "type": "List<Element>",
+          "csType": "List<Element>"
+        },
+        {
+          "name": "spawnID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "terrainID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "minQuantity",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "maxQuantity",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "minDistFromZoneBounds",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "minDistFromPlayer",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "quantityInfluenceMod",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "applyRot",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "percentChance",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "adjustWallTypesAccordingly",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "removeItems",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "itemMustFit",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "quickSpawnMode",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "Faction": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "name_possessive",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "name_long",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "capital_locationID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spawnInZone",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "minimumFleets_merchant",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "minimumFleets_battle",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "maximumFleets_merchant",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "maximumFleets_battle",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "spawnChance_merchant_min",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "spawnChance_merchant_max",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "spawnChance_battle_min",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "spawnChance_battle_max",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "minimapColor",
+          "type": "Color",
+          "csType": "Color"
+        },
+        {
+          "name": "rankTitles",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "rankIcons",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "commodore_actorPrefabs_merchant",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "commodore_actorPrefabs_battle",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "commodore_actorPrefabs_battle_elite",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "powerMod",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "factionWealthOverride",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "canInvest",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "humanoidManned",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "trackFavor",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "FXData": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "particleID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "numParticles",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "posOffset",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "randPos",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "posOffsetPerParticle",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "velocOffset",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "randVeloc",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "accelOffset",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "randAccel",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "targetPosOffset",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "minimumVeloc",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "minimumPosDist",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "rotOffset",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "rotVelocOffset",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "rotOffsetPerParticle",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "scaleOffset",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "scaleVelocOffset",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "scaleOffsetPerParticle",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "scaleAccelOffset",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "speedOffset",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "randRot",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "randRotVeloc",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "randScale",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "randScaleVeloc",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "alphaOffset",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "alphaVelocOffset",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "randAlphaVeloc",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "alphaAccelOffset",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "initialDelayIncreasePerParticle",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "randInitialDelay",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "initialDelayMod",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "durationMod",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "rand_durationMod",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "depthMod",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "shake",
+          "type": "Screenshake",
+          "csType": "Screenshake"
+        },
+        {
+          "name": "tint",
+          "type": "ScreenTint",
+          "csType": "ScreenTint"
+        },
+        {
+          "name": "timeSpeedModOverride",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "timeSpeedMod",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "timeSpeedModDuration",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "travelToTargetSpeed",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "removeAtDestination",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "stopAtDestination",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "flicker",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "hideLight",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "intenseVisual",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "divideSourceRectBetweenParticles",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "addRotToTextureID",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "addCasterRotation",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "roundRotToNearest",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "rotateBasedOnVelocity",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "useTerrainDepth",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "loopAroundZoneEdge",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "drawOnlyIfRoofsAreDrawn",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "percentDurationBeforeOverlapWithOtherFX",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "soundName",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "soundVolume",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "soundPitch",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "soundPitchRand",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "soundDistanceMult",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "soundDropoffDist",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "alphaZero_dropoffScreenDist",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "spawnFXatEnd",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spawnFXatEndColor",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spawnFXatEndAoEID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spawnFXatEndIfActorNear",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spawnFXatEndIfActorNearColor",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spawnFXatEndIfActorNear_distance",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "pR",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "pG",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "pB",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "flip",
+          "type": "SpriteEffects",
+          "csType": "SpriteEffects"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "Screenshake": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "magnitude",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "xShake",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "yShake",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "delay",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "ScreenTint": {
+      "category": "nested",
+      "fields": [
+        {
+          "name": "color",
+          "type": "Color",
+          "csType": "Color"
+        },
+        {
+          "name": "whiteTint",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "fadeInTime",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "fadeSpeed",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "delay",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "paletteOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "darknessColor",
+          "type": "Color",
+          "csType": "Color"
+        },
+        {
+          "name": "applyTintToUI",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "drawOrderFX": {
+      "category": "definition",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "texture",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "sourceRect",
+          "type": "Rectangle",
+          "csType": "Rectangle"
+        },
+        {
+          "name": "pR",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "pG",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "pB",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "speed",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "timePerFrame",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "positionIsScreenPosition",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "alphaZero_dropoffScreenDist",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "removeAtDestination",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "stopAtDestination",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "flickerEveryFrame",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "veloc",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "accel",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "rotVeloc",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "rotAccel",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "scaleVeloc",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "scaleAccel",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "alphaVeloc",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "alphaAccel",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "addRotToTextureID",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "rotateBasedOnVelocity",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "roundRotToNearest",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "useTerrainDepth",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "loop",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "ignoreDarkness",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "scaleLightSizeAndAlpha",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "loopAroundZoneEdge",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "drawOnlyIfRoofsAreDrawn",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "playWhileGameIsPaused",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "light",
+          "type": "Light",
+          "csType": "Light"
+        },
+        {
+          "name": "spawnFXatEnd",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spawnFXatEndColor",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spawnFXatEndAoEID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spawnFXatEndIfActorNear",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spawnFXatEndIfActorNearColor",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spawnFXatEndIfActorNear_distance",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "initialDelay",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "No such texture as N",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "pattern": true
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "ActTimer": {
+      "category": "nested",
+      "fields": [
+        {
+          "name": "timer",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "timeToAct",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "IDnum",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "recurring",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "paused",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "forTestPurposes",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "actorID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "actionToBeExecuted",
+          "type": "ActionExecution",
+          "csType": "ActionExecution"
+        },
+        {
+          "name": "itemTimed",
+          "type": "Item",
+          "csType": "Item"
+        },
+        {
+          "name": "itemTC",
+          "type": "TileCoord",
+          "csType": "TileCoord"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": false
+    }
+  },
+  "typeAliases": {
+    "TerrainLight": "Light",
+    "TerrainReaction": "ElementReaction",
+    "ActorValueReaction": "ElementReaction",
+    "ActorTypeAoE": "AreaOfEffect",
+    "ActorTypeAOE": "AreaOfEffect",
+    "ActorTypeDetectAoE": "AreaOfEffect",
+    "ActorTypeDetectAOE": "AreaOfEffect",
+    "ActorTypeReaction": "ElementReaction",
+    "AvEffect": "ActorValueEffect",
+    "ActorTypeLight": "Light",
+    "ItemEffect": "ActorValueEffect",
+    "ItemEffectInWeapon": "ActorValueEffect",
+    "ItemEffectInArmor": "ActorValueEffect",
+    "ItemLight": "Light",
+    "ItemReaction": "ElementReaction",
+    "ItemReactionInWeapon": "ElementReaction",
+    "ItemReactionInArmor": "ElementReaction",
+    "ActorItem": "Item",
+    "ActorGateItem": "Item",
+    "ActorClone": "Actor",
+    "ActorCrew": "Actor",
+    "FleetBoat": "Actor",
+    "FleetCargo": "Container",
+    "FleetCargoItem": "Item",
+    "StashItem": "Item",
+    "CargoItem": "Item",
+    "LocationContainer": "Container",
+    "LocationItem": "Item",
+    "GlobalTrigger": "Trigger",
+    "GlobalTriggerEffect": "TriggerEffect",
+    "PlayerActor": "Actor",
+    "PlayerActorMissing": "Actor",
+    "PlayerActorBarracks": "Actor",
+    "PlayerActorDead": "Actor",
+    "PlayerActorCorpse": "Actor",
+    "ActorPrefab": "Actor",
+    "ActorSavePrefab": "Actor",
+    "ActorAOE": "AreaOfEffect",
+    "ActorAoE": "AreaOfEffect",
+    "GlobalAoE": "AreaOfEffect",
+    "GlobalAOE": "AreaOfEffect",
+    "ActorInventory": "Container",
+    "ActorContainer": "Container",
+    "ActorGateInventory": "Container",
+    "ActorGateContainer": "Container",
+    "ActorEffect": "ActorValueEffect",
+    "ActorClassReaction": "ElementReaction",
+    "ActorClassEffect": "ActorValueEffect",
+    "ActionAoE": "AreaOfEffect",
+    "ActionAOE": "AreaOfEffect",
+    "AvAffecter": "ActorValueAffecter",
+    "AvAffecterAoE": "AreaOfEffect",
+    "AvAffecterAOE": "AreaOfEffect",
+    "SupportAbilityReaction": "ElementReaction",
+    "SupportAbilityEffect": "ActorValueEffect",
+    "Screentint": "ScreenTint",
+    "drawOrderFXLight": "Light",
+    "actTimer": "ActTimer"
+  },
+  "enums": {
+    "ShadowType": [
+      "Solid",
+      "Illuminated",
+      "Occluded"
+    ],
+    "TaskType": [
+      "none",
+      "clear",
+      "debug_drawStrings",
+      "action",
+      "actionOnPartyNumActor",
+      "applyElement",
+      "applyElementToArea",
+      "applyElementToZone",
+      "setTileTerrain",
+      "script",
+      "consolecommand",
+      "togglePause",
+      "preventInteraction",
+      "delayActions",
+      "cutsceneMode",
+      "timeSpeed",
+      "setFactionHostile",
+      "setFactionAI",
+      "killFaction",
+      "removeFaction",
+      "changeFaction",
+      "moveToNewZone",
+      "travel",
+      "travel_point",
+      "travel_point_g",
+      "travel_leaveLocation",
+      "travel_gVars",
+      "travel_noSave",
+      "travel_procedural",
+      "travel_procedural_point",
+      "travel_setReturnPath",
+      "returnPath",
+      "travel_g",
+      "setGlobalVar",
+      "setGlobalVar_math",
+      "setGlobalVar_toOtherGlobalVar",
+      "setGlobalVar_toPartyActorID",
+      "setGlobalVar_toActorID",
+      "setGlobalVarToZoneProperty",
+      "setGlobalVarWithCommas",
+      "clearGlobalVar",
+      "enableUI",
+      "disableUI",
+      "unlockHelpGem",
+      "enableHelpGem",
+      "disableHelpGem",
+      "save",
+      "quietsave",
+      "heal",
+      "healparty",
+      "healfaction",
+      "fullrestore",
+      "revive",
+      "fx",
+      "sfx",
+      "fxOnTalker",
+      "fxOnParty",
+      "damageNumber",
+      "damageNumber_worldTime",
+      "animate",
+      "textOverlay",
+      "textOverlay_tween",
+      "textOverlay_dynamic",
+      "pointCameraAt",
+      "lockCameraAt",
+      "scaleCameraTo",
+      "setRoofDrawNoMatterWhat",
+      "cancelIfEnemiesPresent",
+      "cancelIfEnemiesNotPresent",
+      "cancelIfItemPresent",
+      "cancelIfItemNotPresent",
+      "cancelIf",
+      "facingRot",
+      "facingRotParty",
+      "song",
+      "playSong",
+      "playNearestLocationSong",
+      "setZoneSongs",
+      "removeItem",
+      "removeActorItem",
+      "removeItemsNearPlayerActor",
+      "removeItemOfValue",
+      "removeEmptyItem",
+      "removeAllItems",
+      "removeAllItemsOfValue",
+      "removeHeldItems",
+      "addItem",
+      "addItemToContainer",
+      "spawnItem",
+      "moveItems",
+      "moveItemsToActor",
+      "replaceEquipment",
+      "dropItem",
+      "buryAllItemsOfType",
+      "buryGlobalVarItems",
+      "buryLocations",
+      "reactOnMatchingItems",
+      "specialKeyStatusUpdate",
+      "removeActor",
+      "removeActorType",
+      "removeActors_despawnable",
+      "setActorFloat",
+      "setActorBool",
+      "setActorAI",
+      "setActorName",
+      "setActorIdleAnimOverride",
+      "setActorDialogNodeID",
+      "setActorAIActions",
+      "setActorPalettes",
+      "setFaceSprite",
+      "setCurrentActor_partSpritesThatTakePriorityOverClass",
+      "giveActorsBaseXP",
+      "moveActor",
+      "moveActor_point",
+      "movePartyTo",
+      "movePartyTo_point",
+      "movePartyBy",
+      "moveAllActorsBy",
+      "addToParty",
+      "addTalkerToParty",
+      "addTalkerToParty_temp",
+      "removeFromParty",
+      "handleTiredStates",
+      "hideParty",
+      "path",
+      "pathParty",
+      "destination",
+      "movement",
+      "addZoneFX",
+      "createZoneSpecialFX",
+      "removeZoneFX",
+      "setZonePalettes",
+      "setZonePeaceful",
+      "disableFog",
+      "setZoneRollingPinStyle",
+      "screenDarkWaveEffect",
+      "changeZoneDarkColor",
+      "setZoneDarkColor",
+      "setZoneDarkness",
+      "setZoneDarknessToWorldDarkness",
+      "screenWaveEffect",
+      "setZoneBG",
+      "setZoneBGFX",
+      "initWaypoints",
+      "safe",
+      "sendAISignal",
+      "disableTrigger",
+      "resetTrigger",
+      "enableTrigger",
+      "trigger",
+      "addTrigger",
+      "removeTrigger",
+      "specialSpawn",
+      "spawn",
+      "spawn_g",
+      "spawn_g_nearPlayer",
+      "spawn_actorPrefab",
+      "spawn_actorPrefab_point",
+      "spawn_actorPrefab_point_specialZone",
+      "spawn_location",
+      "spawn_onItem",
+      "spawn_seamonster",
+      "spawn_sm",
+      "spawn_fleet",
+      "spawn_corpse",
+      "talk",
+      "tryDialog",
+      "tryDialog_commodore",
+      "exitDialog",
+      "attractAttention",
+      "attractAttentionToPlayer",
+      "executeDialogEffect",
+      "loadSpecialZone",
+      "loadSpecialZone_precision",
+      "loadSpecialZone_playerFlagship",
+      "loadSpecialZone_playerFlagship_precision",
+      "moveSpecialZone",
+      "moveSpecialZone_precision",
+      "scaleSpecialZone",
+      "mergeSpecialZone",
+      "barracksLineup",
+      "unlockExtras",
+      "trySetAchievement",
+      "resetLocations",
+      "refreshUndamagedShipZones",
+      "boardActor",
+      "endBoarding",
+      "enterFleetBattle",
+      "setDialogSpeed",
+      "setMoney",
+      "enterCombat",
+      "enterCombat_timer",
+      "exitCombat",
+      "offerRest",
+      "advanceTimers",
+      "scoreScreen",
+      "setupGraveyard",
+      "endGame",
+      "handleDeaths",
+      "getResponse_combat",
+      "getResponse_peace",
+      "getResponse_bribe",
+      "getBribeAmount",
+      "subtractBribeAmount",
+      "stealloc",
+      "add50gp",
+      "addgp",
+      "subtractgp",
+      "subtract10gp",
+      "subtract20gp",
+      "subtract30gp",
+      "subtract40gp",
+      "subtract50gp",
+      "subtract60gp",
+      "subtract75gp",
+      "subtract100gp",
+      "subtract130gp",
+      "subtract150gp",
+      "subtract200gp",
+      "subtract250gp",
+      "subtract300gp",
+      "subtract350gp",
+      "subtract400gp",
+      "subtract500gp",
+      "subtract800gp",
+      "subtract1000gp",
+      "subtract5000gp",
+      "subtract10000gp",
+      "subtractAllgp",
+      "dominateworld",
+      "giveGlobalVarGP",
+      "enterSellMode",
+      "openCargo",
+      "autobuy_food",
+      "enterSellMode_cargo",
+      "enterSellMode_stash",
+      "enterBuyMode",
+      "enterBuyMode_location",
+      "enterBuyMode_locationItems",
+      "enterBuyMode_fleet",
+      "setBuyPriceMult",
+      "buyItem_confirmWindow",
+      "buyGoods_confirmWindow",
+      "buyFood_fillCargo",
+      "buyFood",
+      "buyGoods",
+      "giveFood",
+      "lose10Food",
+      "removeCargo",
+      "removeCargo_g",
+      "removeItem_g",
+      "removeItemFromParty",
+      "refreshStatMods",
+      "grantXPShare_5percent",
+      "hostile",
+      "playerInitiateCombat",
+      "enemyInitiateCombat",
+      "enterFleetBattle_player",
+      "giveQuestItemReward",
+      "reassignQuestItem",
+      "gotoNodeIf",
+      "gotoIf",
+      "gotoNodeDelay",
+      "delayDialog",
+      "incOnNewDay",
+      "incDefaultNode",
+      "setMyNode",
+      "setDefaultNode",
+      "setAsDialogNode",
+      "setAsMyNode",
+      "setMyNodeIf",
+      "setDefaultNodeIf",
+      "clearDialogNode",
+      "flee",
+      "enemyFlee",
+      "playerFlee",
+      "enemyMoraleUp",
+      "enemyMoraleDown",
+      "playerMoraleUp",
+      "crewMorale",
+      "peace",
+      "peaceXPrewardOnly",
+      "moveCamXY",
+      "moveXY",
+      "moveX1",
+      "moveY1",
+      "moveXNeg1",
+      "moveYNeg1",
+      "playerFacingRot",
+      "playerAnim",
+      "facingRot90",
+      "facingRot180",
+      "facingRot0",
+      "facingRot270",
+      "facingRotPrev",
+      "setPrevFacingRot",
+      "lookAtTalker",
+      "lookAtPlayer",
+      "setAI_idle",
+      "setAI_idle_flag",
+      "die",
+      "crash",
+      "escapeGate",
+      "removeTalker",
+      "setDialogWindowSizeY",
+      "setNPCDialogWindowSizeY",
+      "setOnlyNPCDialogWindowSizeY",
+      "setDialogWindowSizeYAuto",
+      "setPCDialogWindowSizeY",
+      "resetPCDialogWindowSizeY",
+      "showCharstats",
+      "showQuickslots",
+      "hideQuickslots",
+      "setCombatUIVisible",
+      "showEscFactionWindow",
+      "hideEscWindows",
+      "unlockGem",
+      "modGlobalVar",
+      "modNodeIDGlobalVar_1",
+      "modNodeIDGlobalVar_999",
+      "setNodeIDGlobalVar_1",
+      "appendToGlobalVar",
+      "appendToGlobalVar_math",
+      "appendToGlobalVar_string",
+      "appendToGlobalVar_zoneID",
+      "appendToGlobalVar_locID",
+      "setGlobalVarTo0",
+      "setGlobalVarToTalkerID",
+      "setGlobalVarWithTalkerID",
+      "setGlobalVarToLocID",
+      "setGlobalVarToPartyActorNum",
+      "setGlobalVarPlusLocID",
+      "setGlobalVarPlusLocID_math",
+      "setGlobalVarPlusZoneID",
+      "modFame",
+      "goToNodeID_plus_GlobalVar",
+      "scoreScreenResponse",
+      "research_report",
+      "cartographer_report",
+      "donate",
+      "jobDialogOptions",
+      "refreshLocQuests",
+      "cancelQuest",
+      "cancelRoyalQuest",
+      "cleanUpQuest",
+      "royalJobDialogOptions",
+      "refreshRoyalQuests",
+      "refreshRoyalTitle",
+      "setupBuyShipDialog",
+      "buyShip",
+      "giveShip",
+      "renameShip",
+      "addToFleet",
+      "addToFleet_andSwapWithFleet_slot",
+      "removeFromParty_slot",
+      "removeFromFleet_slot",
+      "researchFromFleet_slot",
+      "enterPort",
+      "enterLocation",
+      "buyLocationFood",
+      "invest",
+      "modTalkerFavor",
+      "modLocFavor",
+      "modLocWealthLevel",
+      "setLocDiscoverable",
+      "createMonsterDenNearby",
+      "bezoar_setupportselect",
+      "cameraAtPlayer",
+      "cameraAtTalker",
+      "cameraAtPoint",
+      "cameraAtPointLock",
+      "talkToOtherActor",
+      "giveItem",
+      "triggerEffect",
+      "dialogEffect",
+      "nextDialogNode_hideWindow",
+      "closeCharEdit",
+      "gameOver",
+      "autosaveASAP",
+      "noSpeechFXLookOrAnim",
+      "speechFX",
+      "fxOnPlayerRank",
+      "returnMissingPartyMembers",
+      "modPlayerFactionFavor",
+      "modTalkerFactionFavor",
+      "refreshStatModifiers",
+      "storeBoost",
+      "recoverOverboardPartyActors",
+      "talkToCommodore",
+      "talkToFirstMate",
+      "talkToFlagship",
+      "setupFleetLooting",
+      "captureShips_afterCombat",
+      "captureShipNum",
+      "lootFleet_afterCombat",
+      "openFleetWindow",
+      "openFleetWindow_delay",
+      "openFleetWindow_talker",
+      "closeFleetWindow",
+      "showFleetInfo",
+      "repairFleet_pay",
+      "repairFleet_free",
+      "retro",
+      "help",
+      "h",
+      "csave",
+      "testitemload",
+      "howmanyitems",
+      "convertRGB",
+      "screenshot",
+      "screenpic",
+      "anim",
+      "fullheal",
+      "rest",
+      "testboatanim",
+      "bighead",
+      "screenscale",
+      "res",
+      "go",
+      "gob",
+      "p",
+      "world",
+      "w",
+      "loads",
+      "z",
+      "sp",
+      "bz",
+      "k",
+      "kills",
+      "kill",
+      "killall",
+      "killcrew",
+      "reviveall",
+      "win",
+      "setk",
+      "set",
+      "get",
+      "calc",
+      "math",
+      "resetfog",
+      "fog",
+      "cfog",
+      "clearfog",
+      "hidemapicon",
+      "hidemapicons",
+      "clearitems",
+      "removeitems",
+      "clearroofs",
+      "clearroof",
+      "deleteZone",
+      "forget",
+      "resetloc",
+      "resetlocation",
+      "resetlocations",
+      "refreshloc",
+      "resetprocgen",
+      "resetwp",
+      "resetwaypoint",
+      "resetwaypoints",
+      "build",
+      "b",
+      "overseer",
+      "gm",
+      "godmode",
+      "abil",
+      "crewxp",
+      "xp",
+      "allxp",
+      "xpall",
+      "xpcosts",
+      "xpcost",
+      "testskillcost",
+      "allc",
+      "allclass",
+      "gp",
+      "fl",
+      "tfl",
+      "tm",
+      "tt",
+      "tdm",
+      "tq",
+      "tc",
+      "tcui",
+      "tw",
+      "realtime",
+      "hideparty",
+      "hidep",
+      "mpos",
+      "rankstyle",
+      "clearjournal",
+      "clearj",
+      "filljournal",
+      "fillj",
+      "dm",
+      "debug",
+      "debugMessage",
+      "errors",
+      "resize",
+      "setBPC",
+      "setBP",
+      "time",
+      "wind",
+      "weather",
+      "resetachievements",
+      "formulas",
+      "markTrainerLocDone",
+      "markDojoLocDone",
+      "createTreasureMap",
+      "tMapTest",
+      "addTreasuresToZone",
+      "setupPartyFromGVars",
+      "removeTempPartyActors",
+      "removeExcessLandingPartyActors",
+      "replaceTriggerWithZoneSeries",
+      "location_tryUnlockItems",
+      "getItemsFromZone",
+      "resetFleetAI",
+      "adjustFleetAlliegances",
+      "openJournal",
+      "openJournal_interactive",
+      "closeJournal",
+      "addJournalGoal",
+      "completeJournalGoal",
+      "learnJournalEntry",
+      "moveJournal",
+      "setTerrainType_spriteOffsetMult",
+      "setTerrainType_spriteOffsetModulo",
+      "setTerrainTypes_spriteOffsetModulo",
+      "testzones",
+      "gc",
+      "listfx",
+      "listav",
+      "loadItOnUpYo",
+      "uploadmod",
+      "getmod",
+      "editmod",
+      "editmodtags",
+      "loadModPageInBrowser",
+      "setMainMenuUIVisible",
+      "howmany",
+      "howmanyWorld",
+      "discoverFog",
+      "setFog",
+      "resetAllTileReactTimers",
+      "changePlayerActor",
+      "stopCombatAIActing",
+      "startCombatAIActing",
+      "relocateActors",
+      "relocateActors_point",
+      "task_gvar",
+      "investigator_nearestLoc",
+      "investigator_tradespecial",
+      "investigator_slainenemy",
+      "investigator_fleetpos",
+      "investigator_setupportselect",
+      "setupLocationAsPlayerPort",
+      "addIconToCurrentLocation",
+      "placeActorFromBoardedShip",
+      "setPartyActorAsVendor",
+      "readdVendorToParty",
+      "giveMathXPToActorWithDialogNodeID",
+      "askForNewPortName",
+      "setupCafeFoodDialogOptionsWealth100",
+      "changeCafeFood",
+      "convertPlayerPortsToFaction",
+      "addLocationUnlockable",
+      "setGlobalVarToActorProperty",
+      "UIPartInputCommand",
+      "maximizeWindowSet",
+      "maximizeWindowIfTrue",
+      "changeScreenResolution2",
+      "test",
+      "test2"
+    ],
+    "specialProperty": [
+      "none",
+      "shipWeapon",
+      "cargo",
+      "tradeGood",
+      "foodPrice",
+      "location",
+      "grove",
+      "monsterden",
+      "grove_guaranteed",
+      "waypoint",
+      "waypointConnector",
+      "showOnMinimap",
+      "playerPickup",
+      "animated",
+      "animatedFast",
+      "animatedPauseOnFrame1and3",
+      "animated2",
+      "animated2Fast",
+      "animatedSlow",
+      "animated2Slow",
+      "animated8",
+      "animated8Med",
+      "animated8Fast",
+      "pushable",
+      "pushableXOnly",
+      "pushableYOnly",
+      "big",
+      "huge",
+      "consumeOnUse",
+      "canAssignSpecialTC",
+      "autoAssignSpecialTC",
+      "needsSpecialTCtoReact",
+      "dontChangeSpecialTCOnPush",
+      "reactsToPressure",
+      "cannotBePickedUp",
+      "cannotUseInContainer",
+      "dontWarnForUseInContainer",
+      "applyAVEffectsToTile",
+      "twoHanded",
+      "unbreakable",
+      "cannotEverBePushed",
+      "drawSpecialTC",
+      "drawSpecialTCTopLayer",
+      "adjustSpriteYUp1",
+      "adjustSpriteY1",
+      "adjustSpriteYUp2",
+      "adjustSpriteY2",
+      "adjustSpriteYUp4",
+      "adjustSpriteY4",
+      "adjustSpriteYUp8",
+      "adjustSpriteY8",
+      "adjustSpriteYUp16",
+      "adjustSpriteY16",
+      "adjustSpriteYUp32",
+      "adjustSpriteY32",
+      "adjustSpriteX2",
+      "adjustSpriteXNeg2",
+      "adjustSpriteX4",
+      "adjustSpriteXNeg4",
+      "adjustSpriteX8",
+      "adjustSpriteXNeg8",
+      "sprite2xHeight",
+      "sprite3xHeight",
+      "sprite4xHeight",
+      "sprite2xWidth",
+      "elementUsableForRestrictedAoEs",
+      "preventTileReactions",
+      "moveCostOverride_2",
+      "moveCostOverride_3",
+      "overrideTerrainCollisions",
+      "overrideMostCollisions",
+      "pushOnlyCaresAboutLoE",
+      "inheritTerrainPalettes",
+      "inheritTerrainPaletteR",
+      "inheritTerrainPaletteG",
+      "inheritTerrainPaletteB",
+      "canHangOnWalls",
+      "canBeInsideWalls",
+      "canFloatOnWater",
+      "canOnlyBeOnWater",
+      "canBePlacedOnBlockedEarthTiles",
+      "alwaysBuried",
+      "invisible",
+      "itemsIgnoreBlockWalking",
+      "itemsOnSameTileAreRaised",
+      "ignoreBeingRaised",
+      "ignoreBeingRaised_offsetOnly",
+      "ignoreHeight",
+      "actorsOnSameTileAreRaised",
+      "canBeDroppedInOverworld",
+      "canOnlyBeDroppedInOverworld",
+      "unburyWhenLookedAt",
+      "alwaysBelowOtherItems",
+      "bottomPriorityItemClickSearchOrder",
+      "canAlwaysFitInTile",
+      "canAlwaysFitInTileWhenSpawned",
+      "canAlwaysFitInTile_build",
+      "ignoreDarkness",
+      "supertransparent",
+      "verytransparent",
+      "transparent",
+      "semitransparent",
+      "quantityIncreasesPaletteRZoneMisc",
+      "quantityChangesSprite_upTo2",
+      "quantityChangesSprite_upTo3",
+      "quantityChangesSprite_upTo4",
+      "quantityChangesSprite_upTo5",
+      "quantityChangesSprite_upTo6",
+      "quantityChangesSprite",
+      "container_drawRandomItem",
+      "disappearFromCorpse",
+      "shopContainer",
+      "infiniteStockContainer",
+      "priorityContainer",
+      "lockedContainer",
+      "container",
+      "container2x2",
+      "container2x3",
+      "container4x4",
+      "container5x5",
+      "container8x8",
+      "containerWood",
+      "containerSkull",
+      "containerMetal",
+      "defaultContainsWoodEquipment",
+      "defaultContainsIronEquipment",
+      "defaultContainsSteelEquipment",
+      "defaultContainsMythrilEquipment",
+      "defaultContainsToolEquipment",
+      "stackCannotBeSplit",
+      "defaultStack_2",
+      "defaultStack_x2",
+      "defaultStack_x3",
+      "defaultStack_x10",
+      "defaultStack_x1024Rand",
+      "animateEvery100Frames",
+      "emitParticleEvery100Frames",
+      "hideTimer",
+      "timer",
+      "timer_advanceOnScreenOnly",
+      "hiddenFromBuildMode",
+      "noTooltip",
+      "noTooltips",
+      "noTooltipIcons",
+      "autoEquipOnPickup",
+      "equipInAnySlot",
+      "currency",
+      "cannotBeTraded",
+      "cannotBeBuried",
+      "climbAnim",
+      "studyTool",
+      "repairTool",
+      "cannotBeSheathed",
+      "rotate90WhenSheathed",
+      "rotate180WhenSheathed",
+      "rotate270WhenSheathed",
+      "cannotBeRotated",
+      "rotateWhenUsed",
+      "canUseWithoutConsumingAction",
+      "addCastersRotationOnSpawn",
+      "reactionsDontPreventMoveUndo",
+      "canReactWhileMoving",
+      "delayBetweenReactions",
+      "canReactIndefinitely",
+      "dontCloneReactions",
+      "dontIncrementTimerInInventory",
+      "raiseTileDepth1050",
+      "raiseTileDepth2050",
+      "raiseItemsDepth900",
+      "raiseItemsDepth1000",
+      "raiseItemsDepth1050",
+      "raiseActorsDepth200",
+      "raiseActorsDepth1000",
+      "raiseActorsDepth1050",
+      "noPlayerPlacedItems",
+      "cantGrabItemsFromThisTile",
+      "roof",
+      "roofFaded",
+      "invisibleUnderRoofs",
+      "blackenOtherTiles",
+      "notBlackened",
+      "drawLightOnTopOfRoofs",
+      "cannotTarget",
+      "cannotTargetInPeacefulZones",
+      "cannotAct",
+      "cannotActInPeacefulZones",
+      "noTileHitbox",
+      "fullTileHitbox",
+      "fullTileRoof",
+      "replaceTerrainWithDefault1PercentChance",
+      "replaceTerrainWithDefault1PercentChance_GroupA",
+      "removeItems1PercentChance",
+      "removeItemsIfNoOtherItemsRemoved",
+      "removeItems1PercentChance_B",
+      "removeItemsIfNoOtherItemsRemoved_B",
+      "replaceWith_toMake_list",
+      "replaceWith_globalVarMatch",
+      "replaceWith_assign_globalVar",
+      "randomRotateWhenPlaced",
+      "randomFlipWhenPlaced",
+      "randomOffsetYUp4WhenPlaced",
+      "set0RotWhenPlaced",
+      "canRot45deg",
+      "reactionDoesntApplyItemRot",
+      "slideWhenPushed",
+      "slideWhenPushedMax4",
+      "oneClickToUse",
+      "canUseInAnyZone",
+      "shopTile",
+      "wiggleWhenMoved",
+      "anim_bobUpAndDown",
+      "anim_bobUpAndDown_slow",
+      "anim_bobUpAndDown_slow_small",
+      "anim_scaleUpAndDown",
+      "anim_scaleUpAndDown_slow",
+      "anim_scaleUpAndDown_slow_small",
+      "anim_bobLeftAndRight",
+      "anim_bobLeftAndRight_slow",
+      "anim_bobLeftAndRight_slow_small",
+      "convertIntoCashAtEnd",
+      "setGlobalVarWhenConverted",
+      "sellForFullValue",
+      "cantEndCombat",
+      "openEnhanceUI",
+      "enhanceSlots_0",
+      "enhanceSlots_1",
+      "enhanceSlots_2",
+      "enhanceSlots_3",
+      "enhanceSlots_4",
+      "enhanceSlots_5",
+      "enhanceSlots_6",
+      "enhanceSlots_7",
+      "enhanceSlots_8",
+      "enhanceDoesntAlterPalettes",
+      "blockLoE_exceptFromN",
+      "blockLoE_exceptFromS",
+      "blockLoE_exceptFromE",
+      "blockLoE_exceptFromW",
+      "blockJumpingRot",
+      "blockJumping_N",
+      "blockJumping_S",
+      "blockJumping_E",
+      "blockJumping_W",
+      "slopeRot",
+      "slopeN",
+      "slopeS",
+      "slopeE",
+      "slopeW",
+      "attachedToPushable",
+      "removeWhenAtZoneEdge",
+      "reduceItemGrabRangeWhenStoodUpon",
+      "canAlwaysReachThisTile",
+      "rollingPin_drawLower",
+      "rollingPin_drawY3Lower",
+      "rollingPin_drawSplit",
+      "rollingPin_drawFlat",
+      "rollingPin_scaleHalf",
+      "rollingPin_scaleMore",
+      "rollingPin_dontApplyDepthMod",
+      "rollingPin_scaleDepthMod",
+      "rollingPin_squishOnHorizon",
+      "waterFXTile",
+      "windBeacon",
+      "weatherBeacon",
+      "monsterBeacon",
+      "lakeMarker",
+      "forestOverworldItem",
+      "travel_point0",
+      "travel_point1",
+      "travel_point2",
+      "travel_point3",
+      "travel_point4",
+      "travel_point5",
+      "travel_point6",
+      "travel_point7",
+      "travel_point8",
+      "travel_point9",
+      "travel_point0B",
+      "travel_point1B",
+      "travel_point2B",
+      "travel_point3B",
+      "travel_point4B",
+      "travel_point5B",
+      "travel_point6B",
+      "travel_point7B",
+      "travel_point8B",
+      "travel_point9B",
+      "travel_point0C",
+      "travel_point1C",
+      "travel_point2C",
+      "travel_point3C",
+      "travel_point4C",
+      "travel_point5C",
+      "travel_point6C",
+      "travel_point7C",
+      "travel_point8C",
+      "travel_point9C",
+      "travel_point0D",
+      "travel_point1D",
+      "travel_point2D",
+      "travel_point3D",
+      "travel_point4D",
+      "travel_point5D",
+      "travel_point6D",
+      "travel_point7D",
+      "travel_point8D",
+      "travel_point9D",
+      "spawnpoint"
+    ],
+    "SpriteType": [
+      "none",
+      "single",
+      "animated2",
+      "animated4",
+      "animated8",
+      "animated12",
+      "animated12_irregular",
+      "animated12_windBased",
+      "animated12_windBased_irregular",
+      "wallSet48",
+      "wallSet48_noScaleY_96down",
+      "wallSet48_random2",
+      "wallSet16",
+      "wallSet16_random2",
+      "wallSet20",
+      "wallSet3",
+      "wallSet3NS",
+      "ledgeSet_North",
+      "ledgeSet_South",
+      "ledgeSet_East",
+      "ledgeSet_West",
+      "slopeBasedWallSet9_North",
+      "slopeBasedWallSet9_South",
+      "slopeBasedWallSet9_East",
+      "slopeBasedWallSet9_West",
+      "singleRandom2",
+      "singleRandom3",
+      "singleRandom4",
+      "singleRandom5",
+      "singleRandom8",
+      "singleRandom16",
+      "animated2Slow",
+      "animated4Slow",
+      "animated8Slow",
+      "animated16Slow",
+      "animated8Med",
+      "picture",
+      "picture2x2",
+      "picture2x2_animated8",
+      "picture3x3"
+    ],
+    "WeatherType": [
+      "none",
+      "rain",
+      "storm",
+      "snow",
+      "gale",
+      "krill"
+    ],
+    "ItemCategory": [
+      "thing",
+      "consumable",
+      "weapon",
+      "armor",
+      "accessory",
+      "tool",
+      "other",
+      "natural",
+      "furnishing",
+      "building",
+      "mech",
+      "hazard",
+      "plant",
+      "overworld",
+      "hide",
+      "hidden"
+    ],
+    "gameMode": [
+      "mainMenu",
+      "menu",
+      "travel",
+      "combat",
+      "build",
+      "console",
+      "dialog",
+      "chargen",
+      "overseer",
+      "action"
+    ],
+    "heldType": [
+      "none",
+      "actorClass"
+    ],
+    "GameMode": [
+      "Menu",
+      "Game",
+      "Loading",
+      "Quitting",
+      "Splash"
+    ],
+    "AoEShapeType": [
+      "plusShape",
+      "walkpathShape",
+      "walkpathShape_straightLinesPlus2",
+      "lineShape",
+      "wideLineShape",
+      "player",
+      "playerParty",
+      "allButPlayerParty",
+      "allActors",
+      "allTiles",
+      "allActors_nonIncapped",
+      "useWeaponAoE",
+      "useWeaponAVAoE",
+      "diagonalX"
+    ],
+    "JournalCategory": [
+      "notes",
+      "help",
+      "creature",
+      "item",
+      "actorClass",
+      "equipment",
+      "artifact",
+      "other"
+    ],
+    "Element": [
+      "any",
+      "none",
+      "physical",
+      "magic",
+      "melee",
+      "ranged",
+      "use",
+      "slash",
+      "smash",
+      "heavySlash",
+      "heavySmash",
+      "stab",
+      "heavyStab",
+      "explode",
+      "mech",
+      "mechanical",
+      "mech2",
+      "mechanical2",
+      "pickaxe",
+      "dig",
+      "digDown",
+      "growth",
+      "wither",
+      "bury",
+      "focus",
+      "prayer",
+      "fire",
+      "heat",
+      "ice",
+      "water",
+      "deepwater",
+      "abyss",
+      "elec",
+      "lightning",
+      "fakeElec",
+      "earth",
+      "wind",
+      "life",
+      "ruin",
+      "acid",
+      "poison",
+      "oil",
+      "HPbased",
+      "breakItem",
+      "shatter",
+      "weapon",
+      "sword",
+      "dagger",
+      "fist",
+      "axe",
+      "hammer",
+      "flail",
+      "spear",
+      "bow",
+      "aim",
+      "shield",
+      "whip",
+      "cannon",
+      "javelin",
+      "axe_throw",
+      "dart",
+      "kindle",
+      "ruinTouch",
+      "dispel",
+      "bonemeld",
+      "antiMachine",
+      "antimachine",
+      "antiUndead",
+      "mechanistAbil",
+      "weaponAugment",
+      "gateCannon",
+      "pressurePlateDown",
+      "pressurePlateUp",
+      "pressureMove",
+      "pressureMoveAcross",
+      "pressureJumpAcross",
+      "pressureMoveTo",
+      "elementwalker",
+      "elementwalker_status",
+      "itemEquipped",
+      "itemCombine",
+      "itemCombined",
+      "actionUsed",
+      "timerUp",
+      "weaponBuff",
+      "appliedWeaponBuffs",
+      "combatStart",
+      "combatEnd",
+      "combatLost",
+      "combatWon",
+      "gameOver",
+      "tileReacted",
+      "itemReacted_timerUp",
+      "actorFall",
+      "actionTaken",
+      "noActionTaken",
+      "noMoveTaken",
+      "startTurn",
+      "endTurn",
+      "moveAbilUsed",
+      "usedMeleeWeaponAtk",
+      "daytime",
+      "nighttime",
+      "nightime",
+      "newDay",
+      "incapacitated",
+      "incapped",
+      "enemyKOd",
+      "dodged",
+      "blocked",
+      "reloading",
+      "reload",
+      "repair",
+      "railway",
+      "spreadRope",
+      "removeRope",
+      "spreadChain",
+      "removeChain",
+      "unarmed",
+      "BreakerWpn",
+      "shiftcloakWpn",
+      "punchDaggerWpn",
+      "hammerDaggerWpn",
+      "shieldShotWpn",
+      "whipFlailWpn",
+      "catchFish",
+      "fistWpn",
+      "closeContainer",
+      "removeDecay",
+      "cutsc_destroy",
+      "windAnimate",
+      "replaceCapsule",
+      "stairs",
+      "itemPushed",
+      "burst1",
+      "burstSpread1",
+      "burst2",
+      "burstSpread2",
+      "burst3",
+      "burstSpread3",
+      "drainWater",
+      "odduleDeath",
+      "blockDestroyed",
+      "vines_wither",
+      "vines_growth",
+      "burnStatus",
+      "decaying",
+      "defiler",
+      "matched",
+      "matchedSelf",
+      "notInCastleZone",
+      "inCastleZone",
+      "nearKeyPedestal",
+      "openGates",
+      "closeGates",
+      "gameLoaded",
+      "leavingZone",
+      "removeShadow",
+      "somethingHappened",
+      "monsterBeaconUsed",
+      "everswarm",
+      "batZWing",
+      "pillImmune",
+      "slayAspect",
+      "transform",
+      "spawnFireWhirl",
+      "pushDamage",
+      "boardingEnd"
+    ],
+    "LightMapSize": [
+      "Full",
+      "Fourth",
+      "Eighth"
+    ],
+    "BlendTechnique": [
+      "Add",
+      "Multiply"
+    ],
+    "BlurTechnique": [
+      "Horizontal",
+      "Vertical"
+    ]
+  }
+}

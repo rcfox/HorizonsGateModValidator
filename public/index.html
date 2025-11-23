@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Horizon's Gate Mod Validator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Horizon's Gate Mod Validator</h1>
+        <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+          🌙
+        </button>
+      </header>
+
+      <main>
+        <div class="editor-section">
+          <div class="section-header">
+            <h2>Mod Code</h2>
+            <div class="actions">
+              <button id="loadSampleBtn" class="btn btn-secondary">
+                Load Sample
+              </button>
+              <button id="clearBtn" class="btn btn-secondary">Clear</button>
+              <button id="validateBtn" class="btn btn-primary">Validate</button>
+            </div>
+          </div>
+          <div class="editor-wrapper">
+            <div class="line-numbers" id="lineNumbers"></div>
+            <textarea
+              id="modInput"
+              placeholder="Paste your mod code here...
+
+Example:
+[Action] ID=greatswordAttack;
+	applyWeaponBuffs=true;
+
+	casterAnimation=broadswing;
+	casterAnimationDependsOnWeaponHand=true;
+	FXChangesWithWeaponHand=true;
+	FXOnTarget=swipe;
+[ActionAoE]
+	ID=greatswordAttack;
+	cloneFrom=adjacent;
+[AvAffecter]
+	ID=greatswordAttack;
+	actorValue=HP;
+	magnitude= d:gswordDmg;
+	duration=-2;
+	chance=d:gswordAcc;
+	element=melee;
+	element=physical;
+	element=slash;
+	element=heavySlash;
+[AvAffecterAoE]
+	ID=greatswordAttack;
+	aoeCasterAsOrigin=true;
+	maxRange = 1.5;
+	coneAngle=90;
+"
+              spellcheck="false"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="results-section">
+          <div class="section-header">
+            <h2>Validation Results</h2>
+            <div id="validationStatus" class="status"></div>
+          </div>
+          <div id="results" class="results-container">
+            <p class="placeholder">
+              No validation results yet. Paste your mod code and click
+              "Validate".
+            </p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="validator.bundle.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

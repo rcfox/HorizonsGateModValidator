@@ -1,0 +1,26 @@
+========================================
+   Mod Validator - Static Page Usage
+========================================
+
+QUICK START:
+1. Simply open index.html in any web browser
+2. Paste your mod code
+3. Click "Validate"
+
+No web server required! The validator runs entirely in your browser.
+
+FILES NEEDED:
+- index.html           (main page)
+- styles.css           (styles)
+- validator.bundle.js  (validator engine - 134KB)
+- app.js              (UI logic)
+
+You can copy these 4 files anywhere and they'll work.
+
+REBUILDING THE BUNDLE:
+If you modify the TypeScript source, rebuild with:
+  npm run build:bundle
+
+This will regenerate validator.bundle.js
+
+========================================

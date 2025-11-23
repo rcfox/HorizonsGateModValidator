@@ -1,0 +1,89 @@
+[Action] ID=focusStone_act_good; 
+	harmful=false;
+	attractAttention=false;
+	
+	casterAnimation=crouch;
+	
+	FXOnTarget=sfx_highAura;
+	
+	FXOnCaster=chargeup;
+	FXOnCasterColor=Purple;
+	FXOnCaster=casting;
+	FXOnCasterColor=Purple;
+[ActionAoE] 
+	ID=focusStone_act_good; 
+	cloneFrom=oneTile;
+[AvAffecter]
+	ID=focusStone_act_good; 
+	harmful=false;
+	actorValue=MP;
+	magnitude=12 + c:MagAtk * 0.4
+	+ c:skill_Fire * 0.25
+	+ c:skill_Ice * 0.25
+	+ c:skill_Elec * 0.25
+	+ c:skill_Wind * 0.25
+	+ c:skill_Ruin * 0.25
+	+ c:skill_Life * 0.3;
+	duration=-2;
+	chance=100;
+[AvAffecterAoE]
+	ID=focusStone_act_good;
+	cloneFrom=oneTile;        
+
+
+
+
+[Action] ID=focusStone_act_bad; 
+	harmful=false;
+	attractAttention=false;
+	
+	casterAnimation=crouch;
+	
+	FXOnTarget=sfx_highAura;
+	
+	FXOnCaster=chargeup;
+	FXOnCasterColor=Purple;
+	FXOnCaster=casting;
+	FXOnCasterColor=Purple;
+[ActionAoE] 
+	ID=focusStone_act_bad; 
+	cloneFrom=oneTile;
+[AvAffecter]
+	ID=focusStone_act_bad; 
+	harmful=false;
+	actorValue=MP;
+	magnitude=12 + c:MagAtk * 0.4
+	+ c:skill_Fire * 0.25
+	+ c:skill_Ice * 0.25
+	+ c:skill_Elec * 0.25
+	+ c:skill_Wind * 0.25
+	+ c:skill_Ruin * 0.25
+	+ c:skill_Life * 0.3
+	duration=-2;
+	chance=100;
+[AvAffecterAoE]
+	ID=focusStone_act_bad;
+	cloneFrom=oneTile;        
+
+
+[ItemType]  name=Itchy Barbs;
+ID=barb_itchy_good; sprite=874;
+stackable=true; itemCategory=1;
+pR=p22; 
+pB=p22; 
+
+description=Irritating barbs from a Netchal.<font=thickIcons><color=Black>
+<n=><icon=invIcon_sword> +Itchy Attack
+<n=><icon=invIcon_armor> +50% Itchy Resist;
+weight=0; volume=0; value=150;
+
+[ItemType]  name=Itchy Barbs;
+ID=barb_itchy_bad; sprite=874;
+stackable=true; itemCategory=1;
+pR=p22; 
+pB=p22; 
+
+description=Irritating barbs from a Netchal.<font=thickIcons><color=Black>
+it gives <n=><icon=invIcon_sword> +Itchy Attack
+and <n=><icon=invIcon_armor> +50% Itchy Resist
+weight=0; volume=0; value=150;
