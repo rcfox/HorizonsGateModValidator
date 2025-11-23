@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
 
 # Build output
 dist/
@@ -24,6 +23,3 @@ yarn-error.log*
 # OS files
 .DS_Store
 Thumbs.db
-
-# Optional: Include if you don't want to track test files
-# public/test-static.html
