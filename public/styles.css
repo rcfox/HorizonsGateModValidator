@@ -86,6 +86,45 @@ h1 {
     background-color: var(--code-bg);
 }
 
+.known-issues {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+.known-issues summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--warning-color);
+    user-select: none;
+    padding: 4px 0;
+}
+
+.known-issues summary:hover {
+    color: var(--primary-color);
+}
+
+.known-issues ul {
+    margin-top: 12px;
+    margin-left: 20px;
+}
+
+.known-issues li {
+    margin-bottom: 8px;
+    color: var(--text-color);
+}
+
+.known-issues code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85em;
+}
+
 main {
     display: grid;
     grid-template-columns: 1fr 1fr;

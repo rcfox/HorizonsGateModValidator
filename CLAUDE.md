@@ -134,6 +134,7 @@ Schema extraction expects decompiled C# files in the parent directory of the roo
 ```
 
 ## Future TODOs
+- [ ] Add a section of "known issues" to the top of the page.
 - [ ] Namespace colliding enum names (e.g., `Action.specialProperty` vs `ItemType.specialProperty`)
 - [ ] Handle missing virtual properties on Trigger: topX, topY, btmX, btmY
 - [ ] Better formula parsing: handle arguments for operators, no dangling expressions, @ expressions (@F, @G, etc.)

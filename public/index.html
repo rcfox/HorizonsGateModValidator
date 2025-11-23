@@ -15,6 +15,17 @@
         </button>
       </header>
 
+      <details class="known-issues">
+        <summary>Known Issues</summary>
+        <ul>
+          <li><strong>Enum naming collisions:</strong> Some enums have properties with the same name (e.g., <code>specialProperty</code> exists in both Action and ItemType). These need to be namespaced to avoid ambiguity.</li>
+          <li><strong>Missing Trigger properties:</strong> Virtual properties on Trigger objects (topX, topY, btmX, btmY) are not yet supported.</li>
+          <li><strong>Formula validation limitations:</strong> Formula parser doesn't fully validate operator arguments, detect dangling expressions, or handle all @ expressions (@F, @G, etc.).</li>
+          <li><strong>Task validation incomplete:</strong> Task required arguments and task enum values are not yet validated.</li>
+          <li><strong>Dialog text formatting:</strong> Text formatting tags (e.g., <code>&lt;foo=bar&gt;</code>) in dialog strings are not yet supported.</li>
+        </ul>
+      </details>
+
       <main>
         <div class="editor-section">
           <div class="section-header">
