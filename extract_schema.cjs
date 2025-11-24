@@ -324,29 +324,95 @@ function extractEnums(baseDir) {
     for (const filePath of files) {
       const content = fs.readFileSync(filePath, 'utf-8');
 
-      // Find enum declarations: public enum EnumName
-      const enumRegex = /public\s+enum\s+(\w+)\s*\{([^}]+)\}/g;
+      // First, find enums nested inside classes
+      // Match: public class ClassName { ... }
+      const classRegex = /public\s+class\s+(\w+)\s*[\r\n]*\{([\s\S]*?)(?:\n}\s*$|\n}\s*\n)/gm;
 
-      let match;
-      while ((match = enumRegex.exec(content)) !== null) {
-        const enumName = match[1];
-        const enumBody = match[2];
+      let classMatch;
+      while ((classMatch = classRegex.exec(content)) !== null) {
+        const className = classMatch[1];
+        const classBody = classMatch[2];
 
-        // Extract enum values (name = value or just name)
-        const valueRegex = /(\w+)\s*=?\s*[^,\n]*/g;
-        const values = [];
+        // Find enums within this class
+        const enumRegex = /public\s+enum\s+(\w+)\s*\{([^}]+)\}/g;
 
-        let valueMatch;
-        while ((valueMatch = valueRegex.exec(enumBody)) !== null) {
-          const valueName = valueMatch[1].trim();
-          if (valueName) {
-            values.push(valueName);
+        let enumMatch;
+        while ((enumMatch = enumRegex.exec(classBody)) !== null) {
+          const enumName = enumMatch[1];
+          const enumBody = enumMatch[2];
+
+          // Extract enum values (name = value or just name)
+          const valueRegex = /(\w+)\s*=?\s*[^,\n]*/g;
+          const values = [];
+
+          let valueMatch;
+          while ((valueMatch = valueRegex.exec(enumBody)) !== null) {
+            const valueName = valueMatch[1].trim();
+            if (valueName) {
+              values.push(valueName);
+            }
+          }
+
+          if (values.length > 0) {
+            // Namespace enum by its containing class
+            const namespacedName = `${className}.${enumName}`;
+            enums[namespacedName] = values;
+            console.log(`  ${namespacedName}: ${values.slice(0, 5).join(', ')}${values.length > 5 ? `, ... (${values.length} total)` : ''}`);
+          }
+        }
+      }
+
+      // Also find standalone enums (not inside a class)
+      // These should use their simple name
+      const standaloneEnumRegex = /^public\s+enum\s+(\w+)\s*\{([^}]+)\}/gm;
+
+      let standaloneMatch;
+      while ((standaloneMatch = standaloneEnumRegex.exec(content)) !== null) {
+        const enumName = standaloneMatch[1];
+        const enumBody = standaloneMatch[2];
+
+        // Check if this enum is already captured as part of a class
+        // by checking if any class contains this position
+        const enumPosition = standaloneMatch.index;
+        let isInsideClass = false;
+
+        const classCheckRegex = /public\s+class\s+\w+\s*[\r\n]*\{/g;
+        let classCheckMatch;
+        while ((classCheckMatch = classCheckRegex.exec(content)) !== null) {
+          const classStart = classCheckMatch.index;
+          // Find the matching closing brace for this class
+          let braceCount = 1;
+          let pos = classCheckMatch.index + classCheckMatch[0].length;
+          while (braceCount > 0 && pos < content.length) {
+            if (content[pos] === '{') braceCount++;
+            if (content[pos] === '}') braceCount--;
+            pos++;
+          }
+          const classEnd = pos;
+
+          if (enumPosition > classStart && enumPosition < classEnd) {
+            isInsideClass = true;
+            break;
           }
         }
 
-        if (values.length > 0) {
-          enums[enumName] = values;
-          console.log(`  ${enumName}: ${values.slice(0, 5).join(', ')}${values.length > 5 ? `, ... (${values.length} total)` : ''}`);
+        if (!isInsideClass) {
+          // Extract enum values
+          const valueRegex = /(\w+)\s*=?\s*[^,\n]*/g;
+          const values = [];
+
+          let valueMatch;
+          while ((valueMatch = valueRegex.exec(enumBody)) !== null) {
+            const valueName = valueMatch[1].trim();
+            if (valueName) {
+              values.push(valueName);
+            }
+          }
+
+          if (values.length > 0) {
+            enums[enumName] = values;
+            console.log(`  ${enumName}: ${values.slice(0, 5).join(', ')}${values.length > 5 ? `, ... (${values.length} total)` : ''}`);
+          }
         }
       }
     }

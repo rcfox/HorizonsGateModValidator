@@ -252,7 +252,8 @@ export class ModValidator {
         propName,
         propValue,
         fieldType,
-        propLine
+        propLine,
+        resolvedTypeName
       );
 
       messages.push(...typeMessages);

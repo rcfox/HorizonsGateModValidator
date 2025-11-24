@@ -25,7 +25,8 @@ export class PropertyValidator {
     propertyName: string,
     value: string,
     expectedType: FieldType,
-    line?: number
+    line?: number,
+    className?: string
   ): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
 
@@ -140,21 +141,28 @@ export class PropertyValidator {
         break;
 
       default:
-        // Check if this is an enum type
-        if (this.enums[expectedType]) {
-          messages.push(...this.validateEnum(propertyName, cleanValue, expectedType, line));
+        // Check if this is an enum type (direct or namespaced)
+        let resolvedEnumType = this.resolveEnumName(expectedType, className);
+        if (resolvedEnumType) {
+          messages.push(...this.validateEnum(propertyName, cleanValue, resolvedEnumType, line, className));
           break;
         }
 
-        // Check if this is a List<Enum> type
-        const listEnumMatch = expectedType.match(/^List<(\w+)>$/);
-        if (listEnumMatch && this.enums[listEnumMatch[1]]) {
-          // List of enum values - validate each comma-separated value
-          const parts = cleanValue.split(',').map(p => p.trim()).filter(p => p.length > 0);
-          for (const part of parts) {
-            messages.push(...this.validateEnum(propertyName, part, listEnumMatch[1], line));
+        // Check if this is a List<Enum> or HashSet<Enum> type
+        const listEnumMatch = expectedType.match(/^(?:List|HashSet)<(\w+)>$/);
+        if (listEnumMatch) {
+          const enumName = listEnumMatch[1];
+          // Try to find the enum (might be namespaced)
+          const resolvedEnumName = this.resolveEnumName(enumName, className);
+
+          if (resolvedEnumName) {
+            // List/HashSet of enum values - validate each comma-separated value
+            const parts = cleanValue.split(',').map(p => p.trim()).filter(p => p.length > 0);
+            for (const part of parts) {
+              messages.push(...this.validateEnum(propertyName, part, resolvedEnumName, line, className));
+            }
+            break;
           }
-          break;
         }
 
         // Unknown type or complex type - issue warning but don't fail
@@ -192,7 +200,28 @@ export class PropertyValidator {
     return !isNaN(num) && num >= 0 && num <= 255;
   }
 
-  private validateEnum(propertyName: string, value: string, enumName: string, line?: number): ValidationMessage[] {
+  /**
+   * Resolve an enum name to its actual key in the enums registry
+   * Tries className.enumName first, then just enumName
+   */
+  private resolveEnumName(enumName: string, className?: string): string | null {
+    // First try the namespaced version if we have a className
+    if (className) {
+      const namespacedName = `${className}.${enumName}`;
+      if (this.enums[namespacedName]) {
+        return namespacedName;
+      }
+    }
+
+    // Fall back to the simple name
+    if (this.enums[enumName]) {
+      return enumName;
+    }
+
+    return null;
+  }
+
+  private validateEnum(propertyName: string, value: string, enumName: string, line?: number, className?: string): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
     const enumValues = this.enums[enumName];
 
