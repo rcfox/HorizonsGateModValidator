@@ -4279,9 +4279,37 @@
         },
         {
           "name": "fReq",
-          "type": "string",
-          "csType": "string",
+          "type": "Formula",
+          "csType": "Formula",
           "virtual": true
+        },
+        {
+          "name": "topX+",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true,
+          "pattern": true
+        },
+        {
+          "name": "topY+",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true,
+          "pattern": true
+        },
+        {
+          "name": "btmX+",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true,
+          "pattern": true
+        },
+        {
+          "name": "btmY+",
+          "type": "integer",
+          "csType": "integer",
+          "virtual": true,
+          "pattern": true
         },
         {
           "name": "ID",
@@ -4345,7 +4373,7 @@
         },
         {
           "name": "fReq",
-          "type": "string",
+          "type": "Formula",
           "csType": "string"
         },
         {

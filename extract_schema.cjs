@@ -157,6 +157,7 @@ function extractVirtualProperties(filePath, className) {
   const dictAccessRegex = new RegExp(`${dictVarName}\\[["']([^"']+)["']\\]|${dictVarName}\\.(?:ContainsKey|TryGetValue)\\(["']([^"']+)["']`, 'g');
 
   const foundKeys = new Set();
+  const patternKeys = new Set(); // Keys that use StartsWith pattern
   let match;
 
   while ((match = dictAccessRegex.exec(constructorBody)) !== null) {
@@ -164,13 +165,26 @@ function extractVirtualProperties(filePath, className) {
     foundKeys.add(key);
   }
 
+  // Also look for key.StartsWith("pattern") patterns in foreach loops
+  // This handles cases like Trigger where topX, topY, etc. use StartsWith
+  const startsWithRegex = /\bkey\.StartsWith\(["']([^"']+)["']\)/g;
+  while ((match = startsWithRegex.exec(constructorBody)) !== null) {
+    const baseKey = match[1];
+    patternKeys.add(baseKey);
+  }
+
   // Convert to virtual properties with inferred types
   for (const key of foundKeys) {
     // Try to infer type from usage
     let type = 'string'; // default
 
+    // Check for Formula assignment (e.g., someFormula.formulaString = v["key"])
+    const formulaAssignmentRegex = new RegExp(`\\w+\\.formulaString\\s*=\\s*${dictVarName}\\["${key}"\\]`);
+    if (formulaAssignmentRegex.test(constructorBody)) {
+      type = 'Formula';
+    }
     // Check for byte.Parse (like R, G, B)
-    if (constructorBody.includes(`byte.Parse(${dictVarName}["${key}"])`)) {
+    else if (constructorBody.includes(`byte.Parse(${dictVarName}["${key}"])`)) {
       type = 'byte';
     }
     // Check for int.Parse
@@ -191,6 +205,39 @@ function extractVirtualProperties(filePath, className) {
       type: type,
       csType: type,
       virtual: true // Mark as virtual property
+    });
+  }
+
+  // Process pattern keys (from key.StartsWith("pattern"))
+  for (const baseKey of patternKeys) {
+    // These accept the base name with optional + suffixes (like topX, topX+, topX++, etc.)
+    // We'll infer the type from how the value is used
+    let type = 'string';
+
+    // Look for how the value from the dictionary is parsed
+    // Pattern: v[key] is used somewhere after the StartsWith check
+    const blockAfterStartsWith = constructorBody.substring(
+      constructorBody.indexOf(`key.StartsWith("${baseKey}")`)
+    );
+    const nextBraceIdx = blockAfterStartsWith.indexOf('}');
+    const relevantBlock = blockAfterStartsWith.substring(0, nextBraceIdx);
+
+    if (relevantBlock.includes(`int.Parse(${dictVarName}[key])`)) {
+      type = 'integer';
+    } else if (relevantBlock.includes(`float.Parse(${dictVarName}[key])`)) {
+      type = 'float';
+    } else if (relevantBlock.includes(`byte.Parse(${dictVarName}[key])`)) {
+      type = 'byte';
+    } else if (relevantBlock.includes(`bool.Parse(${dictVarName}[key])`)) {
+      type = 'boolean';
+    }
+
+    virtualProps.push({
+      name: baseKey + '+',
+      type: type,
+      csType: type,
+      virtual: true,
+      pattern: true // Indicates this accepts + suffixes
     });
   }
 
@@ -575,10 +622,35 @@ function extractSchema(tacticsDir) {
   // Add virtual properties to schema
   addCommonVirtualProperties(schema, dataManagerVirtualProps);
 
+  // Fix known property type issues
+  fixfReqTypes(schema);
+
   // Extract enums
   const enums = extractEnums(baseDir);
 
   return { schema, typeAliases, enums };
+}
+
+/**
+ * Fix known property type issues that can't be automatically detected
+ * For example, fReq is defined as string in C# but should be treated as Formula
+ */
+function fixfReqTypes(schema) {
+  console.log('\nFixing known property type issues...');
+
+  // fReq should always be validated as Formula
+  const classesWithFReq = ['TriggerEffect'];
+
+  for (const className of classesWithFReq) {
+    if (schema[className]) {
+      const fReqField = schema[className].fields.find(f => f.name === 'fReq');
+      if (fReqField && fReqField.type === 'string') {
+        console.log(`  Fixing ${className}.fReq: string -> Formula`);
+        fReqField.type = 'Formula';
+        // Keep csType as 'string' since that's what it actually is in C#
+      }
+    }
+  }
 }
 
 function extractDataManagerVirtualProps(dataManagerPath) {

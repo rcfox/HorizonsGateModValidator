@@ -180,7 +180,7 @@ export class ModValidator {
   private validateProperties(obj: ParsedObject, classSchema: ClassSchema, resolvedTypeName: string): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
     const knownFields = new Map<string, string>();
-    const patternFields: Array<{base: string, type: string}> = [];
+    const patternFields: Array<{base: string, type: string, suffix: 'number' | 'plus'}> = [];
 
     // Build map of known fields and pattern fields
     // Real fields take precedence over virtual properties
@@ -188,7 +188,11 @@ export class ModValidator {
       if (field.pattern && field.name.endsWith('N')) {
         // This is a pattern field like "bodyPartN" - accepts numbered properties
         const baseName = field.name.substring(0, field.name.length - 1);
-        patternFields.push({ base: baseName, type: field.type });
+        patternFields.push({ base: baseName, type: field.type, suffix: 'number' });
+      } else if (field.pattern && field.name.endsWith('+')) {
+        // This is a pattern field like "topX+" - accepts + suffixes
+        const baseName = field.name.substring(0, field.name.length - 1);
+        patternFields.push({ base: baseName, type: field.type, suffix: 'plus' });
       } else {
         // Only add if not already present (real fields come before virtual in the array)
         // or if this is a real field (not virtual) - prefer real fields over virtual
@@ -215,12 +219,22 @@ export class ModValidator {
 
       let fieldType = knownFields.get(cleanPropName);
 
-      // Check if it matches a pattern field (e.g., bodyPart1, bodyPart2)
+      // Check if it matches a pattern field
       if (!fieldType) {
         for (const pattern of patternFields) {
-          if (cleanPropName.startsWith(pattern.base) && /\d+$/.test(cleanPropName)) {
-            fieldType = pattern.type;
-            break;
+          if (pattern.suffix === 'number') {
+            // Pattern like "bodyPart1", "bodyPart2" - base name + number
+            if (cleanPropName.startsWith(pattern.base) && /\d+$/.test(cleanPropName)) {
+              fieldType = pattern.type;
+              break;
+            }
+          } else if (pattern.suffix === 'plus') {
+            // Pattern like "topX", "topX+", "topX++" - base name + optional + suffixes
+            if (cleanPropName === pattern.base ||
+                (cleanPropName.startsWith(pattern.base) && /^\+*$/.test(cleanPropName.substring(pattern.base.length)))) {
+              fieldType = pattern.type;
+              break;
+            }
           }
         }
       }
