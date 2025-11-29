@@ -48,7 +48,64 @@ interface TasksData {
   tasks: Task[];
 }
 
-let filteredTasks: Task[] = tasksData.tasks;
+// Convert array notation to user-friendly variable names
+function convertToFriendlyNames(text: string): string {
+  return text
+    // tileCoords with property access (must come first, most specific)
+    .replace(/tileCoords\[(\d+)\]\.X/g, (match, num) => {
+      const n = parseInt(num);
+      return n === 0 ? 'xValue' : `xValue${n + 1}`;
+    })
+    .replace(/tileCoords\[(\d+)\]\.Y/g, (match, num) => {
+      const n = parseInt(num);
+      return n === 0 ? 'yValue' : `yValue${n + 1}`;
+    })
+
+    // tileCoords general (any index or no index)
+    .replace(/tileCoords\[\d+\]/g, '(xValue, yValue)')
+    .replace(/tileCoords/g, '(xValue, yValue)')
+
+    // strings (specific indexes first, then general)
+    .replace(/strings\[0\]/g, 'sValue')
+    .replace(/strings\[1\]/g, 'sValue2')
+    .replace(/strings\[(\d+)\]/g, (match, num) => {
+      const n = parseInt(num);
+      return n === 0 ? 'sValue' : `sValue${n + 1}`;
+    })
+
+    // floats
+    .replace(/floats\[0\]/g, 'fValue')
+    .replace(/floats\[1\]/g, 'fValue2')
+    .replace(/floats\[(\d+)\]/g, (match, num) => {
+      const n = parseInt(num);
+      return n === 0 ? 'fValue' : `fValue${n + 1}`;
+    })
+
+    // bools
+    .replace(/bools\[0\]/g, 'bValue1')
+    .replace(/bools\[1\]/g, 'bValue2')
+    .replace(/bools\[(\d+)\]/g, (match, num) => `bValue${parseInt(num) + 1}`);
+}
+
+// Convert task data to use friendly names
+function convertTaskData(tasks: Task[]): Task[] {
+  return tasks.map(task => ({
+    ...task,
+    name: convertToFriendlyNames(task.name),
+    description: convertToFriendlyNames(task.description),
+    required: task.required.map(arg => ({
+      name: convertToFriendlyNames(arg.name),
+      description: convertToFriendlyNames(arg.description)
+    })),
+    optional: task.optional.map(arg => ({
+      name: convertToFriendlyNames(arg.name),
+      description: convertToFriendlyNames(arg.description)
+    }))
+  }));
+}
+
+const convertedTasks = convertTaskData(tasksData.tasks);
+let filteredTasks: Task[] = convertedTasks;
 let searchTerm = '';
 let highlightEnabled = localStorage.getItem('highlightEnabled') !== 'false'; // Default to true unless explicitly disabled
 
@@ -156,13 +213,13 @@ function searchTasks(query: string) {
   searchTerm = query.toLowerCase().trim();
 
   if (!searchTerm) {
-    filteredTasks = tasksData.tasks;
+    filteredTasks = convertedTasks;
     renderTasks(filteredTasks);
-    updateTaskCount(filteredTasks.length, tasksData.tasks.length);
+    updateTaskCount(filteredTasks.length, convertedTasks.length);
     return;
   }
 
-  filteredTasks = tasksData.tasks.filter(task => {
+  filteredTasks = convertedTasks.filter(task => {
     // Search in task name
     if (task.name.toLowerCase().includes(searchTerm)) {
       return true;
@@ -193,7 +250,7 @@ function searchTasks(query: string) {
   });
 
   renderTasks(filteredTasks);
-  updateTaskCount(filteredTasks.length, tasksData.tasks.length);
+  updateTaskCount(filteredTasks.length, convertedTasks.length);
 }
 
 // Highlight matching text
@@ -289,4 +346,4 @@ document.addEventListener('keydown', (e) => {
 // Initialize
 highlightToggle.checked = highlightEnabled;
 renderTasks(filteredTasks);
-updateTaskCount(filteredTasks.length, tasksData.tasks.length);
+updateTaskCount(filteredTasks.length, convertedTasks.length);
