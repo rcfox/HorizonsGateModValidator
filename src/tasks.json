@@ -89,7 +89,7 @@
         },
         {
           "name": "floats[0]",
-          "description": "The quantity of the item to add. Accessed before any length check (though checked if > 0)"
+          "description": "The quantity of the item to add."
         },
         {
           "name": "bools[0]",
@@ -117,7 +117,7 @@
         },
         {
           "name": "floats[0]",
-          "description": "The quantity of the item to add to the container. Accessed before any length check (though checked if > 0)"
+          "description": "The quantity of the item to add to the container."
         }
       ],
       "optional": [

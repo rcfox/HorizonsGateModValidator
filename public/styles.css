@@ -69,10 +69,33 @@ h1 {
     color: var(--primary-color);
 }
 
-.theme-toggle {
+.header-actions {
     position: absolute;
     top: 0;
     right: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-link {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: 1px solid var(--border-color);
+}
+
+.nav-link:hover {
+    background-color: var(--code-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.theme-toggle {
     background: none;
     border: none;
     font-size: 1.5rem;

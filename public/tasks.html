@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Horizon's Gate Task Reference</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="tasks-styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Horizon's Gate Task Reference</h1>
+        <div class="header-actions">
+          <a href="index.html" class="nav-link">Mod Validator</a>
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+            🌙
+          </button>
+        </div>
+      </header>
+
+      <main class="tasks-main">
+        <div class="tasks-section">
+          <div class="section-header">
+            <h2>Tasks</h2>
+            <div id="taskCount" class="task-count"></div>
+          </div>
+
+          <div class="search-wrapper">
+            <input
+              type="text"
+              id="searchInput"
+              class="search-input"
+              placeholder="Search tasks, descriptions, or arguments..."
+              autocomplete="off"
+            />
+            <button id="clearSearch" class="clear-search" aria-label="Clear search">×</button>
+          </div>
+
+          <div class="tasks-controls">
+            <button id="expandAll" class="btn btn-secondary">Expand All</button>
+            <button id="collapseAll" class="btn btn-secondary">Collapse All</button>
+            <label class="highlight-checkbox">
+              <input type="checkbox" id="highlightToggle" checked />
+              Highlight matches
+            </label>
+          </div>
+
+          <div id="tasksList" class="tasks-list">
+            <p class="placeholder">Loading tasks...</p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="tasks.bundle.js"></script>
+  </body>
+</html>
