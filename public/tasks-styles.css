@@ -19,10 +19,25 @@
   overflow: hidden;
 }
 
+.tasks-section .section-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.game-version {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: normal;
+  font-style: italic;
+  text-align: center;
+}
+
 .task-count {
   font-size: 0.9rem;
   color: var(--text-muted);
   font-weight: normal;
+  text-align: right;
 }
 
 /* Search input */

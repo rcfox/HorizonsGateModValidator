@@ -347,3 +347,7 @@ document.addEventListener('keydown', (e) => {
 highlightToggle.checked = highlightEnabled;
 renderTasks(filteredTasks);
 updateTaskCount(filteredTasks.length, convertedTasks.length);
+
+// Display game version
+const gameVersionElement = document.getElementById('gameVersion')!;
+gameVersionElement.textContent = `Up to date for v${tasksData.gameVersion}`;
