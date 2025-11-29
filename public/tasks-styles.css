@@ -1,10 +1,18 @@
 /* Task-specific styles */
 
+/* Override body styles for tasks page */
+body {
+  height: auto;
+  overflow: auto;
+}
+
+.container {
+  height: auto;
+}
+
 .tasks-main {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
 }
 
 .tasks-section {
@@ -14,9 +22,6 @@
   padding: 20px;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
 }
 
 .tasks-section .section-header {
@@ -116,9 +121,8 @@
 
 /* Tasks list */
 .tasks-list {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Task item */
@@ -355,25 +359,6 @@ mark {
 /* Placeholder states */
 .placeholder.error {
   color: var(--error-color);
-}
-
-/* Scrollbar styling */
-.tasks-list::-webkit-scrollbar {
-  width: 10px;
-}
-
-.tasks-list::-webkit-scrollbar-track {
-  background: var(--code-bg);
-  border-radius: 5px;
-}
-
-.tasks-list::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 5px;
-}
-
-.tasks-list::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
 }
 
 /* Responsive adjustments */
