@@ -14,14 +14,12 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Value to compare against",
-              "optional": false
+              "description": "Value to compare against"
             },
             {
               "name": "formula",
               "type": "formula",
-              "description": "Formula to evaluate",
-              "optional": false
+              "description": "Formula to evaluate"
             }
           ]
         }
@@ -40,14 +38,12 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Value to compare against",
-              "optional": false
+              "description": "Value to compare against"
             },
             {
               "name": "formula",
               "type": "formula",
-              "description": "Formula to evaluate",
-              "optional": false
+              "description": "Formula to evaluate"
             }
           ]
         }
@@ -66,14 +62,12 @@
             {
               "name": "value",
               "type": "float",
-              "description": "Value to compare against",
-              "optional": false
+              "description": "Value to compare against"
             },
             {
               "name": "formula",
               "type": "formula",
-              "description": "Formula to evaluate",
-              "optional": false
+              "description": "Formula to evaluate"
             }
           ]
         }
@@ -92,14 +86,12 @@
             {
               "name": "value",
               "type": "float",
-              "description": "Value to compare against",
-              "optional": false
+              "description": "Value to compare against"
             },
             {
               "name": "formula",
               "type": "formula",
-              "description": "Formula to evaluate",
-              "optional": false
+              "description": "Formula to evaluate"
             }
           ]
         }
@@ -118,14 +110,12 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Minimum allowed value",
-              "optional": false
+              "description": "Minimum allowed value"
             },
             {
               "name": "formula",
               "type": "formula",
-              "description": "Formula to evaluate",
-              "optional": false
+              "description": "Formula to evaluate"
             }
           ]
         }
@@ -144,14 +134,12 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Maximum allowed value",
-              "optional": false
+              "description": "Maximum allowed value"
             },
             {
               "name": "formula",
               "type": "formula",
-              "description": "Formula to evaluate",
-              "optional": false
+              "description": "Formula to evaluate"
             }
           ]
         }
@@ -170,20 +158,17 @@
             {
               "name": "min",
               "type": "float",
-              "description": "Lower bound (exclusive)",
-              "optional": false
+              "description": "Lower bound (exclusive)"
             },
             {
               "name": "max",
               "type": "float",
-              "description": "Upper bound (exclusive)",
-              "optional": false
+              "description": "Upper bound (exclusive)"
             },
             {
               "name": "formula",
               "type": "formula",
-              "description": "Formula to evaluate",
-              "optional": false
+              "description": "Formula to evaluate"
             }
           ]
         }
@@ -202,8 +187,7 @@
             {
               "name": "formula",
               "type": "formula",
-              "description": "Formula to evaluate",
-              "optional": false
+              "description": "Formula to evaluate"
             }
           ]
         }
@@ -222,8 +206,7 @@
             {
               "name": "formula",
               "type": "formula",
-              "description": "Formula to evaluate",
-              "optional": false
+              "description": "Formula to evaluate"
             }
           ]
         }
@@ -242,8 +225,7 @@
             {
               "name": "formula",
               "type": "formula",
-              "description": "Formula to evaluate",
-              "optional": false
+              "description": "Formula to evaluate"
             }
           ]
         }
@@ -262,8 +244,7 @@
             {
               "name": "formula",
               "type": "formula",
-              "description": "Formula to evaluate",
-              "optional": false
+              "description": "Formula to evaluate"
             }
           ]
         }
@@ -282,8 +263,7 @@
             {
               "name": "formula",
               "type": "formula",
-              "description": "Formula to evaluate",
-              "optional": false
+              "description": "Formula to evaluate"
             }
           ]
         }
@@ -302,8 +282,7 @@
             {
               "name": "formula",
               "type": "formula",
-              "description": "Formula to evaluate and debug",
-              "optional": false
+              "description": "Formula to evaluate and debug"
             }
           ]
         }
@@ -322,8 +301,7 @@
             {
               "name": "formula",
               "type": "formula",
-              "description": "Formula to evaluate with swapped context",
-              "optional": false
+              "description": "Formula to evaluate with swapped context"
             }
           ],
           "requires": ["caster", "target"]
@@ -343,14 +321,12 @@
             {
               "name": "actorID",
               "type": "string",
-              "description": "ID of actor to use as caster",
-              "optional": false
+              "description": "ID of actor to use as caster"
             },
             {
               "name": "formula",
               "type": "formula",
-              "description": "Formula to evaluate",
-              "optional": false
+              "description": "Formula to evaluate"
             }
           ],
           "requires": ["target"]
@@ -370,14 +346,12 @@
             {
               "name": "actorID",
               "type": "string",
-              "description": "ID of actor to use as target",
-              "optional": false
+              "description": "ID of actor to use as target"
             },
             {
               "name": "formula",
               "type": "formula",
-              "description": "Formula to evaluate",
-              "optional": false
+              "description": "Formula to evaluate"
             }
           ],
           "requires": ["caster"]
@@ -398,8 +372,7 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value to get",
-              "optional": false
+              "description": "Name of the actor value to get"
             }
           ],
           "requires": ["caster"]
@@ -420,8 +393,7 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the base actor value to get",
-              "optional": false
+              "description": "Name of the base actor value to get"
             }
           ],
           "requires": ["caster"]
@@ -442,8 +414,7 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value to get",
-              "optional": false
+              "description": "Name of the actor value to get"
             }
           ],
           "requires": ["target"]
@@ -464,8 +435,7 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the base actor value to get",
-              "optional": false
+              "description": "Name of the base actor value to get"
             }
           ],
           "requires": ["target"]
@@ -485,8 +455,7 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value to check",
-              "optional": false
+              "description": "Name of the actor value to check"
             }
           ],
           "requires": ["caster"]
@@ -506,14 +475,12 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value to check",
-              "optional": false
+              "description": "Name of the actor value to check"
             },
             {
               "name": "value",
               "type": "float",
-              "description": "Value to compare against",
-              "optional": false
+              "description": "Value to compare against"
             }
           ],
           "requires": ["caster"]
@@ -533,14 +500,12 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value to check",
-              "optional": false
+              "description": "Name of the actor value to check"
             },
             {
               "name": "value",
               "type": "float",
-              "description": "Value to compare against",
-              "optional": false
+              "description": "Value to compare against"
             }
           ],
           "requires": ["target"]
@@ -561,14 +526,12 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value to check",
-              "optional": false
+              "description": "Name of the actor value to check"
             },
             {
               "name": "value",
               "type": "float",
-              "description": "Value to compare against",
-              "optional": false
+              "description": "Value to compare against"
             }
           ],
           "requires": ["caster"]
@@ -589,14 +552,12 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value to check",
-              "optional": false
+              "description": "Name of the actor value to check"
             },
             {
               "name": "value",
               "type": "float",
-              "description": "Value to compare against",
-              "optional": false
+              "description": "Value to compare against"
             }
           ],
           "requires": ["target"]
@@ -616,14 +577,12 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value to check",
-              "optional": false
+              "description": "Name of the actor value to check"
             },
             {
               "name": "value",
               "type": "float",
-              "description": "Value to compare against",
-              "optional": false
+              "description": "Value to compare against"
             }
           ],
           "requires": ["caster"]
@@ -643,14 +602,12 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value to check",
-              "optional": false
+              "description": "Name of the actor value to check"
             },
             {
               "name": "value",
               "type": "float",
-              "description": "Value to compare against",
-              "optional": false
+              "description": "Value to compare against"
             }
           ],
           "requires": ["target"]
@@ -670,8 +627,7 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value to check",
-              "optional": false
+              "description": "Name of the actor value to check"
             }
           ],
           "requires": ["target"]
@@ -691,8 +647,7 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value to check",
-              "optional": false
+              "description": "Name of the actor value to check"
             }
           ],
           "requires": ["target"]
@@ -712,8 +667,7 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value to compare",
-              "optional": false
+              "description": "Name of the actor value to compare"
             }
           ],
           "requires": ["caster", "target"]
@@ -733,8 +687,7 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value effect",
-              "optional": false
+              "description": "Name of the actor value effect"
             }
           ],
           "requires": ["caster"]
@@ -754,8 +707,7 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value effect",
-              "optional": false
+              "description": "Name of the actor value effect"
             }
           ],
           "requires": ["target"]
@@ -775,14 +727,12 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value",
-              "optional": false
+              "description": "Name of the actor value"
             },
             {
               "name": "source",
               "type": "string",
-              "description": "Source ID to filter by",
-              "optional": false
+              "description": "Source ID to filter by"
             }
           ],
           "requires": ["caster"]
@@ -802,14 +752,12 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value",
-              "optional": false
+              "description": "Name of the actor value"
             },
             {
               "name": "source",
               "type": "string",
-              "description": "Source ID to filter by",
-              "optional": false
+              "description": "Source ID to filter by"
             }
           ],
           "requires": ["target"]
@@ -829,14 +777,12 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value",
-              "optional": false
+              "description": "Name of the actor value"
             },
             {
               "name": "source",
               "type": "string",
-              "description": "Source ID to exclude",
-              "optional": false
+              "description": "Source ID to exclude"
             }
           ],
           "requires": ["caster"]
@@ -856,14 +802,12 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Name of the actor value",
-              "optional": false
+              "description": "Name of the actor value"
             },
             {
               "name": "source",
               "type": "string",
-              "description": "Source ID to exclude",
-              "optional": false
+              "description": "Source ID to exclude"
             }
           ],
           "requires": ["target"]
@@ -882,10 +826,9 @@
           "example": "weapon:power",
           "arguments": [
             {
-              "name": "parameter",
+              "name": "power",
               "type": "string",
-              "description": "Must be 'power' or 'Power'",
-              "optional": false
+              "description": ""
             }
           ],
           "requires": ["caster"]
@@ -896,10 +839,9 @@
           "example": "weapon:maxRange",
           "arguments": [
             {
-              "name": "parameter",
+              "name": "maxRange",
               "type": "string",
-              "description": "Must be 'maxRange'",
-              "optional": false
+              "description": ""
             }
           ],
           "requires": ["caster"]
@@ -910,10 +852,9 @@
           "example": "weapon:weight",
           "arguments": [
             {
-              "name": "parameter",
+              "name": "weight",
               "type": "string",
-              "description": "Must be 'weight'",
-              "optional": false
+              "description": ""
             }
           ],
           "requires": ["caster"]
@@ -924,10 +865,9 @@
           "example": "weapon:throwDamageMod",
           "arguments": [
             {
-              "name": "parameter",
+              "name": "throwDamageMod",
               "type": "string",
-              "description": "Must be 'throwDamageMod'",
-              "optional": false
+              "description": ""
             }
           ],
           "requires": ["caster"]
@@ -938,10 +878,9 @@
           "example": "weapon:throwRangePenalty",
           "arguments": [
             {
-              "name": "parameter",
+              "name": "throwRangePenalty",
               "type": "string",
-              "description": "Must be 'throwRangePenalty'",
-              "optional": false
+              "description": ""
             }
           ],
           "requires": ["caster"]
@@ -952,10 +891,9 @@
           "example": "weapon:magnitude",
           "arguments": [
             {
-              "name": "parameter",
+              "name": "magnitude",
               "type": "string",
-              "description": "Must be 'magnitude'",
-              "optional": false
+              "description": ""
             }
           ],
           "requires": ["caster"]
@@ -966,10 +904,9 @@
           "example": "weapon:duration",
           "arguments": [
             {
-              "name": "parameter",
+              "name": "duration",
               "type": "string",
-              "description": "Must be 'duration'",
-              "optional": false
+              "description": ""
             }
           ],
           "requires": ["caster"]
@@ -980,10 +917,9 @@
           "example": "weapon:chance",
           "arguments": [
             {
-              "name": "parameter",
+              "name": "chance",
               "type": "string",
-              "description": "Must be 'chance'",
-              "optional": false
+              "description": ""
             }
           ],
           "requires": ["caster"]
@@ -996,8 +932,7 @@
             {
               "name": "element",
               "type": "Element",
-              "description": "Element name (e.g., fire, ice, lightning, physical, melee)",
-              "optional": false
+              "description": "Element name (e.g., fire, ice, lightning, physical, melee)"
             }
           ],
           "requires": ["caster"]
@@ -1016,10 +951,9 @@
           "example": "weapon2:power",
           "arguments": [
             {
-              "name": "parameter",
+              "name": "power",
               "type": "string",
-              "description": "Must be 'power' or 'Power'",
-              "optional": false
+              "description": ""
             }
           ],
           "requires": ["caster"]
@@ -1030,10 +964,9 @@
           "example": "weapon2:maxRange",
           "arguments": [
             {
-              "name": "parameter",
+              "name": "maxRange",
               "type": "string",
-              "description": "Must be 'maxRange'",
-              "optional": false
+              "description": ""
             }
           ],
           "requires": ["caster"]
@@ -1044,10 +977,9 @@
           "example": "weapon2:weight",
           "arguments": [
             {
-              "name": "parameter",
+              "name": "weight",
               "type": "string",
-              "description": "Must be 'weight'",
-              "optional": false
+              "description": ""
             }
           ],
           "requires": ["caster"]
@@ -1058,10 +990,9 @@
           "example": "weapon2:throwDamageMod",
           "arguments": [
             {
-              "name": "parameter",
+              "name": "throwDamageMod",
               "type": "string",
-              "description": "Must be 'throwDamageMod'",
-              "optional": false
+              "description": ""
             }
           ],
           "requires": ["caster"]
@@ -1072,10 +1003,9 @@
           "example": "weapon2:throwRangePenalty",
           "arguments": [
             {
-              "name": "parameter",
+              "name": "throwRangePenalty",
               "type": "string",
-              "description": "Must be 'throwRangePenalty'",
-              "optional": false
+              "description": ""
             }
           ],
           "requires": ["caster"]
@@ -1086,10 +1016,9 @@
           "example": "weapon2:magnitude",
           "arguments": [
             {
-              "name": "parameter",
+              "name": "magnitude",
               "type": "string",
-              "description": "Must be 'magnitude'",
-              "optional": false
+              "description": ""
             }
           ],
           "requires": ["caster"]
@@ -1100,10 +1029,9 @@
           "example": "weapon2:duration",
           "arguments": [
             {
-              "name": "parameter",
+              "name": "duration",
               "type": "string",
-              "description": "Must be 'duration'",
-              "optional": false
+              "description": ""
             }
           ],
           "requires": ["caster"]
@@ -1114,10 +1042,9 @@
           "example": "weapon2:chance",
           "arguments": [
             {
-              "name": "parameter",
+              "name": "chance",
               "type": "string",
-              "description": "Must be 'chance'",
-              "optional": false
+              "description": ""
             }
           ],
           "requires": ["caster"]
@@ -1125,13 +1052,12 @@
         {
           "description": "Returns 1 if the caster's off-hand weapon meets the specified element requirement, otherwise 0",
           "returns": "boolean",
-          "example": "weapon2:ice",
+          "example": "weapon2:melee",
           "arguments": [
             {
               "name": "element",
               "type": "Element",
-              "description": "Element name (e.g., fire, ice, lightning, physical, melee)",
-              "optional": false
+              "description": "Element name (e.g., fire, ice, lightning, physical, melee)"
             }
           ],
           "requires": ["caster"]
@@ -1152,8 +1078,7 @@
             {
               "name": "aoeID",
               "type": "string",
-              "description": "ID of the area of effect",
-              "optional": false
+              "description": "ID of the area of effect"
             }
           ],
           "requires": ["caster"]
@@ -1166,14 +1091,12 @@
             {
               "name": "aoeID",
               "type": "string",
-              "description": "ID of the area of effect",
-              "optional": false
+              "description": "ID of the area of effect"
             },
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Actor value to sum from each actor",
-              "optional": true
+              "description": "Actor value to sum from each actor"
             }
           ],
           "requires": ["caster"]
@@ -1194,8 +1117,7 @@
             {
               "name": "aoeID",
               "type": "string",
-              "description": "ID of the area of effect",
-              "optional": false
+              "description": "ID of the area of effect"
             }
           ],
           "requires": ["target or targetTC"]
@@ -1208,14 +1130,12 @@
             {
               "name": "aoeID",
               "type": "string",
-              "description": "ID of the area of effect",
-              "optional": false
+              "description": "ID of the area of effect"
             },
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Actor value to sum from each actor",
-              "optional": true
+              "description": "Actor value to sum from each actor"
             }
           ],
           "requires": ["target or targetTC"]
@@ -1235,8 +1155,7 @@
             {
               "name": "itemID",
               "type": "string",
-              "description": "ID of the item to count",
-              "optional": false
+              "description": "ID of the item to count"
             }
           ],
           "requires": ["target or targetTC"]
@@ -1256,14 +1175,12 @@
             {
               "name": "itemID",
               "type": "string",
-              "description": "ID of the item to count",
-              "optional": false
+              "description": "ID of the item to count"
             },
             {
               "name": "radius",
               "type": "integer",
-              "description": "Search radius in tiles",
-              "optional": false
+              "description": "Search radius in tiles"
             }
           ],
           "requires": ["target or targetTC"]
@@ -1283,14 +1200,12 @@
             {
               "name": "itemID",
               "type": "string",
-              "description": "ID of the item to count",
-              "optional": false
+              "description": "ID of the item to count"
             },
             {
               "name": "threshold",
               "type": "float",
-              "description": "Minimum count required",
-              "optional": false
+              "description": "Minimum count required"
             }
           ],
           "requires": ["target or targetTC"]
@@ -1310,14 +1225,12 @@
             {
               "name": "itemID",
               "type": "string",
-              "description": "ID of the item to count",
-              "optional": false
+              "description": "ID of the item to count"
             },
             {
               "name": "threshold",
               "type": "float",
-              "description": "Minimum count required",
-              "optional": false
+              "description": "Minimum count required"
             }
           ]
         }
@@ -1336,20 +1249,17 @@
             {
               "name": "x",
               "type": "integer",
-              "description": "X coordinate",
-              "optional": false
+              "description": "X coordinate"
             },
             {
               "name": "y",
               "type": "integer",
-              "description": "Y coordinate",
-              "optional": false
+              "description": "Y coordinate"
             },
             {
               "name": "itemID",
               "type": "string",
-              "description": "ID of the item to check",
-              "optional": false
+              "description": "ID of the item to check"
             }
           ]
         },
@@ -1361,8 +1271,7 @@
             {
               "name": "itemID",
               "type": "string",
-              "description": "ID of the item to check",
-              "optional": false
+              "description": "ID of the item to check"
             }
           ],
           "requires": ["targetTC"]
@@ -1382,8 +1291,7 @@
             {
               "name": "itemID",
               "type": "string",
-              "description": "ID of the item to count",
-              "optional": false
+              "description": "ID of the item to count"
             }
           ]
         }
@@ -1402,8 +1310,7 @@
             {
               "name": "itemID",
               "type": "string",
-              "description": "ID of the item to count",
-              "optional": false
+              "description": "ID of the item to count"
             }
           ]
         }
@@ -1422,8 +1329,7 @@
             {
               "name": "itemID",
               "type": "string",
-              "description": "ID of the item to check",
-              "optional": false
+              "description": "ID of the item to check"
             }
           ],
           "requires": ["targetTC"]
@@ -1443,8 +1349,7 @@
             {
               "name": "itemID",
               "type": "string",
-              "description": "ID of the item",
-              "optional": false
+              "description": "ID of the item"
             }
           ]
         }
@@ -1463,8 +1368,7 @@
             {
               "name": "itemID",
               "type": "string",
-              "description": "ID of the item",
-              "optional": false
+              "description": "ID of the item"
             }
           ]
         }
@@ -1483,8 +1387,7 @@
             {
               "name": "itemID",
               "type": "string",
-              "description": "ID of the item to count",
-              "optional": false
+              "description": "ID of the item to count"
             }
           ]
         }
@@ -1503,8 +1406,7 @@
             {
               "name": "globalVarName",
               "type": "string",
-              "description": "Global variable containing item ID",
-              "optional": false
+              "description": "Global variable containing item ID"
             }
           ]
         },
@@ -1516,14 +1418,12 @@
             {
               "name": "globalVarName",
               "type": "string",
-              "description": "Global variable containing item ID",
-              "optional": false
+              "description": "Global variable containing item ID"
             },
             {
               "name": "threshold",
               "type": "float",
-              "description": "Minimum count required",
-              "optional": true
+              "description": "Minimum count required"
             }
           ]
         }
@@ -1542,8 +1442,7 @@
             {
               "name": "itemID",
               "type": "string",
-              "description": "ID of the item to count",
-              "optional": false
+              "description": "ID of the item to count"
             }
           ]
         },
@@ -1555,14 +1454,12 @@
             {
               "name": "itemID",
               "type": "string",
-              "description": "ID of the item to count",
-              "optional": false
+              "description": "ID of the item to count"
             },
             {
               "name": "threshold",
               "type": "float",
-              "description": "Minimum count required",
-              "optional": true
+              "description": "Minimum count required"
             }
           ]
         }
@@ -1581,8 +1478,7 @@
             {
               "name": "globalVarName",
               "type": "string",
-              "description": "Global variable containing item ID",
-              "optional": false
+              "description": "Global variable containing item ID"
             }
           ]
         },
@@ -1594,14 +1490,12 @@
             {
               "name": "globalVarName",
               "type": "string",
-              "description": "Global variable containing item ID",
-              "optional": false
+              "description": "Global variable containing item ID"
             },
             {
               "name": "threshold",
               "type": "float",
-              "description": "Minimum count required",
-              "optional": true
+              "description": "Minimum count required"
             }
           ]
         }
@@ -1620,8 +1514,7 @@
             {
               "name": "itemID",
               "type": "string",
-              "description": "ID of the item with toMake list",
-              "optional": false
+              "description": "ID of the item with toMake list"
             }
           ]
         }
@@ -1640,8 +1533,7 @@
             {
               "name": "actorID",
               "type": "string",
-              "description": "ID of the actor to check",
-              "optional": false
+              "description": "ID of the actor to check"
             }
           ]
         }
@@ -1660,20 +1552,17 @@
             {
               "name": "actorID",
               "type": "string",
-              "description": "ID of the actor to check",
-              "optional": false
+              "description": "ID of the actor to check"
             },
             {
               "name": "x",
               "type": "integer",
-              "description": "X coordinate",
-              "optional": false
+              "description": "X coordinate"
             },
             {
               "name": "y",
               "type": "integer",
-              "description": "Y coordinate",
-              "optional": false
+              "description": "Y coordinate"
             }
           ]
         }
@@ -1692,8 +1581,7 @@
             {
               "name": "actorTypeID",
               "type": "string",
-              "description": "ID of the actor type",
-              "optional": false
+              "description": "ID of the actor type"
             }
           ]
         }
@@ -1712,8 +1600,7 @@
             {
               "name": "actorID",
               "type": "string",
-              "description": "ID of the actor to check",
-              "optional": false
+              "description": "ID of the actor to check"
             }
           ],
           "requires": ["target"]
@@ -1733,14 +1620,12 @@
             {
               "name": "x",
               "type": "integer",
-              "description": "X coordinate",
-              "optional": false
+              "description": "X coordinate"
             },
             {
               "name": "y",
               "type": "integer",
-              "description": "Y coordinate",
-              "optional": false
+              "description": "Y coordinate"
             }
           ],
           "requires": ["target"]
@@ -1760,8 +1645,7 @@
             {
               "name": "actorID",
               "type": "string",
-              "description": "ID of the actor to check",
-              "optional": false
+              "description": "ID of the actor to check"
             }
           ]
         }
@@ -1780,8 +1664,7 @@
             {
               "name": "actorID",
               "type": "string",
-              "description": "ID of the actor to check",
-              "optional": false
+              "description": "ID of the actor to check"
             }
           ]
         }
@@ -1800,14 +1683,12 @@
             {
               "name": "x",
               "type": "integer",
-              "description": "X coordinate",
-              "optional": false
+              "description": "X coordinate"
             },
             {
               "name": "y",
               "type": "integer",
-              "description": "Y coordinate",
-              "optional": false
+              "description": "Y coordinate"
             }
           ]
         }
@@ -1826,8 +1707,7 @@
             {
               "name": "actorID",
               "type": "string",
-              "description": "ID of the actor to check",
-              "optional": false
+              "description": "ID of the actor to check"
             }
           ]
         }
@@ -1846,8 +1726,7 @@
             {
               "name": "actorID",
               "type": "string",
-              "description": "ID of the actor to check",
-              "optional": false
+              "description": "ID of the actor to check"
             }
           ]
         }
@@ -1866,8 +1745,7 @@
             {
               "name": "actorTypeID",
               "type": "string",
-              "description": "ID of the ship actor type",
-              "optional": false
+              "description": "ID of the ship actor type"
             }
           ]
         }
@@ -1887,8 +1765,7 @@
             {
               "name": "actorTypeID",
               "type": "string",
-              "description": "ID of the actor type",
-              "optional": false
+              "description": "ID of the actor type"
             }
           ]
         }
@@ -1908,8 +1785,7 @@
             {
               "name": "globalVarName",
               "type": "string",
-              "description": "Global variable containing actor type ID",
-              "optional": false
+              "description": "Global variable containing actor type ID"
             }
           ]
         }
@@ -1929,8 +1805,7 @@
             {
               "name": "abilityID",
               "type": "string",
-              "description": "ID of the support ability",
-              "optional": false
+              "description": "ID of the support ability"
             }
           ],
           "requires": ["caster"]
@@ -1950,8 +1825,7 @@
             {
               "name": "abilityID",
               "type": "string",
-              "description": "ID of the support ability",
-              "optional": false
+              "description": "ID of the support ability"
             }
           ],
           "requires": ["caster"]
@@ -1971,8 +1845,7 @@
             {
               "name": "abilityID",
               "type": "string",
-              "description": "ID of the support ability",
-              "optional": false
+              "description": "ID of the support ability"
             }
           ],
           "requires": ["target"]
@@ -1992,8 +1865,7 @@
             {
               "name": "abilityID",
               "type": "string",
-              "description": "ID of the support ability",
-              "optional": false
+              "description": "ID of the support ability"
             }
           ],
           "requires": ["target"]
@@ -2014,8 +1886,7 @@
             {
               "name": "formulaName",
               "type": "string",
-              "description": "Name of the global formula",
-              "optional": false
+              "description": "Name of the global formula"
             }
           ]
         },
@@ -2027,14 +1898,12 @@
             {
               "name": "formulaName",
               "type": "string",
-              "description": "Name of the global formula",
-              "optional": false
+              "description": "Name of the global formula"
             },
             {
               "name": "x",
               "type": "float",
-              "description": "Parameter value passed as x to the formula",
-              "optional": true
+              "description": "Parameter value passed as x to the formula"
             }
           ]
         }
@@ -2054,8 +1923,7 @@
             {
               "name": "formulaName",
               "type": "string",
-              "description": "Name of the global formula",
-              "optional": false
+              "description": "Name of the global formula"
             }
           ]
         }
@@ -2075,8 +1943,7 @@
             {
               "name": "formulaName",
               "type": "string",
-              "description": "Name of the global formula",
-              "optional": false
+              "description": "Name of the global formula"
             }
           ]
         }
@@ -2096,8 +1963,7 @@
             {
               "name": "formulaName",
               "type": "string",
-              "description": "Name of the global formula",
-              "optional": false
+              "description": "Name of the global formula"
             }
           ]
         }
@@ -2117,8 +1983,7 @@
             {
               "name": "formulaName",
               "type": "string",
-              "description": "Name of the global formula",
-              "optional": false
+              "description": "Name of the global formula"
             }
           ]
         }
@@ -2137,14 +2002,12 @@
             {
               "name": "formulaName",
               "type": "string",
-              "description": "Name of the global formula",
-              "optional": false
+              "description": "Name of the global formula"
             },
             {
               "name": "threshold",
               "type": "float",
-              "description": "Maximum allowed value",
-              "optional": false
+              "description": "Maximum allowed value"
             }
           ]
         }
@@ -2163,14 +2026,12 @@
             {
               "name": "formulaName",
               "type": "string",
-              "description": "Name of the global formula",
-              "optional": false
+              "description": "Name of the global formula"
             },
             {
               "name": "threshold",
               "type": "float",
-              "description": "Minimum allowed value",
-              "optional": false
+              "description": "Minimum allowed value"
             }
           ]
         }
@@ -2189,14 +2050,12 @@
             {
               "name": "abilityID",
               "type": "string",
-              "description": "Support ability to check",
-              "optional": false
+              "description": "Support ability to check"
             },
             {
               "name": "formulaName",
               "type": "string",
-              "description": "Global formula to evaluate",
-              "optional": false
+              "description": "Global formula to evaluate"
             }
           ],
           "requires": ["caster"]
@@ -2217,8 +2076,7 @@
             {
               "name": "functionName",
               "type": "string",
-              "description": "Name of the math function",
-              "optional": false
+              "description": "Name of the math function"
             }
           ]
         },
@@ -2230,14 +2088,12 @@
             {
               "name": "functionName",
               "type": "string",
-              "description": "Name of the math function",
-              "optional": false
+              "description": "Name of the math function"
             },
             {
               "name": "parameter",
               "type": "float",
-              "description": "Parameter for the function",
-              "optional": true
+              "description": "Parameter for the function"
             }
           ]
         }
@@ -2256,8 +2112,7 @@
             {
               "name": "functionName",
               "type": "string",
-              "description": "Name of the math function",
-              "optional": false
+              "description": "Name of the math function"
             }
           ]
         }
@@ -2277,8 +2132,7 @@
             {
               "name": "functionName",
               "type": "string",
-              "description": "Name of the math function",
-              "optional": false
+              "description": "Name of the math function"
             }
           ]
         }
@@ -2298,8 +2152,7 @@
             {
               "name": "element",
               "type": "Element",
-              "description": "Element to check reactions for",
-              "optional": false
+              "description": "Element to check reactions for"
             }
           ],
           "requires": ["target"]
@@ -2319,8 +2172,7 @@
             {
               "name": "element",
               "type": "Element",
-              "description": "Element to check reactions for",
-              "optional": false
+              "description": "Element to check reactions for"
             }
           ],
           "requires": ["caster"]
@@ -2340,8 +2192,7 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Actor value to check reactions for",
-              "optional": false
+              "description": "Actor value to check reactions for"
             }
           ],
           "requires": ["target"]
@@ -2361,8 +2212,7 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Actor value to check immunity for",
-              "optional": false
+              "description": "Actor value to check immunity for"
             }
           ],
           "requires": ["target"]
@@ -2382,8 +2232,7 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Actor value to check reactions for",
-              "optional": false
+              "description": "Actor value to check reactions for"
             }
           ],
           "requires": ["caster"]
@@ -2403,8 +2252,7 @@
             {
               "name": "element",
               "type": "Element",
-              "description": "Element to count reactions for",
-              "optional": false
+              "description": "Element to count reactions for"
             }
           ],
           "requires": ["targetTC"]
@@ -2424,14 +2272,12 @@
             {
               "name": "prefix",
               "type": "string",
-              "description": "Prefix for the global var name",
-              "optional": false
+              "description": "Prefix for the global var name"
             },
             {
               "name": "globalVarName",
               "type": "string",
-              "description": "Global var containing the suffix",
-              "optional": false
+              "description": "Global var containing the suffix"
             }
           ]
         }
@@ -2450,14 +2296,12 @@
             {
               "name": "prefix",
               "type": "string",
-              "description": "Prefix for the global var name",
-              "optional": false
+              "description": "Prefix for the global var name"
             },
             {
               "name": "globalVarName",
               "type": "string",
-              "description": "Global var containing the suffix",
-              "optional": false
+              "description": "Global var containing the suffix"
             }
           ]
         }
@@ -2476,8 +2320,7 @@
             {
               "name": "prefix",
               "type": "string",
-              "description": "Prefix for the global var name",
-              "optional": false
+              "description": "Prefix for the global var name"
             }
           ]
         }
@@ -2496,8 +2339,7 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable",
-              "optional": false
+              "description": "Name of the global variable"
             }
           ]
         }
@@ -2516,8 +2358,7 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable",
-              "optional": false
+              "description": "Name of the global variable"
             }
           ]
         }
@@ -2536,8 +2377,7 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable",
-              "optional": false
+              "description": "Name of the global variable"
             }
           ]
         }
@@ -2556,8 +2396,7 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable",
-              "optional": false
+              "description": "Name of the global variable"
             }
           ]
         }
@@ -2576,8 +2415,7 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable",
-              "optional": false
+              "description": "Name of the global variable"
             }
           ]
         }
@@ -2596,8 +2434,7 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable",
-              "optional": false
+              "description": "Name of the global variable"
             }
           ]
         }
@@ -2616,8 +2453,7 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable",
-              "optional": false
+              "description": "Name of the global variable"
             }
           ]
         }
@@ -2636,8 +2472,7 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable",
-              "optional": false
+              "description": "Name of the global variable"
             }
           ]
         }
@@ -2656,8 +2491,7 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable",
-              "optional": false
+              "description": "Name of the global variable"
             }
           ]
         }
@@ -2676,14 +2510,12 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Global var containing actor ID",
-              "optional": false
+              "description": "Global var containing actor ID"
             },
             {
               "name": "dialogNodeID",
               "type": "string",
-              "description": "Dialog node ID to match",
-              "optional": false
+              "description": "Dialog node ID to match"
             }
           ]
         }
@@ -2702,8 +2534,7 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Global var containing location ID",
-              "optional": false
+              "description": "Global var containing location ID"
             }
           ]
         }
@@ -2723,14 +2554,12 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable",
-              "optional": false
+              "description": "Name of the global variable"
             },
             {
               "name": "compareValue",
               "type": "string",
-              "description": "Value to compare against",
-              "optional": false
+              "description": "Value to compare against"
             }
           ]
         },
@@ -2742,8 +2571,7 @@
             {
               "name": "varName,compareValue",
               "type": "string",
-              "description": "Comma-separated var name and value",
-              "optional": false
+              "description": "Comma-separated var name and value"
             }
           ]
         }
@@ -2763,14 +2591,12 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable",
-              "optional": false
+              "description": "Name of the global variable"
             },
             {
               "name": "compareValue",
               "type": "string",
-              "description": "Value to compare against",
-              "optional": false
+              "description": "Value to compare against"
             }
           ]
         },
@@ -2782,8 +2608,7 @@
             {
               "name": "varName,compareValue",
               "type": "string",
-              "description": "Comma-separated var name and value",
-              "optional": false
+              "description": "Comma-separated var name and value"
             }
           ]
         }
@@ -2802,14 +2627,12 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable",
-              "optional": false
+              "description": "Name of the global variable"
             },
             {
               "name": "value",
               "type": "float",
-              "description": "Value to compare against",
-              "optional": false
+              "description": "Value to compare against"
             }
           ]
         }
@@ -2829,14 +2652,12 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable",
-              "optional": false
+              "description": "Name of the global variable"
             },
             {
               "name": "value",
               "type": "float",
-              "description": "Value to compare against",
-              "optional": false
+              "description": "Value to compare against"
             }
           ]
         }
@@ -2855,8 +2676,7 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable",
-              "optional": false
+              "description": "Name of the global variable"
             }
           ]
         }
@@ -2875,14 +2695,12 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Global var containing actor ID",
-              "optional": false
+              "description": "Global var containing actor ID"
             },
             {
               "name": "partyIndex",
               "type": "integer",
-              "description": "Index in the party actors list",
-              "optional": false
+              "description": "Index in the party actors list"
             }
           ]
         }
@@ -2901,8 +2719,7 @@
             {
               "name": "partyIndex",
               "type": "integer",
-              "description": "Index in the party actors list",
-              "optional": false
+              "description": "Index in the party actors list"
             }
           ]
         }
@@ -2921,8 +2738,7 @@
             {
               "name": "actorTypeID",
               "type": "string",
-              "description": "Actor type ID to check",
-              "optional": false
+              "description": "Actor type ID to check"
             }
           ]
         }
@@ -2941,8 +2757,7 @@
             {
               "name": "actorTypeID",
               "type": "string",
-              "description": "Actor type ID to check",
-              "optional": false
+              "description": "Actor type ID to check"
             }
           ],
           "requires": ["caster"]
@@ -2962,8 +2777,7 @@
             {
               "name": "actorTypeID",
               "type": "string",
-              "description": "Actor type ID to check",
-              "optional": false
+              "description": "Actor type ID to check"
             }
           ],
           "requires": ["target"]
@@ -2983,8 +2797,7 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable containing time",
-              "optional": false
+              "description": "Name of the global variable containing time"
             }
           ]
         }
@@ -3003,8 +2816,7 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable containing time",
-              "optional": false
+              "description": "Name of the global variable containing time"
             }
           ]
         }
@@ -3023,14 +2835,12 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Global var containing time",
-              "optional": false
+              "description": "Global var containing time"
             },
             {
               "name": "threshold",
               "type": "float",
-              "description": "Maximum elapsed time",
-              "optional": false
+              "description": "Maximum elapsed time"
             }
           ]
         }
@@ -3049,14 +2859,12 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Global var containing time",
-              "optional": false
+              "description": "Global var containing time"
             },
             {
               "name": "threshold",
               "type": "float",
-              "description": "Maximum elapsed time (inclusive)",
-              "optional": false
+              "description": "Maximum elapsed time (inclusive)"
             }
           ]
         }
@@ -3075,14 +2883,12 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Global var containing time",
-              "optional": false
+              "description": "Global var containing time"
             },
             {
               "name": "threshold",
               "type": "float",
-              "description": "Minimum elapsed time",
-              "optional": false
+              "description": "Minimum elapsed time"
             }
           ]
         }
@@ -3101,14 +2907,12 @@
             {
               "name": "varName",
               "type": "string",
-              "description": "Global var containing time",
-              "optional": false
+              "description": "Global var containing time"
             },
             {
               "name": "threshold",
               "type": "float",
-              "description": "Minimum elapsed time",
-              "optional": false
+              "description": "Minimum elapsed time"
             }
           ]
         }
@@ -3127,8 +2931,7 @@
             {
               "name": "prefix",
               "type": "string",
-              "description": "Prefix to combine with location ID",
-              "optional": false
+              "description": "Prefix to combine with location ID"
             }
           ]
         }
@@ -3147,8 +2950,7 @@
             {
               "name": "actorID",
               "type": "string",
-              "description": "Actor ID to check",
-              "optional": false
+              "description": "Actor ID to check"
             }
           ]
         }
@@ -3168,8 +2970,7 @@
             {
               "name": "element",
               "type": "Element",
-              "description": "Element to check",
-              "optional": false
+              "description": "Element to check"
             }
           ],
           "requires": ["caster"]
@@ -3190,8 +2991,7 @@
             {
               "name": "element",
               "type": "Element",
-              "description": "Element to check",
-              "optional": false
+              "description": "Element to check"
             }
           ],
           "requires": ["caster"]
@@ -3211,8 +3011,7 @@
             {
               "name": "element",
               "type": "Element",
-              "description": "Element to check",
-              "optional": false
+              "description": "Element to check"
             }
           ],
           "requires": ["caster"]
@@ -3232,8 +3031,7 @@
             {
               "name": "element",
               "type": "Element",
-              "description": "Element to check",
-              "optional": false
+              "description": "Element to check"
             }
           ],
           "requires": ["caster"]
@@ -3253,20 +3051,17 @@
             {
               "name": "element",
               "type": "Element",
-              "description": "Element to check",
-              "optional": false
+              "description": "Element to check"
             },
             {
               "name": "x",
               "type": "integer",
-              "description": "X coordinate",
-              "optional": false
+              "description": "X coordinate"
             },
             {
               "name": "y",
               "type": "integer",
-              "description": "Y coordinate",
-              "optional": false
+              "description": "Y coordinate"
             }
           ]
         }
@@ -3285,8 +3080,7 @@
             {
               "name": "element",
               "type": "Element",
-              "description": "Element to check for",
-              "optional": false
+              "description": "Element to check for"
             }
           ],
           "requires": ["caster"]
@@ -3306,8 +3100,7 @@
             {
               "name": "element",
               "type": "Element",
-              "description": "Element to check for",
-              "optional": false
+              "description": "Element to check for"
             }
           ],
           "requires": ["caster"]
@@ -3327,8 +3120,7 @@
             {
               "name": "affecterID",
               "type": "string",
-              "description": "ActorValueAffecter ID to check",
-              "optional": false
+              "description": "ActorValueAffecter ID to check"
             }
           ]
         }
@@ -3347,8 +3139,7 @@
             {
               "name": "affecterID",
               "type": "string",
-              "description": "ActorValueAffecter ID to check",
-              "optional": false
+              "description": "ActorValueAffecter ID to check"
             }
           ],
           "requires": ["caster"]
@@ -3368,8 +3159,7 @@
             {
               "name": "zoneID",
               "type": "string",
-              "description": "Zone ID to check",
-              "optional": false
+              "description": "Zone ID to check"
             }
           ]
         }
@@ -3388,8 +3178,7 @@
             {
               "name": "zoneName",
               "type": "string",
-              "description": "Zone name to check",
-              "optional": false
+              "description": "Zone name to check"
             }
           ]
         }
@@ -3408,8 +3197,7 @@
             {
               "name": "locationID",
               "type": "string",
-              "description": "Location ID to check",
-              "optional": false
+              "description": "Location ID to check"
             }
           ]
         }
@@ -3428,8 +3216,7 @@
             {
               "name": "property",
               "type": "string",
-              "description": "Property name from Location object",
-              "optional": false
+              "description": "Property name from Location object"
             }
           ]
         }
@@ -3448,8 +3235,7 @@
             {
               "name": "locationID",
               "type": "string",
-              "description": "Location ID to check",
-              "optional": false
+              "description": "Location ID to check"
             }
           ]
         }
@@ -3468,8 +3254,7 @@
             {
               "name": "factionID",
               "type": "string",
-              "description": "Faction ID",
-              "optional": false
+              "description": "Faction ID"
             }
           ]
         }
@@ -3488,8 +3273,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Fame threshold",
-              "optional": false
+              "description": "Fame threshold"
             }
           ]
         }
@@ -3508,8 +3292,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Fame threshold",
-              "optional": false
+              "description": "Fame threshold"
             }
           ]
         }
@@ -3528,8 +3311,7 @@
             {
               "name": "factionID",
               "type": "string",
-              "description": "Faction ID",
-              "optional": false
+              "description": "Faction ID"
             }
           ]
         }
@@ -3548,14 +3330,12 @@
             {
               "name": "factionID",
               "type": "string",
-              "description": "Faction ID",
-              "optional": false
+              "description": "Faction ID"
             },
             {
               "name": "threshold",
               "type": "integer",
-              "description": "Minimum number of ports",
-              "optional": false
+              "description": "Minimum number of ports"
             }
           ]
         }
@@ -3574,8 +3354,7 @@
             {
               "name": "factionID",
               "type": "string",
-              "description": "Faction ID",
-              "optional": false
+              "description": "Faction ID"
             }
           ]
         }
@@ -3594,8 +3373,7 @@
             {
               "name": "factionID",
               "type": "string",
-              "description": "Faction ID",
-              "optional": false
+              "description": "Faction ID"
             }
           ]
         }
@@ -3614,8 +3392,7 @@
             {
               "name": "factionID",
               "type": "string",
-              "description": "Faction ID",
-              "optional": false
+              "description": "Faction ID"
             }
           ]
         }
@@ -3634,8 +3411,7 @@
             {
               "name": "factionID",
               "type": "string",
-              "description": "Faction ID",
-              "optional": false
+              "description": "Faction ID"
             }
           ]
         }
@@ -3654,8 +3430,7 @@
             {
               "name": "locationID",
               "type": "string",
-              "description": "Location ID",
-              "optional": false
+              "description": "Location ID"
             }
           ]
         }
@@ -3674,8 +3449,7 @@
             {
               "name": "partyIndex",
               "type": "integer",
-              "description": "Index in the party actors list",
-              "optional": false
+              "description": "Index in the party actors list"
             }
           ]
         }
@@ -3694,8 +3468,7 @@
             {
               "name": "dialogNodeID",
               "type": "string",
-              "description": "Dialog node ID",
-              "optional": false
+              "description": "Dialog node ID"
             }
           ]
         }
@@ -3714,8 +3487,7 @@
             {
               "name": "dialogNodeID",
               "type": "string",
-              "description": "Dialog node ID to check",
-              "optional": false
+              "description": "Dialog node ID to check"
             }
           ]
         }
@@ -3734,8 +3506,7 @@
             {
               "name": "dialogNodeID",
               "type": "string",
-              "description": "Dialog node ID to check",
-              "optional": false
+              "description": "Dialog node ID to check"
             }
           ]
         }
@@ -3754,14 +3525,12 @@
             {
               "name": "max",
               "type": "integer",
-              "description": "Maximum random value (inclusive)",
-              "optional": false
+              "description": "Maximum random value (inclusive)"
             },
             {
               "name": "compareValue",
               "type": "integer",
-              "description": "Value to check against",
-              "optional": false
+              "description": "Value to check against"
             }
           ],
           "requires": ["target"]
@@ -3782,8 +3551,7 @@
             {
               "name": "modID",
               "type": "string",
-              "description": "Mod ID or name (without special chars)",
-              "optional": false
+              "description": "Mod ID or name (without special chars)"
             }
           ]
         }
@@ -3802,8 +3570,7 @@
             {
               "name": "commandName",
               "type": "string",
-              "description": "Name of the key command",
-              "optional": false
+              "description": "Name of the key command"
             }
           ]
         }
@@ -3822,8 +3589,7 @@
             {
               "name": "commandName",
               "type": "string",
-              "description": "Name of the key command",
-              "optional": false
+              "description": "Name of the key command"
             }
           ],
           "requires": ["caster", "target"]
@@ -3843,8 +3609,7 @@
             {
               "name": "actorValue",
               "type": "string",
-              "description": "Actor value to get from clone",
-              "optional": false
+              "description": "Actor value to get from clone"
             }
           ],
           "requires": ["caster"]
@@ -3968,8 +3733,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Distance threshold to check",
-              "optional": true
+              "description": "Distance threshold to check"
             }
           ]
         }
@@ -4157,8 +3921,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "HP percentage threshold (0-1)",
-              "optional": false
+              "description": "HP percentage threshold (0-1)"
             }
           ]
         }
@@ -4402,8 +4165,7 @@
             {
               "name": "time",
               "type": "float",
-              "description": "Time threshold to check",
-              "optional": false
+              "description": "Time threshold to check"
             }
           ]
         }
@@ -4591,8 +4353,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Damage threshold",
-              "optional": false
+              "description": "Damage threshold"
             }
           ]
         }
@@ -4612,8 +4373,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Damage threshold",
-              "optional": false
+              "description": "Damage threshold"
             }
           ]
         }
@@ -4689,8 +4449,7 @@
             {
               "name": "value",
               "type": "float",
-              "description": "MP value to check",
-              "optional": false
+              "description": "MP value to check"
             }
           ]
         }
@@ -4710,8 +4469,7 @@
             {
               "name": "max",
               "type": "integer",
-              "description": "Maximum random value (min 1)",
-              "optional": true
+              "description": "Maximum random value (min 1)"
             }
           ]
         }
@@ -4745,8 +4503,7 @@
             {
               "name": "max",
               "type": "integer",
-              "description": "Maximum random value (min 1)",
-              "optional": true
+              "description": "Maximum random value (min 1)"
             }
           ]
         }
@@ -4772,8 +4529,7 @@
             {
               "name": "amount",
               "type": "float",
-              "description": "Money threshold to check",
-              "optional": true
+              "description": "Money threshold to check"
             }
           ]
         }
@@ -5107,8 +4863,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Party size threshold",
-              "optional": true
+              "description": "Party size threshold"
             }
           ]
         }
@@ -5134,8 +4889,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Party size threshold",
-              "optional": true
+              "description": "Party size threshold"
             }
           ]
         }
@@ -5161,8 +4915,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Crew size threshold",
-              "optional": true
+              "description": "Crew size threshold"
             }
           ]
         }
@@ -5188,8 +4941,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Fleet size threshold",
-              "optional": true
+              "description": "Fleet size threshold"
             }
           ]
         }
@@ -5215,8 +4967,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Barracks size threshold",
-              "optional": true
+              "description": "Barracks size threshold"
             }
           ]
         }
@@ -5236,8 +4987,7 @@
             {
               "name": "radius",
               "type": "integer",
-              "description": "Search radius in tiles",
-              "optional": false
+              "description": "Search radius in tiles"
             }
           ]
         }
@@ -5271,8 +5021,7 @@
             {
               "name": "radius",
               "type": "integer",
-              "description": "Search radius in tiles",
-              "optional": false
+              "description": "Search radius in tiles"
             }
           ]
         }
@@ -5292,8 +5041,7 @@
             {
               "name": "radius",
               "type": "integer",
-              "description": "Search radius in tiles",
-              "optional": false
+              "description": "Search radius in tiles"
             }
           ]
         }
@@ -5313,8 +5061,7 @@
             {
               "name": "radius",
               "type": "integer",
-              "description": "Search radius in tiles",
-              "optional": false
+              "description": "Search radius in tiles"
             }
           ]
         }
@@ -5334,8 +5081,7 @@
             {
               "name": "radius",
               "type": "integer",
-              "description": "Search radius in tiles",
-              "optional": false
+              "description": "Search radius in tiles"
             }
           ]
         }
@@ -5355,8 +5101,7 @@
             {
               "name": "radius",
               "type": "integer",
-              "description": "Search radius in tiles",
-              "optional": false
+              "description": "Search radius in tiles"
             }
           ]
         }
@@ -5376,8 +5121,7 @@
             {
               "name": "radius",
               "type": "integer",
-              "description": "Search radius in tiles",
-              "optional": false
+              "description": "Search radius in tiles"
             }
           ]
         }
@@ -5495,8 +5239,7 @@
             {
               "name": "radius",
               "type": "integer",
-              "description": "Search radius in tiles",
-              "optional": false
+              "description": "Search radius in tiles"
             }
           ]
         }
@@ -5516,8 +5259,7 @@
             {
               "name": "radius",
               "type": "integer",
-              "description": "Search radius in tiles",
-              "optional": false
+              "description": "Search radius in tiles"
             }
           ]
         }
@@ -5711,8 +5453,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Space threshold",
-              "optional": true
+              "description": "Space threshold"
             }
           ]
         }
@@ -5802,8 +5543,7 @@
             {
               "name": "amount",
               "type": "float",
-              "description": "Amount of food to check",
-              "optional": false
+              "description": "Amount of food to check"
             }
           ]
         }
@@ -5823,8 +5563,7 @@
             {
               "name": "amount",
               "type": "float",
-              "description": "Amount of goods to check",
-              "optional": false
+              "description": "Amount of goods to check"
             }
           ]
         }
@@ -5998,8 +5737,7 @@
             {
               "name": "index",
               "type": "integer",
-              "description": "Fleet boat index",
-              "optional": false
+              "description": "Fleet boat index"
             }
           ]
         }
@@ -6019,8 +5757,7 @@
             {
               "name": "index",
               "type": "integer",
-              "description": "Fleet boat index",
-              "optional": false
+              "description": "Fleet boat index"
             }
           ]
         }
@@ -6068,8 +5805,7 @@
             {
               "name": "max",
               "type": "float",
-              "description": "Maximum crew to consider",
-              "optional": false
+              "description": "Maximum crew to consider"
             }
           ]
         }
@@ -6243,8 +5979,7 @@
             {
               "name": "dayNumber",
               "type": "integer",
-              "description": "Day of week (0-6)",
-              "optional": false
+              "description": "Day of week (0-6)"
             }
           ]
         }
@@ -6284,8 +6019,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Day threshold",
-              "optional": true
+              "description": "Day threshold"
             }
           ]
         }
@@ -6381,8 +6115,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Favor threshold",
-              "optional": true
+              "description": "Favor threshold"
             }
           ]
         }
@@ -6402,8 +6135,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Favor threshold",
-              "optional": false
+              "description": "Favor threshold"
             }
           ]
         }
@@ -6437,8 +6169,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Favor threshold",
-              "optional": false
+              "description": "Favor threshold"
             }
           ]
         }
@@ -6458,8 +6189,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Negative favor threshold (used as -threshold)",
-              "optional": false
+              "description": "Negative favor threshold (used as -threshold)"
             }
           ]
         }
@@ -6479,8 +6209,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Favor threshold",
-              "optional": false
+              "description": "Favor threshold"
             }
           ]
         }
@@ -6500,8 +6229,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Negative favor threshold (used as -threshold)",
-              "optional": false
+              "description": "Negative favor threshold (used as -threshold)"
             }
           ]
         }
@@ -6527,8 +6255,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Count threshold",
-              "optional": true
+              "description": "Count threshold"
             }
           ]
         }
@@ -6638,8 +6365,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Wealth threshold",
-              "optional": true
+              "description": "Wealth threshold"
             }
           ]
         }
@@ -6665,8 +6391,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Favor threshold",
-              "optional": true
+              "description": "Favor threshold"
             }
           ]
         }
@@ -6756,8 +6481,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "X coordinate threshold",
-              "optional": false
+              "description": "X coordinate threshold"
             }
           ]
         }
@@ -6777,8 +6501,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Y coordinate threshold",
-              "optional": false
+              "description": "Y coordinate threshold"
             }
           ]
         }
@@ -6798,8 +6521,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "X coordinate threshold",
-              "optional": false
+              "description": "X coordinate threshold"
             }
           ]
         }
@@ -6819,8 +6541,7 @@
             {
               "name": "threshold",
               "type": "float",
-              "description": "Y coordinate threshold",
-              "optional": false
+              "description": "Y coordinate threshold"
             }
           ]
         }
