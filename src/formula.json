@@ -1,0 +1,6985 @@
+{
+  "gameVersion": "1.5.97",
+  "operators": [
+    {
+      "name": "lessThan",
+      "category": "comparison",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a formula result is less than a threshold value, otherwise 0",
+          "returns": "boolean",
+          "example": "lessThan:50:c:HP",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Value to compare against",
+              "optional": false
+            },
+            {
+              "name": "formula",
+              "type": "formula",
+              "description": "Formula to evaluate",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "moreThan",
+      "category": "comparison",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a formula result is greater than a threshold value, otherwise 0",
+          "returns": "boolean",
+          "example": "moreThan:100:t:HP",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Value to compare against",
+              "optional": false
+            },
+            {
+              "name": "formula",
+              "type": "formula",
+              "description": "Formula to evaluate",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "is",
+      "category": "comparison",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a formula result equals a value, otherwise 0",
+          "returns": "boolean",
+          "example": "is:5:c:morale",
+          "arguments": [
+            {
+              "name": "value",
+              "type": "float",
+              "description": "Value to compare against",
+              "optional": false
+            },
+            {
+              "name": "formula",
+              "type": "formula",
+              "description": "Formula to evaluate",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "isNot",
+      "category": "comparison",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a formula result does not equal a value, otherwise 0",
+          "returns": "boolean",
+          "example": "isNot:0:t:hostile",
+          "arguments": [
+            {
+              "name": "value",
+              "type": "float",
+              "description": "Value to compare against",
+              "optional": false
+            },
+            {
+              "name": "formula",
+              "type": "formula",
+              "description": "Formula to evaluate",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "min",
+      "category": "math",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the maximum of a threshold and a formula result (note: Math.Max is used despite the name)",
+          "returns": "float",
+          "example": "min:0:c:HP-10",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Minimum allowed value",
+              "optional": false
+            },
+            {
+              "name": "formula",
+              "type": "formula",
+              "description": "Formula to evaluate",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "max",
+      "category": "math",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the minimum of a threshold and a formula result (note: Math.Min is used despite the name)",
+          "returns": "float",
+          "example": "max:100:c:HP+50",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Maximum allowed value",
+              "optional": false
+            },
+            {
+              "name": "formula",
+              "type": "formula",
+              "description": "Formula to evaluate",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "between",
+      "category": "comparison",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a formula result is between two values (exclusive), otherwise 0",
+          "returns": "boolean",
+          "example": "between:10:50:c:HP",
+          "arguments": [
+            {
+              "name": "min",
+              "type": "float",
+              "description": "Lower bound (exclusive)",
+              "optional": false
+            },
+            {
+              "name": "max",
+              "type": "float",
+              "description": "Upper bound (exclusive)",
+              "optional": false
+            },
+            {
+              "name": "formula",
+              "type": "formula",
+              "description": "Formula to evaluate",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "abs",
+      "category": "math",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the absolute value of a formula",
+          "returns": "float",
+          "example": "abs:c:HP-t:HP",
+          "arguments": [
+            {
+              "name": "formula",
+              "type": "formula",
+              "description": "Formula to evaluate",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "floor",
+      "category": "math",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Rounds a formula result down to the nearest integer",
+          "returns": "float",
+          "example": "floor:c:HP*0.5",
+          "arguments": [
+            {
+              "name": "formula",
+              "type": "formula",
+              "description": "Formula to evaluate",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ceiling",
+      "category": "math",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Rounds a formula result up to the nearest integer",
+          "returns": "float",
+          "example": "ceiling:c:HP*0.5",
+          "arguments": [
+            {
+              "name": "formula",
+              "type": "formula",
+              "description": "Formula to evaluate",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "round",
+      "category": "math",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Rounds a formula result to the nearest integer",
+          "returns": "float",
+          "example": "round:c:HP*0.5",
+          "arguments": [
+            {
+              "name": "formula",
+              "type": "formula",
+              "description": "Formula to evaluate",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "not",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the formula evaluates to 0 or less, otherwise 0 (boolean NOT)",
+          "returns": "boolean",
+          "example": "not:c:hostile",
+          "arguments": [
+            {
+              "name": "formula",
+              "type": "formula",
+              "description": "Formula to evaluate",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "debug",
+      "category": "debug",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Evaluates a formula and prints its result and formula string to debug output",
+          "returns": "float",
+          "example": "debug:c:HP+t:HP",
+          "arguments": [
+            {
+              "name": "formula",
+              "type": "formula",
+              "description": "Formula to evaluate and debug",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "swapCasterTarget",
+      "category": "context-swap",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Evaluates a formula with caster and target swapped",
+          "returns": "float",
+          "example": "swapCasterTarget:c:HP",
+          "arguments": [
+            {
+              "name": "formula",
+              "type": "formula",
+              "description": "Formula to evaluate with swapped context",
+              "optional": false
+            }
+          ],
+          "requires": ["caster", "target"]
+        }
+      ]
+    },
+    {
+      "name": "swapCasterID",
+      "category": "context-swap",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Evaluates a formula with a specific actor as the caster",
+          "returns": "float",
+          "example": "swapCasterID:player:c:HP",
+          "arguments": [
+            {
+              "name": "actorID",
+              "type": "string",
+              "description": "ID of actor to use as caster",
+              "optional": false
+            },
+            {
+              "name": "formula",
+              "type": "formula",
+              "description": "Formula to evaluate",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "swapTargetID",
+      "category": "context-swap",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Evaluates a formula with a specific actor as the target",
+          "returns": "float",
+          "example": "swapTargetID:enemy1:t:HP",
+          "arguments": [
+            {
+              "name": "actorID",
+              "type": "string",
+              "description": "ID of actor to use as target",
+              "optional": false
+            },
+            {
+              "name": "formula",
+              "type": "formula",
+              "description": "Formula to evaluate",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "c",
+      "category": "actor-value",
+      "isFunctionStyle": false,
+      "aliases": ["C"],
+      "uses": [
+        {
+          "description": "Gets an actor value from the caster, or rank if the value is 'rank'",
+          "returns": "float",
+          "example": "c:HP",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value to get",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "cb",
+      "category": "actor-value",
+      "isFunctionStyle": false,
+      "aliases": ["CB"],
+      "uses": [
+        {
+          "description": "Gets the base actor value from the caster (without temporary effects)",
+          "returns": "float",
+          "example": "cb:STR",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the base actor value to get",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "t",
+      "category": "actor-value",
+      "isFunctionStyle": false,
+      "aliases": ["T"],
+      "uses": [
+        {
+          "description": "Gets an actor value from the target",
+          "returns": "float",
+          "example": "t:HP",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value to get",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "tb",
+      "category": "actor-value",
+      "isFunctionStyle": false,
+      "aliases": ["TB"],
+      "uses": [
+        {
+          "description": "Gets the base actor value from the target (without temporary effects)",
+          "returns": "float",
+          "example": "tb:DEF",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the base actor value to get",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "cIs1",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the caster's actor value equals 1, otherwise 0",
+          "returns": "boolean",
+          "example": "cIs1:burning",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value to check",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "cIs",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the caster's actor value equals a specific value, otherwise 0",
+          "returns": "boolean",
+          "example": "cIs:morale:5",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value to check",
+              "optional": false
+            },
+            {
+              "name": "value",
+              "type": "float",
+              "description": "Value to compare against",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "tIs",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the target's actor value equals a specific value, otherwise 0",
+          "returns": "boolean",
+          "example": "tIs:HP:10",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value to check",
+              "optional": false
+            },
+            {
+              "name": "value",
+              "type": "float",
+              "description": "Value to compare against",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "cIsMoreThan",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "aliases": ["cIsGreaterThan"],
+      "uses": [
+        {
+          "description": "Returns 1 if the caster's actor value is greater than a specific value, otherwise 0",
+          "returns": "boolean",
+          "example": "cIsMoreThan:HP:50",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value to check",
+              "optional": false
+            },
+            {
+              "name": "value",
+              "type": "float",
+              "description": "Value to compare against",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "tIsMoreThan",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "aliases": ["tIsGreaterThan"],
+      "uses": [
+        {
+          "description": "Returns 1 if the target's actor value is greater than a specific value, otherwise 0",
+          "returns": "boolean",
+          "example": "tIsMoreThan:DEF:20",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value to check",
+              "optional": false
+            },
+            {
+              "name": "value",
+              "type": "float",
+              "description": "Value to compare against",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "cIsLessThan",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the caster's actor value is less than a specific value, otherwise 0",
+          "returns": "boolean",
+          "example": "cIsLessThan:HP:25",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value to check",
+              "optional": false
+            },
+            {
+              "name": "value",
+              "type": "float",
+              "description": "Value to compare against",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "tIsLessThan",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the target's actor value is less than a specific value, otherwise 0",
+          "returns": "boolean",
+          "example": "tIsLessThan:HP:15",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value to check",
+              "optional": false
+            },
+            {
+              "name": "value",
+              "type": "float",
+              "description": "Value to compare against",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "tIs1",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the target's actor value equals 1, otherwise 0",
+          "returns": "boolean",
+          "example": "tIs1:stunned",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value to check",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "tIs99",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the target's actor value equals 99, otherwise 0",
+          "returns": "boolean",
+          "example": "tIs99:skill_Sword",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value to check",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "max_tc",
+      "category": "actor-value",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the maximum of the same actor value from target and caster",
+          "returns": "float",
+          "example": "max_tc:STR",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value to compare",
+              "optional": false
+            }
+          ],
+          "requires": ["caster", "target"]
+        }
+      ]
+    },
+    {
+      "name": "cDur",
+      "category": "actor-value",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the duration remaining of an actor value effect on the caster",
+          "returns": "float",
+          "example": "cDur:burning",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value effect",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "tDur",
+      "category": "actor-value",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the duration remaining of an actor value effect on the target",
+          "returns": "float",
+          "example": "tDur:stunned",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value effect",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "cFromSource",
+      "category": "actor-value",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the caster's actor value from a specific source",
+          "returns": "float",
+          "example": "cFromSource:STR:potion",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value",
+              "optional": false
+            },
+            {
+              "name": "source",
+              "type": "string",
+              "description": "Source ID to filter by",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "tFromSource",
+      "category": "actor-value",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the target's actor value from a specific source",
+          "returns": "float",
+          "example": "tFromSource:DEF:armor",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value",
+              "optional": false
+            },
+            {
+              "name": "source",
+              "type": "string",
+              "description": "Source ID to filter by",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "cExceptFromSource",
+      "category": "actor-value",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the caster's actor value excluding a specific source",
+          "returns": "float",
+          "example": "cExceptFromSource:STR:curse",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value",
+              "optional": false
+            },
+            {
+              "name": "source",
+              "type": "string",
+              "description": "Source ID to exclude",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "tExceptFromSource",
+      "category": "actor-value",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the target's actor value excluding a specific source",
+          "returns": "float",
+          "example": "tExceptFromSource:DEF:debuff",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Name of the actor value",
+              "optional": false
+            },
+            {
+              "name": "source",
+              "type": "string",
+              "description": "Source ID to exclude",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "weapon",
+      "category": "item",
+      "isFunctionStyle": false,
+      "aliases": ["w", "W"],
+      "uses": [
+        {
+          "description": "Returns the power value of the caster's equipped main-hand weapon",
+          "returns": "float",
+          "example": "weapon:power",
+          "arguments": [
+            {
+              "name": "parameter",
+              "type": "string",
+              "description": "Must be 'power' or 'Power'",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Returns the maximum range of the caster's equipped main-hand weapon action",
+          "returns": "float",
+          "example": "weapon:maxRange",
+          "arguments": [
+            {
+              "name": "parameter",
+              "type": "string",
+              "description": "Must be 'maxRange'",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Returns the weight of the caster's equipped main-hand weapon (minimum 1)",
+          "returns": "float",
+          "example": "weapon:weight",
+          "arguments": [
+            {
+              "name": "parameter",
+              "type": "string",
+              "description": "Must be 'weight'",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Returns the throw damage modifier of the caster's equipped main-hand weapon",
+          "returns": "float",
+          "example": "weapon:throwDamageMod",
+          "arguments": [
+            {
+              "name": "parameter",
+              "type": "string",
+              "description": "Must be 'throwDamageMod'",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Returns the throw range penalty of the caster's equipped main-hand weapon (based on weight)",
+          "returns": "float",
+          "example": "weapon:throwRangePenalty",
+          "arguments": [
+            {
+              "name": "parameter",
+              "type": "string",
+              "description": "Must be 'throwRangePenalty'",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Returns the magnitude formula result from the caster's equipped main-hand weapon action",
+          "returns": "float",
+          "example": "weapon:magnitude",
+          "arguments": [
+            {
+              "name": "parameter",
+              "type": "string",
+              "description": "Must be 'magnitude'",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Returns the duration formula result from the caster's equipped main-hand weapon action",
+          "returns": "float",
+          "example": "weapon:duration",
+          "arguments": [
+            {
+              "name": "parameter",
+              "type": "string",
+              "description": "Must be 'duration'",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Returns the chance formula result from the caster's equipped main-hand weapon action",
+          "returns": "float",
+          "example": "weapon:chance",
+          "arguments": [
+            {
+              "name": "parameter",
+              "type": "string",
+              "description": "Must be 'chance'",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Returns 1 if the caster's main-hand weapon meets the specified element requirement, otherwise 0",
+          "returns": "boolean",
+          "example": "weapon:fire",
+          "arguments": [
+            {
+              "name": "element",
+              "type": "Element",
+              "description": "Element name (e.g., fire, ice, lightning, physical, melee)",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "weapon2",
+      "category": "item",
+      "isFunctionStyle": false,
+      "aliases": ["w2", "W2"],
+      "uses": [
+        {
+          "description": "Returns the power value of the caster's equipped off-hand weapon",
+          "returns": "float",
+          "example": "weapon2:power",
+          "arguments": [
+            {
+              "name": "parameter",
+              "type": "string",
+              "description": "Must be 'power' or 'Power'",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Returns the maximum range of the caster's equipped off-hand weapon action",
+          "returns": "float",
+          "example": "weapon2:maxRange",
+          "arguments": [
+            {
+              "name": "parameter",
+              "type": "string",
+              "description": "Must be 'maxRange'",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Returns the weight of the caster's equipped off-hand weapon (minimum 1)",
+          "returns": "float",
+          "example": "weapon2:weight",
+          "arguments": [
+            {
+              "name": "parameter",
+              "type": "string",
+              "description": "Must be 'weight'",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Returns the throw damage modifier of the caster's equipped off-hand weapon",
+          "returns": "float",
+          "example": "weapon2:throwDamageMod",
+          "arguments": [
+            {
+              "name": "parameter",
+              "type": "string",
+              "description": "Must be 'throwDamageMod'",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Returns the throw range penalty of the caster's equipped off-hand weapon (based on weight)",
+          "returns": "float",
+          "example": "weapon2:throwRangePenalty",
+          "arguments": [
+            {
+              "name": "parameter",
+              "type": "string",
+              "description": "Must be 'throwRangePenalty'",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Returns the magnitude formula result from the caster's equipped off-hand weapon action",
+          "returns": "float",
+          "example": "weapon2:magnitude",
+          "arguments": [
+            {
+              "name": "parameter",
+              "type": "string",
+              "description": "Must be 'magnitude'",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Returns the duration formula result from the caster's equipped off-hand weapon action",
+          "returns": "float",
+          "example": "weapon2:duration",
+          "arguments": [
+            {
+              "name": "parameter",
+              "type": "string",
+              "description": "Must be 'duration'",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Returns the chance formula result from the caster's equipped off-hand weapon action",
+          "returns": "float",
+          "example": "weapon2:chance",
+          "arguments": [
+            {
+              "name": "parameter",
+              "type": "string",
+              "description": "Must be 'chance'",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Returns 1 if the caster's off-hand weapon meets the specified element requirement, otherwise 0",
+          "returns": "boolean",
+          "example": "weapon2:ice",
+          "arguments": [
+            {
+              "name": "element",
+              "type": "Element",
+              "description": "Element name (e.g., fire, ice, lightning, physical, melee)",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "allWithinAoEofCaster",
+      "category": "spatial",
+      "isFunctionStyle": false,
+      "aliases": ["allWithinAOEofCaster"],
+      "uses": [
+        {
+          "description": "Counts all actors within an AoE centered on the caster",
+          "returns": "float",
+          "example": "allWithinAoEofCaster:burst3",
+          "arguments": [
+            {
+              "name": "aoeID",
+              "type": "string",
+              "description": "ID of the area of effect",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        },
+        {
+          "description": "Sums an actor value from all actors within an AoE centered on the caster",
+          "returns": "float",
+          "example": "allWithinAoEofCaster:burst3:HP",
+          "arguments": [
+            {
+              "name": "aoeID",
+              "type": "string",
+              "description": "ID of the area of effect",
+              "optional": false
+            },
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Actor value to sum from each actor",
+              "optional": true
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "allWithinAoEofTarget",
+      "category": "spatial",
+      "isFunctionStyle": false,
+      "aliases": ["allWithinAOEofTarget"],
+      "uses": [
+        {
+          "description": "Counts all actors within an AoE centered on the target",
+          "returns": "float",
+          "example": "allWithinAoEofTarget:burst2",
+          "arguments": [
+            {
+              "name": "aoeID",
+              "type": "string",
+              "description": "ID of the area of effect",
+              "optional": false
+            }
+          ],
+          "requires": ["target or targetTC"]
+        },
+        {
+          "description": "Sums an actor value from all actors within an AoE centered on the target",
+          "returns": "float",
+          "example": "allWithinAoEofTarget:burst2:morale",
+          "arguments": [
+            {
+              "name": "aoeID",
+              "type": "string",
+              "description": "ID of the area of effect",
+              "optional": false
+            },
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Actor value to sum from each actor",
+              "optional": true
+            }
+          ],
+          "requires": ["target or targetTC"]
+        }
+      ]
+    },
+    {
+      "name": "item",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the number of a specific item at the target location or in target's inventory",
+          "returns": "float",
+          "example": "item:food",
+          "arguments": [
+            {
+              "name": "itemID",
+              "type": "string",
+              "description": "ID of the item to count",
+              "optional": false
+            }
+          ],
+          "requires": ["target or targetTC"]
+        }
+      ]
+    },
+    {
+      "name": "itemWithin",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the number of a specific item within a radius of the target",
+          "returns": "float",
+          "example": "itemWithin:treasure:5",
+          "arguments": [
+            {
+              "name": "itemID",
+              "type": "string",
+              "description": "ID of the item to count",
+              "optional": false
+            },
+            {
+              "name": "radius",
+              "type": "integer",
+              "description": "Search radius in tiles",
+              "optional": false
+            }
+          ],
+          "requires": ["target or targetTC"]
+        }
+      ]
+    },
+    {
+      "name": "itemsMoreThan",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if there are more than a specific number of items at target, otherwise 0",
+          "returns": "boolean",
+          "example": "itemsMoreThan:gold:10",
+          "arguments": [
+            {
+              "name": "itemID",
+              "type": "string",
+              "description": "ID of the item to count",
+              "optional": false
+            },
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Minimum count required",
+              "optional": false
+            }
+          ],
+          "requires": ["target or targetTC"]
+        }
+      ]
+    },
+    {
+      "name": "itemsZoneMoreThan",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if there are more than a specific number of items in the entire zone, otherwise 0",
+          "returns": "boolean",
+          "example": "itemsZoneMoreThan:treasure:5",
+          "arguments": [
+            {
+              "name": "itemID",
+              "type": "string",
+              "description": "ID of the item to count",
+              "optional": false
+            },
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Minimum count required",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "itemAt",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if an item exists at specific coordinates, otherwise 0",
+          "returns": "boolean",
+          "example": "itemAt:10:20:chest",
+          "arguments": [
+            {
+              "name": "x",
+              "type": "integer",
+              "description": "X coordinate",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "integer",
+              "description": "Y coordinate",
+              "optional": false
+            },
+            {
+              "name": "itemID",
+              "type": "string",
+              "description": "ID of the item to check",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "description": "Returns 1 if an item exists at targetTC, otherwise 0",
+          "returns": "boolean",
+          "example": "itemAt:treasure",
+          "arguments": [
+            {
+              "name": "itemID",
+              "type": "string",
+              "description": "ID of the item to check",
+              "optional": false
+            }
+          ],
+          "requires": ["targetTC"]
+        }
+      ]
+    },
+    {
+      "name": "itemsZone",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the number of a specific item in the entire zone",
+          "returns": "float",
+          "example": "itemsZone:food",
+          "arguments": [
+            {
+              "name": "itemID",
+              "type": "string",
+              "description": "ID of the item to count",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "itemsZoneOrParty",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the combined count of an item in the zone plus party inventory",
+          "returns": "float",
+          "example": "itemsZoneOrParty:key",
+          "arguments": [
+            {
+              "name": "itemID",
+              "type": "string",
+              "description": "ID of the item to count",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "canItemFit",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if an item can fit at the target tile coordinates, otherwise 0",
+          "returns": "boolean",
+          "example": "canItemFit:chest",
+          "arguments": [
+            {
+              "name": "itemID",
+              "type": "string",
+              "description": "ID of the item to check",
+              "optional": false
+            }
+          ],
+          "requires": ["targetTC"]
+        }
+      ]
+    },
+    {
+      "name": "itemValue",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the base value of an item type",
+          "returns": "float",
+          "example": "itemValue:sword",
+          "arguments": [
+            {
+              "name": "itemID",
+              "type": "string",
+              "description": "ID of the item",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "buyPrice",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the purchase price of an item",
+          "returns": "float",
+          "example": "buyPrice:armor",
+          "arguments": [
+            {
+              "name": "itemID",
+              "type": "string",
+              "description": "ID of the item",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "partyItem",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the total count of an item across all party members, crew, stash, and held items",
+          "returns": "float",
+          "example": "partyItem:potion",
+          "arguments": [
+            {
+              "name": "itemID",
+              "type": "string",
+              "description": "ID of the item to count",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "partyItem_g",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the count of an item (from global var) across party, or 1 if count meets threshold",
+          "returns": "float",
+          "example": "partyItem_g:questItem",
+          "arguments": [
+            {
+              "name": "globalVarName",
+              "type": "string",
+              "description": "Global variable containing item ID",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "description": "Returns 1 if party has at least threshold of item (from global var), otherwise 0",
+          "returns": "boolean",
+          "example": "partyItem_g:questItem:5",
+          "arguments": [
+            {
+              "name": "globalVarName",
+              "type": "string",
+              "description": "Global variable containing item ID",
+              "optional": false
+            },
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Minimum count required",
+              "optional": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "cargoItem",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the count of an item in the cargo inventory",
+          "returns": "float",
+          "example": "cargoItem:goods",
+          "arguments": [
+            {
+              "name": "itemID",
+              "type": "string",
+              "description": "ID of the item to count",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "description": "Returns 1 if cargo has at least threshold of item, otherwise 0",
+          "returns": "boolean",
+          "example": "cargoItem:food:10",
+          "arguments": [
+            {
+              "name": "itemID",
+              "type": "string",
+              "description": "ID of the item to count",
+              "optional": false
+            },
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Minimum count required",
+              "optional": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "cargoItem_g",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the count of an item (from global var) in cargo",
+          "returns": "float",
+          "example": "cargoItem_g:tradeGood",
+          "arguments": [
+            {
+              "name": "globalVarName",
+              "type": "string",
+              "description": "Global variable containing item ID",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "description": "Returns 1 if cargo has at least threshold of item (from global var), otherwise 0",
+          "returns": "boolean",
+          "example": "cargoItem_g:tradeGood:20",
+          "arguments": [
+            {
+              "name": "globalVarName",
+              "type": "string",
+              "description": "Global variable containing item ID",
+              "optional": false
+            },
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Minimum count required",
+              "optional": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "allItemsSpawned",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if all items in an item's toMake list have been spawned (global vars >= 1), otherwise 0",
+          "returns": "boolean",
+          "example": "allItemsSpawned:recipe",
+          "arguments": [
+            {
+              "name": "itemID",
+              "type": "string",
+              "description": "ID of the item with toMake list",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "actor",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if an actor with the specified ID exists in the zone, otherwise 0",
+          "returns": "boolean",
+          "example": "actor:guard1",
+          "arguments": [
+            {
+              "name": "actorID",
+              "type": "string",
+              "description": "ID of the actor to check",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "actorXY",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if an actor exists and is at specific coordinates, otherwise 0",
+          "returns": "boolean",
+          "example": "actorXY:guard1:10:15",
+          "arguments": [
+            {
+              "name": "actorID",
+              "type": "string",
+              "description": "ID of the actor to check",
+              "optional": false
+            },
+            {
+              "name": "x",
+              "type": "integer",
+              "description": "X coordinate",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "integer",
+              "description": "Y coordinate",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "actorsOfType",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the count of actors of a specific type in the zone",
+          "returns": "float",
+          "example": "actorsOfType:goblin",
+          "arguments": [
+            {
+              "name": "actorTypeID",
+              "type": "string",
+              "description": "ID of the actor type",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "target",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the target is a specific actor, otherwise 0",
+          "returns": "boolean",
+          "example": "target:boss",
+          "arguments": [
+            {
+              "name": "actorID",
+              "type": "string",
+              "description": "ID of the actor to check",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "targetXY",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the target is at specific coordinates, otherwise 0",
+          "returns": "boolean",
+          "example": "targetXY:5:10",
+          "arguments": [
+            {
+              "name": "x",
+              "type": "integer",
+              "description": "X coordinate",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "integer",
+              "description": "Y coordinate",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "fleet",
+      "category": "fleet",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if an actor is part of a fleet, otherwise 0",
+          "returns": "boolean",
+          "example": "fleet:ship1",
+          "arguments": [
+            {
+              "name": "actorID",
+              "type": "string",
+              "description": "ID of the actor to check",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "party",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if an actor is in the player's party, otherwise 0",
+          "returns": "boolean",
+          "example": "party:companion1",
+          "arguments": [
+            {
+              "name": "actorID",
+              "type": "string",
+              "description": "ID of the actor to check",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "partyXY",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if any party member is at specific coordinates, otherwise 0",
+          "returns": "boolean",
+          "example": "partyXY:20:25",
+          "arguments": [
+            {
+              "name": "x",
+              "type": "integer",
+              "description": "X coordinate",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "integer",
+              "description": "Y coordinate",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "landingParty",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if an actor ID is in the landing party, otherwise 0",
+          "returns": "boolean",
+          "example": "landingParty:crewMember1",
+          "arguments": [
+            {
+              "name": "actorID",
+              "type": "string",
+              "description": "ID of the actor to check",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "partyOrCrew",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if an actor is in the party or the player fleet's crew, otherwise 0",
+          "returns": "boolean",
+          "example": "partyOrCrew:sailor1",
+          "arguments": [
+            {
+              "name": "actorID",
+              "type": "string",
+              "description": "ID of the actor to check",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "shipTypeInPlayerFleet",
+      "category": "fleet",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the player fleet contains a ship of a specific type, otherwise 0",
+          "returns": "boolean",
+          "example": "shipTypeInPlayerFleet:galleon",
+          "arguments": [
+            {
+              "name": "actorTypeID",
+              "type": "string",
+              "description": "ID of the ship actor type",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "kills",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "aliases": ["k"],
+      "uses": [
+        {
+          "description": "Returns the number of kills of a specific actor type",
+          "returns": "float",
+          "example": "kills:goblin",
+          "arguments": [
+            {
+              "name": "actorTypeID",
+              "type": "string",
+              "description": "ID of the actor type",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "kills_g",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "aliases": ["k_g"],
+      "uses": [
+        {
+          "description": "Returns the number of kills of an actor type stored in a global variable",
+          "returns": "float",
+          "example": "kills_g:enemyType",
+          "arguments": [
+            {
+              "name": "globalVarName",
+              "type": "string",
+              "description": "Global variable containing actor type ID",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sa",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "aliases": ["csa", "support"],
+      "uses": [
+        {
+          "description": "Returns 1 if the caster has a specific support ability, otherwise 0",
+          "returns": "boolean",
+          "example": "sa:leadership",
+          "arguments": [
+            {
+              "name": "abilityID",
+              "type": "string",
+              "description": "ID of the support ability",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "notsa",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the caster does NOT have a specific support ability, otherwise 0",
+          "returns": "boolean",
+          "example": "notsa:swimming",
+          "arguments": [
+            {
+              "name": "abilityID",
+              "type": "string",
+              "description": "ID of the support ability",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "tsa",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the target has a specific support ability, otherwise 0",
+          "returns": "boolean",
+          "example": "tsa:flying",
+          "arguments": [
+            {
+              "name": "abilityID",
+              "type": "string",
+              "description": "ID of the support ability",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "nottsa",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the target does NOT have a specific support ability, otherwise 0",
+          "returns": "boolean",
+          "example": "nottsa:aquatic",
+          "arguments": [
+            {
+              "name": "abilityID",
+              "type": "string",
+              "description": "ID of the support ability",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "d",
+      "category": "global-var",
+      "isFunctionStyle": true,
+      "aliases": ["D", "Data", "data"],
+      "uses": [
+        {
+          "description": "Evaluates a user-defined global formula from Data.formulaGlobals",
+          "returns": "float",
+          "example": "d:swordDmg",
+          "arguments": [
+            {
+              "name": "formulaName",
+              "type": "string",
+              "description": "Name of the global formula",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "description": "Evaluates a user-defined global formula with an x parameter",
+          "returns": "float",
+          "example": "d:scalingDmg(5)",
+          "arguments": [
+            {
+              "name": "formulaName",
+              "type": "string",
+              "description": "Name of the global formula",
+              "optional": false
+            },
+            {
+              "name": "x",
+              "type": "float",
+              "description": "Parameter value passed as x to the formula",
+              "optional": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dMin0",
+      "category": "global-var",
+      "isFunctionStyle": true,
+      "aliases": ["DMin0"],
+      "uses": [
+        {
+          "description": "Evaluates a global formula and returns the maximum of 0 and the result",
+          "returns": "float",
+          "example": "dMin0:damage",
+          "arguments": [
+            {
+              "name": "formulaName",
+              "type": "string",
+              "description": "Name of the global formula",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dMax0",
+      "category": "global-var",
+      "isFunctionStyle": true,
+      "aliases": ["DMax0"],
+      "uses": [
+        {
+          "description": "Evaluates a global formula and returns the minimum of 0 and the result",
+          "returns": "float",
+          "example": "dMax0:healing",
+          "arguments": [
+            {
+              "name": "formulaName",
+              "type": "string",
+              "description": "Name of the global formula",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dMax1",
+      "category": "global-var",
+      "isFunctionStyle": true,
+      "aliases": ["DMax1"],
+      "uses": [
+        {
+          "description": "Evaluates a global formula and returns the minimum of 1 and the result (clamps to max 1)",
+          "returns": "float",
+          "example": "dMax1:chance",
+          "arguments": [
+            {
+              "name": "formulaName",
+              "type": "string",
+              "description": "Name of the global formula",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dMaxNeg1",
+      "category": "global-var",
+      "isFunctionStyle": true,
+      "aliases": ["DMaxNeg1"],
+      "uses": [
+        {
+          "description": "Evaluates a global formula and returns the minimum of -1 and the result (clamps to max -1)",
+          "returns": "float",
+          "example": "dMaxNeg1:penalty",
+          "arguments": [
+            {
+              "name": "formulaName",
+              "type": "string",
+              "description": "Name of the global formula",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dMax",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Evaluates a global formula and returns the minimum of a threshold and the result",
+          "returns": "float",
+          "example": "dMax:damage:50",
+          "arguments": [
+            {
+              "name": "formulaName",
+              "type": "string",
+              "description": "Name of the global formula",
+              "optional": false
+            },
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Maximum allowed value",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dMin",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Evaluates a global formula and returns the maximum of a threshold and the result",
+          "returns": "float",
+          "example": "dMin:damage:1",
+          "arguments": [
+            {
+              "name": "formulaName",
+              "type": "string",
+              "description": "Name of the global formula",
+              "optional": false
+            },
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Minimum allowed value",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dsa",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Evaluates a global formula if the caster has a specific support ability, otherwise returns 0",
+          "returns": "float",
+          "example": "dsa:berserker:rageDamage",
+          "arguments": [
+            {
+              "name": "abilityID",
+              "type": "string",
+              "description": "Support ability to check",
+              "optional": false
+            },
+            {
+              "name": "formulaName",
+              "type": "string",
+              "description": "Global formula to evaluate",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "m",
+      "category": "math",
+      "isFunctionStyle": true,
+      "aliases": ["M", "Math", "math"],
+      "uses": [
+        {
+          "description": "Evaluates a math function from the evaluateMath() method",
+          "returns": "float",
+          "example": "m:distance",
+          "arguments": [
+            {
+              "name": "functionName",
+              "type": "string",
+              "description": "Name of the math function",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "description": "Evaluates a math function with a parameter",
+          "returns": "float",
+          "example": "m:rand(100)",
+          "arguments": [
+            {
+              "name": "functionName",
+              "type": "string",
+              "description": "Name of the math function",
+              "optional": false
+            },
+            {
+              "name": "parameter",
+              "type": "float",
+              "description": "Parameter for the function",
+              "optional": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mIs0",
+      "category": "math",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if a math function evaluates to 0, otherwise 0",
+          "returns": "boolean",
+          "example": "mIs0:distance",
+          "arguments": [
+            {
+              "name": "functionName",
+              "type": "string",
+              "description": "Name of the math function",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mMin0",
+      "category": "math",
+      "isFunctionStyle": true,
+      "aliases": ["MMin0", "MathMin0", "mathMin0"],
+      "uses": [
+        {
+          "description": "Evaluates a math function and returns the maximum of 0 and the result",
+          "returns": "float",
+          "example": "mMin0:percentHPLost",
+          "arguments": [
+            {
+              "name": "functionName",
+              "type": "string",
+              "description": "Name of the math function",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ERxn",
+      "category": "combat",
+      "isFunctionStyle": false,
+      "aliases": ["rxn"],
+      "uses": [
+        {
+          "description": "Returns the combined damage multiplier from target's elemental reactions to a specific element",
+          "returns": "float",
+          "example": "ERxn:fire",
+          "arguments": [
+            {
+              "name": "element",
+              "type": "Element",
+              "description": "Element to check reactions for",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "rxnC",
+      "category": "combat",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the combined damage multiplier from caster's elemental reactions to a specific element",
+          "returns": "float",
+          "example": "rxnC:ice",
+          "arguments": [
+            {
+              "name": "element",
+              "type": "Element",
+              "description": "Element to check reactions for",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "AVrxn",
+      "category": "combat",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the combined damage multiplier from target's reactions to an actor value",
+          "returns": "float",
+          "example": "AVrxn:poison",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Actor value to check reactions for",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "AVrxnImmune",
+      "category": "combat",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if target is immune to an actor value (reaction multiplier <= 0), otherwise 0",
+          "returns": "boolean",
+          "example": "AVrxnImmune:stun",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Actor value to check immunity for",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "AVrxnC",
+      "category": "combat",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the combined damage multiplier from caster's reactions to an actor value",
+          "returns": "float",
+          "example": "AVrxnC:bleeding",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Actor value to check reactions for",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "numRxnsTile",
+      "category": "combat",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the count of elemental reactions on the target tile",
+          "returns": "float",
+          "example": "numRxnsTile:fire",
+          "arguments": [
+            {
+              "name": "element",
+              "type": "Element",
+              "description": "Element to count reactions for",
+              "optional": false
+            }
+          ],
+          "requires": ["targetTC"]
+        }
+      ]
+    },
+    {
+      "name": "g_gID",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Gets a global variable by concatenating a prefix with a value from another global var",
+          "returns": "float",
+          "example": "g_gID:questStep:currentQuest",
+          "arguments": [
+            {
+              "name": "prefix",
+              "type": "string",
+              "description": "Prefix for the global var name",
+              "optional": false
+            },
+            {
+              "name": "globalVarName",
+              "type": "string",
+              "description": "Global var containing the suffix",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "g_gIDIs1",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a composite global variable (prefix + global var value) equals 1, otherwise 0",
+          "returns": "boolean",
+          "example": "g_gIDIs1:flag:itemID",
+          "arguments": [
+            {
+              "name": "prefix",
+              "type": "string",
+              "description": "Prefix for the global var name",
+              "optional": false
+            },
+            {
+              "name": "globalVarName",
+              "type": "string",
+              "description": "Global var containing the suffix",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gPlusLocID",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Gets a global variable by concatenating a prefix with the current location ID",
+          "returns": "float",
+          "example": "gPlusLocID:visited",
+          "arguments": [
+            {
+              "name": "prefix",
+              "type": "string",
+              "description": "Prefix for the global var name",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "g",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Gets the value of a global variable",
+          "returns": "float",
+          "example": "g:questProgress",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Name of the global variable",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "g1",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Gets the value of a global variable clamped to a maximum of 1",
+          "returns": "float",
+          "example": "g1:completion",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Name of the global variable",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gIs0",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a global variable equals 0, otherwise 0",
+          "returns": "boolean",
+          "example": "gIs0:questStarted",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Name of the global variable",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gIs1",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a global variable equals 1, otherwise 0",
+          "returns": "boolean",
+          "example": "gIs1:bossDefeated",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Name of the global variable",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gIs2",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a global variable equals 2, otherwise 0",
+          "returns": "boolean",
+          "example": "gIs2:questPhase",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Name of the global variable",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gIsTalker",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a global variable's string value equals the current talking actor ID, otherwise 0",
+          "returns": "boolean",
+          "example": "gIsTalker:lastSpokenTo",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Name of the global variable",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gIsLocID",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a global variable's string value equals the current location ID, otherwise 0",
+          "returns": "boolean",
+          "example": "gIsLocID:savedLocation",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Name of the global variable",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gIsLocFaction",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a global variable's string value equals the current location's faction, otherwise 0",
+          "returns": "boolean",
+          "example": "gIsLocFaction:savedFaction",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Name of the global variable",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gIsTalkerFaction",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a global variable's string value equals the talking actor's faction, otherwise 0",
+          "returns": "boolean",
+          "example": "gIsTalkerFaction:allyFaction",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Name of the global variable",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gIsActorWithDialogNodeID",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if there's an actor in the zone with a specific dialog node ID and their ID matches a global var, otherwise 0",
+          "returns": "boolean",
+          "example": "gIsActorWithDialogNodeID:npcID:merchant",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Global var containing actor ID",
+              "optional": false
+            },
+            {
+              "name": "dialogNodeID",
+              "type": "string",
+              "description": "Dialog node ID to match",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gLocDiscovered",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a location stored in a global var has been discovered, otherwise 0",
+          "returns": "boolean",
+          "example": "gLocDiscovered:secretLocation",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Global var containing location ID",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gIs",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "alternateDelimiters": [","],
+      "uses": [
+        {
+          "description": "Returns 1 if a global variable's string value equals a comparison string, otherwise 0",
+          "returns": "boolean",
+          "example": "gIs:faction:pirates",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Name of the global variable",
+              "optional": false
+            },
+            {
+              "name": "compareValue",
+              "type": "string",
+              "description": "Value to compare against",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "description": "Returns 1 if a global variable equals a value (comma-delimited format)",
+          "returns": "boolean",
+          "example": "gIs:faction,pirates",
+          "arguments": [
+            {
+              "name": "varName,compareValue",
+              "type": "string",
+              "description": "Comma-separated var name and value",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gIsNot",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "alternateDelimiters": [","],
+      "uses": [
+        {
+          "description": "Returns 1 if a global variable's string value does not equal a comparison string, otherwise 0",
+          "returns": "boolean",
+          "example": "gIsNot:state:completed",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Name of the global variable",
+              "optional": false
+            },
+            {
+              "name": "compareValue",
+              "type": "string",
+              "description": "Value to compare against",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "description": "Returns 1 if a global variable does not equal a value (comma-delimited format)",
+          "returns": "boolean",
+          "example": "gIsNot:state,completed",
+          "arguments": [
+            {
+              "name": "varName,compareValue",
+              "type": "string",
+              "description": "Comma-separated var name and value",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gIsLessThan",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a global variable is less than a value, otherwise 0",
+          "returns": "boolean",
+          "example": "gIsLessThan:level:10",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Name of the global variable",
+              "optional": false
+            },
+            {
+              "name": "value",
+              "type": "float",
+              "description": "Value to compare against",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gIsMoreThan",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "aliases": ["gIsGreaterThan"],
+      "uses": [
+        {
+          "description": "Returns 1 if a global variable is greater than a value, otherwise 0",
+          "returns": "boolean",
+          "example": "gIsMoreThan:wealth:1000",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Name of the global variable",
+              "optional": false
+            },
+            {
+              "name": "value",
+              "type": "float",
+              "description": "Value to compare against",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gIsString",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a global variable contains a non-numeric string value (not empty, not '0'), otherwise 0",
+          "returns": "boolean",
+          "example": "gIsString:actorName",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Name of the global variable",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gIsPartyActorNum",
+      "category": "global-var",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a global variable's string value matches a party member's ID at a specific index, otherwise 0",
+          "returns": "boolean",
+          "example": "gIsPartyActorNum:leaderID:0",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Global var containing actor ID",
+              "optional": false
+            },
+            {
+              "name": "partyIndex",
+              "type": "integer",
+              "description": "Index in the party actors list",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mainPlayerIsPartyActorNum",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the main player actor is at a specific index in the party, otherwise 0",
+          "returns": "boolean",
+          "example": "mainPlayerIsPartyActorNum:0",
+          "arguments": [
+            {
+              "name": "partyIndex",
+              "type": "integer",
+              "description": "Index in the party actors list",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mainPlayerIsActorType",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the main player's actor type matches the specified type, otherwise 0",
+          "returns": "boolean",
+          "example": "mainPlayerIsActorType:human",
+          "arguments": [
+            {
+              "name": "actorTypeID",
+              "type": "string",
+              "description": "Actor type ID to check",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "cIsActorType",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the caster's actor type matches the specified type, otherwise 0",
+          "returns": "boolean",
+          "example": "cIsActorType:elf",
+          "arguments": [
+            {
+              "name": "actorTypeID",
+              "type": "string",
+              "description": "Actor type ID to check",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "tIsActorType",
+      "category": "condition",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the target's actor type matches the specified type, otherwise 0",
+          "returns": "boolean",
+          "example": "tIsActorType:dragon",
+          "arguments": [
+            {
+              "name": "actorTypeID",
+              "type": "string",
+              "description": "Actor type ID to check",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "gTime",
+      "category": "time",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the world time value stored in a global variable",
+          "returns": "float",
+          "example": "gTime:lastVisit",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Name of the global variable containing time",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gTimeSince",
+      "category": "time",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the time elapsed since the world time stored in a global variable",
+          "returns": "float",
+          "example": "gTimeSince:eventTime",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Name of the global variable containing time",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gTimeSinceLessThan",
+      "category": "time",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the time since a stored time is less than a threshold, otherwise 0",
+          "returns": "boolean",
+          "example": "gTimeSinceLessThan:cooldown:100",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Global var containing time",
+              "optional": false
+            },
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Maximum elapsed time",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gTimeSinceLessThanOrEqual",
+      "category": "time",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the time since a stored time is less than or equal to a threshold, otherwise 0",
+          "returns": "boolean",
+          "example": "gTimeSinceLessThanOrEqual:duration:50",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Global var containing time",
+              "optional": false
+            },
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Maximum elapsed time (inclusive)",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gTimeSinceMoreThanOrNeverAssigned",
+      "category": "time",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if time since stored time exceeds threshold OR variable doesn't exist, otherwise 0",
+          "returns": "boolean",
+          "example": "gTimeSinceMoreThanOrNeverAssigned:lastEvent:200",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Global var containing time",
+              "optional": false
+            },
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Minimum elapsed time",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gTimeSinceMoreThan",
+      "category": "time",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the time since a stored time exceeds a threshold, otherwise 0",
+          "returns": "boolean",
+          "example": "gTimeSinceMoreThan:respawnTime:300",
+          "arguments": [
+            {
+              "name": "varName",
+              "type": "string",
+              "description": "Global var containing time",
+              "optional": false
+            },
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Minimum elapsed time",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "gPlusLocIDTimeSince",
+      "category": "time",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns time elapsed since a global var formed by prefix + current location ID",
+          "returns": "float",
+          "example": "gPlusLocIDTimeSince:visited",
+          "arguments": [
+            {
+              "name": "prefix",
+              "type": "string",
+              "description": "Prefix to combine with location ID",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "talker",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the current talking actor has a specific ID, otherwise 0",
+          "returns": "boolean",
+          "example": "talker:merchant",
+          "arguments": [
+            {
+              "name": "actorID",
+              "type": "string",
+              "description": "Actor ID to check",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "geo",
+      "category": "spatial",
+      "isFunctionStyle": false,
+      "aliases": ["geo2"],
+      "uses": [
+        {
+          "description": "Returns the elemental strength of an element in the area around the caster (radius 3, power 2)",
+          "returns": "float",
+          "example": "geo:fire",
+          "arguments": [
+            {
+              "name": "element",
+              "type": "Element",
+              "description": "Element to check",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "geo_noVisuals",
+      "category": "spatial",
+      "isFunctionStyle": false,
+      "aliases": ["geo2_noVisuals"],
+      "uses": [
+        {
+          "description": "Returns elemental strength around caster without showing visual effects (radius 3, power 2)",
+          "returns": "float",
+          "example": "geo_noVisuals:ice",
+          "arguments": [
+            {
+              "name": "element",
+              "type": "Element",
+              "description": "Element to check",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "geo1",
+      "category": "spatial",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the elemental strength of an element around the caster (radius 3, power 1)",
+          "returns": "float",
+          "example": "geo1:elec",
+          "arguments": [
+            {
+              "name": "element",
+              "type": "Element",
+              "description": "Element to check",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "geo0",
+      "category": "spatial",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the elemental strength of an element around the caster (radius 3, power 0, no visuals)",
+          "returns": "float",
+          "example": "geo0:wind",
+          "arguments": [
+            {
+              "name": "element",
+              "type": "Element",
+              "description": "Element to check",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "geoXY",
+      "category": "spatial",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the elemental strength at specific coordinates (radius 3, power 0, no visuals)",
+          "returns": "float",
+          "example": "geoXY:fire:15:20",
+          "arguments": [
+            {
+              "name": "element",
+              "type": "Element",
+              "description": "Element to check",
+              "optional": false
+            },
+            {
+              "name": "x",
+              "type": "integer",
+              "description": "X coordinate",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "integer",
+              "description": "Y coordinate",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "cWeaponAugmentElement",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if caster's weapon has an augment of a specific element, otherwise 0",
+          "returns": "boolean",
+          "example": "cWeaponAugmentElement:fire",
+          "arguments": [
+            {
+              "name": "element",
+              "type": "Element",
+              "description": "Element to check for",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "cWeaponAugmentElementNoEnchant",
+      "category": "item",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if caster's weapon has an augment of a specific element but no corresponding enchantment, otherwise 0",
+          "returns": "boolean",
+          "example": "cWeaponAugmentElementNoEnchant:ice",
+          "arguments": [
+            {
+              "name": "element",
+              "type": "Element",
+              "description": "Element to check for",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "thisPreviousAVHit",
+      "category": "combat",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the previous AV affecter hit and matches a specific ID, otherwise 0",
+          "returns": "boolean",
+          "example": "thisPreviousAVHit:poisonDart",
+          "arguments": [
+            {
+              "name": "affecterID",
+              "type": "string",
+              "description": "ActorValueAffecter ID to check",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "myPreviousAVHit",
+      "category": "combat",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the previous AV affecter was cast by caster, hit, and matches an ID, otherwise 0",
+          "returns": "boolean",
+          "example": "myPreviousAVHit:fireball",
+          "arguments": [
+            {
+              "name": "affecterID",
+              "type": "string",
+              "description": "ActorValueAffecter ID to check",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "z",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a zone has been visited (exists in fog of war), otherwise 0",
+          "returns": "boolean",
+          "example": "z:dungeon1",
+          "arguments": [
+            {
+              "name": "zoneID",
+              "type": "string",
+              "description": "Zone ID to check",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "currentZone",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the current zone name matches the specified zone, otherwise 0",
+          "returns": "boolean",
+          "example": "currentZone:overworld",
+          "arguments": [
+            {
+              "name": "zoneName",
+              "type": "string",
+              "description": "Zone name to check",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "loc",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if the current location ID matches the specified location, otherwise 0",
+          "returns": "boolean",
+          "example": "loc:town",
+          "arguments": [
+            {
+              "name": "locationID",
+              "type": "string",
+              "description": "Location ID to check",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "locFloat",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns a numeric property value from the current location object",
+          "returns": "float",
+          "example": "locFloat:wealthLevel",
+          "arguments": [
+            {
+              "name": "property",
+              "type": "string",
+              "description": "Property name from Location object",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "locDiscovered",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a location has been discovered, otherwise 0",
+          "returns": "boolean",
+          "example": "locDiscovered:island2",
+          "arguments": [
+            {
+              "name": "locationID",
+              "type": "string",
+              "description": "Location ID to check",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "maxFavor",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the maximum favor value for a faction",
+          "returns": "float",
+          "example": "maxFavor:pirates",
+          "arguments": [
+            {
+              "name": "factionID",
+              "type": "string",
+              "description": "Faction ID",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "totalFameLessThan",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if total fame (explore + trade + combat) is less than threshold, otherwise 0",
+          "returns": "boolean",
+          "example": "totalFameLessThan:100",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Fame threshold",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "totalFameMoreThan",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if total fame (explore + trade + combat) is greater than threshold, otherwise 0",
+          "returns": "boolean",
+          "example": "totalFameMoreThan:500",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Fame threshold",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "factionPorts",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the number of ports allied with a faction",
+          "returns": "float",
+          "example": "factionPorts:empire",
+          "arguments": [
+            {
+              "name": "factionID",
+              "type": "string",
+              "description": "Faction ID",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "factionPortsMoreThan",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a faction has more than a threshold number of allied ports, otherwise 0",
+          "returns": "boolean",
+          "example": "factionPortsMoreThan:republic:5",
+          "arguments": [
+            {
+              "name": "factionID",
+              "type": "string",
+              "description": "Faction ID",
+              "optional": false
+            },
+            {
+              "name": "threshold",
+              "type": "integer",
+              "description": "Minimum number of ports",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "factionWealth",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the total wealth of a faction",
+          "returns": "float",
+          "example": "factionWealth:traders",
+          "arguments": [
+            {
+              "name": "factionID",
+              "type": "string",
+              "description": "Faction ID",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "factionFleets",
+      "category": "fleet",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the total number of fleets (merchant + battle) for a faction",
+          "returns": "float",
+          "example": "factionFleets:navy",
+          "arguments": [
+            {
+              "name": "factionID",
+              "type": "string",
+              "description": "Faction ID",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "factionMFleets",
+      "category": "fleet",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the number of merchant fleets for a faction",
+          "returns": "float",
+          "example": "factionMFleets:traders",
+          "arguments": [
+            {
+              "name": "factionID",
+              "type": "string",
+              "description": "Faction ID",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "factionBFleets",
+      "category": "fleet",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the number of battle fleets for a faction",
+          "returns": "float",
+          "example": "factionBFleets:empire",
+          "arguments": [
+            {
+              "name": "factionID",
+              "type": "string",
+              "description": "Faction ID",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "portWealth100",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a location's wealth level is at least 100, otherwise 0",
+          "returns": "boolean",
+          "example": "portWealth100:capital",
+          "arguments": [
+            {
+              "name": "locationID",
+              "type": "string",
+              "description": "Location ID",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "currentXPOfPartyActorNum",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the XP of the current class for a party member at a specific index",
+          "returns": "float",
+          "example": "currentXPOfPartyActorNum:0",
+          "arguments": [
+            {
+              "name": "partyIndex",
+              "type": "integer",
+              "description": "Index in the party actors list",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "getVendorTotalXP",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the total XP earned by an actor with a specific dialog node ID",
+          "returns": "float",
+          "example": "getVendorTotalXP:blacksmith",
+          "arguments": [
+            {
+              "name": "dialogNodeID",
+              "type": "string",
+              "description": "Dialog node ID",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "actorWithDialogNodeID",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if there's an actor in the zone with a specific dialog node ID, otherwise 0",
+          "returns": "boolean",
+          "example": "actorWithDialogNodeID:merchant",
+          "arguments": [
+            {
+              "name": "dialogNodeID",
+              "type": "string",
+              "description": "Dialog node ID to check",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "actorsWithDialogNodeID",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if there's an actor in the zone with a specific dialog node ID, otherwise 0 (same as actorWithDialogNodeID)",
+          "returns": "boolean",
+          "example": "actorsWithDialogNodeID:questGiver",
+          "arguments": [
+            {
+              "name": "dialogNodeID",
+              "type": "string",
+              "description": "Dialog node ID to check",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "randIDIs",
+      "category": "random",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a seeded random number (0 to max) equals a value, otherwise 0 (seed based on target hash + days/6)",
+          "returns": "boolean",
+          "example": "randIDIs:10:5",
+          "arguments": [
+            {
+              "name": "max",
+              "type": "integer",
+              "description": "Maximum random value (inclusive)",
+              "optional": false
+            },
+            {
+              "name": "compareValue",
+              "type": "integer",
+              "description": "Value to check against",
+              "optional": false
+            }
+          ],
+          "requires": ["target"]
+        }
+      ]
+    },
+    {
+      "name": "mod",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "aliases": ["modEnabled"],
+      "uses": [
+        {
+          "description": "Returns 1 if a mod is enabled and its folder exists, otherwise 0",
+          "returns": "boolean",
+          "example": "mod:myModName",
+          "arguments": [
+            {
+              "name": "modID",
+              "type": "string",
+              "description": "Mod ID or name (without special chars)",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "keyHeld",
+      "category": "game-state",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns 1 if a specific key command is currently held, otherwise 0",
+          "returns": "boolean",
+          "example": "keyHeld:action1",
+          "arguments": [
+            {
+              "name": "commandName",
+              "type": "string",
+              "description": "Name of the key command",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "timedHitCheck",
+      "category": "combat",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Returns the timed hit power multiplier if conditions are met (key held briefly at right moment), otherwise 0",
+          "returns": "float",
+          "example": "timedHitCheck:action1",
+          "arguments": [
+            {
+              "name": "commandName",
+              "type": "string",
+              "description": "Name of the key command",
+              "optional": false
+            }
+          ],
+          "requires": ["caster", "target"]
+        }
+      ]
+    },
+    {
+      "name": "cClone",
+      "category": "actor-value",
+      "isFunctionStyle": false,
+      "uses": [
+        {
+          "description": "Creates a clone of the caster and returns an actor value from the clone",
+          "returns": "float",
+          "example": "cClone:HP",
+          "arguments": [
+            {
+              "name": "actorValue",
+              "type": "string",
+              "description": "Actor value to get from clone",
+              "optional": false
+            }
+          ],
+          "requires": ["caster"]
+        }
+      ]
+    },
+    {
+      "name": "m:evasionFacing",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns evasion multiplier based on the facing angle between caster and target (0.1 to 1.0)",
+          "returns": "float",
+          "example": "m:evasionFacing",
+          "arguments": []
+        }
+      ],
+      "aliases": ["m:evaFacing", "m:evafacing", "m:evasionfacing"]
+    },
+    {
+      "name": "m:evasionfacing_diffFromBack",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns evasion multiplier minus 0.1 (difference from back facing)",
+          "returns": "float",
+          "example": "m:evasionfacing_diffFromBack",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:evasionfacing_diffFromOpposite",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns difference between evasion multiplier and opposite-facing evasion",
+          "returns": "float",
+          "example": "m:evasionfacing_diffFromOpposite",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:evaFacingMod",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns additional evasion from PhysEvaFlank actor value based on facing angle",
+          "returns": "float",
+          "example": "m:evaFacingMod",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:frontFacing",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster is facing target's front (within 45 degrees), 0 otherwise",
+          "returns": "boolean",
+          "example": "m:frontFacing",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:backFacing",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster is facing target's back (135-225 degrees), 0 otherwise",
+          "returns": "boolean",
+          "example": "m:backFacing",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:dark",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if the zone has darkness and target is in a dark area, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:dark",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:distance",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns distance in tiles between caster and target",
+          "returns": "float",
+          "example": "m:distance",
+          "arguments": []
+        },
+        {
+          "description": "Returns 1 if distance is >= threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:distance(5)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Distance threshold to check",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "aliases": ["m:tileDistance", "m:tiledistance"]
+    },
+    {
+      "name": "m:distanceFleet",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns distance in tiles between player's flagship and target",
+          "returns": "float",
+          "example": "m:distanceFleet",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:distanceRaw",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns raw distance (not rounded to tiles) between caster and target",
+          "returns": "float",
+          "example": "m:distanceRaw",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:distFromCaster",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns distance from the original caster position (stored in global)",
+          "returns": "float",
+          "example": "m:distFromCaster",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:previousAVHit",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if the previous ActorValueAffecter hit, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:previousAVHit",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:previousAVChanceYes",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if the previous ActorValueAffecter's chance check succeeded, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:previousAVChanceYes",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:numSelectedTargets",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns the number of currently selected targets",
+          "returns": "float",
+          "example": "m:numSelectedTargets",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:numSelectedTargets_Actors",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns the number of selected targets that have actors on them",
+          "returns": "float",
+          "example": "m:numSelectedTargets_Actors",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:sniperBonus",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns damage bonus (0-0.3) for chance values over 100%",
+          "returns": "float",
+          "example": "m:sniperBonus",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:targetExists",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target is not null, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:targetExists",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:targetExistsAndIsntCaster",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target exists and is not the same as caster, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:targetExistsAndIsntCaster",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:percentHPLost",
+      "category": "actor-value",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns percentage (0-1) of HP lost by caster",
+          "returns": "float",
+          "example": "m:percentHPLost",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:targetPercentHPLost",
+      "category": "actor-value",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns percentage (0-1) of HP lost by target",
+          "returns": "float",
+          "example": "m:targetPercentHPLost",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:targetPercentHPLowerThan",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target's current HP percentage is <= threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:targetPercentHPLowerThan(0.5)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "HP percentage threshold (0-1)",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tBreakableWeapon",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target has a weapon that can be broken, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tBreakableWeapon",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tBrokenWeapon",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target has a broken weapon equipped, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tBrokenWeapon",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tBreakableArmor",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target has armor that can be broken, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tBreakableArmor",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tDropItem",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target can drop an item, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tDropItem",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:incapped",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target is incapacitated or has HP <= 0, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:incapped",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tCancel",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target is charging or casting and can be cancelled, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tCancel",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cCritical",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster is in critical HP state, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:cCritical",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tCritical",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target is in critical HP state, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tCritical",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cCurable",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster has any curable harmful status effects, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:cCurable",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tCurable",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target has any curable harmful status effects, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tCurable",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tNegativeStatuses",
+      "category": "actor-value",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of harmful removable status effects on target",
+          "returns": "float",
+          "example": "m:tNegativeStatuses",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tStatuses",
+      "category": "actor-value",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of all removable status effects on target",
+          "returns": "float",
+          "example": "m:tStatuses",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:casterCurrentTurn",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if it's caster's turn or not in combat mode, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:casterCurrentTurn",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:casterNotCurrentTurn",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if it's not caster's turn and in combat mode, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:casterNotCurrentTurn",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tActTimer",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns target's current act timer value",
+          "returns": "float",
+          "example": "m:tActTimer",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tActTimerLeft",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns time remaining on target's act timer",
+          "returns": "float",
+          "example": "m:tActTimerLeft",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tCanActBeforeX",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target can act before specified time, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tCanActBeforeX(50)",
+          "arguments": [
+            {
+              "name": "time",
+              "type": "float",
+              "description": "Time threshold to check",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cHostile",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster is hostile, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:cHostile",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:hostile",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster is hostile, 0 otherwise (same as cHostile)",
+          "returns": "boolean",
+          "example": "m:hostile",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tHostile",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target is hostile, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tHostile",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:sameHostile",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster and target have same hostile state, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:sameHostile",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:diffHostile",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster and target have different hostile states, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:diffHostile",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:targetIsCurrentActor",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target is the current actor whose turn it is, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:targetIsCurrentActor",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:casterIsTarget",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster and target are the same actor, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:casterIsTarget",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:casterIsntTarget",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster and target are different actors, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:casterIsntTarget",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tTameable",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target is tameable and valid to tame, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tTameable",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tLastDmgTaken",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns last HP damage taken by target (0 or positive)",
+          "returns": "float",
+          "example": "m:tLastDmgTaken",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cLastDmgTaken",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns last HP damage taken by caster (0 or positive)",
+          "returns": "float",
+          "example": "m:cLastDmgTaken",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tLastDmgHealed",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns last HP healing received by target (0 or negative)",
+          "returns": "float",
+          "example": "m:tLastDmgHealed",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cLastDmgTakenGreaterThanX",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster's last damage taken exceeds threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:cLastDmgTakenGreaterThanX(10)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Damage threshold",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cLastDmgTakenLessThanX",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster's last damage taken is below threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:cLastDmgTakenLessThanX(5)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Damage threshold",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cLastDmgTakenVsLifeSkill",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns minimum of caster's last damage taken and Life skill value",
+          "returns": "float",
+          "example": "m:cLastDmgTakenVsLifeSkill",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cLastDmgTakenVsHalfLifeSkill",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns minimum of caster's last damage taken and half of Life skill value (min 1)",
+          "returns": "float",
+          "example": "m:cLastDmgTakenVsHalfLifeSkill",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cLastDmgTakenLessThanHalfLifeSkillPlus1",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if last damage taken < floor(Life skill * 0.5) + 1, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:cLastDmgTakenLessThanHalfLifeSkillPlus1",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cLastDmgTakenLessThanHalfLifeSkillPlus2",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if last damage taken < floor(Life skill * 0.5) + 2, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:cLastDmgTakenLessThanHalfLifeSkillPlus2",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cIsMP",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster's MP equals the specified value, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:cIsMP(5)",
+          "arguments": [
+            {
+              "name": "value",
+              "type": "float",
+              "description": "MP value to check",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:rand",
+      "category": "random",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns random integer from 0 to parameter (inclusive)",
+          "returns": "float",
+          "example": "m:rand(100)",
+          "arguments": [
+            {
+              "name": "max",
+              "type": "integer",
+              "description": "Maximum random value (min 1)",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:randSign",
+      "category": "random",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns randomly either 1 or -1",
+          "returns": "float",
+          "example": "m:randSign",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:randID",
+      "category": "random",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns seeded random integer (0 to max) based on target's hash code",
+          "returns": "float",
+          "example": "m:randID(10)",
+          "arguments": [
+            {
+              "name": "max",
+              "type": "integer",
+              "description": "Maximum random value (min 1)",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:money",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns player's current money amount",
+          "returns": "float",
+          "example": "m:money",
+          "arguments": []
+        },
+        {
+          "description": "Returns 1 if player has >= specified money, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:money(100)",
+          "arguments": [
+            {
+              "name": "amount",
+              "type": "float",
+              "description": "Money threshold to check",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tmoney",
+      "category": "item",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns amount of gold in target's inventory",
+          "returns": "float",
+          "example": "m:tmoney",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tInvValue",
+      "category": "item",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns total value of all items in target's inventory",
+          "returns": "float",
+          "example": "m:tInvValue",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tArmed",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target has weapon(s) equipped, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tArmed",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tArmored",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target has armor equipped, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tArmored",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tHumanoid",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target's actor type is humanoid, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tHumanoid",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cWpnBroken",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster's weapon is broken, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:cWpnBroken",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tIsPlayer",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target is the player actor, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tIsPlayer",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tControllable",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target is controllable by player, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tControllable",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tcControllable",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target and caster have same controllable state, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tcControllable",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tFearless",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target is fearless, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tFearless",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tUnrevivable",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target's actor type is unrevivable, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tUnrevivable",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tCastTime",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns time remaining on target's cast/charge timer, 0 if not casting",
+          "returns": "float",
+          "example": "m:tCastTime",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tHPBasedMax5",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns minimum of 5 and target's max HP * 0.1",
+          "returns": "float",
+          "example": "m:tHPBasedMax5",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tIsHP10OrLess",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target has 10 HP or less, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tIsHP10OrLess",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cMorale_Vs_tMorale",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns positive difference between caster and target morale (0 if caster lower)",
+          "returns": "float",
+          "example": "m:cMorale_Vs_tMorale",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cHighestRangedSkill",
+      "category": "actor-value",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns highest of caster's Bow and Aim skills",
+          "returns": "float",
+          "example": "m:cHighestRangedSkill",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cLowestMeleeSkill",
+      "category": "actor-value",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns lowest of caster's Sword, Axe, Hammer, Spear, and Flail skills",
+          "returns": "float",
+          "example": "m:cLowestMeleeSkill",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cLowestCCMeleeSkill",
+      "category": "actor-value",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns lowest of caster's Fist and Dagger skills",
+          "returns": "float",
+          "example": "m:cLowestCCMeleeSkill",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cLowestMagicSkill",
+      "category": "actor-value",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns lowest of caster's Fire, Ice, Elec, Wind, Life, and Ruin skills",
+          "returns": "float",
+          "example": "m:cLowestMagicSkill",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cDistanceMoved",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns distance in tiles caster moved this turn",
+          "returns": "float",
+          "example": "m:cDistanceMoved",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tDistanceFromCOriginalPos",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns distance between target and caster's position before movement",
+          "returns": "float",
+          "example": "m:tDistanceFromCOriginalPos",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:anySameClassesOrActorType",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target shares any class or actor type with caster, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:anySameClassesOrActorType",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:partySize",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns number of actors in the party",
+          "returns": "float",
+          "example": "m:partySize",
+          "arguments": []
+        },
+        {
+          "description": "Returns 1 if party size >= threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:partySize(4)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Party size threshold",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:landingPartySize",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns number of actors in the landing party",
+          "returns": "float",
+          "example": "m:landingPartySize",
+          "arguments": []
+        },
+        {
+          "description": "Returns 1 if landing party size >= threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:landingPartySize(3)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Party size threshold",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:crewSize",
+      "category": "fleet",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns number of crew members in player fleet",
+          "returns": "float",
+          "example": "m:crewSize",
+          "arguments": []
+        },
+        {
+          "description": "Returns 1 if crew size >= threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:crewSize(10)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Crew size threshold",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:fleetSize",
+      "category": "fleet",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns number of boats in player fleet",
+          "returns": "float",
+          "example": "m:fleetSize",
+          "arguments": []
+        },
+        {
+          "description": "Returns 1 if fleet size > threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:fleetSize(2)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Fleet size threshold",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:barracksSize",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns total actors in barracks plus active party",
+          "returns": "float",
+          "example": "m:barracksSize",
+          "arguments": []
+        },
+        {
+          "description": "Returns 1 if barracks size >= threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:barracksSize(8)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Barracks size threshold",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:numEnemiesWithinX",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of non-incapacitated enemy actors within specified radius of caster",
+          "returns": "float",
+          "example": "m:numEnemiesWithinX(3)",
+          "arguments": [
+            {
+              "name": "radius",
+              "type": "integer",
+              "description": "Search radius in tiles",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:numEnemiesWithin1",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of non-incapacitated enemy actors within 1 tile of caster",
+          "returns": "float",
+          "example": "m:numEnemiesWithin1",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:numFactionAlliesWithin",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of same-faction allies within radius of caster",
+          "returns": "float",
+          "example": "m:numFactionAlliesWithin(2)",
+          "arguments": [
+            {
+              "name": "radius",
+              "type": "integer",
+              "description": "Search radius in tiles",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:numAlliesWithin",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of same-hostility allies within radius of caster",
+          "returns": "float",
+          "example": "m:numAlliesWithin(3)",
+          "arguments": [
+            {
+              "name": "radius",
+              "type": "integer",
+              "description": "Search radius in tiles",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:numAlliesNearTargetWithin",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of caster's allies within radius of target",
+          "returns": "float",
+          "example": "m:numAlliesNearTargetWithin(2)",
+          "arguments": [
+            {
+              "name": "radius",
+              "type": "integer",
+              "description": "Search radius in tiles",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:numAlliesExceptCasterNearTargetWithin",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of caster's allies (excluding caster) within radius of target",
+          "returns": "float",
+          "example": "m:numAlliesExceptCasterNearTargetWithin(3)",
+          "arguments": [
+            {
+              "name": "radius",
+              "type": "integer",
+              "description": "Search radius in tiles",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:numActorsExceptCasterNearTargetWithin",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of all actors (excluding caster) within radius of target",
+          "returns": "float",
+          "example": "m:numActorsExceptCasterNearTargetWithin(2)",
+          "arguments": [
+            {
+              "name": "radius",
+              "type": "integer",
+              "description": "Search radius in tiles",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:numEnemiesNearTargetWithin",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of enemies within radius of target",
+          "returns": "float",
+          "example": "m:numEnemiesNearTargetWithin(2)",
+          "arguments": [
+            {
+              "name": "radius",
+              "type": "integer",
+              "description": "Search radius in tiles",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:numActorsAt",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of actors at target position",
+          "returns": "float",
+          "example": "m:numActorsAt",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:moreThanOneActorAt",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if more than one actor is at target position, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:moreThanOneActorAt",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:numNPCsAt",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of non-controllable actors at target position",
+          "returns": "float",
+          "example": "m:numNPCsAt",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tPlayer",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target's faction is 'player', 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tPlayer",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:extraRacesUnlocked",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if extra races are unlocked globally, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:extraRacesUnlocked",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:ruinMode",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if ruin mode is enabled, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:ruinMode",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:corruptedZonesDetected",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Always returns 0 (feature removed or not implemented)",
+          "returns": "float",
+          "example": "m:corruptedZonesDetected",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:corespawner_rangeBonus",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of 'pillburrow' actor types within radius of caster (same hostility)",
+          "returns": "float",
+          "example": "m:corespawner_rangeBonus(5)",
+          "arguments": [
+            {
+              "name": "radius",
+              "type": "integer",
+              "description": "Search radius in tiles",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:heart_rangeBonus",
+      "category": "spatial",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of 'heart_segment' actor types within radius of caster (same hostility)",
+          "returns": "float",
+          "example": "m:heart_rangeBonus(4)",
+          "arguments": [
+            {
+              "name": "radius",
+              "type": "integer",
+              "description": "Search radius in tiles",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:target90PercentHPCantKill",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 90% of target's HP if result wouldn't reduce HP below 2, otherwise 0",
+          "returns": "float",
+          "example": "m:target90PercentHPCantKill",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:combat",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if currently in combat mode, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:combat",
+          "arguments": []
+        }
+      ],
+      "aliases": ["m:inCombat"]
+    },
+    {
+      "name": "m:outCombat",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if not in combat mode, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:outCombat",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cCanBoard",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster (a boat) has crew available for boarding, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:cCanBoard",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:manipItemsThisTurn",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if current action involves item manipulation, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:manipItemsThisTurn",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:didntActLastTurn",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if actor didn't perform action last turn, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:didntActLastTurn",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:didntMoveLastTurn",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if actor didn't move last turn, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:didntMoveLastTurn",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:bribeCost",
+      "category": "combat",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns calculated bribery cost for target's combat group",
+          "returns": "float",
+          "example": "m:bribeCost",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:buriedItemsAtTarget",
+      "category": "item",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of buried items at target tile coordinates",
+          "returns": "float",
+          "example": "m:buriedItemsAtTarget",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:itemsHeld",
+      "category": "item",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of items currently being held by player",
+          "returns": "float",
+          "example": "m:itemsHeld",
+          "arguments": []
+        }
+      ],
+      "aliases": ["m:itemHeld", "m:heldItems", "m:heldItem"]
+    },
+    {
+      "name": "m:cargo",
+      "category": "fleet",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns current cargo weight",
+          "returns": "float",
+          "example": "m:cargo",
+          "arguments": []
+        }
+      ],
+      "aliases": ["m:cargoCurrent"]
+    },
+    {
+      "name": "m:cargoMax",
+      "category": "fleet",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns maximum cargo capacity",
+          "returns": "float",
+          "example": "m:cargoMax",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cargoSpace",
+      "category": "fleet",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns available cargo space (max - current)",
+          "returns": "float",
+          "example": "m:cargoSpace",
+          "arguments": []
+        },
+        {
+          "description": "Returns 1 if cargo space >= threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:cargoSpace(50)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Space threshold",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cargoOverLimit",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if current cargo exceeds maximum capacity, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:cargoOverLimit",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:maxFoodBuy",
+      "category": "item",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns maximum food units player can buy (limited by money and cargo space)",
+          "returns": "float",
+          "example": "m:maxFoodBuy",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:fleetRepairsNeeded",
+      "category": "fleet",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns total repair points needed for player fleet",
+          "returns": "float",
+          "example": "m:fleetRepairsNeeded",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:fleetRepairsCost",
+      "category": "fleet",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns cost to repair fleet (with favor reduction applied)",
+          "returns": "float",
+          "example": "m:fleetRepairsCost",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:fleetRepairsCostBase",
+      "category": "fleet",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns base cost to repair fleet (without favor reduction)",
+          "returns": "float",
+          "example": "m:fleetRepairsCostBase",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:canAffordFood",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if player can afford specified amount of food, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:canAffordFood(10)",
+          "arguments": [
+            {
+              "name": "amount",
+              "type": "float",
+              "description": "Amount of food to check",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:canAffordGoods",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if player can afford specified amount of location's trade goods, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:canAffordGoods(5)",
+          "arguments": [
+            {
+              "name": "amount",
+              "type": "float",
+              "description": "Amount of goods to check",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:anyDuplicateCannons",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if any fleet boat has duplicate cannons equipped, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:anyDuplicateCannons",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:noEquippedCannonsButSomeInCargo",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if fleet has no cannons equipped but some in cargo, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:noEquippedCannonsButSomeInCargo",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:gamepad",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if gamepad is being used instead of keyboard, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:gamepad",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:partyPower",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns current party power level (with modifiers)",
+          "returns": "float",
+          "example": "m:partyPower",
+          "arguments": []
+        }
+      ],
+      "aliases": ["m:partypower"]
+    },
+    {
+      "name": "m:partyPower_base",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns base party power level (without temporary modifiers)",
+          "returns": "float",
+          "example": "m:partyPower_base",
+          "arguments": []
+        }
+      ],
+      "aliases": ["m:partypower_base"]
+    },
+    {
+      "name": "m:enemyPower",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns total power level of all hostile actors in zone",
+          "returns": "float",
+          "example": "m:enemyPower",
+          "arguments": []
+        }
+      ],
+      "aliases": ["m:enemypower"]
+    },
+    {
+      "name": "m:partyVsEnemyPower",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns ratio of party power to enemy power (party / enemy)",
+          "returns": "float",
+          "example": "m:partyVsEnemyPower",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cBoat",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster is a boat, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:cBoat",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tBoat",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target is a boat, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tBoat",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:foodPerDay",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns food consumption per day for current fleet",
+          "returns": "float",
+          "example": "m:foodPerDay",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:pCrewNum",
+      "category": "fleet",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns total number of crew in player fleet",
+          "returns": "float",
+          "example": "m:pCrewNum",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:bCrewNum",
+      "category": "fleet",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns crew count for boat at specified fleet index",
+          "returns": "float",
+          "example": "m:bCrewNum(0)",
+          "arguments": [
+            {
+              "name": "index",
+              "type": "integer",
+              "description": "Fleet boat index",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:bTypeValue",
+      "category": "fleet",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns value of boat type at specified fleet index",
+          "returns": "float",
+          "example": "m:bTypeValue(1)",
+          "arguments": [
+            {
+              "name": "index",
+              "type": "integer",
+              "description": "Fleet boat index",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cMinCrew",
+      "category": "actor-value",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns minimum crew requirement for caster's actor type",
+          "returns": "float",
+          "example": "m:cMinCrew",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cCrewNum",
+      "category": "actor-value",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns current crew count for caster (boat)",
+          "returns": "float",
+          "example": "m:cCrewNum",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cCrewNumMax",
+      "category": "actor-value",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns minimum of caster's crew count and specified maximum",
+          "returns": "float",
+          "example": "m:cCrewNumMax(5)",
+          "arguments": [
+            {
+              "name": "max",
+              "type": "float",
+              "description": "Maximum crew to consider",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cCrewLow",
+      "category": "actor-value",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns crew multiplier: 1.0 (normal), 0.75 (<=1 crew), or 0.5 (<=0.5 crew)",
+          "returns": "float",
+          "example": "m:cCrewLow",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tCrewNum",
+      "category": "actor-value",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns current crew count for target (boat)",
+          "returns": "float",
+          "example": "m:tCrewNum",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cCrewMorale",
+      "category": "actor-value",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns crew morale (0-1) for caster: 0.7 if NPC, player crew morale / 100 if player",
+          "returns": "float",
+          "example": "m:cCrewMorale",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:pCrewMorale",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns player crew morale as decimal (0-1)",
+          "returns": "float",
+          "example": "m:pCrewMorale",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cCrewNumIsNot0",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster has at least one non-incapacitated crew member, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:cCrewNumIsNot0",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cCrewNumIs0",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if caster has no non-incapacitated crew members, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:cCrewNumIs0",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:player_crewMorale",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns player crew morale as integer (0-100)",
+          "returns": "float",
+          "example": "m:player_crewMorale",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:playerStrongerThanFleet",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if player fleet power > talking actor's fleet power * 3 * bravery, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:playerStrongerThanFleet",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:playerStrongerThanCasterFleet",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if player fleet power > caster's fleet power * 3 * bravery, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:playerStrongerThanCasterFleet",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tIntelligence",
+      "category": "actor-value",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns target's intelligence value",
+          "returns": "float",
+          "example": "m:tIntelligence",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:player_speed",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns player's current movement speed (0 if idle, speed * 4 if moving)",
+          "returns": "float",
+          "example": "m:player_speed",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:isItThisDayOfWeek",
+      "category": "time",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if current day matches specified day of week (0-6), 0 otherwise",
+          "returns": "boolean",
+          "example": "m:isItThisDayOfWeek(3)",
+          "arguments": [
+            {
+              "name": "dayNumber",
+              "type": "integer",
+              "description": "Day of week (0-6)",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:isItDaytime",
+      "category": "time",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if current time is daytime, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:isItDaytime",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:time_days",
+      "category": "time",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns current day of month (1-30)",
+          "returns": "float",
+          "example": "m:time_days",
+          "arguments": []
+        },
+        {
+          "description": "Returns 1 if day >= threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:time_days(15)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Day threshold",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:time_month",
+      "category": "time",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns current month number",
+          "returns": "float",
+          "example": "m:time_month",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:time_days_total",
+      "category": "time",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns total days elapsed since game start + 1",
+          "returns": "float",
+          "example": "m:time_days_total",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:overworld",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if current zone is the overworld, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:overworld",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:peaceful",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if current zone is peaceful (no combat), 0 otherwise",
+          "returns": "boolean",
+          "example": "m:peaceful",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:tMerchant",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target's fleet is a merchant fleet, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:tMerchant",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:playerFavor",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns player's favor with their current faction",
+          "returns": "float",
+          "example": "m:playerFavor",
+          "arguments": []
+        },
+        {
+          "description": "Returns 1 if favor >= threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:playerFavor(50)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Favor threshold",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:playerFavorBelow",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if player's current faction favor < threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:playerFavorBelow(25)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Favor threshold",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:playerFavorWithTarget",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns player's favor with target's faction",
+          "returns": "float",
+          "example": "m:playerFavorWithTarget",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:playerFavorWithTargetAbove",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if player's favor with target's faction >= threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:playerFavorWithTargetAbove(30)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Favor threshold",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:playerFavorWithTargetAboveNeg",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if player's favor with target's faction >= -threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:playerFavorWithTargetAboveNeg(10)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Negative favor threshold (used as -threshold)",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:playerFavorWithTargetBelow",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if player's favor with target's faction < threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:playerFavorWithTargetBelow(40)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Favor threshold",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:playerFavorWithTargetBelowNeg",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if player's favor with target's faction < -threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:playerFavorWithTargetBelowNeg(20)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Negative favor threshold (used as -threshold)",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:unreportedRareDiscoveries",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of unreported rare journal entries (rarity > 2)",
+          "returns": "float",
+          "example": "m:unreportedRareDiscoveries",
+          "arguments": []
+        },
+        {
+          "description": "Returns 1 if unreported rare discoveries >= threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:unreportedRareDiscoveries(3)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Count threshold",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:totalFame",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns sum of explore, trade, and combat fame",
+          "returns": "float",
+          "example": "m:totalFame",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:nextRoyalFameReq",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns fame requirement for next royal quest",
+          "returns": "float",
+          "example": "m:nextRoyalFameReq",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:nextRoyalFameReqMet",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if highest fame category meets royal quest requirement, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:nextRoyalFameReqMet",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:journalGoals",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of active journal goals (not completed)",
+          "returns": "float",
+          "example": "m:journalGoals",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:museumValue",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns total value of items displayed in museum tiles",
+          "returns": "float",
+          "example": "m:museumValue",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:locIsPort",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if current location is a port, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:locIsPort",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:locWealth",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns wealth level of current location",
+          "returns": "float",
+          "example": "m:locWealth",
+          "arguments": []
+        },
+        {
+          "description": "Returns 1 if location wealth >= threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:locWealth(75)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Wealth threshold",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:favorWithLoc",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns player's favor with current location's faction (clamped to min -99)",
+          "returns": "float",
+          "example": "m:favorWithLoc",
+          "arguments": []
+        },
+        {
+          "description": "Returns 1 if favor >= threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:favorWithLoc(50)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Favor threshold",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:locGoodsRestockPerDay",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns goods restock rate per day for current location",
+          "returns": "float",
+          "example": "m:locGoodsRestockPerDay",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:locFoodPrice",
+      "category": "item",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns base price of food at current location",
+          "returns": "float",
+          "example": "m:locFoodPrice",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:locFoodPriceTotal",
+      "category": "item",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns total cost to feed entire crew at current location",
+          "returns": "float",
+          "example": "m:locFoodPriceTotal",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:canBuylocFood",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if player can afford to feed crew at current location, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:canBuylocFood",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:locHasUnlockableShip",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if current location has unlockable ship types for sale, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:locHasUnlockableShip",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:locXLessThan",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if current location's X coordinate < threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:locXLessThan(100)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "X coordinate threshold",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:locYLessThan",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if current location's Y coordinate < threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:locYLessThan(150)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Y coordinate threshold",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:locXMoreThan",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if current location's X coordinate > threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:locXMoreThan(200)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "X coordinate threshold",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:locYMoreThan",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if current location's Y coordinate > threshold, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:locYMoreThan(250)",
+          "arguments": [
+            {
+              "name": "threshold",
+              "type": "float",
+              "description": "Y coordinate threshold",
+              "optional": false
+            }
+          ]
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:canChangeFaction",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if player can change faction at current location, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:canChangeFaction",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:unoccupiableTileInTheWayOfMoveToTarget",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if tile adjacent to target (toward caster) is unoccupiable, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:unoccupiableTileInTheWayOfMoveToTarget",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:occupiableTileTarget",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if target tile is occupiable, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:occupiableTileTarget",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:actorInTheWayOfMoveToTarget",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if there's an actor on tile adjacent to target (toward caster), 0 otherwise",
+          "returns": "boolean",
+          "example": "m:actorInTheWayOfMoveToTarget",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:actorInTheWayOfMovePastTarget",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if there's an actor on tile opposite target (away from caster), 0 otherwise",
+          "returns": "boolean",
+          "example": "m:actorInTheWayOfMovePastTarget",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:actorInTheWayOfMoveToTargetOrUnoccupiable",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if tile toward target is blocked by actor or unoccupiable, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:actorInTheWayOfMoveToTargetOrUnoccupiable",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:actorInTheWayOfMovePastTargetOrUnoccupiable",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if tile past target is blocked by actor or unoccupiable, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:actorInTheWayOfMovePastTargetOrUnoccupiable",
+          "arguments": []
+        }
+      ],
+      "aliases": ["m:actorInTheWayOfMovePastTargetOrUnccupiable"]
+    },
+    {
+      "name": "m:killsWithoutKnownJournals",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns count of actor types killed that have journal entries but aren't yet known",
+          "returns": "float",
+          "example": "m:killsWithoutKnownJournals",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:cutsceneMode",
+      "category": "condition",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if currently in cutscene mode, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:cutsceneMode",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "m:debug",
+      "category": "debug",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if debug mode is enabled, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:debug",
+          "arguments": []
+        }
+      ],
+      "aliases": ["m:debugMode", "m:debugmode"]
+    },
+    {
+      "name": "m:intenseVisuals",
+      "category": "game-state",
+      "isFunctionStyle": true,
+      "uses": [
+        {
+          "description": "Returns 1 if intense visual effects are enabled, 0 otherwise",
+          "returns": "boolean",
+          "example": "m:intenseVisuals",
+          "arguments": []
+        }
+      ],
+      "aliases": []
+    }
+  ]
+}
