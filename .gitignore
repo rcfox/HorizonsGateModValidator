@@ -6,10 +6,8 @@ dist/
 ExecuteTaskSplit/
 
 # Bundled output
-public/validator.bundle.js
-public/validator.bundle.js.map
-public/tasks.bundle.js
-public/tasks.bundle.js.map
+*.bundle.js
+*.bundle.js.map
 
 # Logs
 npm-debug.log*

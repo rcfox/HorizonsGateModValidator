@@ -40,3 +40,20 @@ await esbuild.build({
 });
 
 console.log('✅ Bundle created: public/tasks.bundle.js');
+
+// Build formulas bundle
+await esbuild.build({
+  entryPoints: ['src/formulas-app.ts'],
+  bundle: true,
+  outfile: 'public/formulas.bundle.js',
+  format: 'iife',
+  platform: 'browser',
+  target: 'es2020',
+  loader: {
+    '.json': 'json',
+  },
+  sourcemap: true,
+  minify: false, // Set to true for production
+});
+
+console.log('✅ Bundle created: public/formulas.bundle.js');
