@@ -103,7 +103,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns the maximum of a threshold and a formula result (note: Math.Max is used despite the name)",
+          "description": "Clamps the result of the formula to at least the value of the threshold.",
           "returns": "float",
           "example": "min:0:c:HP-10",
           "arguments": [
@@ -127,7 +127,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns the minimum of a threshold and a formula result (note: Math.Min is used despite the name)",
+          "description": "Clamps the result of the formula to at most the value of the threshold.",
           "returns": "float",
           "example": "max:100:c:HP+50",
           "arguments": [
