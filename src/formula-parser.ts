@@ -19,6 +19,7 @@ import {
   isFunctionStyle,
   getArgCount,
   hasFormulaBody,
+  resolveOperatorAlias,
 } from "./formula-metadata.js";
 
 // Re-export validator for convenience
@@ -325,9 +326,11 @@ function parseFunctionCall(operand: string): FunctionCallNode {
     }
   }
 
-  // Parse each argument - only m: and d: operators support function-style arguments with parentheses
+  // Parse each argument - only m: and d: operators (and their aliases) support function-style arguments with parentheses
+  const canonicalFunctionName = resolveOperatorAlias(functionName);
+  const isMathOperator = canonicalFunctionName === "m" || canonicalFunctionName === "d";
   const args: FunctionArg[] = rawArgs.map((arg) => {
-    if ((functionName === "m" || functionName === "d") && arg.includes("(")) {
+    if (isMathOperator && arg.includes("(")) {
       const parsed = parseFunctionStyleArg(arg);
       if (parsed) {
         return { type: "functionStyle", ...parsed };

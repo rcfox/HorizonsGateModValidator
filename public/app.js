@@ -314,6 +314,26 @@ function applyCorrection(lineNumber, correction) {
                 const valueSimilar = ModValidator.findSimilar(correction, [propertyValue], ModValidator.MAX_EDIT_DISTANCE);
                 const nameSimilar = ModValidator.findSimilar(correction, [propertyName], ModValidator.MAX_EDIT_DISTANCE);
 
+                // Check if the value is a formula with operator prefix (e.g., "dat:fireDmg(3)")
+                // and correction matches the prefix part
+                const formulaMatch = propertyValue.match(/^(\w+):(.+)$/);
+                let formulaPrefixSimilar = [];
+                if (formulaMatch) {
+                    const formulaPrefix = formulaMatch[1];
+                    formulaPrefixSimilar = ModValidator.findSimilar(correction, [formulaPrefix], ModValidator.MAX_EDIT_DISTANCE);
+                }
+
+                // If correction is similar to the formula prefix (e.g., "dat" in "dat:fireDmg(3)")
+                if (formulaPrefixSimilar.length > 0 && formulaMatch) {
+                    incorrectText = formulaMatch[1]; // Just the prefix part
+                    searchStart = line.indexOf(pair) + pair.indexOf('=') + 1;
+                    // Skip whitespace after '='
+                    while (searchStart < line.length && line[searchStart] === ' ') {
+                        searchStart++;
+                    }
+                    break;
+                }
+
                 // If correction is similar to the value, replace the value
                 if (valueSimilar.length > 0 && propertyValue !== correction) {
                     incorrectText = propertyValue;

@@ -416,27 +416,44 @@ gameVersionElement.textContent = `Up to date for v${formulasData.gameVersion}`;
 const urlParams = new URLSearchParams(window.location.search);
 const operatorParam = urlParams.get('operator');
 if (operatorParam) {
-  // Find all matching operator elements (could be multiple uses)
-  const operatorElements = document.querySelectorAll(
-    `.operator-item[data-operator-key^="${operatorParam}-use-"]`
-  );
+  // Resolve alias to canonical name
+  let targetOperatorName = operatorParam;
 
-  if (operatorElements.length > 0) {
-    // Expand all uses of this operator
-    operatorElements.forEach((element) => {
-      (element as HTMLDetailsElement).open = true;
-    });
+  // Search for the operator by name or alias
+  const matchingOperator = formulasData.operators.find(op => {
+    if (op.name === operatorParam) {
+      return true;
+    }
+    if (op.aliases && op.aliases.includes(operatorParam)) {
+      targetOperatorName = op.name; // Use canonical name for searching
+      return true;
+    }
+    return false;
+  });
 
-    // Scroll to the first one with a slight delay to ensure DOM is ready
-    setTimeout(() => {
-      operatorElements[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // Add a highlight effect
+  if (matchingOperator) {
+    // Find all matching operator elements (could be multiple uses)
+    const operatorElements = document.querySelectorAll(
+      `.operator-item[data-operator-key^="${targetOperatorName}-use-"]`
+    );
+
+    if (operatorElements.length > 0) {
+      // Expand all uses of this operator
       operatorElements.forEach((element) => {
-        element.classList.add('operator-highlight');
-        setTimeout(() => {
-          element.classList.remove('operator-highlight');
-        }, 2000);
+        (element as HTMLDetailsElement).open = true;
       });
-    }, 100);
+
+      // Scroll to the first one with a slight delay to ensure DOM is ready
+      setTimeout(() => {
+        operatorElements[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Add a highlight effect
+        operatorElements.forEach((element) => {
+          element.classList.add('operator-highlight');
+          setTimeout(() => {
+            element.classList.remove('operator-highlight');
+          }, 2000);
+        });
+      }, 100);
+    }
   }
 }

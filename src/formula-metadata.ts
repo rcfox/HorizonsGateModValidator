@@ -22,6 +22,7 @@ interface FormulaOperator {
   name: string;
   category: string;
   isFunctionStyle: boolean;
+  aliases?: string[];
   uses: FormulaUse[];
 }
 
@@ -31,6 +32,12 @@ interface FormulaData {
 }
 
 const data = formulaData as FormulaData;
+
+/**
+ * Map from operator name (or alias) to canonical operator name
+ * Examples: "w" -> "weapon", "W" -> "weapon", "weapon" -> "weapon"
+ */
+export const operatorAliasMap = new Map<string, string>();
 
 /**
  * Set of operators that use function-style syntax with parentheses: name(arg)
@@ -56,6 +63,16 @@ export const operatorsWithFormulaBodies = new Set<string>();
 for (const op of data.operators) {
   const args = op.uses[0]?.arguments || [];
 
+  // Add canonical name to alias map
+  operatorAliasMap.set(op.name, op.name);
+
+  // Add aliases to alias map
+  if (op.aliases) {
+    for (const alias of op.aliases) {
+      operatorAliasMap.set(alias, op.name);
+    }
+  }
+
   // Count non-formula arguments
   const nonFormulaArgs = args.filter((a) => a.type !== "formula");
   operatorArgCounts.set(op.name, nonFormulaArgs.length);
@@ -67,24 +84,39 @@ for (const op of data.operators) {
 }
 
 /**
+ * Resolve an operator name or alias to its canonical name
+ * Returns undefined if the operator doesn't exist
+ * Examples: "w" -> "weapon", "W" -> "weapon", "weapon" -> "weapon"
+ */
+export function resolveOperatorAlias(nameOrAlias: string): string | undefined {
+  return operatorAliasMap.get(nameOrAlias);
+}
+
+/**
  * Check if an operator uses function-style syntax (parentheses)
+ * Accepts both operator names and aliases
  */
 export function isFunctionStyle(operatorName: string): boolean {
-  return functionStyleOperators.has(operatorName);
+  const canonical = resolveOperatorAlias(operatorName);
+  return canonical ? functionStyleOperators.has(canonical) : false;
 }
 
 /**
  * Get the number of non-formula arguments for an operator
+ * Accepts both operator names and aliases
  */
 export function getArgCount(operatorName: string): number {
-  return operatorArgCounts.get(operatorName) ?? 0;
+  const canonical = resolveOperatorAlias(operatorName);
+  return canonical ? (operatorArgCounts.get(canonical) ?? 0) : 0;
 }
 
 /**
  * Check if an operator takes a formula as an argument
+ * Accepts both operator names and aliases
  */
 export function hasFormulaBody(operatorName: string): boolean {
-  return operatorsWithFormulaBodies.has(operatorName);
+  const canonical = resolveOperatorAlias(operatorName);
+  return canonical ? operatorsWithFormulaBodies.has(canonical) : false;
 }
 
 /**
