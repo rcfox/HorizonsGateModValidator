@@ -411,3 +411,32 @@ updateOperatorCount(
 // Display game version
 const gameVersionElement = document.getElementById("gameVersion")!;
 gameVersionElement.textContent = `Up to date for v${formulasData.gameVersion}`;
+
+// Handle URL parameter to auto-expand and scroll to operator
+const urlParams = new URLSearchParams(window.location.search);
+const operatorParam = urlParams.get('operator');
+if (operatorParam) {
+  // Find all matching operator elements (could be multiple uses)
+  const operatorElements = document.querySelectorAll(
+    `.operator-item[data-operator-key^="${operatorParam}-use-"]`
+  );
+
+  if (operatorElements.length > 0) {
+    // Expand all uses of this operator
+    operatorElements.forEach((element) => {
+      (element as HTMLDetailsElement).open = true;
+    });
+
+    // Scroll to the first one with a slight delay to ensure DOM is ready
+    setTimeout(() => {
+      operatorElements[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Add a highlight effect
+      operatorElements.forEach((element) => {
+        element.classList.add('operator-highlight');
+        setTimeout(() => {
+          element.classList.remove('operator-highlight');
+        }, 2000);
+      });
+    }, 100);
+  }
+}

@@ -1,0 +1,479 @@
+/**
+ * AST Validator - Validates parsed formula ASTs against formula.json metadata
+ * Checks argument counts, types, and calling conventions
+ */
+
+import {
+  ASTNode,
+  FunctionCallNode,
+  FunctionArg,
+  BinaryOperationNode,
+  UnaryOperationNode,
+  MathFunctionNode,
+} from "./formula-parser.js";
+import formulaData from "./formula.json" with { type: "json" };
+import { findSimilar } from "./string-similarity.js";
+
+interface FormulaArgument {
+  name: string;
+  type: string;
+  description: string;
+}
+
+interface FormulaUse {
+  description: string;
+  returns: string;
+  example: string;
+  arguments?: FormulaArgument[];
+}
+
+interface FormulaOperator {
+  name: string;
+  category: string;
+  isFunctionStyle: boolean;
+  uses: FormulaUse[];
+}
+
+interface FormulaData {
+  gameVersion: string;
+  operators: FormulaOperator[];
+}
+
+const data = formulaData as FormulaData;
+
+// Build lookup map for operators
+const operatorMap = new Map<string, FormulaOperator>();
+for (const op of data.operators) {
+  operatorMap.set(op.name, op);
+}
+
+export interface ValidationError {
+  message: string;
+  node: ASTNode | FunctionArg;
+  path: string; // Path to the node in the tree for context
+  operatorName?: string; // Operator name for linking to formula reference
+  suggestions?: string[]; // Suggested corrections for typos
+}
+
+/**
+ * Validates an AST against formula.json metadata
+ * Returns array of validation errors (empty if valid)
+ */
+export function validateAST(
+  ast: ASTNode,
+  path: string = "root",
+): ValidationError[] {
+  const errors: ValidationError[] = [];
+
+  switch (ast.type) {
+    case "literal":
+    case "variable":
+      // These are always valid
+      break;
+
+    case "function":
+      errors.push(...validateFunctionCall(ast, path));
+      break;
+
+    case "global":
+      // Global formula references - could validate against known globals
+      // but we don't have that data in formula.json
+      if (ast.argument) {
+        errors.push(...validateAST(ast.argument, `${path}.argument`));
+      }
+      break;
+
+    case "mathFunction":
+      // Math functions use function-style syntax
+      errors.push(...validateMathFunction(ast, path));
+      break;
+
+    case "binaryOp":
+      errors.push(...validateBinaryOp(ast, path));
+      break;
+
+    case "unaryOp":
+      errors.push(...validateUnaryOp(ast, path));
+      break;
+  }
+
+  return errors;
+}
+
+/**
+ * Validates a function call node
+ */
+function validateFunctionCall(
+  node: FunctionCallNode,
+  path: string,
+): ValidationError[] {
+  const errors: ValidationError[] = [];
+  const operator = operatorMap.get(node.name);
+
+  if (!operator) {
+    // Find similar operator names for suggestions
+    const allOperatorNames = Array.from(operatorMap.keys());
+    const similar = findSimilar(node.name, allOperatorNames);
+    const suggestions = similar.map((s) => s.value);
+
+    errors.push({
+      message: `Unknown operator: '${node.name}'`,
+      node,
+      path,
+      suggestions,
+    });
+    return errors;
+  }
+
+  // Special case: m: and d: are marked as isFunctionStyle but they use colon syntax
+  // The "function style" refers to their arguments, not their calling convention
+  if (operator.isFunctionStyle && node.name !== "m" && node.name !== "d") {
+    errors.push({
+      message: `Operator '${node.name}' requires function-style syntax with parentheses, not colon-separated. Example: ${operator.uses[0]?.example || node.name + "(...)"}`,
+      node,
+      path,
+    });
+  }
+
+  // Get expected arguments from first use case
+  const expectedArgs = operator.uses[0]?.arguments || [];
+
+  // Validate argument count
+  const totalExpectedArgs = expectedArgs.length;
+  const providedArgs = node.args.length + (node.body ? 1 : 0);
+
+  if (providedArgs !== totalExpectedArgs) {
+    errors.push({
+      message: `Operator '${node.name}' expects ${totalExpectedArgs} argument(s), but got ${providedArgs}. Expected: ${expectedArgs.map((a) => `${a.name}:${a.type}`).join(", ")}`,
+      node,
+      path,
+      operatorName: node.name,
+    });
+  }
+
+  // Validate each argument type
+  node.args.forEach((arg, i) => {
+    const expectedArg = expectedArgs[i];
+    if (!expectedArg) return;
+
+    errors.push(
+      ...validateFunctionArg(arg, expectedArg, node.name, `${path}.args[${i}]`),
+    );
+  });
+
+  // Validate body if present
+  if (node.body) {
+    const formulaArgIndex = expectedArgs.findIndex((a) => a.type === "formula");
+    if (formulaArgIndex === -1) {
+      errors.push({
+        message: `Operator '${node.name}' does not expect a formula body`,
+        node,
+        path: `${path}.body`,
+      });
+    } else {
+      // Recursively validate the body
+      errors.push(...validateAST(node.body, `${path}.body`));
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Validates that a parameter (ASTNode) matches the expected type
+ * This is used for validating parameters inside function-style arguments like d:foo(5)
+ */
+function validateParameterType(
+  param: ASTNode,
+  expectedArg: FormulaArgument,
+  operatorName: string,
+  path: string,
+): ValidationError[] {
+  const errors: ValidationError[] = [];
+
+  switch (expectedArg.type) {
+    case "integer":
+    case "float":
+    case "byte":
+      // Parameter should be a literal number, not a complex formula
+      if (param.type !== "literal") {
+        errors.push({
+          message: `Parameter '${expectedArg.name}' of operator '${operatorName}' expects a ${expectedArg.type}, but got a formula expression`,
+          node: param,
+          path,
+          operatorName,
+        });
+      }
+      break;
+
+    case "boolean":
+      // Should be a literal 0/1 or true/false
+      if (param.type !== "literal") {
+        errors.push({
+          message: `Parameter '${expectedArg.name}' of operator '${operatorName}' expects a boolean, but got a formula expression`,
+          node: param,
+          path,
+          operatorName,
+        });
+      }
+      break;
+
+    case "string":
+      // String type - this is more complex, would need to check if it's a simple identifier
+      break;
+
+    case "formula":
+      // Formula type - any valid formula is acceptable
+      break;
+
+    default:
+      // Other types - we don't validate these yet
+      break;
+  }
+
+  return errors;
+}
+
+/**
+ * Validates a single function argument against expected type
+ */
+function validateFunctionArg(
+  arg: FunctionArg,
+  expectedArg: FormulaArgument,
+  operatorName: string,
+  path: string,
+): ValidationError[] {
+  const errors: ValidationError[] = [];
+
+  if (arg.type === "string") {
+    // String argument - check if it matches expected type
+    const value = arg.value;
+
+    switch (expectedArg.type) {
+      case "integer":
+      case "float":
+      case "byte":
+        // Should be a number
+        if (isNaN(parseFloat(value))) {
+          errors.push({
+            message: `Argument '${expectedArg.name}' of operator '${operatorName}' expects a ${expectedArg.type}, but got non-numeric value: '${value}'`,
+            node: arg,
+            path,
+            operatorName,
+          });
+        }
+        break;
+
+      case "boolean":
+        // Should be true/false or 0/1
+        if (!["true", "false", "0", "1"].includes(value.toLowerCase())) {
+          errors.push({
+            message: `Argument '${expectedArg.name}' of operator '${operatorName}' expects a boolean, but got: '${value}'`,
+            node: arg,
+            path,
+            operatorName,
+          });
+        }
+        break;
+
+      case "string":
+        // For m: operators, check if m:value exists as an operator
+        if (operatorName === "m" || operatorName === "M") {
+          const fullOperatorName = `${operatorName}:${value}`;
+          const specificOperator = operatorMap.get(fullOperatorName);
+
+          if (!specificOperator) {
+            // m:functionName not found - suggest similar m: operators
+            const allMOperators = Array.from(operatorMap.keys()).filter(
+              (name) => name.startsWith("m:") || name.startsWith("M:"),
+            );
+            const similar = findSimilar(fullOperatorName, allMOperators);
+            const suggestions = similar.map((s) => s.value);
+
+            errors.push({
+              message: `Unknown operator: '${fullOperatorName}'`,
+              node: arg,
+              path,
+              suggestions,
+            });
+          }
+        }
+        // For d:, the formula name is defined at runtime, so we can't validate it
+        break;
+
+      case "formula":
+        errors.push({
+          message: `Argument '${expectedArg.name}' of operator '${operatorName}' expects a formula expression, not a simple string`,
+          node: arg,
+          path,
+          operatorName,
+        });
+        break;
+
+      default:
+        // Other types like enums, we'd need more metadata to validate
+        break;
+    }
+  } else if (arg.type === "functionStyle") {
+    // Function-style argument (only valid for m: and d:)
+    // For m: operators, try to look up m:functionName (e.g., m:distance) first
+    let specificOperator: FormulaOperator | undefined;
+    let specificOperatorName = operatorName;
+
+    if (operatorName === "m" || operatorName === "M") {
+      const fullOperatorName = `${operatorName}:${arg.name}`;
+      specificOperator = operatorMap.get(fullOperatorName);
+      if (specificOperator) {
+        specificOperatorName = fullOperatorName;
+      } else {
+        // m:functionName not found - suggest similar m: operators
+        const allMOperators = Array.from(operatorMap.keys()).filter(
+          (name) => name.startsWith("m:") || name.startsWith("M:"),
+        );
+        const similar = findSimilar(fullOperatorName, allMOperators);
+        const suggestions = similar.map((s) => s.value);
+
+        errors.push({
+          message: `Unknown operator: '${fullOperatorName}'`,
+          node: arg,
+          path,
+          suggestions,
+        });
+        return errors;
+      }
+    }
+
+    // If we didn't find a specific operator, fall back to the base operator
+    const operator = specificOperator || operatorMap.get(operatorName);
+
+    if (operator) {
+      // Find the use case with the most arguments (includes parameters)
+      const useWithParams = operator.uses.reduce(
+        (max, use) =>
+          use.arguments && use.arguments.length > (max.arguments?.length || 0)
+            ? use
+            : max,
+        operator.uses[0],
+      );
+
+      // The parameters correspond to arguments after the first one (for d:) or all arguments (for m:functionName)
+      const paramArguments = specificOperator
+        ? useWithParams.arguments || [] // For m:distance, all arguments are parameters
+        : useWithParams.arguments?.slice(1) || []; // For d:, skip formulaName
+
+      if (paramArguments.length > 0) {
+        // Validate each parameter against its expected type
+        arg.params.forEach((param, i) => {
+          const expectedParamArg = paramArguments[i];
+          if (expectedParamArg) {
+            // Check if the parameter is a literal that matches the expected type
+            errors.push(
+              ...validateParameterType(
+                param,
+                expectedParamArg,
+                specificOperatorName,
+                `${path}.params[${i}]`,
+              ),
+            );
+          }
+          // Also recursively validate the parameter's structure
+          errors.push(...validateAST(param, `${path}.params[${i}]`));
+        });
+      } else {
+        // No parameters expected, but some were provided
+        if (arg.params.length > 0) {
+          errors.push({
+            message: `Function '${arg.name}' in operator '${specificOperatorName}' does not accept parameters`,
+            node: arg,
+            path,
+            operatorName: specificOperatorName,
+          });
+        }
+      }
+    } else {
+      // Just validate the parameters recursively
+      arg.params.forEach((param, i) => {
+        errors.push(...validateAST(param, `${path}.params[${i}]`));
+      });
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Validates a math function (function-style operator)
+ */
+function validateMathFunction(node: MathFunctionNode, path: string): ValidationError[] {
+  const errors: ValidationError[] = [];
+  const operator = operatorMap.get(node.name);
+
+  if (!operator) {
+    errors.push({
+      message: `Unknown function-style operator: '${node.name}'`,
+      node,
+      path,
+    });
+    return errors;
+  }
+
+  // Check if this operator should NOT use function-style syntax
+  if (!operator.isFunctionStyle) {
+    errors.push({
+      message: `Operator '${node.name}' should use colon-separated syntax, not parentheses. Example: ${operator.uses[0]?.example || node.name + ":..."}`,
+      node,
+      path,
+    });
+  }
+
+  // Validate the argument if present
+  if (node.argument) {
+    errors.push(...validateAST(node.argument, `${path}.argument`));
+  }
+
+  return errors;
+}
+
+/**
+ * Validates a binary operation
+ */
+function validateBinaryOp(
+  node: BinaryOperationNode,
+  path: string,
+): ValidationError[] {
+  const errors: ValidationError[] = [];
+
+  // Validate both operands
+  errors.push(...validateAST(node.left, `${path}.left`));
+  errors.push(...validateAST(node.right, `${path}.right`));
+
+  return errors;
+}
+
+/**
+ * Validates a unary operation
+ */
+function validateUnaryOp(
+  node: UnaryOperationNode,
+  path: string,
+): ValidationError[] {
+  const errors: ValidationError[] = [];
+
+  // Validate the operand
+  errors.push(...validateAST(node.operand, `${path}.operand`));
+
+  return errors;
+}
+
+/**
+ * Formats validation errors for display
+ */
+export function formatValidationErrors(errors: ValidationError[]): string {
+  if (errors.length === 0) {
+    return "No validation errors found.";
+  }
+
+  return errors
+    .map((err, i) => `${i + 1}. [${err.path}] ${err.message}`)
+    .join("\n");
+}

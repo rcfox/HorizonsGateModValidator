@@ -181,6 +181,12 @@ function createMessageHTML(msg) {
         correctionsHTML = `<div class="message-corrections">💡 Did you mean: ${correctionLinks}?</div>`;
     }
 
+    // Create formula reference link if available
+    let formulaReferenceHTML = '';
+    if (msg.formulaReference) {
+        formulaReferenceHTML = `<div class="message-corrections">📖 See formula reference: <span class="correction-link formula-reference-link" data-operator="${escapeHTML(msg.formulaReference)}">${escapeHTML(msg.formulaReference)}</span></div>`;
+    }
+
     return `
         <div class="message ${msg.severity} ${cursorClass}" ${lineAttr}>
             <div class="message-header">
@@ -189,7 +195,9 @@ function createMessageHTML(msg) {
             </div>
             ${msg.line ? `<div class="message-line-info">Line ${msg.line}</div>` : ''}
             ${msg.context ? `<div class="message-context">${escapeHTML(msg.context)}</div>` : ''}
-            ${correctionsHTML || (msg.suggestion ? `<div class="message-suggestion">💡 ${escapeHTML(msg.suggestion)}</div>` : '')}
+            ${correctionsHTML}
+            ${formulaReferenceHTML}
+            ${!correctionsHTML && !formulaReferenceHTML && msg.suggestion ? `<div class="message-suggestion">💡 ${escapeHTML(msg.suggestion)}</div>` : ''}
         </div>
     `;
 }
@@ -364,8 +372,19 @@ function applyCorrection(lineNumber, correction) {
 
 // Handle clicks on messages to jump to line
 resultsContainer.addEventListener('click', (e) => {
+    // Check if clicked on a formula reference link
+    const formulaReferenceLink = e.target.closest('.formula-reference-link');
+    if (formulaReferenceLink) {
+        e.stopPropagation();
+        const operator = formulaReferenceLink.getAttribute('data-operator');
+        if (operator) {
+            window.open(`formulas.html?operator=${operator}`, '_blank');
+        }
+        return;
+    }
+
     // Check if clicked on a correction link
-    const correctionLink = e.target.closest('.correction-link');
+    const correctionLink = e.target.closest('.correction-link:not(.formula-reference-link)');
     if (correctionLink) {
         e.stopPropagation();
         const correction = correctionLink.getAttribute('data-correction');

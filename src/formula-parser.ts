@@ -10,6 +10,9 @@
  *    - A global formula reference with optional parenthesized argument
  *    - A math function with parenthesized argument
  * 4. Replace operands with their values and evaluate the math expression
+ *
+ * After parsing, use validateAST() from formula-ast-validator.ts to check
+ * the AST against formula.json metadata.
  */
 
 import {
@@ -17,6 +20,13 @@ import {
   getArgCount,
   hasFormulaBody,
 } from "./formula-metadata.js";
+
+// Re-export validator for convenience
+export {
+  validateAST,
+  formatValidationErrors,
+  type ValidationError,
+} from "./formula-ast-validator.js";
 
 export type ASTNode =
   | LiteralNode
@@ -117,12 +127,14 @@ function tokenizeFormula(formula: string): {
 
       // Check if this is a unary minus (at start or after another operator)
       const prevIsOperator = operators.length === operands.length;
-      if (char === '-' && prevIsOperator) {
+      if (char === "-" && prevIsOperator) {
         // Unary minus
-        operators.push('unary-');
-      } else if (char === '+' && prevIsOperator) {
+        operators.push("unary-");
+      } else if (char === "+" && prevIsOperator) {
         // Unary plus - this crashes the game!
-        throw new Error(`Invalid syntax: unary '+' is not supported by the game. Use '-' for negation or remove the '+'.`);
+        throw new Error(
+          `Invalid syntax: unary '+' is not supported by the game. Use '-' for negation or remove the '+'.`,
+        );
       } else {
         // Binary operator
         operators.push(char);
@@ -215,7 +227,9 @@ function parseParenthesizedOperand(
  * Parses a function-style argument like "distance(32)" or "rand(100)"
  * Returns the function name and parsed parameters
  */
-function parseFunctionStyleArg(arg: string): { name: string; params: ASTNode[] } | null {
+function parseFunctionStyleArg(
+  arg: string,
+): { name: string; params: ASTNode[] } | null {
   const parenIndex = arg.indexOf("(");
   if (parenIndex === -1) {
     return null;
@@ -225,8 +239,11 @@ function parseFunctionStyleArg(arg: string): { name: string; params: ASTNode[] }
   const paramString = arg.substring(parenIndex + 1, arg.length - 1); // Remove '(' and ')'
 
   // Split parameters by comma (for multi-param functions)
-  const paramStrings = paramString.split(",").map(s => s.trim()).filter(s => s);
-  const params: ASTNode[] = paramStrings.map(param => {
+  const paramStrings = paramString
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s);
+  const params: ASTNode[] = paramStrings.map((param) => {
     // Try to parse as number
     const numValue = parseFloat(param);
     if (!isNaN(numValue) && param === numValue.toString()) {
@@ -246,10 +263,44 @@ function parseFunctionStyleArg(arg: string): { name: string; params: ASTNode[] }
 }
 
 /**
+ * Splits a string by colons, but only those outside of parentheses
+ */
+function splitByColonRespectingParens(str: string): string[] {
+  const parts: string[] = [];
+  let current = "";
+  let parenDepth = 0;
+
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+
+    if (char === "(") {
+      parenDepth++;
+      current += char;
+    } else if (char === ")") {
+      parenDepth--;
+      current += char;
+    } else if (char === ":" && parenDepth === 0) {
+      // Colon at top level - this is a separator
+      parts.push(current);
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+
+  // Add the last part
+  if (current) {
+    parts.push(current);
+  }
+
+  return parts;
+}
+
+/**
  * Parses a function call with colon-separated arguments: name:arg1:arg2:...
  */
 function parseFunctionCall(operand: string): FunctionCallNode {
-  const parts = operand.split(":");
+  const parts = splitByColonRespectingParens(operand);
   const functionName = parts[0];
 
   let body: ASTNode | undefined;
@@ -275,7 +326,7 @@ function parseFunctionCall(operand: string): FunctionCallNode {
   }
 
   // Parse each argument - only m: and d: operators support function-style arguments with parentheses
-  const args: FunctionArg[] = rawArgs.map(arg => {
+  const args: FunctionArg[] = rawArgs.map((arg) => {
     if ((functionName === "m" || functionName === "d") && arg.includes("(")) {
       const parsed = parseFunctionStyleArg(arg);
       if (parsed) {
@@ -373,13 +424,13 @@ export function parseFormula(formula: string): ASTNode {
     const invalidChar = invalidMatch[2];
 
     let errorMsg = `Invalid syntax: '${operatorName}:${invalidChar}' - `;
-    if (invalidChar === '(') {
-      errorMsg += `parentheses cannot appear immediately after colon. Did you mean '${operatorName}:' without parentheses?`;
-    } else if ('+-*/%'.includes(invalidChar)) {
-      errorMsg += `math operator cannot appear immediately after colon. Operator '${operatorName}' requires an argument before the math operator.`;
-    } else if (invalidChar === ' ') {
+    if (invalidChar === "(") {
+      errorMsg += `parentheses cannot appear immediately after colon.`;
+    } else if ("+-*/%".includes(invalidChar)) {
+      errorMsg += `math operator cannot appear immediately after colon.`;
+    } else if (invalidChar === " ") {
       errorMsg += `space cannot appear after colon. Remove the space.`;
-    } else if (invalidChar === '_') {
+    } else if (invalidChar === "_") {
       errorMsg += `underscore cannot appear after colon. Colon must be followed by a letter or digit.`;
     } else {
       errorMsg += `colon must be followed by a letter or digit, not '${invalidChar}'.`;
@@ -420,7 +471,12 @@ export function printAST(node: ASTNode, indent: string = ""): string {
             // Function-style argument with params
             funcStr += "\n" + indent + `    [${i}] ${arg.name}(...)`;
             arg.params.forEach((param, j) => {
-              funcStr += "\n" + printAST(param, indent + "      ").replace(indent + "      ", indent + `      param[${j}]: `);
+              funcStr +=
+                "\n" +
+                printAST(param, indent + "      ").replace(
+                  indent + "      ",
+                  indent + `      param[${j}]: `,
+                );
             });
           }
         });

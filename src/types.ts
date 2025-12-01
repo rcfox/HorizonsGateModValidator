@@ -85,6 +85,7 @@ export interface ValidationMessage {
   context?: string;
   suggestion?: string;
   corrections?: string[]; // Suggested corrections for typos
+  formulaReference?: string; // Operator name for linking to formula reference page
 }
 
 export interface ValidationResult {

@@ -402,3 +402,21 @@ mark {
     grid-template-columns: 1fr;
   }
 }
+
+/* Highlight effect for URL-linked operators */
+.operator-highlight {
+  animation: operator-highlight-pulse 2s ease-in-out;
+}
+
+@keyframes operator-highlight-pulse {
+  0% {
+    background-color: transparent;
+  }
+  10% {
+    background-color: var(--primary-color);
+    opacity: 0.2;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
