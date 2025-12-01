@@ -180,9 +180,9 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns the absolute value of a formula",
+          "description": "Returns the absolute value of a formula.",
           "returns": "float",
-          "example": "abs:c:HP-t:HP",
+          "example": "abs:c:HP",
           "arguments": [
             {
               "name": "formula",
@@ -201,7 +201,7 @@
         {
           "description": "Rounds a formula result down to the nearest integer",
           "returns": "float",
-          "example": "floor:c:HP*0.5",
+          "example": "floor:0.5",
           "arguments": [
             {
               "name": "formula",
