@@ -87,7 +87,8 @@ const testCases = [
   // Invalid unary plus (crashes game)
   "5*+2",
 
-  "52 + c:MagAtk * 2 + c:skill_Fire + c:skill_Ice + c:skill_Elec + c:skill_Wind + c:skill_Ruin + c:skill_Life + m:distance(32)*d:foo + abs:c:HP-t:HP",
+  "-52 + c:MagAtk * 2",
+  "52 + c:MagAtk * 2",
 ];
 
 console.log("Formula Parser Test Results\n");

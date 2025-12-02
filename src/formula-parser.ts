@@ -113,6 +113,7 @@ function tokenizeFormula(formula: string): {
   let i = 0;
   let currentOperand = "";
   let currentOperandStart = 0;
+  let justPushedOperand = false;
 
   while (i < cleanFormula.length) {
     const char = cleanFormula[i];
@@ -124,10 +125,14 @@ function tokenizeFormula(formula: string): {
         operands.push(currentOperand);
         positions.push(currentOperandStart);
         currentOperand = "";
+        justPushedOperand = true;
+      } else {
+        justPushedOperand = false;
       }
 
       // Check if this is a unary minus (at start or after another operator)
-      const prevIsOperator = operators.length === operands.length;
+      // If we just pushed an operand, this must be a binary operator
+      const prevIsOperator = !justPushedOperand;
       if (char === "-" && prevIsOperator) {
         // Unary minus
         operators.push("unary-");
