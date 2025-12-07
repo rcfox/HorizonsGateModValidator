@@ -220,7 +220,7 @@ export class ModParser {
       const shouldHaveSemicolon = this.shouldWarnAboutMissingSemicolon(value);
 
       if (shouldHaveSemicolon) {
-        this.addWarning(
+        this.addError(
           `Property '${propertyName} = ${value}' does not end with semicolon`,
           propertyLine,
           'Add ; at the end of the line'
