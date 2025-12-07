@@ -11,7 +11,7 @@ import type { SchemaData } from './types.js';
 
 export class PropertyValidator {
   private formulaValidator = new FormulaValidator();
-  private enums: Record<string, string[]>;
+  private enums: Record<string, Record<string, number>>;
 
   constructor() {
     const data = modSchemaData as SchemaData;
@@ -238,10 +238,56 @@ export class PropertyValidator {
       return messages;
     }
 
-    // Check if value is in the enum
-    if (!enumValues.includes(value)) {
+    // Check if value is a numeric string
+    const numericValue = parseInt(value, 10);
+    if (!isNaN(numericValue) && value === numericValue.toString()) {
+      // Special case for Element enum with custom values (> 2000)
+      if (enumName === 'Element' && numericValue > 2000) {
+        messages.push({
+          severity: 'info',
+          message: `Custom Element value detected: ${value}`,
+          line,
+          context: `Custom element values (> 2000) are reserved for modders`,
+          suggestion: `Check the modder community document to ensure this value hasn't been taken and to reserve a section`,
+          documentationUrl: 'https://docs.google.com/document/d/15H0QN-tm2ERGXdeV2esavm6u-eaNniliTs4ZlAML79U/edit?tab=t.0#heading=h.75sdxuctqmty',
+          documentationLabel: 'Modder Community Element Registry',
+        });
+        return messages;
+      }
+
+      // Find the enum name(s) that correspond to this numeric value
+      const matchingNames = Object.entries(enumValues)
+        .filter(([_, enumVal]) => enumVal === numericValue)
+        .map(([name, _]) => name);
+
+      if (matchingNames.length > 0) {
+        messages.push({
+          severity: 'warning',
+          message: `Numeric enum value used for ${propertyName}`,
+          line,
+          context: `Use the enum name instead of the numeric value '${value}'`,
+          suggestion: matchingNames.length === 1
+            ? `Use '${matchingNames[0]}' instead of '${value}'`
+            : `Use one of: ${matchingNames.join(', ')} instead of '${value}'`,
+          corrections: matchingNames,
+        });
+      } else {
+        messages.push({
+          severity: 'error',
+          message: `Invalid ${enumName} numeric value for ${propertyName}`,
+          line,
+          context: `'${value}' is not a valid ${enumName} value`,
+          suggestion: `Use enum names instead of numbers`,
+        });
+      }
+      return messages;
+    }
+
+    // Check if value is in the enum (enumValues is now an object mapping names to numeric values)
+    const enumNames = Object.keys(enumValues);
+    if (!enumNames.includes(value)) {
       // Find similar enum values
-      const similar = findSimilar(value, enumValues, MAX_EDIT_DISTANCE);
+      const similar = findSimilar(value, enumNames, MAX_EDIT_DISTANCE);
       const corrections = similar.map(s => s.value);
 
       messages.push({
@@ -251,7 +297,7 @@ export class PropertyValidator {
         context: `'${value}' is not a valid ${enumName}`,
         suggestion: corrections.length > 0
           ? `Did you mean: ${corrections.join(', ')}?`
-          : `Valid values: ${enumValues.slice(0, 10).join(', ')}${enumValues.length > 10 ? ', ...' : ''}`,
+          : `Valid values: ${enumNames.slice(0, 10).join(', ')}${enumNames.length > 10 ? ', ...' : ''}`,
         corrections,
       });
     }

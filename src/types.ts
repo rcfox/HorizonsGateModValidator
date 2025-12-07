@@ -52,7 +52,7 @@ export type ModSchema = Record<string, ClassSchema>;
 export interface SchemaData {
   schema: ModSchema;
   typeAliases: Record<string, string>;
-  enums: Record<string, string[]>;
+  enums: Record<string, Record<string, number>>;
 }
 
 /**
@@ -86,6 +86,8 @@ export interface ValidationMessage {
   suggestion?: string;
   corrections?: string[]; // Suggested corrections for typos
   formulaReference?: string; // Operator name for linking to formula reference page
+  documentationUrl?: string; // External documentation URL
+  documentationLabel?: string; // Label for the documentation link
 }
 
 export interface ValidationResult {

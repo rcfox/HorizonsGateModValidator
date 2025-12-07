@@ -187,6 +187,13 @@ function createMessageHTML(msg) {
         formulaReferenceHTML = `<div class="message-corrections">📖 See formula reference: <span class="correction-link formula-reference-link" data-operator="${escapeHTML(msg.formulaReference)}">${escapeHTML(msg.formulaReference)}</span></div>`;
     }
 
+    // Create documentation URL link if available
+    let documentationHTML = '';
+    if (msg.documentationUrl) {
+        const label = msg.documentationLabel || 'Documentation';
+        documentationHTML = `<div class="message-corrections">📚 <a href="${escapeHTML(msg.documentationUrl)}" target="_blank" rel="noopener noreferrer" class="documentation-link">${escapeHTML(label)}</a></div>`;
+    }
+
     return `
         <div class="message ${msg.severity} ${cursorClass}" ${lineAttr}>
             <div class="message-header">
@@ -197,7 +204,8 @@ function createMessageHTML(msg) {
             ${msg.context ? `<div class="message-context">${escapeHTML(msg.context)}</div>` : ''}
             ${correctionsHTML}
             ${formulaReferenceHTML}
-            ${!correctionsHTML && !formulaReferenceHTML && msg.suggestion ? `<div class="message-suggestion">💡 ${escapeHTML(msg.suggestion)}</div>` : ''}
+            ${documentationHTML}
+            ${!correctionsHTML && !formulaReferenceHTML && !documentationHTML && msg.suggestion ? `<div class="message-suggestion">💡 ${escapeHTML(msg.suggestion)}</div>` : ''}
         </div>
     `;
 }
@@ -309,6 +317,21 @@ function applyCorrection(lineNumber, correction) {
             if (pairMatch) {
                 const propertyName = pairMatch[1];
                 const propertyValue = pairMatch[2].trim();
+
+                // Check if the value is a number (for numeric enum corrections)
+                const isNumeric = /^-?\d+$/.test(propertyValue);
+
+                // If correction is not a number and property value is a number,
+                // this is likely a numeric enum value replacement
+                if (isNumeric && !/^\d+$/.test(correction)) {
+                    incorrectText = propertyValue;
+                    searchStart = line.indexOf(pair) + pair.indexOf('=') + 1;
+                    // Skip whitespace after '='
+                    while (searchStart < line.length && line[searchStart] === ' ') {
+                        searchStart++;
+                    }
+                    break;
+                }
 
                 // Use findSimilar to check if correction matches the value or name
                 const valueSimilar = ModValidator.findSimilar(correction, [propertyValue], ModValidator.MAX_EDIT_DISTANCE);
