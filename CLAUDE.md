@@ -77,8 +77,21 @@ A web-based validator for Horizon's Gate game mod files. Validates mod syntax, o
 ### Multi-line Values
 Parser continues collecting value tokens across newlines until it finds a line starting with `IDENTIFIER=` (new property pattern).
 
-### Property Line Numbers
-Properties stored as `Map<string, PropertyInfo>` where `PropertyInfo = { value: string, line: number }` to track exact error locations.
+### Position Tracking
+The parser tracks precise positions for all elements to enable accurate corrections:
+
+**PropertyInfo** contains:
+- `value: string` - The property value
+- `nameStartLine`, `nameStartColumn`, `nameEndColumn` - Position of the property name
+- `valueStartLine`, `valueStartColumn`, `valueEndLine`, `valueEndColumn` - Position of the property value
+  - Values can span multiple lines (e.g., formulas)
+  - Columns are 0-indexed, lines are 1-indexed
+  - endColumn is exclusive (like JavaScript slice)
+
+**ParsedObject** contains:
+- `typeStartLine`, `typeStartColumn`, `typeEndColumn` - Position of the object type name (text between `[` and `]`)
+
+This position tracking enables exact text replacement without any text searching or pattern matching.
 
 ### Type Aliases
 Mod code allows for object type aliases where a new name is used for an actual class name.
@@ -94,11 +107,31 @@ But there are many more.
 All enums are automatically validated - no hardcoded enum names required.
 
 ### Correction Logic
-When applying corrections, the code:
-1. Splits line by semicolons to handle multiple properties
-2. Uses `findSimilar()` to determine if correction matches property name or value
-3. Finds correct text position accounting for line offsets
-4. Uses `replaceTextUndoable()` for Ctrl+Z support
+The correction system uses position-based text replacement for accuracy and simplicity:
+
+**Correction Interface**:
+```typescript
+interface Correction {
+  startLine: number;      // 1-indexed (line number)
+  startColumn: number;    // 0-indexed (character position in line)
+  endLine: number;        // 1-indexed (>= startLine for multi-line)
+  endColumn: number;      // 0-indexed (exclusive, like slice)
+  replacementText: string;
+}
+```
+
+**How it works**:
+1. Validators create corrections with exact positions from the parser's position tracking
+2. UI receives correction objects with precise start/end coordinates
+3. `applyCorrection()` converts line/column to absolute character position
+4. Text is replaced using `document.execCommand('insertText')` for undo support
+5. No text searching, pattern matching, or similarity checking in the UI
+
+**Key benefits**:
+- Exact, reliable text replacement
+- Supports multi-line values (formulas)
+- Simple UI logic (~35 lines vs ~100 lines of text-searching)
+- No ambiguity with duplicate property names
 
 ## Build & Deployment
 

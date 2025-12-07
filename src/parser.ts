@@ -69,6 +69,9 @@ export class ModParser {
 
     const typeToken = this.advance();
     const objectType = typeToken.value;
+    const typeStartLine = typeToken.line;
+    const typeStartColumn = typeToken.column;
+    const typeEndColumn = typeToken.column + typeToken.value.length;
 
     // Expect closing bracket
     if (!this.check(TokenType.RIGHT_BRACKET)) {
@@ -96,6 +99,9 @@ export class ModParser {
       properties,
       startLine,
       endLine,
+      typeStartLine,
+      typeStartColumn,
+      typeEndColumn,
     };
   }
 
@@ -143,6 +149,9 @@ export class ModParser {
 
     const nameToken = this.advance();
     let propertyName = nameToken.value;
+    const nameStartLine = nameToken.line;
+    const nameStartColumn = nameToken.column;
+    const nameEndColumn = nameToken.column + nameToken.value.length;
 
     // Check for equals sign
     if (!this.check(TokenType.EQUALS)) {
@@ -159,6 +168,13 @@ export class ModParser {
 
     // Get value - can be identifier or string value
     let value = '';
+
+    // Track value position (first and last tokens)
+    let valueStartLine = 0;
+    let valueStartColumn = 0;
+    let valueEndLine = 0;
+    let valueEndColumn = 0;
+    let firstValueToken = true;
 
     // Collect all tokens until semicolon, handling multi-line values
     const valueParts: string[] = [];
@@ -205,9 +221,29 @@ export class ModParser {
       const token = this.advance();
       if (token.type === TokenType.IDENTIFIER || token.type === TokenType.STRING_VALUE) {
         valueParts.push(token.value);
+
+        // Track position of first value token
+        if (firstValueToken) {
+          valueStartLine = token.line;
+          valueStartColumn = token.column;
+          firstValueToken = false;
+        }
+
+        // Always update end position to the latest token
+        valueEndLine = token.line;
+        valueEndColumn = token.column + token.value.length;
       } else if (token.type === TokenType.EQUALS) {
         // This might be part of a formula like "is:1:value"
         valueParts.push('=');
+
+        if (firstValueToken) {
+          valueStartLine = token.line;
+          valueStartColumn = token.column;
+          firstValueToken = false;
+        }
+
+        valueEndLine = token.line;
+        valueEndColumn = token.column + 1; // '=' is 1 character
       }
     }
 
@@ -230,7 +266,16 @@ export class ModParser {
 
     return {
       key: propertyName,
-      info: { value, line: propertyLine }
+      info: {
+        value,
+        nameStartLine,
+        nameStartColumn,
+        nameEndColumn,
+        valueStartLine,
+        valueStartColumn,
+        valueEndLine,
+        valueEndColumn,
+      }
     };
   }
 

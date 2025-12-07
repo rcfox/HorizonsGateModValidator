@@ -56,21 +56,36 @@ export interface SchemaData {
 }
 
 /**
- * Property with metadata
+ * Property with metadata and position information
  */
 export interface PropertyInfo {
   value: string;
-  line: number;
+
+  // Property name position (always single line)
+  nameStartLine: number;
+  nameStartColumn: number;
+  nameEndColumn: number;
+
+  // Property value position (can be multi-line)
+  valueStartLine: number;
+  valueStartColumn: number;
+  valueEndLine: number;
+  valueEndColumn: number;
 }
 
 /**
- * Parsed object representation
+ * Parsed object representation with position information
  */
 export interface ParsedObject {
   type: string;
   properties: Map<string, PropertyInfo>;
   startLine: number;
   endLine: number;
+
+  // Type name position (always single line)
+  typeStartLine: number;
+  typeStartColumn: number;
+  typeEndColumn: number;
 }
 
 /**
@@ -78,13 +93,32 @@ export interface ParsedObject {
  */
 export type ValidationSeverity = 'error' | 'warning' | 'info';
 
+/**
+ * Position-based correction for auto-fixing issues
+ *
+ * Positions use:
+ * - Lines: 1-indexed (matches editor display)
+ * - Columns: 0-indexed (matches JavaScript string indexing)
+ * - endColumn: exclusive (like substring/slice)
+ *
+ * Invariant: startLine <= endLine
+ * Multi-line: Only property values can span multiple lines
+ */
+export interface Correction {
+  startLine: number;
+  startColumn: number;
+  endLine: number;
+  endColumn: number;
+  replacementText: string;
+}
+
 export interface ValidationMessage {
   severity: ValidationSeverity;
   message: string;
   line?: number;
   context?: string;
   suggestion?: string;
-  corrections?: string[]; // Suggested corrections for typos
+  corrections?: Correction[]; // Suggested corrections for typos
   formulaReference?: string; // Operator name for linking to formula reference page
   documentationUrl?: string; // External documentation URL
   documentationLabel?: string; // Label for the documentation link

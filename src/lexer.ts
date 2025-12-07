@@ -163,7 +163,7 @@ export class ModLexer {
       type,
       value,
       line: this.line,
-      column: this.column - value.length,
+      column: this.column - value.length - 1, // -1 to convert from 1-indexed to 0-indexed
     });
   }
 }

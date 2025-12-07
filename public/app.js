@@ -176,7 +176,10 @@ function createMessageHTML(msg) {
     let correctionsHTML = '';
     if (msg.corrections && msg.corrections.length > 0) {
         const correctionLinks = msg.corrections
-            .map(correction => `<span class="correction-link" data-correction="${escapeHTML(correction)}">${escapeHTML(correction)}</span>`)
+            .map(correction => {
+                const correctionData = JSON.stringify(correction).replace(/"/g, '&quot;');
+                return `<span class="correction-link" data-correction="${correctionData}">${escapeHTML(correction.replacementText)}</span>`;
+            })
             .join(', ');
         correctionsHTML = `<div class="message-corrections">💡 Did you mean: ${correctionLinks}?</div>`;
     }
@@ -284,133 +287,40 @@ function replaceTextUndoable(textarea, start, end, replacement) {
     textarea.setSelectionRange(start, start + replacement.length);
 }
 
-function applyCorrection(lineNumber, correction) {
+function applyCorrection(correction) {
     const lines = modInput.value.split('\n');
-    if (lineNumber < 1 || lineNumber > lines.length) {
+    const { startLine, startColumn, endLine, endColumn, replacementText } = correction;
+
+    // Validate correction bounds
+    if (startLine < 1 || startLine > lines.length || endLine < 1 || endLine > lines.length) {
+        console.warn('Invalid correction line numbers:', correction);
+        return;
+    }
+    if (startLine > endLine) {
+        console.warn('Start line > end line:', correction);
         return;
     }
 
-    const line = lines[lineNumber - 1];
-
-    // Try to find and replace the incorrect identifier
-    // Look for:
-    // 1. Object type pattern: [ObjectType]
-    // 2. Property name pattern: property=value
-    // 3. Property value pattern: property=value (for enum corrections)
-    let incorrectText = '';
-    let searchStart = 0;
-
-    // Check if this is an object type line [Type]
-    const objectTypeMatch = line.match(/\[(\w+)\]/);
-    if (objectTypeMatch) {
-        incorrectText = objectTypeMatch[1];
-    } else {
-        // Check if this is a property line: property=value
-        // The line may contain multiple properties separated by semicolons
-        // We need to find which property/value pair to correct
-
-        // First, try to find a property=value pair that contains the correction
-        const propertyPairs = line.split(';').map(p => p.trim()).filter(p => p.length > 0);
-
-        for (const pair of propertyPairs) {
-            const pairMatch = pair.match(/^\s*(!?[\w+]+)\s*=\s*(.+)$/);
-            if (pairMatch) {
-                const propertyName = pairMatch[1];
-                const propertyValue = pairMatch[2].trim();
-
-                // Check if the value is a number (for numeric enum corrections)
-                const isNumeric = /^-?\d+$/.test(propertyValue);
-
-                // If correction is not a number and property value is a number,
-                // this is likely a numeric enum value replacement
-                if (isNumeric && !/^\d+$/.test(correction)) {
-                    incorrectText = propertyValue;
-                    searchStart = line.indexOf(pair) + pair.indexOf('=') + 1;
-                    // Skip whitespace after '='
-                    while (searchStart < line.length && line[searchStart] === ' ') {
-                        searchStart++;
-                    }
-                    break;
-                }
-
-                // Use findSimilar to check if correction matches the value or name
-                const valueSimilar = ModValidator.findSimilar(correction, [propertyValue], ModValidator.MAX_EDIT_DISTANCE);
-                const nameSimilar = ModValidator.findSimilar(correction, [propertyName], ModValidator.MAX_EDIT_DISTANCE);
-
-                // Check if the value is a formula with operator prefix (e.g., "dat:fireDmg(3)")
-                // and correction matches the prefix part
-                const formulaMatch = propertyValue.match(/^(\w+):(.+)$/);
-                let formulaPrefixSimilar = [];
-                if (formulaMatch) {
-                    const formulaPrefix = formulaMatch[1];
-                    formulaPrefixSimilar = ModValidator.findSimilar(correction, [formulaPrefix], ModValidator.MAX_EDIT_DISTANCE);
-                }
-
-                // If correction is similar to the formula prefix (e.g., "dat" in "dat:fireDmg(3)")
-                if (formulaPrefixSimilar.length > 0 && formulaMatch) {
-                    incorrectText = formulaMatch[1]; // Just the prefix part
-                    searchStart = line.indexOf(pair) + pair.indexOf('=') + 1;
-                    // Skip whitespace after '='
-                    while (searchStart < line.length && line[searchStart] === ' ') {
-                        searchStart++;
-                    }
-                    break;
-                }
-
-                // If correction is similar to the value, replace the value
-                if (valueSimilar.length > 0 && propertyValue !== correction) {
-                    incorrectText = propertyValue;
-                    searchStart = line.indexOf(pair) + pair.indexOf('=') + 1;
-                    break;
-                }
-
-                // If correction is similar to the property name, replace the name
-                if (nameSimilar.length > 0 && propertyName !== correction) {
-                    incorrectText = propertyName;
-                    searchStart = line.indexOf(pair);
-                    break;
-                }
-            }
-        }
+    // Calculate absolute character positions
+    let absoluteStart = 0;
+    for (let i = 0; i < startLine - 1; i++) {
+        absoluteStart += lines[i].length + 1; // +1 for newline
     }
+    absoluteStart += startColumn;
 
-    if (!incorrectText) {
-        // Couldn't find what to replace
-        return;
+    let absoluteEnd = 0;
+    for (let i = 0; i < endLine - 1; i++) {
+        absoluteEnd += lines[i].length + 1;
     }
+    absoluteEnd += endColumn;
 
-    // Calculate character position of the incorrect text
-    let charPosition = 0;
-    for (let i = 0; i < lineNumber - 1; i++) {
-        charPosition += lines[i].length + 1; // +1 for newline
-    }
+    // Replace text (undoably)
+    replaceTextUndoable(modInput, absoluteStart, absoluteEnd, replacementText);
 
-    // Find the position of the incorrect identifier within the line (starting from searchStart)
-    const incorrectStart = line.indexOf(incorrectText, searchStart);
-    if (incorrectStart === -1) {
-        return;
-    }
-
-    const selectionStart = charPosition + incorrectStart;
-    const selectionEnd = selectionStart + incorrectText.length;
-
-    // Replace the text (undoably)
-    replaceTextUndoable(modInput, selectionStart, selectionEnd, correction);
-
-    // Update line numbers and re-validate
+    // Update and re-validate
     updateLineNumbers();
     handleValidate();
-
-    // Scroll to the line
-    const editorWrapper = modInput.parentElement;
-    const lineHeight = parseFloat(getComputedStyle(modInput).lineHeight);
-    const targetScrollTop = (lineNumber - 1) * lineHeight;
-    editorWrapper.scrollTop = targetScrollTop;
-
-    const editorSection = editorWrapper.closest('.editor-section');
-    if (editorSection) {
-        editorSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+    scrollToLine(startLine);
 }
 
 // Handle clicks on messages to jump to line
@@ -430,12 +340,15 @@ resultsContainer.addEventListener('click', (e) => {
     const correctionLink = e.target.closest('.correction-link:not(.formula-reference-link)');
     if (correctionLink) {
         e.stopPropagation();
-        const correction = correctionLink.getAttribute('data-correction');
-        const messageElement = correctionLink.closest('.message');
-        const lineNumber = messageElement ? parseInt(messageElement.getAttribute('data-line'), 10) : null;
+        const correctionData = correctionLink.getAttribute('data-correction');
 
-        if (lineNumber && correction) {
-            applyCorrection(lineNumber, correction);
+        if (correctionData) {
+            try {
+                const correction = JSON.parse(correctionData.replace(/&quot;/g, '"'));
+                applyCorrection(correction);
+            } catch (e) {
+                console.error('Failed to parse correction data:', e);
+            }
         }
         return;
     }

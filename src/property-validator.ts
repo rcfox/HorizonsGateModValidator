@@ -3,7 +3,7 @@
  * Validates that property values match their expected types
  */
 
-import { FieldType, ValidationMessage, ModSchema } from './types.js';
+import { FieldType, ValidationMessage, ModSchema, PropertyInfo } from './types.js';
 import { FormulaValidator } from './formula-validator.js';
 import { findSimilar, MAX_EDIT_DISTANCE } from './string-similarity.js';
 import modSchemaData from './mod-schema.json' with { type: 'json' };
@@ -25,10 +25,11 @@ export class PropertyValidator {
     propertyName: string,
     value: string,
     expectedType: FieldType,
-    line?: number,
+    propInfo: PropertyInfo,
     className?: string
   ): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
+    const line = propInfo.valueStartLine;
 
     // Handle the special ! prefix for overwriting lists
     const hasOverwritePrefix = propertyName.startsWith('!');
@@ -42,13 +43,20 @@ export class PropertyValidator {
     switch (expectedType) {
       case 'boolean':
         if (!this.isValidBoolean(cleanValue)) {
-          const similar = findSimilar(value, ['true', 'false'], MAX_EDIT_DISTANCE).map(s => s.value);
+          const similar = findSimilar(value, ['true', 'false'], MAX_EDIT_DISTANCE);
+          const corrections = similar.map(s => ({
+            startLine: propInfo.valueStartLine,
+            startColumn: propInfo.valueStartColumn,
+            endLine: propInfo.valueEndLine,
+            endColumn: propInfo.valueEndColumn,
+            replacementText: s.value,
+          }));
           messages.push({
             severity: 'error',
             message: `Invalid boolean value for ${propertyName}`,
             line,
             context: `Expected 'true' or 'false', got '${cleanValue}'`,
-            corrections: similar,
+            corrections,
           });
         }
         break;
@@ -111,7 +119,7 @@ export class PropertyValidator {
         break;
 
       case 'Formula':
-        const formulaResult = this.formulaValidator.validate(cleanValue, line);
+        const formulaResult = this.formulaValidator.validate(cleanValue, propInfo);
         messages.push(...formulaResult.errors);
         messages.push(...formulaResult.warnings);
         break;
@@ -137,7 +145,7 @@ export class PropertyValidator {
         break;
 
       case 'List<Formula>':
-        const listFormulaResult = this.formulaValidator.validate(cleanValue, line);
+        const listFormulaResult = this.formulaValidator.validate(cleanValue, propInfo);
         messages.push(...listFormulaResult.errors);
         messages.push(...listFormulaResult.warnings);
         break;
@@ -146,7 +154,7 @@ export class PropertyValidator {
         // Check if this is an enum type (direct or namespaced)
         let resolvedEnumType = this.resolveEnumName(expectedType, className);
         if (resolvedEnumType) {
-          messages.push(...this.validateEnum(propertyName, cleanValue, resolvedEnumType, line, className));
+          messages.push(...this.validateEnum(propertyName, cleanValue, resolvedEnumType, propInfo, className));
           break;
         }
 
@@ -161,7 +169,7 @@ export class PropertyValidator {
             // List/HashSet of enum values - validate each comma-separated value
             const parts = cleanValue.split(',').map(p => p.trim()).filter(p => p.length > 0);
             for (const part of parts) {
-              messages.push(...this.validateEnum(propertyName, part, resolvedEnumName, line, className));
+              messages.push(...this.validateEnum(propertyName, part, resolvedEnumName, propInfo, className));
             }
             break;
           }
@@ -223,8 +231,9 @@ export class PropertyValidator {
     return null;
   }
 
-  private validateEnum(propertyName: string, value: string, enumName: string, line?: number, className?: string): ValidationMessage[] {
+  private validateEnum(propertyName: string, value: string, enumName: string, propInfo: PropertyInfo, className?: string): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
+    const line = propInfo.valueStartLine;
     const enumValues = this.enums[enumName];
 
     if (!enumValues) {
@@ -263,6 +272,13 @@ export class PropertyValidator {
         .map(([name, _]) => name);
 
       if (matchingNames.length > 0) {
+        const corrections = matchingNames.map(name => ({
+          startLine: propInfo.valueStartLine,
+          startColumn: propInfo.valueStartColumn,
+          endLine: propInfo.valueEndLine,
+          endColumn: propInfo.valueEndColumn,
+          replacementText: name,
+        }));
         messages.push({
           severity: 'warning',
           message: `Numeric enum value used for ${propertyName}`,
@@ -271,7 +287,7 @@ export class PropertyValidator {
           suggestion: matchingNames.length === 1
             ? `Use '${matchingNames[0]}' instead of '${value}'`
             : `Use one of: ${matchingNames.join(', ')} instead of '${value}'`,
-          corrections: matchingNames,
+          corrections,
         });
       } else {
         messages.push({
@@ -290,7 +306,13 @@ export class PropertyValidator {
     if (!enumNames.includes(value)) {
       // Find similar enum values
       const similar = findSimilar(value, enumNames, MAX_EDIT_DISTANCE);
-      const corrections = similar.map(s => s.value);
+      const corrections = similar.map(s => ({
+        startLine: propInfo.valueStartLine,
+        startColumn: propInfo.valueStartColumn,
+        endLine: propInfo.valueEndLine,
+        endColumn: propInfo.valueEndColumn,
+        replacementText: s.value,
+      }));
 
       messages.push({
         severity: 'error',
@@ -298,7 +320,7 @@ export class PropertyValidator {
         line,
         context: `'${value}' is not a valid ${enumName}`,
         suggestion: corrections.length > 0
-          ? `Did you mean: ${corrections.join(', ')}?`
+          ? `Did you mean: ${similar.map(s => s.value).join(', ')}?`
           : `Valid values: ${enumNames.slice(0, 10).join(', ')}${enumNames.length > 10 ? ', ...' : ''}`,
         corrections,
       });

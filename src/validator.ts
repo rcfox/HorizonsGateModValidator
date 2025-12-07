@@ -109,7 +109,13 @@ export class ModValidator {
       // Find similar object type names
       const allTypes = [...Object.keys(this.schema), ...Object.keys(this.typeAliases)];
       const similar = findSimilar(obj.type, allTypes, MAX_EDIT_DISTANCE);
-      const corrections = similar.map(s => s.value);
+      const corrections = similar.map(s => ({
+        startLine: obj.typeStartLine,
+        startColumn: obj.typeStartColumn,
+        endLine: obj.typeStartLine,
+        endColumn: obj.typeEndColumn,
+        replacementText: s.value,
+      }));
 
       messages.push({
         severity: 'error',
@@ -118,7 +124,7 @@ export class ModValidator {
         context: 'This object type is not recognized',
         suggestion:
           corrections.length > 0
-            ? `Did you mean: ${corrections.join(', ')}?`
+            ? `Did you mean: ${similar.map(s => s.value).join(', ')}?`
             : 'Check for typos in the object type name',
         corrections,
       });
@@ -228,7 +234,6 @@ export class ModValidator {
     // Validate each property
     for (const [propName, propInfo] of obj.properties) {
       const propValue = propInfo.value;
-      const propLine = propInfo.line;
 
       // Remove the ! prefix and + suffixes for lookup
       let cleanPropName = propName;
@@ -270,26 +275,33 @@ export class ModValidator {
         // Find similar property names
         const allProperties = Array.from(knownFields.keys());
         const similar = findSimilar(cleanPropName, allProperties, MAX_EDIT_DISTANCE);
-        const corrections = similar.map(s => s.value);
+        const corrections = similar.map(s => ({
+          startLine: propInfo.nameStartLine,
+          startColumn: propInfo.nameStartColumn,
+          endLine: propInfo.nameStartLine,
+          endColumn: propInfo.nameEndColumn,
+          replacementText: s.value,
+        }));
 
         messages.push({
           severity: 'error',
           message: `Unknown property '${cleanPropName}' for ${typeDisplay}`,
-          line: propLine,
+          line: propInfo.nameStartLine,
           context: `Value: ${propValue}`,
           suggestion:
-            corrections.length > 0 ? `Did you mean: ${corrections.join(', ')}?` : 'Check for typos in property name',
+            corrections.length > 0 ? `Did you mean: ${similar.map(s => s.value).join(', ')}?` : 'Check for typos in property name',
           corrections,
         });
         continue;
       }
 
       // Validate property type
+      // Use cleanPropName so corrections reference the base property name without + suffixes
       const typeMessages = this.propertyValidator.validateProperty(
-        propName,
+        cleanPropName,
         propValue,
         fieldType,
-        propLine,
+        propInfo,
         resolvedTypeName
       );
 
@@ -386,8 +398,14 @@ export class ModValidator {
         messages.push({
           severity: 'error',
           message: `ActionAoE ID '${actionAoeIdProp.value}' does not match Action ID '${actionId}'`,
-          line: actionAoeIdProp.line,
-          corrections: [actionId],
+          line: actionAoeIdProp.valueStartLine,
+          corrections: [{
+            startLine: actionAoeIdProp.valueStartLine,
+            startColumn: actionAoeIdProp.valueStartColumn,
+            endLine: actionAoeIdProp.valueEndLine,
+            endColumn: actionAoeIdProp.valueEndColumn,
+            replacementText: actionId,
+          }],
         });
       }
 
@@ -421,8 +439,14 @@ export class ModValidator {
             messages.push({
               severity: 'error',
               message: `AvAffecter ID '${avAffecterIdProp.value}' does not match Action ID '${actionId}'`,
-              line: avAffecterIdProp.line,
-              corrections: [actionId],
+              line: avAffecterIdProp.valueStartLine,
+              corrections: [{
+                startLine: avAffecterIdProp.valueStartLine,
+                startColumn: avAffecterIdProp.valueStartColumn,
+                endLine: avAffecterIdProp.valueEndLine,
+                endColumn: avAffecterIdProp.valueEndColumn,
+                replacementText: actionId,
+              }],
             });
           }
 
@@ -459,8 +483,14 @@ export class ModValidator {
               messages.push({
                 severity: 'error',
                 message: `AvAffecterAoE ID '${avAffecterAoeIdProp.value}' does not match Action ID '${actionId}'`,
-                line: avAffecterAoeIdProp.line,
-                corrections: [actionId],
+                line: avAffecterAoeIdProp.valueStartLine,
+                corrections: [{
+                  startLine: avAffecterAoeIdProp.valueStartLine,
+                  startColumn: avAffecterAoeIdProp.valueStartColumn,
+                  endLine: avAffecterAoeIdProp.valueEndLine,
+                  endColumn: avAffecterAoeIdProp.valueEndColumn,
+                  replacementText: actionId,
+                }],
               });
             }
             j++; // Skip the AvAffecterAoE we just validated
