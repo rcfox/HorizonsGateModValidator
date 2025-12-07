@@ -42,11 +42,13 @@ export class PropertyValidator {
     switch (expectedType) {
       case 'boolean':
         if (!this.isValidBoolean(cleanValue)) {
+          const similar = findSimilar(value, ['true', 'false'], MAX_EDIT_DISTANCE).map(s => s.value);
           messages.push({
             severity: 'error',
             message: `Invalid boolean value for ${propertyName}`,
             line,
             context: `Expected 'true' or 'false', got '${cleanValue}'`,
+            corrections: similar,
           });
         }
         break;
