@@ -52,7 +52,12 @@ export function findSimilar(
       value: candidate,
       distance: levenshteinDistance(target, candidate),
     }))
-    .filter((item) => item.distance > 0 && item.distance <= maxDistance)
+    .filter((item) => {
+      // Exclude exact case-sensitive matches
+      if (item.value === target) return false;
+      // Include items within max distance (including case-only differences where distance = 0)
+      return item.distance >= 0 && item.distance <= maxDistance;
+    })
     .sort((a, b) => a.distance - b.distance);
 
   // Return top 3 suggestions
