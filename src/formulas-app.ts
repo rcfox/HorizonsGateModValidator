@@ -93,6 +93,28 @@ function renderOperators(operators: FormulaOperator[]) {
   operatorsList.innerHTML = operators
     .map((operator) => renderOperator(operator, openStates))
     .join("");
+
+  // Add click handlers for copy link buttons
+  operatorsList.querySelectorAll('.copy-link-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const url = (e.target as HTMLElement).getAttribute('data-url');
+      if (url) {
+        try {
+          await navigator.clipboard.writeText(url);
+          const originalText = (e.target as HTMLElement).textContent;
+          (e.target as HTMLElement).textContent = '✓';
+          (e.target as HTMLElement).classList.add('copied');
+          setTimeout(() => {
+            (e.target as HTMLElement).textContent = originalText;
+            (e.target as HTMLElement).classList.remove('copied');
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy:', err);
+        }
+      }
+    });
+  });
 }
 
 function renderOperator(
@@ -121,6 +143,7 @@ function renderOperator(
   return operator.uses
     .map((use, useIndex) => {
       const operatorKey = `${operator.name}-use-${useIndex}`;
+      const operatorUrl = `${window.location.origin}${window.location.pathname}?operator=${encodeURIComponent(operator.name)}`;
       const hasArguments = use.arguments && use.arguments.length > 0;
       const hasRequires = use.requires && use.requires.length > 0;
 
@@ -163,7 +186,9 @@ function renderOperator(
             <div class="operator-description">
               ${highlightMatch(use.description)}
             </div>
-            <a href="${issueUrl}" target="_blank" class="report-issue-link" title="Report issue with this operator">⚠️ Report Issue</a>
+            <button class="copy-link-btn" data-url="${operatorUrl}" title="Copy link to this operator">
+              🔗
+            </button>
           </div>
 
           <div class="operator-info-sections">

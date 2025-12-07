@@ -219,22 +219,25 @@ body {
   flex: 1;
 }
 
-.report-issue-link {
-  color: var(--warning-color);
-  text-decoration: none;
-  font-size: 12px;
-  font-weight: 600;
+.copy-link-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
   padding: 6px 10px;
-  border: 1px solid var(--warning-color);
   border-radius: 4px;
-  white-space: nowrap;
   transition: all 0.2s;
   flex-shrink: 0;
+  color: var(--text-muted);
 }
 
-.report-issue-link:hover {
-  background-color: var(--warning-color);
-  color: var(--surface-color);
+.copy-link-btn:hover {
+  background-color: var(--code-bg);
+  color: var(--primary-color);
+}
+
+.copy-link-btn.copied {
+  color: var(--success-color);
 }
 
 /* Arguments */
@@ -359,6 +362,24 @@ mark {
 /* Placeholder states */
 .placeholder.error {
   color: var(--error-color);
+}
+
+/* Highlight effect for URL-linked tasks */
+.task-highlight {
+  animation: task-highlight-pulse 2s ease-in-out;
+}
+
+@keyframes task-highlight-pulse {
+  0% {
+    background-color: transparent;
+  }
+  10% {
+    background-color: var(--primary-color);
+    opacity: 0.2;
+  }
+  100% {
+    background-color: transparent;
+  }
 }
 
 /* Responsive adjustments */

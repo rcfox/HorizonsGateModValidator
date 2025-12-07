@@ -131,6 +131,7 @@ function renderTasks(tasks: Task[]) {
     const hasRequired = task.required && task.required.length > 0;
     const hasOptional = task.optional && task.optional.length > 0;
 
+    const taskUrl = `${window.location.origin}${window.location.pathname}?task=${encodeURIComponent(task.name)}`;
     const issueTitle = encodeURIComponent(`[Task Documentation] Issue with "${task.name}" task`);
     const issueBody = encodeURIComponent(`**Task Name:** \`${task.name}\`
 
@@ -156,7 +157,9 @@ function renderTasks(tasks: Task[]) {
             <div class="task-description">
               ${highlightMatch(task.description)}
             </div>
-            <a href="${issueUrl}" target="_blank" class="report-issue-link" title="Report issue with this task">⚠️ Report Issue</a>
+            <button class="copy-link-btn" data-url="${taskUrl}" title="Copy link to this task">
+              🔗
+            </button>
           </div>
 
           ${hasRequired ? `
@@ -205,6 +208,28 @@ function renderTasks(tasks: Task[]) {
     if (taskName && openStates.has(taskName)) {
       (item as HTMLDetailsElement).open = openStates.get(taskName)!;
     }
+  });
+
+  // Add click handlers for copy link buttons
+  tasksList.querySelectorAll('.copy-link-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const url = (e.target as HTMLElement).getAttribute('data-url');
+      if (url) {
+        try {
+          await navigator.clipboard.writeText(url);
+          const originalText = (e.target as HTMLElement).textContent;
+          (e.target as HTMLElement).textContent = '✓';
+          (e.target as HTMLElement).classList.add('copied');
+          setTimeout(() => {
+            (e.target as HTMLElement).textContent = originalText;
+            (e.target as HTMLElement).classList.remove('copied');
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy:', err);
+        }
+      }
+    });
   });
 }
 
@@ -351,3 +376,35 @@ updateTaskCount(filteredTasks.length, convertedTasks.length);
 // Display game version
 const gameVersionElement = document.getElementById('gameVersion')!;
 gameVersionElement.textContent = `Up to date for v${tasksData.gameVersion}`;
+
+// Handle URL parameter to auto-expand and scroll to task
+const urlParams = new URLSearchParams(window.location.search);
+const taskParam = urlParams.get('task');
+if (taskParam) {
+  // Find the task by name (case-insensitive)
+  const matchingTask = convertedTasks.find(task =>
+    task.name.toLowerCase() === taskParam.toLowerCase()
+  );
+
+  if (matchingTask) {
+    // Find the task element
+    const taskElement = document.querySelector(
+      `.task-item[data-task-name="${escapeHtml(matchingTask.name)}"]`
+    ) as HTMLDetailsElement;
+
+    if (taskElement) {
+      // Expand the task
+      taskElement.open = true;
+
+      // Scroll to it with a slight delay to ensure DOM is ready
+      setTimeout(() => {
+        taskElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Add a highlight effect
+        taskElement.classList.add('task-highlight');
+        setTimeout(() => {
+          taskElement.classList.remove('task-highlight');
+        }, 2000);
+      }, 100);
+    }
+  }
+}
