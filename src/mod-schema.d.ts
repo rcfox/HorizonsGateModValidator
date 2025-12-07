@@ -25,6 +25,7 @@ export type FieldType =
   | "Dictionary<string, List<string>>"
   | "AreaOfEffect"
   | "AoEShapeType"
+  | "AoEPreset"
   | "ItemCategory"
   | "HashSet<specialProperty>"
   | "List<Light>"

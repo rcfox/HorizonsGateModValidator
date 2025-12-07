@@ -388,23 +388,36 @@ function extractEnums(baseDir) {
           const enumName = enumMatch[1];
           const enumBody = enumMatch[2];
 
-          // Extract enum values (name = value or just name)
-          const valueRegex = /(\w+)\s*=?\s*[^,\n]*/g;
-          const values = [];
+          // Extract enum values with their numeric values
+          const lines = enumBody.split(/[,\n]/).map(l => l.trim()).filter(l => l);
+          const values = {};
+          let currentValue = 0;
 
-          let valueMatch;
-          while ((valueMatch = valueRegex.exec(enumBody)) !== null) {
-            const valueName = valueMatch[1].trim();
-            if (valueName) {
-              values.push(valueName);
+          for (const line of lines) {
+            // Check for explicit value assignment: name = value
+            const explicitMatch = line.match(/^(\w+)\s*=\s*(-?\d+)/);
+            if (explicitMatch) {
+              const name = explicitMatch[1];
+              currentValue = parseInt(explicitMatch[2], 10);
+              values[name] = currentValue;
+              currentValue++;
+            } else {
+              // Just a name, auto-increment
+              const nameMatch = line.match(/^(\w+)/);
+              if (nameMatch) {
+                values[nameMatch[1]] = currentValue;
+                currentValue++;
+              }
             }
           }
 
-          if (values.length > 0) {
+          if (Object.keys(values).length > 0) {
             // Namespace enum by its containing class
             const namespacedName = `${className}.${enumName}`;
             enums[namespacedName] = values;
-            console.log(`  ${namespacedName}: ${values.slice(0, 5).join(', ')}${values.length > 5 ? `, ... (${values.length} total)` : ''}`);
+            const entries = Object.entries(values);
+            const sample = entries.slice(0, 3).map(([k, v]) => `${k}=${v}`).join(', ');
+            console.log(`  ${namespacedName}: ${entries.length} values (${sample}...)`);
           }
         }
       }
@@ -444,21 +457,34 @@ function extractEnums(baseDir) {
         }
 
         if (!isInsideClass) {
-          // Extract enum values
-          const valueRegex = /(\w+)\s*=?\s*[^,\n]*/g;
-          const values = [];
+          // Extract enum values with their numeric values
+          const lines = enumBody.split(/[,\n]/).map(l => l.trim()).filter(l => l);
+          const values = {};
+          let currentValue = 0;
 
-          let valueMatch;
-          while ((valueMatch = valueRegex.exec(enumBody)) !== null) {
-            const valueName = valueMatch[1].trim();
-            if (valueName) {
-              values.push(valueName);
+          for (const line of lines) {
+            // Check for explicit value assignment: name = value
+            const explicitMatch = line.match(/^(\w+)\s*=\s*(-?\d+)/);
+            if (explicitMatch) {
+              const name = explicitMatch[1];
+              currentValue = parseInt(explicitMatch[2], 10);
+              values[name] = currentValue;
+              currentValue++;
+            } else {
+              // Just a name, auto-increment
+              const nameMatch = line.match(/^(\w+)/);
+              if (nameMatch) {
+                values[nameMatch[1]] = currentValue;
+                currentValue++;
+              }
             }
           }
 
-          if (values.length > 0) {
+          if (Object.keys(values).length > 0) {
             enums[enumName] = values;
-            console.log(`  ${enumName}: ${values.slice(0, 5).join(', ')}${values.length > 5 ? `, ... (${values.length} total)` : ''}`);
+            const entries = Object.entries(values);
+            const sample = entries.slice(0, 3).map(([k, v]) => `${k}=${v}`).join(', ');
+            console.log(`  ${enumName}: ${entries.length} values (${sample}...)`);
           }
         }
       }
@@ -468,6 +494,40 @@ function extractEnums(baseDir) {
   }
 
   return enums;
+}
+
+function extractAoEPresets(baseDir) {
+  console.log('\nExtracting AoE presets from Data.cs...\n');
+
+  const dataPath = path.join(baseDir, 'Tactics', 'Data.cs');
+
+  if (!fs.existsSync(dataPath)) {
+    console.warn('Warning: Data.cs not found');
+    return {};
+  }
+
+  const content = fs.readFileSync(dataPath, 'utf-8');
+
+  // Find all AoE.Add("key", ...) calls
+  const aoeRegex = /AoE\.Add\("([^"]*)"/g;
+  const presets = {};
+  let index = 0;
+
+  let match;
+  while ((match = aoeRegex.exec(content)) !== null) {
+    const key = match[1];
+    // Skip empty string - it's not a valid preset name
+    if (key === '') continue;
+    // Assign sequential numeric values for the enum-like structure
+    presets[key] = index;
+    index++;
+  }
+
+  const count = Object.keys(presets).length;
+  const sample = Object.entries(presets).slice(0, 5).map(([k, v]) => k === '' ? '(empty)' : k).join(', ');
+  console.log(`  Found ${count} AoE presets: ${sample}${count > 5 ? ', ...' : ''}`);
+
+  return presets;
 }
 
 function discoverTypesFromDataManager(dataManagerPath) {
@@ -628,6 +688,12 @@ function extractSchema(tacticsDir) {
   // Extract enums
   const enums = extractEnums(baseDir);
 
+  // Extract AoE presets (special enum-like type for AreaOfEffect.cloneFrom)
+  const aoePresets = extractAoEPresets(baseDir);
+  if (Object.keys(aoePresets).length > 0) {
+    enums['AoEPreset'] = aoePresets;
+  }
+
   return { schema, typeAliases, enums };
 }
 
@@ -649,6 +715,16 @@ function fixfReqTypes(schema) {
         fReqField.type = 'Formula';
         // Keep csType as 'string' since that's what it actually is in C#
       }
+    }
+  }
+
+  // AreaOfEffect.cloneFrom should be validated as AoEPreset enum
+  if (schema['AreaOfEffect']) {
+    const cloneFromField = schema['AreaOfEffect'].fields.find(f => f.name === 'cloneFrom');
+    if (cloneFromField && cloneFromField.type === 'string') {
+      console.log(`  Fixing AreaOfEffect.cloneFrom: string -> AoEPreset`);
+      cloneFromField.type = 'AoEPreset';
+      // Keep csType as 'string' since that's what it actually is in C#
     }
   }
 }

@@ -1907,7 +1907,7 @@
         },
         {
           "name": "cloneFrom",
-          "type": "string",
+          "type": "AoEPreset",
           "csType": "string",
           "virtual": true,
           "source": "DataManager (common)"
@@ -8224,6 +8224,31 @@
     "BlurTechnique": {
       "Horizontal": 1,
       "Vertical": 2
+    },
+    "AoEPreset": {
+      "detect": 0,
+      "adjacentAndSelf": 1,
+      "adjacentAndSelf+1": 2,
+      "adjacentAndSelf+2": 3,
+      "adjacentAndSelf+3": 4,
+      "adjacent": 5,
+      "adjacent+1": 6,
+      "adjacent+2": 7,
+      "adjacent+3": 8,
+      "oneTile": 9,
+      "party": 10,
+      "allParty": 11,
+      "allActors": 12,
+      "allAllies": 13,
+      "allEnemies": 14,
+      "walk": 15,
+      "oneTileWalk": 16,
+      "oneTileWalk_selectActors": 17,
+      "boat": 18,
+      "fill": 19,
+      "deepwater_search": 20,
+      "water_search": 21,
+      "land_search": 22
     }
   }
 }
