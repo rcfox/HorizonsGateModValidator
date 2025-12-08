@@ -25,14 +25,13 @@ const SAMPLE_MOD = `[Action] ID=greatswordAttack;
 	FXOnTarget=swipe;
 [Actionaoe]
 	ID=greatswordAttack;
-	cloneFrom=adjacent;
+	cloneFrom=Adjacent;
 [AvAffecter]
-	ID=greatswordAttack;
 	actorValue=HP;
-	magnitude= d:gswordDmg;
+	magnitude= dat:gswordDmg;
 	durration=-2;
 	chance=test;
-	element=melee;
+	element=2;
 	element=physical;
 	element=slash;
 	element=heavSlash;
