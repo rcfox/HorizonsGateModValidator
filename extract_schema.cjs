@@ -34,6 +34,16 @@ const typeMap = {
   'Dictionary<string, float>': 'Dictionary<string, float>',
 };
 
+// Reverse mapping: our schema types to C# types
+const schemaToCsTypeMap = {
+  'boolean': 'bool',
+  'integer': 'int',
+  'float': 'float',
+  'byte': 'byte',
+  'string': 'string',
+  'Formula': 'Formula'
+};
+
 function extractFieldsFromClass(filePath, className) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const fields = [];
@@ -162,6 +172,45 @@ function extractFieldsFromClass(filePath, className) {
     }
   }
 
+  // Extract virtual properties from serialization (properties without matching fields)
+  // Pattern: stringBuilder.Append("fieldName="); or stringBuilder.Append("; fieldName=");
+  const virtualSerializationRegex = /stringBuilder\.Append\("[;\s]*(\w+)="\);?\s+stringBuilder\.Append\(([^;]+);/g;
+
+  while ((match = virtualSerializationRegex.exec(content)) !== null) {
+    const fieldName = match[1];
+    const expression = match[2].trim();
+
+    // Skip if already added (don't override existing fields or virtual props)
+    if (fields.find(f => f.name === fieldName)) {
+      continue;
+    }
+
+    // Infer type from the appended expression
+    let mappedType = 'string'; // default
+    let csType = 'string';
+
+    if (expression.includes('byte.Parse') || expression.match(/\.R\.ToString|\.G\.ToString|\.B\.ToString/)) {
+      mappedType = 'byte';
+      csType = 'byte';
+    } else if (expression.match(/int\.Parse\([^)]*\[["']${fieldName}["']\]\)/)) {
+      // int.Parse(valuesDict["fieldName"])
+      mappedType = 'integer';
+      csType = 'int';
+    } else if (expression.match(/float\.Parse\([^)]*\[["']${fieldName}["']\]/)) {
+      // float.Parse(valuesDict["fieldName"])
+      mappedType = 'float';
+      csType = 'float';
+    }
+    // else default to string
+
+    fields.push({
+      name: fieldName,
+      type: mappedType,
+      csType: csType,
+      virtual: true // Mark as virtual since it doesn't have a direct field
+    });
+  }
+
   return fields;
 }
 
@@ -180,7 +229,13 @@ function extractVirtualProperties(filePath, className) {
   const virtualProps = [];
 
   // Find the constructor that takes Dictionary<string, string>
-  const constructorHeaderMatch = content.match(/public\s+\w+\(Dictionary<string,\s*string>\s+(\w+)\)[^{]*\{/);
+  // Also check for setupZone method (used by Zone class)
+  let constructorHeaderMatch = content.match(/public\s+\w+\(Dictionary<string,\s*string>\s+(\w+)\)[^{]*\{/);
+
+  // If no constructor, check for setupZone or similar setup methods
+  if (!constructorHeaderMatch) {
+    constructorHeaderMatch = content.match(/public\s+void\s+setup\w*\(Dictionary<string,\s*string>\s+(\w+)\)[^{]*\{/);
+  }
 
   if (!constructorHeaderMatch) {
     return virtualProps;
@@ -232,26 +287,27 @@ function extractVirtualProperties(filePath, className) {
       type = 'Formula';
     }
     // Check for byte.Parse (like R, G, B)
-    else if (constructorBody.includes(`byte.Parse(${dictVarName}["${key}"])`)) {
+    // Use regex to handle optional CultureInfo parameter
+    else if (new RegExp(`byte\\.Parse\\(${dictVarName}\\["${key}"\\]`).test(constructorBody)) {
       type = 'byte';
     }
     // Check for int.Parse
-    else if (constructorBody.includes(`int.Parse(${dictVarName}["${key}"])`)) {
+    else if (new RegExp(`int\\.Parse\\(${dictVarName}\\["${key}"\\]`).test(constructorBody)) {
       type = 'integer';
     }
     // Check for float.Parse
-    else if (constructorBody.includes(`float.Parse(${dictVarName}["${key}"])`)) {
+    else if (new RegExp(`float\\.Parse\\(${dictVarName}\\["${key}"\\]`).test(constructorBody)) {
       type = 'float';
     }
     // Check for bool.Parse
-    else if (constructorBody.includes(`bool.Parse(${dictVarName}["${key}"])`)) {
+    else if (new RegExp(`bool\\.Parse\\(${dictVarName}\\["${key}"\\]`).test(constructorBody)) {
       type = 'boolean';
     }
 
     virtualProps.push({
       name: key,
       type: type,
-      csType: type,
+      csType: schemaToCsTypeMap[type] || type,
       virtual: true // Mark as virtual property
     });
   }
@@ -283,7 +339,7 @@ function extractVirtualProperties(filePath, className) {
     virtualProps.push({
       name: baseKey + '+',
       type: type,
-      csType: type,
+      csType: schemaToCsTypeMap[type] || type,
       virtual: true,
       pattern: true // Indicates this accepts + suffixes
     });
@@ -701,15 +757,16 @@ function extractSchema(tacticsDir) {
     }
 
     console.log(`Extracting ${className}...`);
-    const fields = extractFieldsFromClass(filePath, className);
+    // Extract virtual properties from constructor first (they have better type info)
     const virtualProps = extractVirtualProperties(filePath, className);
+    const fields = extractFieldsFromClass(filePath, className);
 
-    // Filter out virtual properties that duplicate real fields
-    const realFieldNames = new Set(fields.map(f => f.name));
-    const uniqueVirtualProps = virtualProps.filter(vp => !realFieldNames.has(vp.name));
+    // Filter out fields that duplicate virtual properties (constructor takes precedence)
+    const virtualPropNames = new Set(virtualProps.map(vp => vp.name));
+    const uniqueFields = fields.filter(f => !virtualPropNames.has(f.name));
 
-    // Combine real fields and unique virtual properties
-    const allFields = [...fields, ...uniqueVirtualProps];
+    // Combine virtual properties and unique fields (virtual props first)
+    const allFields = [...virtualProps, ...uniqueFields];
 
     // Determine category
     const category = categorizeClass(className, dataManagerContent);
@@ -755,6 +812,93 @@ function extractSchema(tacticsDir) {
       }
     }
   }
+
+  // Extract and add property aliases from assignAliasFromDict calls
+  console.log('  Adding property aliases from assignAliasFromDict');
+
+  let aliasCount = 0;
+  let filesChecked = 0;
+  for (const className of Object.keys(schema)) {
+    const classPath = findClassFile(className, baseDir);
+    if (!classPath) continue;
+
+    filesChecked++;
+    const content = fs.readFileSync(classPath, 'utf-8');
+
+    // Check if this file has any assignAliasFromDict calls
+    if (content.includes('assignAliasFromDict')) {
+      const aliasPattern = /DataManager\.assignAliasFromDict\([^,]+,\s*\w+,\s*"([^"]+)",\s*"([^"]+)"\)/g;
+      let match;
+
+      while ((match = aliasPattern.exec(content)) !== null) {
+        const truePropertyName = match[1];
+        const aliasPropertyName = match[2];
+        aliasCount++;
+
+      // Find the true property in the schema
+      const trueProperty = schema[className].fields.find(f => f.name === truePropertyName);
+
+      if (trueProperty) {
+        // Check if alias already exists
+        const aliasExists = schema[className].fields.find(f => f.name === aliasPropertyName);
+
+        if (!aliasExists) {
+          // Add the alias with the same type as the true property
+          schema[className].fields.push({
+            name: aliasPropertyName,
+            type: trueProperty.type,
+            csType: trueProperty.csType,
+            virtual: true  // Mark as virtual since it's an alias
+          });
+          console.log(`    ${className}: ${aliasPropertyName} → ${truePropertyName}`);
+        }
+      }
+      }
+    }
+  }
+  console.log(`  Checked ${filesChecked} files, found ${aliasCount} property aliases`);
+
+  // Add special types that don't follow standard instantiation patterns
+  console.log('  Adding special types (Zone, HeightMap, LevelDataZone, FormulaGlobal)');
+
+  // Zone: Uses setupZone(valuesDict) instead of constructor
+  const zoneFilePath = path.join(baseDir, 'Tactics', 'Zone.cs');
+  if (fs.existsSync(zoneFilePath)) {
+    const zoneFields = extractFieldsFromClass(zoneFilePath, 'Zone');
+    const zoneVirtualProps = extractVirtualProperties(zoneFilePath, 'Zone');
+    const realFieldNames = new Set(zoneFields.map(f => f.name));
+    const uniqueVirtualProps = zoneVirtualProps.filter(vp => !realFieldNames.has(vp.name));
+    schema['Zone'] = {
+      category: 'special',
+      fields: [...zoneFields, ...uniqueVirtualProps],
+      supportsCloneFrom: false
+    };
+  }
+
+  // LevelDataZone: Alias for Zone (creates Zone object)
+  if (schema['Zone']) {
+    schema['LevelDataZone'] = schema['Zone'];
+  }
+
+  // HeightMap: Uses applyHeightmap(valuesDict) - minimal schema
+  schema['HeightMap'] = {
+    category: 'special',
+    fields: [
+      {name: 'h', type:'string', csType: 'string'}
+    ],
+    supportsCloneFrom: false
+  };
+
+  // FormulaGlobal/GlobalFormula: Creates Formula with ID
+  schema['FormulaGlobal'] = {
+    category: 'special',
+    fields: [
+      { name: 'ID', type: 'string', csType: 'string' },
+      { name: 'formula', type: 'Formula', csType: 'string' }
+    ],
+    supportsCloneFrom: false
+  };
+  schema['GlobalFormula'] = schema['FormulaGlobal'];
 
   // Extract enums
   const enums = extractEnums(baseDir);
@@ -893,7 +1037,7 @@ function addCommonVirtualProperties(schema, dataManagerVirtualProps) {
         classSchema.fields.push({
           name: virtualProp.name,
           type: virtualProp.type,
-          csType: virtualProp.type,
+          csType: schemaToCsTypeMap[virtualProp.type] || virtualProp.type,
           virtual: true,
           source: 'DataManager (common)'
         });
@@ -909,7 +1053,7 @@ function addCommonVirtualProperties(schema, dataManagerVirtualProps) {
           classSchema.fields.push({
             name: virtualProp.name,
             type: virtualProp.type,
-            csType: virtualProp.type,
+            csType: schemaToCsTypeMap[virtualProp.type] || virtualProp.type,
             virtual: true,
             source: 'DataManager'
           });

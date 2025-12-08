@@ -4,6 +4,48 @@
       "category": "definition",
       "fields": [
         {
+          "name": "R",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "G",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "B",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "R_checkerboard",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "G_checkerboard",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "B_checkerboard",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "flip",
+          "type": "boolean",
+          "csType": "bool",
+          "virtual": true
+        },
+        {
           "name": "ID",
           "type": "string",
           "csType": "string"
@@ -259,11 +301,6 @@
           "csType": "float"
         },
         {
-          "name": "flip",
-          "type": "SpriteEffects",
-          "csType": "SpriteEffects"
-        },
-        {
           "name": "reactions",
           "type": "List<ElementReaction>",
           "csType": "List<ElementReaction>"
@@ -272,42 +309,6 @@
           "name": "reactionsCauseTerrainFX",
           "type": "boolean",
           "csType": "bool"
-        },
-        {
-          "name": "R",
-          "type": "byte",
-          "csType": "byte",
-          "virtual": true
-        },
-        {
-          "name": "G",
-          "type": "byte",
-          "csType": "byte",
-          "virtual": true
-        },
-        {
-          "name": "B",
-          "type": "byte",
-          "csType": "byte",
-          "virtual": true
-        },
-        {
-          "name": "R_checkerboard",
-          "type": "byte",
-          "csType": "byte",
-          "virtual": true
-        },
-        {
-          "name": "G_checkerboard",
-          "type": "byte",
-          "csType": "byte",
-          "virtual": true
-        },
-        {
-          "name": "B_checkerboard",
-          "type": "byte",
-          "csType": "byte",
-          "virtual": true
         },
         {
           "name": "cloneFrom",
@@ -322,6 +323,48 @@
     "Light": {
       "category": "nested",
       "fields": [
+        {
+          "name": "alpha",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "red",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "green",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "blue",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "X",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "Y",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "texture",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
         {
           "name": "color",
           "type": "Color",
@@ -351,47 +394,6 @@
           "name": "palette",
           "type": "string",
           "csType": "string"
-        },
-        {
-          "name": "texture",
-          "type": "string",
-          "csType": "string"
-        },
-        {
-          "name": "alpha",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
-          "name": "red",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
-          "name": "green",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
-          "name": "blue",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
-          "name": "X",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
-          "name": "Y",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
         },
         {
           "name": "ID",
@@ -501,6 +503,12 @@
           "csType": "string",
           "virtual": true,
           "source": "DataManager (common)"
+        },
+        {
+          "name": "actorValue",
+          "type": "List<string>",
+          "csType": "List<string>",
+          "virtual": true
         }
       ],
       "supportsCloneFrom": false
@@ -737,34 +745,45 @@
       "category": "nested",
       "fields": [
         {
+          "name": "actorValue",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "magnitude",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
           "name": "sourceAVAffecter",
           "type": "string",
-          "csType": "string"
+          "csType": "string",
+          "virtual": true
         },
         {
           "name": "sourceType",
           "type": "string",
-          "csType": "string"
+          "csType": "string",
+          "virtual": true
         },
         {
           "name": "iconText",
           "type": "string",
           "csType": "string"
-        },
-        {
-          "name": "actorValue",
-          "type": "string",
-          "csType": "string"
-        },
-        {
-          "name": "magnitude",
-          "type": "float",
-          "csType": "float"
-        },
-        {
-          "name": "duration",
-          "type": "float",
-          "csType": "float"
         },
         {
           "name": "formulaMod",
@@ -800,12 +819,6 @@
           "name": "critical",
           "type": "boolean",
           "csType": "bool"
-        },
-        {
-          "name": "ID",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
         },
         {
           "name": "cloneFrom",
@@ -1695,8 +1708,9 @@
       "fields": [
         {
           "name": "shape",
-          "type": "AoEShapeType",
-          "csType": "AoEShapeType"
+          "type": "integer",
+          "csType": "int",
+          "virtual": true
         },
         {
           "name": "minRange",
@@ -1920,8 +1934,9 @@
       "fields": [
         {
           "name": "itemCategory",
-          "type": "ItemCategory",
-          "csType": "ItemCategory"
+          "type": "string",
+          "csType": "string",
+          "virtual": true
         },
         {
           "name": "special",
@@ -2262,6 +2277,12 @@
       "category": "definition",
       "fields": [
         {
+          "name": "attackKeyframe",
+          "type": "integer",
+          "csType": "int",
+          "virtual": true
+        },
+        {
           "name": "bodyPartKeyframes",
           "type": "Dictionary<string, List<Keyframe>>",
           "csType": "Dictionary<string, List<Keyframe>>"
@@ -2307,11 +2328,6 @@
           "csType": "float"
         },
         {
-          "name": "attackKeyframe",
-          "type": "integer",
-          "csType": "int"
-        },
-        {
           "name": "ID",
           "type": "string",
           "csType": "string",
@@ -2328,7 +2344,7 @@
         {
           "name": "flipArms",
           "type": "boolean",
-          "csType": "boolean",
+          "csType": "bool",
           "virtual": true,
           "source": "DataManager"
         }
@@ -2435,7 +2451,7 @@
         {
           "name": "cloneFromIndex",
           "type": "integer",
-          "csType": "integer",
+          "csType": "int",
           "virtual": true,
           "source": "DataManager"
         },
@@ -2449,7 +2465,7 @@
         {
           "name": "replaceIndex",
           "type": "integer",
-          "csType": "integer",
+          "csType": "int",
           "virtual": true,
           "source": "DataManager"
         }
@@ -2460,12 +2476,85 @@
       "category": "definition",
       "fields": [
         {
-          "name": "IDnum",
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "q",
           "type": "integer",
-          "csType": "int"
+          "csType": "int",
+          "virtual": true
         },
         {
           "name": "quantity",
+          "type": "integer",
+          "csType": "int",
+          "virtual": true
+        },
+        {
+          "name": "r",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "rot",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "oX",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "oY",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "bu",
+          "type": "boolean",
+          "csType": "bool",
+          "virtual": true
+        },
+        {
+          "name": "buried",
+          "type": "boolean",
+          "csType": "bool",
+          "virtual": true
+        },
+        {
+          "name": "br",
+          "type": "boolean",
+          "csType": "bool",
+          "virtual": true
+        },
+        {
+          "name": "timer",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "specialX",
+          "type": "integer",
+          "csType": "int",
+          "virtual": true
+        },
+        {
+          "name": "specialY",
+          "type": "integer",
+          "csType": "int",
+          "virtual": true
+        },
+        {
+          "name": "IDnum",
           "type": "integer",
           "csType": "int"
         },
@@ -2478,16 +2567,6 @@
           "name": "offset",
           "type": "Vector2",
           "csType": "Vector2"
-        },
-        {
-          "name": "rot",
-          "type": "float",
-          "csType": "float"
-        },
-        {
-          "name": "buried",
-          "type": "boolean",
-          "csType": "bool"
         },
         {
           "name": "broken",
@@ -2520,62 +2599,21 @@
           "csType": "int"
         },
         {
-          "name": "ID",
-          "type": "string",
-          "csType": "string"
-        },
-        {
-          "name": "q",
-          "type": "integer",
-          "csType": "integer",
-          "virtual": true
-        },
-        {
-          "name": "r",
+          "name": "containedIn",
           "type": "string",
           "csType": "string",
           "virtual": true
         },
         {
-          "name": "oX",
+          "name": "cSlot",
           "type": "string",
           "csType": "string",
           "virtual": true
         },
         {
-          "name": "oY",
+          "name": "containerID",
           "type": "string",
           "csType": "string",
-          "virtual": true
-        },
-        {
-          "name": "bu",
-          "type": "boolean",
-          "csType": "boolean",
-          "virtual": true
-        },
-        {
-          "name": "br",
-          "type": "boolean",
-          "csType": "boolean",
-          "virtual": true
-        },
-        {
-          "name": "timer",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
-          "name": "specialX",
-          "type": "integer",
-          "csType": "integer",
-          "virtual": true
-        },
-        {
-          "name": "specialY",
-          "type": "integer",
-          "csType": "integer",
           "virtual": true
         },
         {
@@ -2586,37 +2624,16 @@
           "source": "DataManager (common)"
         },
         {
-          "name": "containerID",
-          "type": "string",
-          "csType": "string",
-          "virtual": true,
-          "source": "DataManager"
-        },
-        {
-          "name": "containedIn",
-          "type": "string",
-          "csType": "string",
-          "virtual": true,
-          "source": "DataManager"
-        },
-        {
-          "name": "cSlot",
-          "type": "integer",
-          "csType": "integer",
-          "virtual": true,
-          "source": "DataManager"
-        },
-        {
           "name": "x",
           "type": "integer",
-          "csType": "integer",
+          "csType": "int",
           "virtual": true,
           "source": "DataManager"
         },
         {
           "name": "y",
           "type": "integer",
-          "csType": "integer",
+          "csType": "int",
           "virtual": true,
           "source": "DataManager"
         }
@@ -2627,14 +2644,15 @@
       "category": "definition",
       "fields": [
         {
+          "name": "category",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
           "name": "ID",
           "type": "string",
           "csType": "string"
-        },
-        {
-          "name": "category",
-          "type": "JournalCategory",
-          "csType": "JournalCategory"
         },
         {
           "name": "title",
@@ -2820,6 +2838,18 @@
           "csType": "string",
           "virtual": true,
           "source": "DataManager (common)"
+        },
+        {
+          "name": "fReq",
+          "type": "List<Formula>",
+          "csType": "List<Formula>",
+          "virtual": true
+        },
+        {
+          "name": "special",
+          "type": "List<string>",
+          "csType": "List<string>",
+          "virtual": true
         }
       ],
       "supportsCloneFrom": false
@@ -3421,6 +3451,78 @@
           "csType": "TileCoord"
         },
         {
+          "name": "canSwap",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "aiScript",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "timer",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "headSprite",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "faceSprite",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "legsSprite",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "armLSprite",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "armRSprite",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "torsoSprite",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "shoulderLSprite",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "shoulderRSprite",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "backSprite",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
           "name": "cloneFrom",
           "type": "string",
           "csType": "string",
@@ -3564,6 +3666,32 @@
       "category": "nested",
       "fields": [
         {
+          "name": "canOnlyContainItemsWithThisProperty",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "capacity",
+          "type": "integer",
+          "csType": "int",
+          "virtual": true
+        },
+        {
+          "name": "itemN",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "pattern": true
+        },
+        {
+          "name": "qN",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "pattern": true
+        },
+        {
           "name": "maxWeight",
           "type": "float",
           "csType": "float"
@@ -3604,32 +3732,6 @@
           "csType": "bool"
         },
         {
-          "name": "canOnlyContainItemsWithThisProperty",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
-          "name": "capacity",
-          "type": "integer",
-          "csType": "integer",
-          "virtual": true
-        },
-        {
-          "name": "itemN",
-          "type": "string",
-          "csType": "string",
-          "virtual": true,
-          "pattern": true
-        },
-        {
-          "name": "qN",
-          "type": "string",
-          "csType": "string",
-          "virtual": true,
-          "pattern": true
-        },
-        {
           "name": "ID",
           "type": "string",
           "csType": "string",
@@ -3649,6 +3751,18 @@
     "Location": {
       "category": "definition",
       "fields": [
+        {
+          "name": "x",
+          "type": "integer",
+          "csType": "int",
+          "virtual": true
+        },
+        {
+          "name": "y",
+          "type": "integer",
+          "csType": "int",
+          "virtual": true
+        },
         {
           "name": "xy",
           "type": "TileCoord",
@@ -3855,18 +3969,6 @@
           "csType": "string"
         },
         {
-          "name": "x",
-          "type": "integer",
-          "csType": "integer",
-          "virtual": true
-        },
-        {
-          "name": "y",
-          "type": "integer",
-          "csType": "integer",
-          "virtual": true
-        },
-        {
           "name": "cloneFrom",
           "type": "string",
           "csType": "string",
@@ -3880,24 +3982,154 @@
       "category": "nested",
       "fields": [
         {
-          "name": "known",
-          "type": "boolean",
-          "csType": "bool"
-        },
-        {
           "name": "saveName",
           "type": "string",
-          "csType": "string"
-        },
-        {
-          "name": "currentZoneName",
-          "type": "string",
-          "csType": "string"
+          "csType": "string",
+          "virtual": true
         },
         {
           "name": "playerActorID",
           "type": "string",
-          "csType": "string"
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "currentZoneName",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "money",
+          "type": "integer",
+          "csType": "int",
+          "virtual": true
+        },
+        {
+          "name": "currentWeather",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "AIPlan_ratingThresholdMod",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "AIMaxTimePerTurnMod",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "playerXPMultiplier",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "enemyStatsMultiplier",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "playerBonusMove",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "enemySpawnPowerMod",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "travelDifficulty",
+          "type": "integer",
+          "csType": "int",
+          "virtual": true
+        },
+        {
+          "name": "canSaveOutsidePort",
+          "type": "boolean",
+          "csType": "bool",
+          "virtual": true
+        },
+        {
+          "name": "timedHitsMode",
+          "type": "boolean",
+          "csType": "bool",
+          "virtual": true
+        },
+        {
+          "name": "stashListMode",
+          "type": "boolean",
+          "csType": "bool",
+          "virtual": true
+        },
+        {
+          "name": "cargoListMode",
+          "type": "boolean",
+          "csType": "bool",
+          "virtual": true
+        },
+        {
+          "name": "openStashCargoPosX",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "openStashCargoPosY",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "openPlayerInventoryPosX",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "openPlayerInventoryPosY",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "openCrewInventoryPosX",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "openCrewInventoryPosY",
+          "type": "float",
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "csType": "int",
+          "virtual": true
+        },
+        {
+          "name": "noteN",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "pattern": true
+        },
+        {
+          "name": "known",
+          "type": "boolean",
+          "csType": "bool"
         },
         {
           "name": "gameTime",
@@ -3928,11 +4160,6 @@
           "name": "windRot",
           "type": "float",
           "csType": "float"
-        },
-        {
-          "name": "currentWeather",
-          "type": "WeatherType",
-          "csType": "WeatherType"
         },
         {
           "name": "crewMorale",
@@ -4080,124 +4307,136 @@
           "csType": "Container"
         },
         {
-          "name": "money",
-          "type": "integer",
-          "csType": "int"
-        },
-        {
-          "name": "AIPlan_ratingThresholdMod",
+          "name": "wind_timer",
           "type": "string",
           "csType": "string",
           "virtual": true
         },
         {
-          "name": "AIMaxTimePerTurnMod",
+          "name": "wind_nextChangeInterval",
           "type": "string",
           "csType": "string",
           "virtual": true
         },
         {
-          "name": "playerXPMultiplier",
+          "name": "masterVolume",
           "type": "string",
           "csType": "string",
           "virtual": true
         },
         {
-          "name": "enemyStatsMultiplier",
+          "name": "soundVolume",
           "type": "string",
           "csType": "string",
           "virtual": true
         },
         {
-          "name": "playerBonusMove",
+          "name": "musicVolume",
           "type": "string",
           "csType": "string",
           "virtual": true
         },
         {
-          "name": "enemySpawnPowerMod",
+          "name": "intenseVisuals",
           "type": "string",
           "csType": "string",
           "virtual": true
         },
         {
-          "name": "travelDifficulty",
-          "type": "integer",
-          "csType": "integer",
-          "virtual": true
-        },
-        {
-          "name": "canSaveOutsidePort",
-          "type": "boolean",
-          "csType": "boolean",
-          "virtual": true
-        },
-        {
-          "name": "timedHitsMode",
-          "type": "boolean",
-          "csType": "boolean",
-          "virtual": true
-        },
-        {
-          "name": "stashListMode",
-          "type": "boolean",
-          "csType": "boolean",
-          "virtual": true
-        },
-        {
-          "name": "cargoListMode",
-          "type": "boolean",
-          "csType": "boolean",
-          "virtual": true
-        },
-        {
-          "name": "openStashCargoPosX",
+          "name": "retroVisuals",
           "type": "string",
           "csType": "string",
           "virtual": true
         },
         {
-          "name": "openStashCargoPosY",
+          "name": "DyslexicFontMode",
           "type": "string",
           "csType": "string",
           "virtual": true
         },
         {
-          "name": "openPlayerInventoryPosX",
+          "name": "colorblind",
           "type": "string",
           "csType": "string",
           "virtual": true
         },
         {
-          "name": "openPlayerInventoryPosY",
+          "name": "PauseOnLossOfFocus",
           "type": "string",
           "csType": "string",
           "virtual": true
         },
         {
-          "name": "openCrewInventoryPosX",
+          "name": "prioritizeKeyboardControls",
           "type": "string",
           "csType": "string",
           "virtual": true
         },
         {
-          "name": "openCrewInventoryPosY",
+          "name": "fullscreen",
           "type": "string",
           "csType": "string",
           "virtual": true
         },
         {
-          "name": "version",
-          "type": "integer",
-          "csType": "integer",
+          "name": "borderless",
+          "type": "string",
+          "csType": "string",
           "virtual": true
         },
         {
-          "name": "noteN",
+          "name": "fullscreenResolutionX",
           "type": "string",
           "csType": "string",
-          "virtual": true,
-          "pattern": true
+          "virtual": true
+        },
+        {
+          "name": "fullscreenResolutionY",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "controls_multiPressMaximumTime",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "cameraSpeed_combat",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "dialogSpeedMult",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "extraRacesUnlocked",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "extraOptionsUnlocked",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "enableErrorMessages",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "debugMode",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
         },
         {
           "name": "ID",
@@ -4262,6 +4501,40 @@
     "Trigger": {
       "category": "nested",
       "fields": [
+        {
+          "name": "fReq",
+          "type": "Formula",
+          "csType": "Formula",
+          "virtual": true
+        },
+        {
+          "name": "topX+",
+          "type": "integer",
+          "csType": "int",
+          "virtual": true,
+          "pattern": true
+        },
+        {
+          "name": "topY+",
+          "type": "integer",
+          "csType": "int",
+          "virtual": true,
+          "pattern": true
+        },
+        {
+          "name": "btmX+",
+          "type": "integer",
+          "csType": "int",
+          "virtual": true,
+          "pattern": true
+        },
+        {
+          "name": "btmY+",
+          "type": "integer",
+          "csType": "int",
+          "virtual": true,
+          "pattern": true
+        },
         {
           "name": "numID",
           "type": "integer",
@@ -4328,40 +4601,6 @@
           "csType": "Formula"
         },
         {
-          "name": "fReq",
-          "type": "Formula",
-          "csType": "Formula",
-          "virtual": true
-        },
-        {
-          "name": "topX+",
-          "type": "integer",
-          "csType": "integer",
-          "virtual": true,
-          "pattern": true
-        },
-        {
-          "name": "topY+",
-          "type": "integer",
-          "csType": "integer",
-          "virtual": true,
-          "pattern": true
-        },
-        {
-          "name": "btmX+",
-          "type": "integer",
-          "csType": "integer",
-          "virtual": true,
-          "pattern": true
-        },
-        {
-          "name": "btmY+",
-          "type": "integer",
-          "csType": "integer",
-          "virtual": true,
-          "pattern": true
-        },
-        {
           "name": "ID",
           "type": "string",
           "csType": "string",
@@ -4382,49 +4621,70 @@
       "category": "nested",
       "fields": [
         {
+          "name": "effectID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
           "name": "sValue",
           "type": "string",
-          "csType": "string"
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "sValue1",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
         },
         {
           "name": "sValue2",
           "type": "string",
-          "csType": "string"
+          "csType": "string",
+          "virtual": true
         },
         {
           "name": "fValue",
           "type": "float",
-          "csType": "float"
+          "csType": "float",
+          "virtual": true
         },
         {
           "name": "xValue",
           "type": "integer",
-          "csType": "int"
+          "csType": "int",
+          "virtual": true
         },
         {
           "name": "yValue",
           "type": "integer",
-          "csType": "int"
-        },
-        {
-          "name": "bValue1",
-          "type": "boolean",
-          "csType": "bool"
-        },
-        {
-          "name": "bValue2",
-          "type": "boolean",
-          "csType": "bool"
+          "csType": "int",
+          "virtual": true
         },
         {
           "name": "delay",
           "type": "float",
-          "csType": "float"
+          "csType": "float",
+          "virtual": true
+        },
+        {
+          "name": "bValue1",
+          "type": "boolean",
+          "csType": "bool",
+          "virtual": true
+        },
+        {
+          "name": "bValue2",
+          "type": "boolean",
+          "csType": "bool",
+          "virtual": true
         },
         {
           "name": "fReq",
           "type": "Formula",
-          "csType": "string"
+          "csType": "string",
+          "virtual": true
         },
         {
           "name": "taskString",
@@ -4435,17 +4695,6 @@
           "name": "XYRefersToThisZone",
           "type": "boolean",
           "csType": "bool"
-        },
-        {
-          "name": "effectID",
-          "type": "string",
-          "csType": "string"
-        },
-        {
-          "name": "sValue1",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
         },
         {
           "name": "ID",
@@ -4464,7 +4713,7 @@
         {
           "name": "numID",
           "type": "integer",
-          "csType": "integer",
+          "csType": "int",
           "virtual": true,
           "source": "DataManager"
         }
@@ -4474,6 +4723,20 @@
     "ActorClass": {
       "category": "definition",
       "fields": [
+        {
+          "name": "bodyPartN",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "pattern": true
+        },
+        {
+          "name": "bodyPartSpriteN",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "pattern": true
+        },
         {
           "name": "ID",
           "type": "string",
@@ -4578,20 +4841,6 @@
           "name": "fReq",
           "type": "Formula",
           "csType": "Formula"
-        },
-        {
-          "name": "bodyPartN",
-          "type": "string",
-          "csType": "string",
-          "virtual": true,
-          "pattern": true
-        },
-        {
-          "name": "bodyPartSpriteN",
-          "type": "string",
-          "csType": "string",
-          "virtual": true,
-          "pattern": true
         },
         {
           "name": "cloneFrom",
@@ -4870,6 +5119,18 @@
       "category": "nested",
       "fields": [
         {
+          "name": "duration",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "chance",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
           "name": "ID",
           "type": "string",
           "csType": "string"
@@ -4890,19 +5151,9 @@
           "csType": "Formula"
         },
         {
-          "name": "duration",
-          "type": "Formula",
-          "csType": "Formula"
-        },
-        {
           "name": "durationIsWorldtimeDays",
           "type": "boolean",
           "csType": "bool"
-        },
-        {
-          "name": "chance",
-          "type": "Formula",
-          "csType": "Formula"
         },
         {
           "name": "weaponAvAffecter",
@@ -6702,6 +6953,13 @@
       "category": "definition",
       "fields": [
         {
+          "name": "No such texture as N",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "pattern": true
+        },
+        {
           "name": "ID",
           "type": "string",
           "csType": "string"
@@ -6902,13 +7160,6 @@
           "csType": "float"
         },
         {
-          "name": "No such texture as N",
-          "type": "string",
-          "csType": "string",
-          "virtual": true,
-          "pattern": true
-        },
-        {
           "name": "cloneFrom",
           "type": "string",
           "csType": "string",
@@ -6984,6 +7235,821 @@
           "csType": "string",
           "virtual": true,
           "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "Zone": {
+      "category": "special",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "locID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "sizeX",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "sizeY",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "showFogOfWar",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "fogOfWar",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "minimapEnabled",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "dark",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "darknessColor",
+          "type": "Color",
+          "csType": "Color"
+        },
+        {
+          "name": "allowCameraPastZoneEdges",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "rollingPinStyle",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "drawSky",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "drawSky_overrideYpos",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "peaceful",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "overseerMode",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "boatZone",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "wind",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "overworld",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "cantAct",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canDropItems",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "cantGameOver",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "alwaysKeepWeaponsUnsheathed",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "zoneDirtPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneDirtDarkPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneGrassPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneGrassDarkPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneStonePalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneStoneLightPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneStoneDarkPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneWaterPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneWoodPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneWoodDarkPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc1Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc2Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc3Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc4Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc5Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc6Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc7Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc8Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "paletteOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "darkenedTileTexture",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "bgTerrainTypeID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "bgFXID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "bgFX_sineWave",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "bgScale",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "bgParallaxRatio",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "bgMoveSpeedX",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "bgMoveSpeedY",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "travelSong",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "travelSongVolume",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "travelSongPitch",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "combatSong",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "combatSongVolume",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "combatSongPitch",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "combatSongDelay",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenWaveFreq",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenDarkWaveFreq",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenWaveAmp",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenDarkWaveAmp",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenWaveSpeed",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenWaveAmp_reflect",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "zoneFX",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "zoneFXTime",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "zoneFX_x",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "zoneFX_y",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "timeUntilNewDay",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "actors",
+          "type": "Dictionary<string, Actor>",
+          "csType": "Dictionary<string, Actor>"
+        },
+        {
+          "name": "triggers",
+          "type": "List<Trigger>",
+          "csType": "List<Trigger>"
+        },
+        {
+          "name": "actTimers",
+          "type": "List<ActTimer>",
+          "csType": "List<ActTimer>"
+        },
+        {
+          "name": "darkR",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "darkG",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "darkB",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "combatMode",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "LevelDataZone": {
+      "category": "special",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "locID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "sizeX",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "sizeY",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "showFogOfWar",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "fogOfWar",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "minimapEnabled",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "dark",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "darknessColor",
+          "type": "Color",
+          "csType": "Color"
+        },
+        {
+          "name": "allowCameraPastZoneEdges",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "rollingPinStyle",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "drawSky",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "drawSky_overrideYpos",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "peaceful",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "overseerMode",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "boatZone",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "wind",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "overworld",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "cantAct",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canDropItems",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "cantGameOver",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "alwaysKeepWeaponsUnsheathed",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "zoneDirtPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneDirtDarkPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneGrassPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneGrassDarkPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneStonePalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneStoneLightPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneStoneDarkPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneWaterPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneWoodPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneWoodDarkPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc1Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc2Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc3Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc4Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc5Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc6Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc7Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc8Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "paletteOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "darkenedTileTexture",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "bgTerrainTypeID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "bgFXID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "bgFX_sineWave",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "bgScale",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "bgParallaxRatio",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "bgMoveSpeedX",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "bgMoveSpeedY",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "travelSong",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "travelSongVolume",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "travelSongPitch",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "combatSong",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "combatSongVolume",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "combatSongPitch",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "combatSongDelay",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenWaveFreq",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenDarkWaveFreq",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenWaveAmp",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenDarkWaveAmp",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenWaveSpeed",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenWaveAmp_reflect",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "zoneFX",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "zoneFXTime",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "zoneFX_x",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "zoneFX_y",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "timeUntilNewDay",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "actors",
+          "type": "Dictionary<string, Actor>",
+          "csType": "Dictionary<string, Actor>"
+        },
+        {
+          "name": "triggers",
+          "type": "List<Trigger>",
+          "csType": "List<Trigger>"
+        },
+        {
+          "name": "actTimers",
+          "type": "List<ActTimer>",
+          "csType": "List<ActTimer>"
+        },
+        {
+          "name": "darkR",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "darkG",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "darkB",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "combatMode",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "HeightMap": {
+      "category": "special",
+      "fields": [
+        {
+          "name": "h",
+          "type": "string",
+          "csType": "string"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "FormulaGlobal": {
+      "category": "special",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "formula",
+          "type": "Formula",
+          "csType": "string"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "GlobalFormula": {
+      "category": "special",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "formula",
+          "type": "Formula",
+          "csType": "string"
         }
       ],
       "supportsCloneFrom": false

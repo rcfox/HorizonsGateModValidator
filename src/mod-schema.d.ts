@@ -1,6 +1,8 @@
 // Auto-generated schema types
 
 export type FieldType = 
+  | "byte"
+  | "boolean"
   | "string"
   | "integer"
   | "float"
@@ -9,11 +11,8 @@ export type FieldType =
   | "List<string>"
   | "Element"
   | "Light"
-  | "boolean"
   | "List<integer>"
-  | "SpriteEffects"
   | "List<ElementReaction>"
-  | "byte"
   | "Vector2"
   | "List<Element>"
   | "List<ActorValueEffect>"
@@ -24,16 +23,13 @@ export type FieldType =
   | "Dictionary<string, string>"
   | "Dictionary<string, List<string>>"
   | "AreaOfEffect"
-  | "AoEShapeType"
   | "AoEPreset"
-  | "ItemCategory"
   | "HashSet<specialProperty>"
   | "List<Light>"
   | "Dictionary<string, List<Keyframe>>"
   | "List<Keyframe>"
   | "TileCoord"
   | "Container"
-  | "JournalCategory"
   | "List<Formula>"
   | "List<DialogOption>"
   | "const int"
@@ -45,7 +41,6 @@ export type FieldType =
   | "List<TileCoord>"
   | "ActionExecution"
   | "Dictionary<string, List<float>>"
-  | "WeatherType"
   | "Dictionary<string, Dictionary<string, Location>>"
   | "Dictionary<string, List<int>>"
   | "List<TriggerEffect>"
@@ -56,8 +51,12 @@ export type FieldType =
   | "Dictionary<string, integer>"
   | "Screenshake"
   | "ScreenTint"
+  | "SpriteEffects"
   | "Rectangle"
-  | "Item";
+  | "Item"
+  | "Dictionary<string, Actor>"
+  | "List<Trigger>"
+  | "List<ActTimer>";
 
 export interface FieldSchema {
   name: string;
