@@ -13,33 +13,13 @@ import {
 } from "./formula-parser.js";
 import formulaData from "./formula.json" with { type: "json" };
 import { findSimilar } from "./string-similarity.js";
-import { resolveOperatorAlias } from "./formula-metadata.js";
-
-interface FormulaArgument {
-  name: string;
-  type: string;
-  description: string;
-}
-
-interface FormulaUse {
-  description: string;
-  returns: string;
-  example: string;
-  arguments?: FormulaArgument[];
-}
-
-interface FormulaOperator {
-  name: string;
-  category: string;
-  isFunctionStyle: boolean;
-  aliases?: string[];
-  uses: FormulaUse[];
-}
-
-interface FormulaData {
-  gameVersion: string;
-  operators: FormulaOperator[];
-}
+import {
+  resolveOperatorAlias,
+  type FormulaArgument,
+  type FormulaUse,
+  type FormulaOperator,
+  type FormulaData,
+} from "./formula-metadata.js";
 
 const data = formulaData as FormulaData;
 
@@ -137,10 +117,12 @@ function validateFunctionCall(
     return errors;
   }
 
-  // Special case: m/M and d/D (and their aliases) are marked as isFunctionStyle but they use colon syntax
+  // Special case: m/M and d/D (and their aliases), and operators that delegate to them,
+  // are marked as isFunctionStyle but they use colon syntax.
   // The "function style" refers to their arguments, not their calling convention
   // Resolve the canonical name to check (handles aliases like "M", "D", "Data", etc.)
-  const isMathOperator = canonicalName === "m" || canonicalName === "d";
+  const isMathOperator = canonicalName === "m" || canonicalName === "d" ||
+                         operator.delegatesTo === "m" || operator.delegatesTo === "d";
   if (operator.isFunctionStyle && !isMathOperator) {
     errors.push({
       message: `Operator '${node.name}' requires function-style syntax with parentheses, not colon-separated. Example: ${operator.uses[0]?.example || node.name + "(...)"}`,
@@ -311,9 +293,14 @@ function validateFunctionArg(
         break;
 
       case "string":
-        // For m: operators (and their aliases), check if m:value exists as an operator
+        // For m: operators (and their aliases), or operators that delegate to m:,
+        // check if m:value exists as an operator
         const canonicalOperatorName = resolveOperatorAlias(operatorName);
-        if (canonicalOperatorName === "m") {
+        const currentOperator = canonicalOperatorName ? operatorMap.get(canonicalOperatorName) : undefined;
+        const delegatesTo = currentOperator?.delegatesTo;
+
+        // Check if this is the m: operator itself, or an operator that delegates to m:
+        if (canonicalOperatorName === "m" || delegatesTo === "m") {
           const fullOperatorName = `m:${value}`;
           // Resolve alias to canonical name (e.g., m:tileDistance -> m:distance)
           const canonicalFullName = resolveOperatorAlias(fullOperatorName);
@@ -332,7 +319,7 @@ function validateFunctionArg(
             }
             const allMOperators = [...allMOperatorNames, ...allMAliases];
             const similar = findSimilar(fullOperatorName, allMOperators);
-            // Preserve user's chosen alias prefix (e.g., "math:" instead of "m:")
+            // Preserve user's chosen alias prefix (e.g., "math:" or "mIs0:")
             const userPrefix = operatorName + ":";
             const suggestions = similar.map((s) => s.value.replace(/^m:/, userPrefix));
 
@@ -361,13 +348,17 @@ function validateFunctionArg(
         break;
     }
   } else if (arg.type === "functionStyle") {
-    // Function-style argument (only valid for m: and d: and their aliases)
-    // For m: operators, try to look up m:functionName (e.g., m:distance) first
+    // Function-style argument (only valid for m: and d: and their aliases, or operators that delegate to them)
+    // For m: operators (or those that delegate to m:), try to look up m:functionName (e.g., m:distance) first
     let specificOperator: FormulaOperator | undefined;
     let specificOperatorName = operatorName;
 
     const canonicalArgOperatorName = resolveOperatorAlias(operatorName);
-    if (canonicalArgOperatorName === "m") {
+    const currentArgOperator = canonicalArgOperatorName ? operatorMap.get(canonicalArgOperatorName) : undefined;
+    const argDelegatesTo = currentArgOperator?.delegatesTo;
+
+    // Check if this is the m: operator itself, or an operator that delegates to m:
+    if (canonicalArgOperatorName === "m" || argDelegatesTo === "m") {
       const fullOperatorName = `m:${arg.name}`;
       // Resolve alias to canonical name (e.g., m:tileDistance -> m:distance)
       const canonicalFullName = resolveOperatorAlias(fullOperatorName);
@@ -387,7 +378,7 @@ function validateFunctionArg(
         }
         const allMOperators = [...allMOperatorNames, ...allMAliases];
         const similar = findSimilar(fullOperatorName, allMOperators);
-        // Preserve user's chosen alias prefix (e.g., "math:" instead of "m:")
+        // Preserve user's chosen alias prefix (e.g., "math:" or "mIs0:")
         const userPrefix = operatorName + ":";
         const suggestions = similar.map((s) => s.value.replace(/^m:/, userPrefix));
 
@@ -404,7 +395,11 @@ function validateFunctionArg(
     // If we didn't find a specific operator, fall back to the base operator
     // Resolve alias to canonical name (e.g., "data" -> "d", "Data" -> "d")
     const canonicalBaseOperatorName = resolveOperatorAlias(operatorName);
-    const operator = specificOperator || (canonicalBaseOperatorName ? operatorMap.get(canonicalBaseOperatorName) : undefined);
+
+    // If this operator delegates to another (like dMin0 delegates to d), use the delegated operator
+    // for parameter validation, since that's where the parameter metadata lives
+    const baseOperatorName = argDelegatesTo || canonicalBaseOperatorName;
+    const operator = specificOperator || (baseOperatorName ? operatorMap.get(baseOperatorName) : undefined);
 
     if (operator) {
       // Find the use case with the most arguments (includes parameters)

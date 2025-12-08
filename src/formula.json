@@ -1913,6 +1913,7 @@
       "name": "dMin0",
       "category": "global-var",
       "isFunctionStyle": true,
+      "delegatesTo": "d",
       "aliases": ["DMin0"],
       "uses": [
         {
@@ -1933,6 +1934,7 @@
       "name": "dMax0",
       "category": "global-var",
       "isFunctionStyle": true,
+      "delegatesTo": "d",
       "aliases": ["DMax0"],
       "uses": [
         {
@@ -1953,6 +1955,7 @@
       "name": "dMax1",
       "category": "global-var",
       "isFunctionStyle": true,
+      "delegatesTo": "d",
       "aliases": ["DMax1"],
       "uses": [
         {
@@ -1973,6 +1976,7 @@
       "name": "dMaxNeg1",
       "category": "global-var",
       "isFunctionStyle": true,
+      "delegatesTo": "d",
       "aliases": ["DMaxNeg1"],
       "uses": [
         {
@@ -1992,7 +1996,8 @@
     {
       "name": "dMax",
       "category": "global-var",
-      "isFunctionStyle": false,
+      "isFunctionStyle": true,
+      "delegatesTo": "d",
       "uses": [
         {
           "description": "Evaluates a global formula and returns the minimum of a threshold and the result",
@@ -2016,7 +2021,8 @@
     {
       "name": "dMin",
       "category": "global-var",
-      "isFunctionStyle": false,
+      "isFunctionStyle": true,
+      "delegatesTo": "d",
       "uses": [
         {
           "description": "Evaluates a global formula and returns the maximum of a threshold and the result",
@@ -2040,7 +2046,8 @@
     {
       "name": "dsa",
       "category": "global-var",
-      "isFunctionStyle": false,
+      "isFunctionStyle": true,
+      "delegatesTo": "d",
       "uses": [
         {
           "description": "Evaluates a global formula if the caster has a specific support ability, otherwise returns 0",
@@ -2103,6 +2110,7 @@
       "name": "mIs0",
       "category": "math",
       "isFunctionStyle": true,
+      "delegatesTo": "m",
       "uses": [
         {
           "description": "Returns 1 if a math function evaluates to 0, otherwise 0",
@@ -2122,6 +2130,7 @@
       "name": "mMin0",
       "category": "math",
       "isFunctionStyle": true,
+      "delegatesTo": "m",
       "aliases": ["MMin0", "MathMin0", "mathMin0"],
       "uses": [
         {

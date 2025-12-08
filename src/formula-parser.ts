@@ -21,6 +21,7 @@ import {
   hasFormulaBody,
   resolveOperatorAlias,
   getAlternateDelimiters,
+  getDelegatesTo,
 } from "./formula-metadata.js";
 
 // Re-export validator for convenience
@@ -342,9 +343,12 @@ function parseFunctionCall(operand: string): FunctionCallNode {
     }
   }
 
-  // Parse each argument - only m: and d: operators (and their aliases) support function-style arguments with parentheses
+  // Parse each argument - only m: and d: operators (and their aliases), or operators that delegate to them,
+  // support function-style arguments with parentheses
   const canonicalFunctionName = resolveOperatorAlias(functionName);
-  const isMathOperator = canonicalFunctionName === "m" || canonicalFunctionName === "d";
+  const delegatesTo = getDelegatesTo(functionName);
+  const isMathOperator = canonicalFunctionName === "m" || canonicalFunctionName === "d" ||
+                         delegatesTo === "m" || delegatesTo === "d";
   const args: FunctionArg[] = rawArgs.map((arg) => {
     if (isMathOperator && arg.includes("(")) {
       const parsed = parseFunctionStyleArg(arg);

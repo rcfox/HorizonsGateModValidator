@@ -5,29 +5,30 @@
 
 import formulaData from "./formula.json" with { type: "json" };
 
-interface FormulaArgument {
+export interface FormulaArgument {
   name: string;
   type: string;
   description: string;
 }
 
-interface FormulaUse {
+export interface FormulaUse {
   description: string;
   returns: string;
   example: string;
   arguments?: FormulaArgument[];
 }
 
-interface FormulaOperator {
+export interface FormulaOperator {
   name: string;
   category: string;
   isFunctionStyle: boolean;
   alternateDelimiters?: string[];
+  delegatesTo?: string; // For operators like mIs0, mMin0 that validate functionName against m: sub-operators
   aliases?: string[];
   uses: FormulaUse[];
 }
 
-interface FormulaData {
+export interface FormulaData {
   gameVersion: string;
   operators: FormulaOperator[];
 }
@@ -162,4 +163,17 @@ export function getOperatorsByCategory(): Map<string, string[]> {
 export function getAlternateDelimiters(operatorName: string): string[] | undefined {
   const canonical = resolveOperatorAlias(operatorName);
   return canonical ? operatorAlternateDelimiters.get(canonical) : undefined;
+}
+
+/**
+ * Get the operator that this operator delegates to (e.g., "m" for mIs0)
+ * Accepts both operator names and aliases
+ * Returns undefined if the operator doesn't delegate
+ */
+export function getDelegatesTo(operatorName: string): string | undefined {
+  const canonical = resolveOperatorAlias(operatorName);
+  if (!canonical) return undefined;
+
+  const operator = data.operators.find(op => op.name === canonical);
+  return operator?.delegatesTo;
 }
