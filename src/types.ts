@@ -92,7 +92,8 @@ export interface ParsedObject {
 /**
  * Validation result types
  */
-export type ValidationSeverity = 'error' | 'warning' | 'info';
+export const VALIDATION_SEVERITIES = ['error', 'warning', 'info'] as const;
+export type ValidationSeverity = (typeof VALIDATION_SEVERITIES)[number];
 
 /**
  * Position-based correction for auto-fixing issues

@@ -167,7 +167,10 @@ export class PropertyValidator {
 
           if (resolvedEnumName) {
             // List/HashSet of enum values - validate each comma-separated value
-            const parts = cleanValue.split(',').map(p => p.trim()).filter(p => p.length > 0);
+            const parts = cleanValue
+              .split(',')
+              .map(p => p.trim())
+              .filter(p => p.length > 0);
             for (const part of parts) {
               messages.push(...this.validateEnum(propertyName, part, resolvedEnumName, propInfo, className));
             }
@@ -176,7 +179,11 @@ export class PropertyValidator {
         }
 
         // Unknown type or complex type - issue warning but don't fail
-        if (expectedType.startsWith('List<') || expectedType.startsWith('Dictionary<') || expectedType.startsWith('HashSet<')) {
+        if (
+          expectedType.startsWith('List<') ||
+          expectedType.startsWith('Dictionary<') ||
+          expectedType.startsWith('HashSet<')
+        ) {
           // Collection types - generally accept comma-separated values
           break;
         }
@@ -231,7 +238,13 @@ export class PropertyValidator {
     return null;
   }
 
-  private validateEnum(propertyName: string, value: string, enumName: string, propInfo: PropertyInfo, className?: string): ValidationMessage[] {
+  private validateEnum(
+    propertyName: string,
+    value: string,
+    enumName: string,
+    propInfo: PropertyInfo,
+    className?: string
+  ): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
     const line = propInfo.valueStartLine;
     const enumValues = this.enums[enumName];
@@ -241,9 +254,8 @@ export class PropertyValidator {
       if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value)) {
         messages.push({
           severity: 'warning',
-          message: `Invalid ${enumName} value for ${propertyName}`,
+          message: `Invalid ${enumName} value '${value}' for ${propertyName}`,
           line,
-          context: `Expected an identifier, got '${value}'`,
         });
       }
       return messages;
@@ -260,7 +272,8 @@ export class PropertyValidator {
           line,
           context: `Custom element values (> 2000) are reserved for modders`,
           suggestion: `Check the modder community document to ensure this value hasn't been taken and to reserve a section`,
-          documentationUrl: 'https://docs.google.com/document/d/15H0QN-tm2ERGXdeV2esavm6u-eaNniliTs4ZlAML79U/edit?tab=t.0#heading=h.75sdxuctqmty',
+          documentationUrl:
+            'https://docs.google.com/document/d/15H0QN-tm2ERGXdeV2esavm6u-eaNniliTs4ZlAML79U/edit?tab=t.0#heading=h.75sdxuctqmty',
           documentationLabel: 'Modder Community Element Registry',
         });
         return messages;
@@ -313,12 +326,8 @@ export class PropertyValidator {
 
       messages.push({
         severity: 'error',
-        message: `Invalid ${enumName} value for ${propertyName}`,
+        message: `Invalid ${enumName} value '${value}' for ${propertyName}`,
         line,
-        context: `'${value}' is not a valid ${enumName}`,
-        suggestion: corrections.length === 0
-          ? `Valid values: ${enumNames.slice(0, 10).join(', ')}${enumNames.length > 10 ? ', ...' : ''}`
-          : undefined,
         corrections,
       });
     }
@@ -434,7 +443,10 @@ export class PropertyValidator {
 
     if (isOverwrite) {
       // Comma-separated list of integers
-      const parts = value.split(',').map(p => p.trim()).filter(p => p.length > 0);
+      const parts = value
+        .split(',')
+        .map(p => p.trim())
+        .filter(p => p.length > 0);
       for (const part of parts) {
         if (!this.isValidInteger(part)) {
           messages.push({
@@ -465,7 +477,10 @@ export class PropertyValidator {
 
     if (isOverwrite) {
       // Comma-separated list of floats
-      const parts = value.split(',').map(p => p.trim()).filter(p => p.length > 0);
+      const parts = value
+        .split(',')
+        .map(p => p.trim())
+        .filter(p => p.length > 0);
       for (const part of parts) {
         if (!this.isValidFloat(part)) {
           messages.push({
