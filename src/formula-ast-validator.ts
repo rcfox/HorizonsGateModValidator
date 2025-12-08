@@ -149,21 +149,41 @@ function validateFunctionCall(
     });
   }
 
-  // Get expected arguments from first use case
-  const expectedArgs = operator.uses[0]?.arguments || [];
-
-  // Validate argument count
-  const totalExpectedArgs = expectedArgs.length;
+  // Find use cases that match the provided argument count
   const providedArgs = node.args.length + (node.body ? 1 : 0);
+  const matchingUses = operator.uses.filter(use => {
+    const expectedArgCount = use.arguments?.length || 0;
+    return expectedArgCount === providedArgs;
+  });
 
-  if (providedArgs !== totalExpectedArgs) {
+  // If no use cases match the argument count, report an error
+  if (matchingUses.length === 0) {
+    // Build a list of all possible argument patterns
+    const possiblePatterns = operator.uses.map(use => {
+      const args = use.arguments || [];
+      if (args.length === 0) {
+        return `${node.name} (no arguments)`;
+      }
+      return `${node.name}:${args.map(a => a.name).join(":")}`;
+    });
+
     errors.push({
-      message: `Operator '${node.name}' expects ${totalExpectedArgs} argument(s), but got ${providedArgs}. Expected: ${expectedArgs.map((a) => `${a.name}:${a.type}`).join(", ")}`,
+      message: `Operator '${node.name}' does not have a use case with ${providedArgs} argument(s). Possible patterns: ${possiblePatterns.join(" OR ")}`,
       node,
       path,
       operatorName: node.name,
     });
+
+    // Skip argument validation since no use case matches
+    if (node.body) {
+      errors.push(...validateAST(node.body, `${path}.body`));
+    }
+    return errors;
   }
+
+  // Use the first matching use case for argument type validation
+  // (In most cases, there's only one matching use case per argument count)
+  const expectedArgs = matchingUses[0].arguments || [];
 
   // Validate each argument type
   node.args.forEach((arg, i) => {

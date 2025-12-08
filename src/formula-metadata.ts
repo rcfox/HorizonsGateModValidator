@@ -22,6 +22,7 @@ interface FormulaOperator {
   name: string;
   category: string;
   isFunctionStyle: boolean;
+  alternateDelimiters?: string[];
   aliases?: string[];
   uses: FormulaUse[];
 }
@@ -59,6 +60,12 @@ export const operatorArgCounts = new Map<string, number>();
  */
 export const operatorsWithFormulaBodies = new Set<string>();
 
+/**
+ * Map of operators to their alternate delimiters
+ * Examples: gIs -> [","], gIsNot -> [","]
+ */
+export const operatorAlternateDelimiters = new Map<string, string[]>();
+
 // Build the maps from formula.json data
 for (const op of data.operators) {
   const args = op.uses[0]?.arguments || [];
@@ -80,6 +87,11 @@ for (const op of data.operators) {
   // Track operators with formula bodies
   if (args.some((a) => a.type === "formula")) {
     operatorsWithFormulaBodies.add(op.name);
+  }
+
+  // Track operators with alternate delimiters
+  if (op.alternateDelimiters && op.alternateDelimiters.length > 0) {
+    operatorAlternateDelimiters.set(op.name, op.alternateDelimiters);
   }
 }
 
@@ -140,4 +152,14 @@ export function getOperatorsByCategory(): Map<string, string[]> {
   }
 
   return categoryMap;
+}
+
+/**
+ * Get alternate delimiters for an operator (e.g., [","] for gIs)
+ * Accepts both operator names and aliases
+ * Returns undefined if the operator doesn't support alternate delimiters
+ */
+export function getAlternateDelimiters(operatorName: string): string[] | undefined {
+  const canonical = resolveOperatorAlias(operatorName);
+  return canonical ? operatorAlternateDelimiters.get(canonical) : undefined;
 }

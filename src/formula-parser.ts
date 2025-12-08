@@ -20,6 +20,7 @@ import {
   getArgCount,
   hasFormulaBody,
   resolveOperatorAlias,
+  getAlternateDelimiters,
 } from "./formula-metadata.js";
 
 // Re-export validator for convenience
@@ -269,12 +270,14 @@ function parseFunctionStyleArg(
 }
 
 /**
- * Splits a string by colons, but only those outside of parentheses
+ * Splits a string by delimiters (colons and optionally commas), but only those outside of parentheses
  */
-function splitByColonRespectingParens(str: string): string[] {
+function splitByDelimitersRespectingParens(str: string, additionalDelimiters: string[] = []): string[] {
   const parts: string[] = [];
   let current = "";
   let parenDepth = 0;
+
+  const allDelimiters = new Set([":", ...additionalDelimiters]);
 
   for (let i = 0; i < str.length; i++) {
     const char = str[i];
@@ -285,8 +288,8 @@ function splitByColonRespectingParens(str: string): string[] {
     } else if (char === ")") {
       parenDepth--;
       current += char;
-    } else if (char === ":" && parenDepth === 0) {
-      // Colon at top level - this is a separator
+    } else if (allDelimiters.has(char) && parenDepth === 0) {
+      // Delimiter at top level - this is a separator
       parts.push(current);
       current = "";
     } else {
@@ -304,10 +307,18 @@ function splitByColonRespectingParens(str: string): string[] {
 
 /**
  * Parses a function call with colon-separated arguments: name:arg1:arg2:...
+ * Also supports alternate delimiters (e.g., commas for gIs:varName,value)
  */
 function parseFunctionCall(operand: string): FunctionCallNode {
-  const parts = splitByColonRespectingParens(operand);
-  const functionName = parts[0];
+  // Extract function name first (before any delimiters)
+  const firstDelimiter = operand.search(/[:]/);
+  const functionName = firstDelimiter === -1 ? operand : operand.substring(0, firstDelimiter);
+
+  // Check if this operator supports alternate delimiters (e.g., comma for gIs)
+  const alternateDelimiters = getAlternateDelimiters(functionName);
+
+  // Split by colons and any alternate delimiters
+  const parts = splitByDelimitersRespectingParens(operand, alternateDelimiters || []);
 
   let body: ASTNode | undefined;
   let rawArgs: string[] = parts.slice(1);
