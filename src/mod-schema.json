@@ -2868,6 +2868,51 @@
           "csType": "string",
           "virtual": true,
           "source": "DataManager (common)"
+        },
+        {
+          "name": "nextNodeID",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "nextNodeID_fReq",
+          "type": "List<Formula>",
+          "csType": "List<Formula>"
+        },
+        {
+          "name": "speakerOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "portraitIcon",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "portraitIconFrames",
+          "type": "List<integer>",
+          "csType": "List<int>"
+        },
+        {
+          "name": "dialogFX",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "statements",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "animations",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "dialogOptions",
+          "type": "List<DialogOption>",
+          "csType": "List<DialogOption>"
         }
       ],
       "supportsCloneFrom": false
@@ -3552,6 +3597,11 @@
           "name": "bgColor",
           "type": "string",
           "csType": "string"
+        },
+        {
+          "name": "canContainAnything",
+          "type": "boolean",
+          "csType": "bool"
         },
         {
           "name": "canOnlyContainItemsWithThisProperty",

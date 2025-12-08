@@ -114,6 +114,54 @@ function extractFieldsFromClass(filePath, className) {
     });
   }
 
+  // Extract private fields that are serialized (appear in stringBuilder output)
+  // Pattern: stringBuilder.Append("; fieldName="); stringBuilder.Append(fieldName);
+  // or: stringBuilder.Append(fieldName.ToString());
+  const serializationRegex = /stringBuilder\.Append\([^)]*["'];\s*(\w+)\s*=["'][^)]*\);\s*stringBuilder\.Append\(\s*(\w+)(?:\.ToString\(\))?\s*\)/g;
+
+  while ((match = serializationRegex.exec(content)) !== null) {
+    const fieldName = match[1];
+    const appendedVar = match[2];
+
+    // The field name in the string should match the appended variable
+    if (fieldName !== appendedVar) {
+      continue;
+    }
+
+    // Skip if already added as a public field
+    if (fields.find(f => f.name === fieldName)) {
+      continue;
+    }
+
+    // Find the field declaration (public or private)
+    const fieldDeclRegex = new RegExp(`\\s+(public|private)\\s+([\\w<>,\\s]+?)\\s+${fieldName}\\s*[=;]`, 'm');
+    const fieldDeclMatch = content.match(fieldDeclRegex);
+
+    if (fieldDeclMatch) {
+      const rawType = fieldDeclMatch[2].trim();
+
+      // Map the type
+      let mappedType = typeMap[rawType];
+
+      if (!mappedType) {
+        if (rawType.startsWith('List<')) {
+          const innerType = rawType.match(/List<(.+)>/)?.[1];
+          mappedType = `List<${innerType}>`;
+        } else if (rawType.startsWith('Dictionary<')) {
+          mappedType = rawType;
+        } else {
+          mappedType = rawType;
+        }
+      }
+
+      fields.push({
+        name: fieldName,
+        type: mappedType,
+        csType: rawType
+      });
+    }
+  }
+
   return fields;
 }
 
@@ -691,6 +739,22 @@ function extractSchema(tacticsDir) {
 
   // Fix known property type issues
   fixfReqTypes(schema);
+
+  // Special case: DialogNodeOverride accepts both its own fields AND DialogNode fields
+  // because DataManager creates both from the same valuesDict
+  if (schema['DialogNodeOverride'] && schema['DialogNode']) {
+    console.log('  Merging DialogNode fields into DialogNodeOverride');
+    const dialogNodeFields = schema['DialogNode'].fields;
+    const overrideFields = schema['DialogNodeOverride'].fields;
+    const overrideFieldNames = new Set(overrideFields.map(f => f.name));
+
+    // Add DialogNode fields that aren't already in DialogNodeOverride
+    for (const field of dialogNodeFields) {
+      if (!overrideFieldNames.has(field.name)) {
+        overrideFields.push(field);
+      }
+    }
+  }
 
   // Extract enums
   const enums = extractEnums(baseDir);
