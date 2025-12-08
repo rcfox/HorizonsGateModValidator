@@ -135,13 +135,11 @@ class ModValidatorCLI {
     //   output += `\n  ${msg.context}`;
     // }
 
-    // if (msg.corrections && msg.corrections.length > 0) {
-    //   const suggestionPrefix = msg.suggestion || 'Did you mean';
-    //   const suggestions = msg.corrections.map((c) => `'${c.replacementText}'`).join(', ');
-    //   output += `\n  ${suggestionPrefix}: ${suggestions}`;
-    // } else if (msg.suggestion) {
-    //   output += `\n  ${msg.suggestion}`;
-    // }
+    if (msg.corrections && msg.corrections.length > 0 && !msg.suggestion) {
+      const suggestionPrefix = 'Did you mean';
+      const suggestions = msg.corrections.map((c) => `'${c.replacementText}'`).join(', ');
+      output += ` (${suggestionPrefix}: ${suggestions}?)`;
+    }
 
     return output;
   }
