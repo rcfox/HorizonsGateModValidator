@@ -99,7 +99,6 @@ file.txt:71: warning: Numeric enum value used for itemCategory
 - **property-validator.ts** - Validates property values against expected types
 - **formula-validator.ts** - Validates formula syntax and functions
 - **string-similarity.ts** - Levenshtein distance for typo suggestions (MAX_EDIT_DISTANCE = 3)
-- **object-registry.ts** - Fallback registry for types not in schema
 - **types.ts** - TypeScript type definitions
 - **mod-schema.json** - Generated schema with class definitions, type aliases, and enums
 - **mod-schema.d.ts** - TypeScript definitions for schema

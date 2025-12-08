@@ -157,18 +157,6 @@ export interface Token {
 }
 
 /**
- * Object type categorization based on parsing pattern
- */
-export interface ObjectTypeInfo {
-  category: ObjectCategory;
-  parentType?: string; // For nested types
-  propertyName?: string; // For nested single-property types
-  isList?: boolean; // For nested list types
-  requiresID: boolean;
-  supportsCloneFrom: boolean;
-}
-
-/**
  * Formula parsing types
  */
 export interface FormulaToken {

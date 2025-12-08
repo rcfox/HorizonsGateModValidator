@@ -6,7 +6,6 @@
 import { ValidationResult, ValidationMessage, ModSchema, ParsedObject, SchemaData, ClassSchema } from './types.js';
 import { ModParser } from './parser.js';
 import { PropertyValidator } from './property-validator.js';
-import { getObjectTypeInfo, isKnownObjectType } from './object-registry.js';
 import { findSimilar, MAX_EDIT_DISTANCE } from './string-similarity.js';
 import modSchemaData from './mod-schema.json' with { type: 'json' };
 
@@ -94,8 +93,7 @@ export class ModValidator {
     if (this.typeAliases[typeName]) {
       return true;
     }
-    // Fall back to object registry for types not in schema
-    return isKnownObjectType(typeName);
+    return false;
   }
 
   /**
@@ -156,27 +154,13 @@ export class ModValidator {
     if (classSchema) {
       messages.push(...this.validateProperties(obj, classSchema, resolvedType));
     } else {
-      // No schema available - fall back to object registry if available
-      const typeInfo = getObjectTypeInfo(obj.type);
-      if (typeInfo) {
-        // Use object registry for validation
-        if (typeInfo.requiresID && !obj.properties.has('ID')) {
-          messages.push({
-            severity: 'error',
-            message: `Object type ${obj.type} requires an ID property`,
-            line: obj.startLine,
-            suggestion: 'Add: ID = yourUniqueID;',
-          });
-        }
-      } else {
-        // No schema or registry info available
-        messages.push({
-          severity: 'info',
-          message: `No property schema available for ${obj.type}${resolvedType !== obj.type ? ` (alias of ${resolvedType})` : ''}`,
-          line: obj.startLine,
-          context: 'Property types will not be validated',
-        });
-      }
+      // No schema available
+      messages.push({
+        severity: 'info',
+        message: `No property schema available for ${obj.type}${resolvedType !== obj.type ? ` (alias of ${resolvedType})` : ''}`,
+        line: obj.startLine,
+        context: 'Property types will not be validated',
+      });
     }
 
     return messages;

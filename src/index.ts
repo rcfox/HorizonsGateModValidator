@@ -8,5 +8,4 @@ export { ModParser } from './parser.js';
 export { FormulaValidator } from './formula-validator.js';
 export { PropertyValidator } from './property-validator.js';
 export * from './types.js';
-export { getObjectTypeInfo, isKnownObjectType } from './object-registry.js';
 export { levenshteinDistance, findSimilar, MAX_EDIT_DISTANCE } from './string-similarity.js';
