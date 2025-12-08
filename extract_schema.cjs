@@ -595,6 +595,13 @@ function categorizeClass(className, dataManagerContent) {
     return 'instance';
   }
 
+  // Nested: Property assignment (e.g., mostRecentActor.state = new ActorState(...))
+  // Pattern: something.property = new ClassName(...)
+  const propertyAssignmentPattern = new RegExp(`\\w+\\.\\w+\\s*=\\s*new\\s+${className}\\(`);
+  if (propertyAssignmentPattern.test(firstMatch.code)) {
+    return 'nested';
+  }
+
   // Nested: Added to collections with .Add() or .addItem() etc.
   // Pattern: something.Add(new ClassName(...))
   const nestedPattern = new RegExp(`\\w+\\.(?:Add|addItem|add)\\([^)]*new\\s+${className}\\(`);

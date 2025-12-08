@@ -249,6 +249,12 @@ export class ModValidator {
       }
 
       if (!fieldType) {
+        // Skip property name validation for Actor type (it dynamically handles extra properties)
+        if (resolvedTypeName === 'Actor') {
+          // For Actor, skip the unknown property check entirely
+          continue;
+        }
+
         // Unknown property - likely a typo that will break the mod
         const typeDisplay = resolvedTypeName !== obj.type ? `${obj.type} (${resolvedTypeName})` : obj.type;
 

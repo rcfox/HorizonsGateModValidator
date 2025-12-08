@@ -3386,7 +3386,7 @@
       "supportsCloneFrom": false
     },
     "ActorState": {
-      "category": "definition",
+      "category": "nested",
       "fields": [
         {
           "name": "canSwap",
@@ -3827,7 +3827,7 @@
       "supportsCloneFrom": true
     },
     "GameState": {
-      "category": "definition",
+      "category": "nested",
       "fields": [
         {
           "name": "known",
