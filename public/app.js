@@ -172,6 +172,13 @@ function createMessageHTML(msg) {
     const lineAttr = msg.line ? `data-line="${msg.line}"` : '';
     const cursorClass = msg.line ? 'clickable' : '';
 
+    // Add position data attributes if corrections are available
+    let positionAttrs = '';
+    if (msg.corrections && msg.corrections.length > 0) {
+        const firstCorrection = msg.corrections[0];
+        positionAttrs = `data-start-line="${firstCorrection.startLine}" data-start-column="${firstCorrection.startColumn}" data-end-line="${firstCorrection.endLine}" data-end-column="${firstCorrection.endColumn}"`;
+    }
+
     // Create corrections HTML if available
     let correctionsHTML = '';
     if (msg.corrections && msg.corrections.length > 0) {
@@ -198,7 +205,7 @@ function createMessageHTML(msg) {
     }
 
     return `
-        <div class="message ${msg.severity} ${cursorClass}" ${lineAttr}>
+        <div class="message ${msg.severity} ${cursorClass}" ${lineAttr} ${positionAttrs}>
             <div class="message-header">
                 <span class="message-icon">${icon}</span>
                 <span>${msg.message}</span>
@@ -241,7 +248,7 @@ function updateLineNumbers() {
         .join('');
 }
 
-function scrollToLine(lineNumber) {
+function scrollToLine(lineNumber, position = null) {
     const lines = modInput.value.split('\n');
     const lineHeight = parseFloat(getComputedStyle(modInput).lineHeight);
     const editorWrapper = modInput.parentElement;
@@ -261,12 +268,32 @@ function scrollToLine(lineNumber) {
     // Focus the textarea
     modInput.focus();
 
-    // Set cursor position at the start of the line and select the entire line
-    let charPosition = 0;
-    for (let i = 0; i < lineNumber - 1; i++) {
-        charPosition += lines[i].length + 1; // +1 for newline
+    // If we have position information, select just that part
+    if (position) {
+        const { startLine, startColumn, endLine, endColumn } = position;
+
+        // Calculate absolute character positions
+        let absoluteStart = 0;
+        for (let i = 0; i < startLine - 1; i++) {
+            absoluteStart += lines[i].length + 1; // +1 for newline
+        }
+        absoluteStart += startColumn;
+
+        let absoluteEnd = 0;
+        for (let i = 0; i < endLine - 1; i++) {
+            absoluteEnd += lines[i].length + 1;
+        }
+        absoluteEnd += endColumn;
+
+        modInput.setSelectionRange(absoluteStart, absoluteEnd);
+    } else {
+        // Fallback: select the entire line
+        let charPosition = 0;
+        for (let i = 0; i < lineNumber - 1; i++) {
+            charPosition += lines[i].length + 1; // +1 for newline
+        }
+        modInput.setSelectionRange(charPosition, charPosition + (lines[lineNumber - 1]?.length || 0));
     }
-    modInput.setSelectionRange(charPosition, charPosition + (lines[lineNumber - 1]?.length || 0));
 }
 
 /**
@@ -320,7 +347,14 @@ function applyCorrection(correction) {
     // Update and re-validate
     updateLineNumbers();
     handleValidate();
-    scrollToLine(startLine);
+
+    // Scroll to and select the corrected text
+    scrollToLine(startLine, {
+        startLine: startLine,
+        startColumn: startColumn,
+        endLine: startLine, // Corrections are always single-line
+        endColumn: startColumn + replacementText.length
+    });
 }
 
 // Handle clicks on messages to jump to line
@@ -358,7 +392,22 @@ resultsContainer.addEventListener('click', (e) => {
     if (messageElement) {
         const lineNumber = parseInt(messageElement.getAttribute('data-line'), 10);
         if (lineNumber) {
-            scrollToLine(lineNumber);
+            // Check if we have position information for more precise selection
+            const startLine = messageElement.getAttribute('data-start-line');
+            const startColumn = messageElement.getAttribute('data-start-column');
+            const endLine = messageElement.getAttribute('data-end-line');
+            const endColumn = messageElement.getAttribute('data-end-column');
+
+            if (startLine && startColumn && endLine && endColumn) {
+                scrollToLine(lineNumber, {
+                    startLine: parseInt(startLine, 10),
+                    startColumn: parseInt(startColumn, 10),
+                    endLine: parseInt(endLine, 10),
+                    endColumn: parseInt(endColumn, 10)
+                });
+            } else {
+                scrollToLine(lineNumber);
+            }
         }
     }
 });
