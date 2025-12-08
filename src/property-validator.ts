@@ -209,7 +209,8 @@ export class PropertyValidator {
   }
 
   private isValidFloat(value: string): boolean {
-    return /^-?\d+\.?\d*$/.test(value);
+    // Support regular floats and scientific notation (e.g., 1.5e10, 2.5E-3)
+    return /^-?\d+\.?\d*([eE][+-]?\d+)?$/.test(value);
   }
 
   private isValidByte(value: string): boolean {
