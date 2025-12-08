@@ -1,11 +1,98 @@
 # Horizon's Gate Mod Validator - Project Context
 
 ## Overview
-A web-based validator for Horizon's Gate game mod files. Validates mod syntax, object types, property types, and provides typo suggestions with clickable corrections.
+A validator for Horizon's Gate game mod files. Validates mod syntax, object types, property types, and provides typo suggestions. Available as both a web UI and command-line tool.
+
+## Usage
+
+### Web UI
+Open `public/index.html` in a browser to use the interactive validator with clickable corrections and auto-fix suggestions.
+
+### Command-Line Interface
+The CLI tool provides linter-style validation for mod files with support for batch processing.
+
+**Build the CLI:**
+```bash
+npm run build:cli
+```
+
+**Basic usage:**
+```bash
+./dist/cli.js <paths...> [options]
+```
+
+**Options:**
+- `-r, --recursive` - Recursively process directories (default: false)
+- `-f, --format <type>` - Output format: `gcc` (default) or `json`
+- `-e, --error-level <level>` - Minimum severity to display: `error`, `warning`, or `info` (default: `info`)
+- `-V, --version` - Show version number
+- `-h, --help` - Show help
+
+**Examples:**
+```bash
+# Validate a single file
+./dist/cli.js mods/mymod.txt
+
+# Validate multiple files
+./dist/cli.js mod1.txt mod2.txt
+
+# Validate all .txt files in a directory
+./dist/cli.js mods/
+
+# Recursively validate all .txt files
+./dist/cli.js mods/ -r
+
+# Show only errors (hide warnings and info)
+./dist/cli.js mods/ -e error
+
+# Output as JSON for tooling integration
+./dist/cli.js mods/ -f json
+
+# Use shell globs (expanded by shell before CLI sees them)
+./dist/cli.js mods/**/*.txt
+```
+
+**File discovery:**
+- Explicitly specified files: Any extension is validated
+- Directories: Only `.txt` files are processed by default
+- Non-recursive by default (use `-r` to recurse)
+
+**Exit codes:**
+- `0` - Success (no messages printed at current error level)
+- `1` - Failure (messages printed or file errors encountered)
+
+**Output formats:**
+
+*GCC-style (default):*
+```
+file.txt:55: error: Property '...' does not end with semicolon
+file.txt:71: warning: Numeric enum value used for itemCategory
+```
+
+*JSON:*
+```json
+{
+  "summary": {
+    "filesProcessed": 1,
+    "filesWithErrors": 1,
+    "totalErrors": 2,
+    "totalWarnings": 2,
+    "totalInfo": 0
+  },
+  "files": [
+    {
+      "file": "example.txt",
+      "valid": false,
+      "messages": [ ... ]
+    }
+  ]
+}
+```
 
 ## Project Structure
 
 ### Source Files (`/src`)
+- **cli.ts** - Command-line interface (compiles to `dist/cli.js`)
 - **validator.ts** - Main validation orchestrator
 - **parser.ts** - Parses mod file format into structured objects
 - **lexer.ts** - Tokenizes mod file content
@@ -138,6 +225,7 @@ interface Correction {
 
 ### Commands
 - `npm run build` - Compile TypeScript to `/dist`
+- `npm run build:cli` - Build CLI tool (same as `build`, but semantic)
 - `npm run build:bundle` - Build + create browser bundle
 - `node extract_schema.cjs` - Re-extract schema from C# source
 
