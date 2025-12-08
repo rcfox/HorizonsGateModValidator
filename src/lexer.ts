@@ -11,6 +11,7 @@ export class ModLexer {
   private current = 0;
   private line = 1;
   private column = 1;
+  private inValueMode = false; // Track if we're scanning a property value
 
   constructor(source: string) {
     this.source = source;
@@ -24,6 +25,7 @@ export class ModLexer {
     this.current = 0;
     this.line = 1;
     this.column = 1;
+    this.inValueMode = false;
 
     while (!this.isAtEnd()) {
       this.scanToken();
@@ -61,15 +63,18 @@ export class ModLexer {
     switch (char) {
       case '[':
         this.addToken(TokenType.LEFT_BRACKET, char);
+        this.inValueMode = false; // New object declaration ends any value mode
         break;
       case ']':
         this.addToken(TokenType.RIGHT_BRACKET, char);
         break;
       case '=':
         this.addToken(TokenType.EQUALS, char);
+        this.inValueMode = true; // Start scanning property value
         break;
       case ';':
         this.addToken(TokenType.SEMICOLON, char);
+        this.inValueMode = false; // End of property value
         break;
       case '\n':
         this.addToken(TokenType.NEWLINE, char);
@@ -90,11 +95,11 @@ export class ModLexer {
         // Skip whitespace
         break;
       case '-':
-        // Check for comment (--)
-        if (this.peek() === '-') {
+        // Check for comment (--), but only when NOT inside a property value
+        if (this.peek() === '-' && !this.inValueMode) {
           this.scanComment();
         } else {
-          // Part of a value (negative number or formula operator)
+          // Part of a value (negative number, formula operator, or text containing --)
           this.scanValue(char);
         }
         break;
