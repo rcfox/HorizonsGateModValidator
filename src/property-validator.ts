@@ -284,9 +284,6 @@ export class PropertyValidator {
           message: `Numeric enum value used for ${propertyName}`,
           line,
           context: `Use the enum name instead of the numeric value '${value}'`,
-          suggestion: matchingNames.length === 1
-            ? `Use '${matchingNames[0]}' instead of '${value}'`
-            : `Use one of: ${matchingNames.join(', ')} instead of '${value}'`,
           corrections,
         });
       } else {
@@ -319,9 +316,9 @@ export class PropertyValidator {
         message: `Invalid ${enumName} value for ${propertyName}`,
         line,
         context: `'${value}' is not a valid ${enumName}`,
-        suggestion: corrections.length > 0
-          ? `Did you mean: ${similar.map(s => s.value).join(', ')}?`
-          : `Valid values: ${enumNames.slice(0, 10).join(', ')}${enumNames.length > 10 ? ', ...' : ''}`,
+        suggestion: corrections.length === 0
+          ? `Valid values: ${enumNames.slice(0, 10).join(', ')}${enumNames.length > 10 ? ', ...' : ''}`
+          : undefined,
         corrections,
       });
     }

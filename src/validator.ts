@@ -122,10 +122,6 @@ export class ModValidator {
         message: `Unknown object type: ${obj.type}`,
         line: obj.startLine,
         context: 'This object type is not recognized',
-        suggestion:
-          corrections.length > 0
-            ? `Did you mean: ${similar.map(s => s.value).join(', ')}?`
-            : 'Check for typos in the object type name',
         corrections,
       });
       return messages; // Can't validate further without type info
@@ -288,8 +284,7 @@ export class ModValidator {
           message: `Unknown property '${cleanPropName}' for ${typeDisplay}`,
           line: propInfo.nameStartLine,
           context: `Value: ${propValue}`,
-          suggestion:
-            corrections.length > 0 ? `Did you mean: ${similar.map(s => s.value).join(', ')}?` : 'Check for typos in property name',
+          suggestion: corrections.length === 0 ? 'Check for typos in property name' : undefined,
           corrections,
         });
         continue;
@@ -393,19 +388,31 @@ export class ModValidator {
           message: `ActionAoE for Action '${actionId}' is missing ID property`,
           line: nextObj.startLine,
           suggestion: `Add: ID=${actionId};`,
+          correctionIcon: '🔧',
+          corrections: [
+            {
+              startLine: nextObj.startLine,
+              startColumn: nextObj.typeBracketEndColumn,
+              endLine: nextObj.startLine,
+              endColumn: nextObj.typeBracketEndColumn,
+              replacementText: ` ID=${actionId};`,
+            },
+          ],
         });
       } else if (actionAoeIdProp.value !== actionId) {
         messages.push({
           severity: 'error',
           message: `ActionAoE ID '${actionAoeIdProp.value}' does not match Action ID '${actionId}'`,
           line: actionAoeIdProp.valueStartLine,
-          corrections: [{
-            startLine: actionAoeIdProp.valueStartLine,
-            startColumn: actionAoeIdProp.valueStartColumn,
-            endLine: actionAoeIdProp.valueEndLine,
-            endColumn: actionAoeIdProp.valueEndColumn,
-            replacementText: actionId,
-          }],
+          corrections: [
+            {
+              startLine: actionAoeIdProp.valueStartLine,
+              startColumn: actionAoeIdProp.valueStartColumn,
+              endLine: actionAoeIdProp.valueEndLine,
+              endColumn: actionAoeIdProp.valueEndColumn,
+              replacementText: actionId,
+            },
+          ],
         });
       }
 
@@ -434,19 +441,31 @@ export class ModValidator {
               message: `AvAffecter for Action '${actionId}' is missing ID property`,
               line: currentObj.startLine,
               suggestion: `Add: ID=${actionId};`,
+              correctionIcon: '🔧',
+              corrections: [
+                {
+                  startLine: currentObj.startLine,
+                  startColumn: currentObj.typeBracketEndColumn,
+                  endLine: currentObj.startLine,
+                  endColumn: currentObj.typeBracketEndColumn,
+                  replacementText: ` ID=${actionId};`,
+                },
+              ],
             });
           } else if (avAffecterIdProp.value !== actionId) {
             messages.push({
               severity: 'error',
               message: `AvAffecter ID '${avAffecterIdProp.value}' does not match Action ID '${actionId}'`,
               line: avAffecterIdProp.valueStartLine,
-              corrections: [{
-                startLine: avAffecterIdProp.valueStartLine,
-                startColumn: avAffecterIdProp.valueStartColumn,
-                endLine: avAffecterIdProp.valueEndLine,
-                endColumn: avAffecterIdProp.valueEndColumn,
-                replacementText: actionId,
-              }],
+              corrections: [
+                {
+                  startLine: avAffecterIdProp.valueStartLine,
+                  startColumn: avAffecterIdProp.valueStartColumn,
+                  endLine: avAffecterIdProp.valueEndLine,
+                  endColumn: avAffecterIdProp.valueEndColumn,
+                  replacementText: actionId,
+                },
+              ],
             });
           }
 
@@ -478,19 +497,31 @@ export class ModValidator {
                 message: `AvAffecterAoE for Action '${actionId}' is missing ID property`,
                 line: nextAfterAvAffecter.startLine,
                 suggestion: `Add: ID=${actionId};`,
+                correctionIcon: '🔧',
+                corrections: [
+                  {
+                    startLine: nextAfterAvAffecter.startLine,
+                    startColumn: nextAfterAvAffecter.typeBracketEndColumn,
+                    endLine: nextAfterAvAffecter.startLine,
+                    endColumn: nextAfterAvAffecter.typeBracketEndColumn,
+                    replacementText: ` ID=${actionId};`,
+                  },
+                ],
               });
             } else if (avAffecterAoeIdProp.value !== actionId) {
               messages.push({
                 severity: 'error',
                 message: `AvAffecterAoE ID '${avAffecterAoeIdProp.value}' does not match Action ID '${actionId}'`,
                 line: avAffecterAoeIdProp.valueStartLine,
-                corrections: [{
-                  startLine: avAffecterAoeIdProp.valueStartLine,
-                  startColumn: avAffecterAoeIdProp.valueStartColumn,
-                  endLine: avAffecterAoeIdProp.valueEndLine,
-                  endColumn: avAffecterAoeIdProp.valueEndColumn,
-                  replacementText: actionId,
-                }],
+                corrections: [
+                  {
+                    startLine: avAffecterAoeIdProp.valueStartLine,
+                    startColumn: avAffecterAoeIdProp.valueStartColumn,
+                    endLine: avAffecterAoeIdProp.valueEndLine,
+                    endColumn: avAffecterAoeIdProp.valueEndColumn,
+                    replacementText: actionId,
+                  },
+                ],
               });
             }
             j++; // Skip the AvAffecterAoE we just validated

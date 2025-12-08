@@ -182,13 +182,25 @@ function createMessageHTML(msg) {
     // Create corrections HTML if available
     let correctionsHTML = '';
     if (msg.corrections && msg.corrections.length > 0) {
-        const correctionLinks = msg.corrections
-            .map(correction => {
-                const correctionData = JSON.stringify(correction).replace(/"/g, '&quot;');
-                return `<span class="correction-link" data-correction="${correctionData}">${escapeHTML(correction.replacementText)}</span>`;
-            })
-            .join(', ');
-        correctionsHTML = `<div class="message-corrections">💡 Did you mean: ${correctionLinks}?</div>`;
+        const icon = msg.correctionIcon || '💡';
+
+        // If there's a custom suggestion text, make the entire suggestion clickable
+        // Otherwise, show "Did you mean:" with each correction's replacementText as links
+        if (msg.suggestion && msg.suggestion.trim().length > 0) {
+            // Make the suggestion text itself clickable (for fixes like "Add a semicolon")
+            const correctionData = JSON.stringify(msg.corrections[0]).replace(/"/g, '&quot;');
+            const suggestionLink = `<span class="correction-link" data-correction="${correctionData}">${escapeHTML(msg.suggestion)}</span>`;
+            correctionsHTML = `<div class="message-corrections">${icon} ${suggestionLink}</div>`;
+        } else {
+            // Show each correction's replacement text as separate links (for typos)
+            const correctionLinks = msg.corrections
+                .map(correction => {
+                    const correctionData = JSON.stringify(correction).replace(/"/g, '&quot;');
+                    return `<span class="correction-link" data-correction="${correctionData}">${escapeHTML(correction.replacementText)}</span>`;
+                })
+                .join(', ');
+            correctionsHTML = `<div class="message-corrections">${icon} Did you mean: ${correctionLinks}?</div>`;
+        }
     }
 
     // Create formula reference link if available

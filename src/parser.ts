@@ -3,7 +3,7 @@
  * Converts tokens into structured object representations
  */
 
-import { Token, TokenType, ParsedObject, PropertyInfo, ValidationMessage } from './types.js';
+import { Correction, Token, TokenType, ParsedObject, PropertyInfo, ValidationMessage } from './types.js';
 import { ModLexer } from './lexer.js';
 
 export class ModParser {
@@ -41,11 +41,11 @@ export class ModParser {
       } else {
         // Unexpected token outside of object definition
         const token = this.peek();
-        this.addError(
-          'Unexpected token outside object definition',
-          token.line,
-          `Found ${token.value}, expected [ObjectType]`
-        );
+        this.addError({
+          message: 'Unexpected token outside object definition',
+          line: token.line,
+          context: `Found ${token.value}, expected [ObjectType]`,
+        });
         this.advance(); // Skip the problematic token
       }
     }
@@ -59,11 +59,11 @@ export class ModParser {
 
     // Get object type name
     if (!this.check(TokenType.IDENTIFIER)) {
-      this.addError(
-        'Expected object type name after [',
-        this.peek().line,
-        `Found ${this.peek().value}`
-      );
+      this.addError({
+        message: 'Expected object type name after [',
+        line: this.peek().line,
+        context: `Found ${this.peek().value}`,
+      });
       return null;
     }
 
@@ -72,21 +72,22 @@ export class ModParser {
     const typeStartLine = typeToken.line;
     const typeStartColumn = typeToken.column;
     const typeEndColumn = typeToken.column + typeToken.value.length;
+    let typeBracketEndColumn = -1;
 
     // Expect closing bracket
     if (!this.check(TokenType.RIGHT_BRACKET)) {
-      this.addError(
-        'Expected ] after object type name',
-        this.peek().line,
-        `Found ${this.peek().value} in [${objectType}]`
-      );
+      this.addError({
+        message: 'Expected ] after object type name',
+        line: this.peek().line,
+        context: `Found ${this.peek().value} in [${objectType}]`,
+      });
       // Try to recover by finding the next ]
       while (!this.isAtEnd() && !this.check(TokenType.RIGHT_BRACKET)) {
         this.advance();
       }
-    }
-
-    if (this.check(TokenType.RIGHT_BRACKET)) {
+    } else {
+      const bracketToken = this.peek();
+      typeBracketEndColumn = bracketToken.column + 1; // Position after ]
       this.advance(); // consume ']'
     }
 
@@ -102,6 +103,7 @@ export class ModParser {
       typeStartLine,
       typeStartColumn,
       typeEndColumn,
+      typeBracketEndColumn,
     };
   }
 
@@ -155,11 +157,11 @@ export class ModParser {
 
     // Check for equals sign
     if (!this.check(TokenType.EQUALS)) {
-      this.addError(
-        `Expected = after property name '${propertyName}'`,
-        propertyLine,
-        `Found ${this.peek().value}`
-      );
+      this.addError({
+        message: `Expected = after property name '${propertyName}'`,
+        line: propertyLine,
+        context: `Found ${this.peek().value}`,
+      });
       this.skipToNextLine();
       return null;
     }
@@ -256,11 +258,22 @@ export class ModParser {
       const shouldHaveSemicolon = this.shouldWarnAboutMissingSemicolon(value);
 
       if (shouldHaveSemicolon) {
-        this.addError(
-          `Property '${propertyName} = ${value}' does not end with semicolon`,
-          propertyLine,
-          'Add ; at the end of the line'
-        );
+        this.addError({
+          message: `Property '${propertyName} = ${value}' does not end with semicolon`,
+          line: propertyLine,
+          context: 'Add ; at the end of the line',
+          suggestion: 'Add a semicolon',
+          correctionIcon: '🔧',
+          corrections: [
+            {
+              startLine: propertyLine,
+              startColumn: valueEndColumn,
+              endLine: propertyLine,
+              endColumn: valueEndColumn,
+              replacementText: ';',
+            },
+          ],
+        });
       }
     }
 
@@ -275,7 +288,7 @@ export class ModParser {
         valueStartColumn,
         valueEndLine,
         valueEndColumn,
-      }
+      },
     };
   }
 
@@ -364,21 +377,17 @@ export class ModParser {
     return this.tokens[this.current - 1];
   }
 
-  private addError(message: string, line: number, context?: string): void {
+  private addError(msg: Omit<ValidationMessage, 'severity'>): void {
     this.errors.push({
+      ...msg,
       severity: 'error',
-      message,
-      line,
-      context,
     });
   }
 
-  private addWarning(message: string, line: number, context?: string): void {
+  private addWarning(msg: Omit<ValidationMessage, 'severity'>): void {
     this.errors.push({
+      ...msg,
       severity: 'warning',
-      message,
-      line,
-      context,
     });
   }
 }

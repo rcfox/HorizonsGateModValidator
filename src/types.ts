@@ -86,6 +86,7 @@ export interface ParsedObject {
   typeStartLine: number;
   typeStartColumn: number;
   typeEndColumn: number;
+  typeBracketEndColumn: number; // Position after the closing ]
 }
 
 /**
@@ -117,7 +118,8 @@ export interface ValidationMessage {
   message: string;
   line?: number;
   context?: string;
-  suggestion?: string;
+  suggestion?: string; // Override text for corrections (e.g., "Add a semicolon" instead of "Did you mean:")
+  correctionIcon?: string; // Override icon for corrections (e.g., "🔧" for fixes, default "💡" for typos)
   corrections?: Correction[]; // Suggested corrections for typos
   formulaReference?: string; // Operator name for linking to formula reference page
   documentationUrl?: string; // External documentation URL

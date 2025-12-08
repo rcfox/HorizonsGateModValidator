@@ -90,6 +90,7 @@ The parser tracks precise positions for all elements to enable accurate correcti
 
 **ParsedObject** contains:
 - `typeStartLine`, `typeStartColumn`, `typeEndColumn` - Position of the object type name (text between `[` and `]`)
+- `typeBracketEndColumn` - Position immediately after the closing `]` bracket (useful for inserting properties after the object type declaration)
 
 This position tracking enables exact text replacement without any text searching or pattern matching.
 
