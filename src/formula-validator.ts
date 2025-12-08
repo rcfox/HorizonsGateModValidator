@@ -57,9 +57,22 @@ export class FormulaValidator {
     }
 
     // Get the incorrect text from the node
-    const incorrectText = this.getNodeText(error.node);
+    let incorrectText = this.getNodeText(error.node);
     if (!incorrectText) {
       return [];
+    }
+
+    // Check if suggestions include an operator prefix (e.g., "m:distance")
+    // If so, we need to search for the full "prefix:text" in the formula
+    const firstSuggestion = error.suggestions[0];
+    const colonIndex = firstSuggestion.indexOf(':');
+    if (colonIndex > 0) {
+      const prefix = firstSuggestion.substring(0, colonIndex + 1);
+      // Check if the formula contains "prefix:incorrectText"
+      const prefixedText = prefix + incorrectText;
+      if (formula.includes(prefixedText)) {
+        incorrectText = prefixedText;
+      }
     }
 
     // Find the position of the incorrect text in the formula
