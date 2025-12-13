@@ -82,6 +82,9 @@ export interface ParsedObject {
   startLine: number;
   endLine: number;
 
+  previousObject: ParsedObject | null;
+  nextObject: ParsedObject | null;
+
   // Type name position (always single line)
   typeStartLine: number;
   typeStartColumn: number;
@@ -119,7 +122,7 @@ export interface ValidationMessage {
   message: string;
   line?: number;
   context?: string;
-  suggestion?: string; // Override text for corrections (e.g., "Add a semicolon" instead of "Did you mean:")
+  suggestion?: string | undefined; // Override text for corrections (e.g., "Add a semicolon" instead of "Did you mean:")
   correctionIcon?: string; // Override icon for corrections (e.g., "🔧" for fixes, default "💡" for typos)
   corrections?: Correction[]; // Suggested corrections for typos
   formulaReference?: string; // Operator name for linking to formula reference page

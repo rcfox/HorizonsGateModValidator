@@ -3,7 +3,7 @@
  * Converts tokens into structured object representations
  */
 
-import { Correction, Token, TokenType, ParsedObject, PropertyInfo, ValidationMessage } from './types.js';
+import { Token, TokenType, ParsedObject, PropertyInfo, ValidationMessage } from './types.js';
 import { ModLexer } from './lexer.js';
 
 export class ModParser {
@@ -26,6 +26,8 @@ export class ModParser {
     this.objects = [];
     this.errors = [];
 
+    let lastObject: ParsedObject | undefined;
+
     // Parse objects
     while (!this.isAtEnd()) {
       this.skipWhitespaceAndComments();
@@ -36,6 +38,10 @@ export class ModParser {
       if (this.check(TokenType.LEFT_BRACKET)) {
         const obj = this.parseObject();
         if (obj) {
+          obj.previousObject = lastObject ?? null;
+          if (lastObject) {
+            lastObject.nextObject = obj;
+          }
           this.objects.push(obj);
         }
       } else {
@@ -104,6 +110,9 @@ export class ModParser {
       typeStartColumn,
       typeEndColumn,
       typeBracketEndColumn,
+
+      previousObject: null, // These will be set up when the function returns.
+      nextObject: null,
     };
   }
 

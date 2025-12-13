@@ -20,58 +20,22 @@ export class ModValidator {
     this.typeAliases = data.typeAliases;
   }
 
-  /**
-   * Resolve a type alias to its actual class name
-   */
   private resolveTypeAlias(typeName: string): string {
     return this.typeAliases[typeName] || typeName;
   }
 
-  /**
-   * Validate mod file content
-   */
   validate(content: string): ValidationResult {
-    const errors: ValidationMessage[] = [];
-    const warnings: ValidationMessage[] = [];
-    const info: ValidationMessage[] = [];
-
     const parser = new ModParser(content);
+
     const { objects, errors: parseErrors } = parser.parse();
-
-    for (const error of parseErrors) {
-      if (error.severity === 'error') {
-        errors.push(error);
-      } else if (error.severity === 'warning') {
-        warnings.push(error);
-      } else {
-        info.push(error);
-      }
-    }
-
-    for (const obj of objects) {
-      const objMessages = this.validateObject(obj);
-
-      for (const msg of objMessages) {
-        if (msg.severity === 'error') {
-          errors.push(msg);
-        } else if (msg.severity === 'warning') {
-          warnings.push(msg);
-        } else {
-          info.push(msg);
-        }
-      }
-    }
-
+    const objMessages = objects.flatMap(obj => this.validateObject(obj));
     const structureMessages = this.validateActionStructures(objects);
-    for (const msg of structureMessages) {
-      if (msg.severity === 'error') {
-        errors.push(msg);
-      } else if (msg.severity === 'warning') {
-        warnings.push(msg);
-      } else {
-        info.push(msg);
-      }
-    }
+
+    const allMessages = [...parseErrors, ...objMessages, ...structureMessages];
+
+    const errors = allMessages.filter(m => m.severity === 'error');
+    const warnings = allMessages.filter(m => m.severity === 'warning');
+    const info = allMessages.filter(m => m.severity === 'info');
 
     return {
       valid: errors.length === 0,
@@ -81,30 +45,13 @@ export class ModValidator {
     };
   }
 
-  /**
-   * Check if a type is known (either in schema directly or as an alias)
-   */
-  private isKnownType(typeName: string): boolean {
-    // Check if it's a direct schema entry
-    if (this.schema[typeName]) {
-      return true;
-    }
-    // Check if it's a type alias
-    if (this.typeAliases[typeName]) {
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Validate a single parsed object
-   */
   private validateObject(obj: ParsedObject): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
 
-    // Check if object type is known
-    if (!this.isKnownType(obj.type)) {
-      // Find similar object type names
+    const resolvedType = this.resolveTypeAlias(obj.type);
+    const classSchema = this.schema[resolvedType];
+
+    if (!classSchema) {
       const allTypes = [...Object.keys(this.schema), ...Object.keys(this.typeAliases)];
       const similar = findSimilar(obj.type, allTypes, MAX_EDIT_DISTANCE);
       const corrections = similar.map(s => ({
@@ -122,15 +69,10 @@ export class ModValidator {
         context: 'This object type is not recognized',
         corrections,
       });
-      return messages; // Can't validate further without type info
+      return messages;
     }
 
-    // Validate properties against schema (resolve aliases)
-    const resolvedType = this.resolveTypeAlias(obj.type);
-    const classSchema = this.schema[resolvedType];
-
-    // For types in schema, check for required ID
-    if (classSchema && classSchema.category === 'definition' && !obj.properties.has('ID')) {
+    if (classSchema.category === 'definition' && !obj.properties.has('ID')) {
       messages.push({
         severity: 'error',
         message: `Object type ${obj.type} requires an ID property`,
@@ -139,36 +81,20 @@ export class ModValidator {
       });
     }
 
-    // Check cloneFrom usage based on schema (if available)
-    if (obj.properties.has('cloneFrom') && classSchema) {
-      if (classSchema.supportsCloneFrom === false) {
-        messages.push({
-          severity: 'warning',
-          message: `Object type ${obj.type} does not support cloneFrom`,
-          line: obj.startLine,
-          context: 'The cloneFrom property will be ignored',
-        });
-      }
-    }
-
-    if (classSchema) {
-      messages.push(...this.validateProperties(obj, classSchema, resolvedType));
-    } else {
-      // No schema available
+    if (obj.properties.has('cloneFrom') && classSchema.supportsCloneFrom === false) {
       messages.push({
-        severity: 'info',
-        message: `No property schema available for ${obj.type}${resolvedType !== obj.type ? ` (alias of ${resolvedType})` : ''}`,
+        severity: 'warning',
+        message: `Object type ${obj.type} does not support cloneFrom`,
         line: obj.startLine,
-        context: 'Property types will not be validated',
+        context: 'The cloneFrom property will be ignored',
       });
     }
+
+    messages.push(...this.validateProperties(obj, classSchema, resolvedType));
 
     return messages;
   }
 
-  /**
-   * Validate object properties against schema
-   */
   private validateProperties(
     obj: ParsedObject,
     classSchema: ClassSchema,
@@ -296,16 +222,10 @@ export class ModValidator {
     return messages;
   }
 
-  /**
-   * Get all known object types
-   */
   getKnownObjectTypes(): string[] {
     return Object.keys(this.schema);
   }
 
-  /**
-   * Get schema for a specific object type
-   */
   getObjectSchema(type: string): ClassSchema | null {
     return this.schema[type] || null;
   }
@@ -316,6 +236,8 @@ export class ModValidator {
    * All IDs must match the Action's ID
    */
   private validateActionStructures(objects: ParsedObject[]): ValidationMessage[] {
+    const messages: ValidationMessage[] = [];
+
     function normalizeTypeName(typeName: string): string {
       switch (typeName) {
         case 'ActionAOE':
@@ -329,208 +251,164 @@ export class ModValidator {
       }
     }
 
-    const messages: ValidationMessage[] = [];
-
-    // Find all Action objects
-    for (let i = 0; i < objects.length; i++) {
-      const obj = objects[i];
-      const normalizedType = normalizeTypeName(obj.type);
-
-      if (normalizedType !== 'Action') {
-        continue;
-      }
-
-      // 1. Action must have an ID
-      const actionIdProp = obj.properties.get('ID');
-      if (!actionIdProp) {
-        // Already handled by existing validation
-        continue;
-      }
-      const actionId = actionIdProp.value;
-
-      // 2. Next object must be ActionAoE
-      if (i + 1 >= objects.length) {
+    function validateActionId(obj: ParsedObject, actionId: string): boolean {
+      const idProp = obj.properties.get('ID');
+      if (!idProp) {
         messages.push({
           severity: 'error',
-          message: `Action '${actionId}' must be followed by [ActionAoE]`,
-          line: obj.endLine,
-        });
-        continue;
-      }
-
-      const nextObj = objects[i + 1];
-      const nextType = normalizeTypeName(nextObj.type);
-
-      if (nextType !== 'ActionAoE') {
-        messages.push({
-          severity: 'error',
-          message: `Action '${actionId}' must be followed by [ActionAoE], but found [${nextObj.type}]`,
-          line: nextObj.startLine,
-        });
-        continue;
-      }
-
-      // 3. ActionAoE must have matching ID
-      const actionAoeIdProp = nextObj.properties.get('ID');
-      if (!actionAoeIdProp) {
-        messages.push({
-          severity: 'error',
-          message: `ActionAoE for Action '${actionId}' is missing ID property`,
-          line: nextObj.startLine,
+          message: `${obj.type} for Action '${actionId}' is missing ID property`,
+          line: obj.startLine,
           suggestion: `Add: ID=${actionId};`,
           correctionIcon: '🔧',
           corrections: [
             {
-              startLine: nextObj.startLine,
-              startColumn: nextObj.typeBracketEndColumn,
-              endLine: nextObj.startLine,
-              endColumn: nextObj.typeBracketEndColumn,
+              startLine: obj.startLine,
+              startColumn: obj.typeBracketEndColumn,
+              endLine: obj.startLine,
+              endColumn: obj.typeBracketEndColumn,
               replacementText: ` ID=${actionId};`,
             },
           ],
         });
-      } else if (actionAoeIdProp.value !== actionId) {
+        return false;
+      }
+
+      if (idProp.value !== actionId) {
         messages.push({
           severity: 'error',
-          message: `ActionAoE ID '${actionAoeIdProp.value}' does not match Action ID '${actionId}'`,
-          line: actionAoeIdProp.valueStartLine,
+          message: `${obj.type} ID '${idProp.value}' does not match Action ID '${actionId}'`,
+          line: idProp.valueStartLine,
           corrections: [
             {
-              startLine: actionAoeIdProp.valueStartLine,
-              startColumn: actionAoeIdProp.valueStartColumn,
-              endLine: actionAoeIdProp.valueEndLine,
-              endColumn: actionAoeIdProp.valueEndColumn,
+              startLine: idProp.valueStartLine,
+              startColumn: idProp.valueStartColumn,
+              endLine: idProp.valueEndLine,
+              endColumn: idProp.valueEndColumn,
               replacementText: actionId,
             },
           ],
         });
+        return false;
       }
+      return true;
+    }
 
-      // 4. Must have at least one AvAffecter+AvAffecterAoE pair
-      let j = i + 2;
-      let foundAnyAffecter = false;
-
-      while (j < objects.length) {
-        const currentObj = objects[j];
-        const currentType = normalizeTypeName(currentObj.type);
-
-        // Stop if we hit another Action or unrelated object
-        if (currentType === 'Action') {
-          break;
-        }
-
-        // Check if this is AvAffecter
-        if (currentType === 'AvAffecter') {
-          foundAnyAffecter = true;
-
-          // 5. AvAffecter must have matching ID
-          const avAffecterIdProp = currentObj.properties.get('ID');
-          if (!avAffecterIdProp) {
-            messages.push({
-              severity: 'error',
-              message: `AvAffecter for Action '${actionId}' is missing ID property`,
-              line: currentObj.startLine,
-              suggestion: `Add: ID=${actionId};`,
-              correctionIcon: '🔧',
-              corrections: [
-                {
-                  startLine: currentObj.startLine,
-                  startColumn: currentObj.typeBracketEndColumn,
-                  endLine: currentObj.startLine,
-                  endColumn: currentObj.typeBracketEndColumn,
-                  replacementText: ` ID=${actionId};`,
-                },
-              ],
-            });
-          } else if (avAffecterIdProp.value !== actionId) {
-            messages.push({
-              severity: 'error',
-              message: `AvAffecter ID '${avAffecterIdProp.value}' does not match Action ID '${actionId}'`,
-              line: avAffecterIdProp.valueStartLine,
-              corrections: [
-                {
-                  startLine: avAffecterIdProp.valueStartLine,
-                  startColumn: avAffecterIdProp.valueStartColumn,
-                  endLine: avAffecterIdProp.valueEndLine,
-                  endColumn: avAffecterIdProp.valueEndColumn,
-                  replacementText: actionId,
-                },
-              ],
-            });
-          }
-
-          // 6. Next object after AvAffecter must be AvAffecterAoE
-          if (j + 1 >= objects.length) {
-            messages.push({
-              severity: 'error',
-              message: `AvAffecter for Action '${actionId}' must be followed by [AvAffecterAoE]`,
-              line: currentObj.endLine,
-            });
-            break;
-          }
-
-          const nextAfterAvAffecter = objects[j + 1];
-          const nextAfterAvAffecterType = normalizeTypeName(nextAfterAvAffecter.type);
-
-          if (nextAfterAvAffecterType !== 'AvAffecterAoE') {
-            messages.push({
-              severity: 'error',
-              message: `AvAffecter for Action '${actionId}' must be followed by [AvAffecterAoE], but found [${nextAfterAvAffecter.type}]`,
-              line: nextAfterAvAffecter.startLine,
-            });
-          } else {
-            // 7. AvAffecterAoE must have matching ID
-            const avAffecterAoeIdProp = nextAfterAvAffecter.properties.get('ID');
-            if (!avAffecterAoeIdProp) {
-              messages.push({
-                severity: 'error',
-                message: `AvAffecterAoE for Action '${actionId}' is missing ID property`,
-                line: nextAfterAvAffecter.startLine,
-                suggestion: `Add: ID=${actionId};`,
-                correctionIcon: '🔧',
-                corrections: [
-                  {
-                    startLine: nextAfterAvAffecter.startLine,
-                    startColumn: nextAfterAvAffecter.typeBracketEndColumn,
-                    endLine: nextAfterAvAffecter.startLine,
-                    endColumn: nextAfterAvAffecter.typeBracketEndColumn,
-                    replacementText: ` ID=${actionId};`,
-                  },
-                ],
-              });
-            } else if (avAffecterAoeIdProp.value !== actionId) {
-              messages.push({
-                severity: 'error',
-                message: `AvAffecterAoE ID '${avAffecterAoeIdProp.value}' does not match Action ID '${actionId}'`,
-                line: avAffecterAoeIdProp.valueStartLine,
-                corrections: [
-                  {
-                    startLine: avAffecterAoeIdProp.valueStartLine,
-                    startColumn: avAffecterAoeIdProp.valueStartColumn,
-                    endLine: avAffecterAoeIdProp.valueEndLine,
-                    endColumn: avAffecterAoeIdProp.valueEndColumn,
-                    replacementText: actionId,
-                  },
-                ],
-              });
-            }
-            j++; // Skip the AvAffecterAoE we just validated
-          }
-        } else if (currentType !== 'AvAffecterAoE' && currentType !== 'ActionAoE') {
-          // Found an unrelated object type, stop checking this Action
-          break;
-        }
-
-        j++;
+    function validateAction(action: ParsedObject): boolean {
+      const actionId = action.properties.get('ID')?.value;
+      if (!actionId) {
+        // We have another check for ID existing elsewhere.
+        return false;
       }
-
-      if (!foundAnyAffecter) {
+      if (!action.nextObject) {
         messages.push({
           severity: 'error',
-          message: `Action '${actionId}' must have at least one [AvAffecter]`,
-          line: nextObj.endLine,
+          message: `Action '${actionId}' must be followed by [ActionAoE]`,
+          line: action.endLine,
         });
+        return false;
       }
+
+      if (!validateActionAoE(action.nextObject, actionId)) {
+        return false;
+      }
+
+      if (!action.nextObject.nextObject) {
+        messages.push({
+          severity: 'error',
+          message: `Action '${actionId}' must have at least one [AvAffecter] following after the [ActionAoE]`,
+          line: action.endLine,
+        });
+        return false;
+      }
+
+      let currentObj: ParsedObject | null = action.nextObject;
+      let firstAvAffecter = true;
+      while ((currentObj = currentObj.nextObject)) {
+        if (!validateAvAffecter(currentObj, actionId, firstAvAffecter)) {
+          return false;
+        }
+
+        if (!currentObj.nextObject) {
+          messages.push({
+            severity: 'error',
+            message: `AvAffecter for Action '${actionId}' must be followed by [AvAffecterAoE]`,
+            line: currentObj.endLine,
+          });
+          return false;
+        }
+
+        currentObj = currentObj.nextObject;
+        if (!validateAvAffecterAoE(currentObj, actionId)) {
+          return false;
+        }
+
+        firstAvAffecter = false;
+      }
+      return true;
+    }
+
+    function validateActionAoE(obj: ParsedObject, actionId: string): boolean {
+      const nextType = normalizeTypeName(obj.type);
+      if (nextType !== 'ActionAoe') {
+        messages.push({
+          severity: 'error',
+          message: `Action '${actionId}' must be followed by [ActionAoE], but found [${obj.type}]`,
+          line: obj.startLine,
+        });
+        return false;
+      }
+
+      if (!validateActionId(obj, actionId)) {
+        return false;
+      }
+
+      return true;
+    }
+
+    function validateAvAffecter(obj: ParsedObject, actionId: string, firstAvAffecter: boolean): boolean {
+      const nextType = normalizeTypeName(obj.type);
+      if (nextType !== 'AvAffecter') {
+        if (!firstAvAffecter) {
+          // If this isn't the first AvAffecter, being a different type isn't an error,
+          // it just marks the end of this Action definition.
+          return false;
+        }
+        messages.push({
+          severity: 'error',
+          message: `Action '${actionId}' expected at least one [AvAffecter], but found [${obj.type}]`,
+          line: obj.startLine,
+        });
+        return false;
+      }
+
+      if (!validateActionId(obj, actionId)) {
+        return false;
+      }
+
+      return true;
+    }
+
+    function validateAvAffecterAoE(obj: ParsedObject, actionId: string): boolean {
+      const nextType = normalizeTypeName(obj.type);
+      if (nextType !== 'AvAffecterAoE') {
+        messages.push({
+          severity: 'error',
+          message: `AvAffecter for Action '${actionId}' must be followed by [AvAffecterAoE], but found [${obj.type}]`,
+          line: obj.startLine,
+        });
+        return false;
+      }
+
+      if (!validateActionId(obj, actionId)) {
+        return false;
+      }
+
+      return true;
+    }
+
+    const actions = objects.filter(obj => normalizeTypeName(obj.type) === 'Action');
+    for (const action of actions) {
+      validateAction(action);
     }
 
     return messages;
