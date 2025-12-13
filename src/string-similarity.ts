@@ -51,7 +51,7 @@ export function findSimilar(
       value: candidate,
       distance: levenshteinDistance(target, candidate),
     }))
-    .filter(item => item.distance > 0 && item.distance <= maxDistance)
+    .filter(item => item.distance >= 0 && item.distance <= maxDistance)
     .sort((a, b) => a.distance - b.distance);
 
   // Return top 3 suggestions
