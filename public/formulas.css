@@ -1,0 +1,70 @@
+/* Formula page specific styles (formulas.html only) */
+
+.operator-name {
+    min-width: 180px;
+}
+
+/* Info sections (Example, Aliases, etc.) */
+.operator-info-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.info-header {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+    color: var(--text-color);
+}
+
+.info-content {
+    padding: 10px 12px;
+    background: var(--code-bg);
+    border-left: 3px solid var(--primary-color);
+    border-radius: 4px;
+}
+
+.info-code {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+    color: var(--text-color);
+    word-break: break-all;
+}
+
+/* Argument styling for formulas */
+.argument-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.argument-type {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    background: var(--surface-color);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-style: italic;
+}
+
+.argument-name {
+    background: var(--surface-color);
+}
+
+@media (max-width: 768px) {
+    .operator-metadata {
+        grid-template-columns: 1fr;
+    }
+}

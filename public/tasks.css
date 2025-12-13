@@ -1,0 +1,46 @@
+/* Task page specific styles (tasks.html only) */
+
+.task-name {
+    min-width: 150px;
+}
+
+/* Required/Optional argument styling */
+.arguments-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.arguments-header.required {
+    color: var(--error-color);
+}
+
+.arguments-header.required::before {
+    content: '●';
+    font-size: 10px;
+}
+
+.arguments-header.optional {
+    color: var(--info-color);
+}
+
+.arguments-header.optional::before {
+    content: '○';
+    font-size: 10px;
+}
+
+.arguments-header.required ~ .arguments-list .argument-item {
+    border-left-color: var(--error-color);
+    background: rgba(245, 34, 45, 0.03);
+}
+
+.arguments-header.optional ~ .arguments-list .argument-item {
+    border-left-color: var(--info-color);
+    background: rgba(24, 144, 255, 0.03);
+}
+
+.argument-name {
+    background: var(--code-bg);
+    display: inline-block;
+    align-self: flex-start;
+}
