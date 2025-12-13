@@ -26,7 +26,7 @@ export class ModParser {
     this.objects = [];
     this.errors = [];
 
-    let lastObject: ParsedObject | undefined;
+    let lastObject: ParsedObject | null = null;
 
     // Parse objects
     while (!this.isAtEnd()) {
@@ -38,12 +38,13 @@ export class ModParser {
       if (this.check(TokenType.LEFT_BRACKET)) {
         const obj = this.parseObject();
         if (obj) {
-          obj.previousObject = lastObject ?? null;
+          obj.previousObject = lastObject;
           if (lastObject) {
             lastObject.nextObject = obj;
           }
           this.objects.push(obj);
         }
+        lastObject = obj;
       } else {
         // Unexpected token outside of object definition
         const token = this.peek();

@@ -349,7 +349,7 @@ export class ModValidator {
 
     function validateActionAoE(obj: ParsedObject, actionId: string): boolean {
       const nextType = normalizeTypeName(obj.type);
-      if (nextType !== 'ActionAoe') {
+      if (nextType !== 'ActionAoE') {
         messages.push({
           severity: 'error',
           message: `Action '${actionId}' must be followed by [ActionAoE], but found [${obj.type}]`,
