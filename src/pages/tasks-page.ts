@@ -3,7 +3,7 @@
  * Uses shared utilities for common functionality
  */
 
-import { initTheme, setupSearch, setupExpandCollapse, setupCopyButtons } from './shared-utils.js';
+import { initTheme, setupSearch, setupExpandCollapse, setupCopyButtons, getElementById, querySelectorAs, querySelectorAllAs } from './shared-utils.js';
 import rawTasksData from '../tasks.json';
 
 interface TaskArgument {
@@ -117,7 +117,7 @@ export function initTasksApp(): void {
   updateCount(filteredTasks.length, convertedTasks.length);
 
   // Display game version
-  const gameVersionElement = document.getElementById('gameVersion')!;
+  const gameVersionElement = getElementById('gameVersion');
   gameVersionElement.textContent = `Up to date for v${tasksData.gameVersion}`;
 
   // Handle deep linking
@@ -127,9 +127,10 @@ export function initTasksApp(): void {
     const matchingTask = convertedTasks.find((task) => task.name.toLowerCase() === taskParam.toLowerCase());
 
     if (matchingTask) {
-      const taskElement = document.querySelector(
-        `.task-item[data-task-name="${matchingTask.name}"]`
-      ) as HTMLDetailsElement;
+      const taskElement = querySelectorAs(
+        `.task-item[data-task-name="${matchingTask.name}"]`,
+        HTMLDetailsElement
+      );
 
       if (taskElement) {
         taskElement.open = true;
@@ -160,7 +161,7 @@ export function initTasksApp(): void {
   }
 
   function renderTasks(tasks: Task[], highlightMatch: (text: string) => string): void {
-    const tasksList = document.getElementById('tasksList')!;
+    const tasksList = getElementById('tasksList');
 
     if (tasks.length === 0) {
       tasksList.innerHTML = '<p class="placeholder">No tasks match your search.</p>';
@@ -169,20 +170,20 @@ export function initTasksApp(): void {
 
     // Save current open state of all tasks
     const openStates = new Map<string, boolean>();
-    tasksList.querySelectorAll('.task-item').forEach((item) => {
+    querySelectorAllAs('.task-item', HTMLDetailsElement, tasksList).forEach((item) => {
       const taskName = item.getAttribute('data-task-name');
       if (taskName) {
-        openStates.set(taskName, (item as HTMLDetailsElement).open);
+        openStates.set(taskName, item.open);
       }
     });
 
     tasksList.innerHTML = tasks.map((task) => renderTask(task, highlightMatch)).join('');
 
     // Restore open state
-    tasksList.querySelectorAll('.task-item').forEach((item) => {
+    querySelectorAllAs('.task-item', HTMLDetailsElement, tasksList).forEach((item) => {
       const taskName = item.getAttribute('data-task-name');
       if (taskName && openStates.has(taskName)) {
-        (item as HTMLDetailsElement).open = openStates.get(taskName)!;
+        item.open = openStates.get(taskName)!;
       }
     });
   }
@@ -259,7 +260,7 @@ export function initTasksApp(): void {
   }
 
   function updateCount(showing: number, total: number): void {
-    const taskCount = document.getElementById('taskCount')!;
+    const taskCount = getElementById('taskCount');
     taskCount.textContent = showing === total ? `${total} tasks` : `${showing} / ${total} tasks`;
   }
 }

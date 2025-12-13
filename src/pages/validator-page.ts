@@ -3,7 +3,7 @@
  * Uses the bundled validator from validator.bundle.js
  */
 
-import { initTheme, escapeHtml } from './shared-utils.js';
+import { initTheme, escapeHtml, getElementByIdAs, assertInstanceOf } from './shared-utils.js';
 import type { ValidationResult, ValidationMessage, Correction } from '../types.js';
 
 // Global ModValidator from bundle
@@ -55,13 +55,13 @@ export function initValidatorApp(): void {
   const validator = new window.ModValidator.ModValidator();
 
   // DOM elements
-  const modInput = document.getElementById('modInput') as HTMLTextAreaElement;
-  const validateBtn = document.getElementById('validateBtn') as HTMLButtonElement;
-  const clearBtn = document.getElementById('clearBtn') as HTMLButtonElement;
-  const loadSampleBtn = document.getElementById('loadSampleBtn') as HTMLButtonElement;
-  const resultsContainer = document.getElementById('results') as HTMLDivElement;
-  const validationStatus = document.getElementById('validationStatus') as HTMLDivElement;
-  const lineNumbers = document.getElementById('lineNumbers') as HTMLDivElement;
+  const modInput = getElementByIdAs('modInput', HTMLTextAreaElement);
+  const validateBtn = getElementByIdAs('validateBtn', HTMLButtonElement);
+  const clearBtn = getElementByIdAs('clearBtn', HTMLButtonElement);
+  const loadSampleBtn = getElementByIdAs('loadSampleBtn', HTMLButtonElement);
+  const resultsContainer = getElementByIdAs('results', HTMLDivElement);
+  const validationStatus = getElementByIdAs('validationStatus', HTMLDivElement);
+  const lineNumbers = getElementByIdAs('lineNumbers', HTMLDivElement);
 
   // Event listeners
   validateBtn.addEventListener('click', handleValidate);
@@ -387,8 +387,10 @@ export function initValidatorApp(): void {
 
   // Handle clicks on messages to jump to line
   resultsContainer.addEventListener('click', (e) => {
+  const target = assertInstanceOf(e.target, HTMLElement, 'Results container click event');
+
   // Check if clicked on a formula reference link
-  const formulaReferenceLink = (e.target as HTMLElement).closest('.formula-reference-link');
+  const formulaReferenceLink = target.closest('.formula-reference-link');
   if (formulaReferenceLink) {
     e.stopPropagation();
     const operator = formulaReferenceLink.getAttribute('data-operator');
@@ -399,7 +401,7 @@ export function initValidatorApp(): void {
   }
 
   // Check if clicked on a correction link
-  const correctionLink = (e.target as HTMLElement).closest('.correction-link:not(.formula-reference-link)');
+  const correctionLink = target.closest('.correction-link:not(.formula-reference-link)');
   if (correctionLink) {
     e.stopPropagation();
     const correctionData = correctionLink.getAttribute('data-correction');
@@ -416,7 +418,7 @@ export function initValidatorApp(): void {
   }
 
   // Otherwise handle message click to jump to line
-  const messageElement = (e.target as HTMLElement).closest('.message.clickable');
+  const messageElement = target.closest('.message.clickable');
   if (messageElement) {
     const lineNumber = parseInt(messageElement.getAttribute('data-line') || '', 10);
     if (lineNumber) {

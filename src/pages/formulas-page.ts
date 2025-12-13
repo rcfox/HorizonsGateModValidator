@@ -3,7 +3,7 @@
  * Uses shared utilities for common functionality
  */
 
-import { initTheme, setupSearch, setupExpandCollapse, setupCopyButtons } from './shared-utils.js';
+import { initTheme, setupSearch, setupExpandCollapse, setupCopyButtons, getElementById, querySelectorAllAs } from './shared-utils.js';
 import rawFormulasData from '../formula.json';
 
 interface FormulaArgument {
@@ -71,7 +71,7 @@ export function initFormulasApp(): void {
   updateCount(filteredOperators.length, formulasData.operators.length);
 
   // Display game version
-  const gameVersionElement = document.getElementById('gameVersion')!;
+  const gameVersionElement = getElementById('gameVersion');
   gameVersionElement.textContent = `Up to date for v${formulasData.gameVersion}`;
 
   // Handle deep linking
@@ -83,13 +83,14 @@ export function initFormulasApp(): void {
     );
 
     if (matchingOperator) {
-      const operatorElements = document.querySelectorAll(
-        `.operator-item[data-operator-key^="${matchingOperator.name}-use-"]`
+      const operatorElements = querySelectorAllAs(
+        `.operator-item[data-operator-key^="${matchingOperator.name}-use-"]`,
+        HTMLDetailsElement
       );
 
       if (operatorElements.length > 0) {
         operatorElements.forEach((element) => {
-          (element as HTMLDetailsElement).open = true;
+          element.open = true;
         });
 
         setTimeout(() => {
@@ -124,7 +125,7 @@ export function initFormulasApp(): void {
   }
 
   function renderOperators(operators: FormulaOperator[], highlightMatch: (text: string) => string): void {
-    const operatorsList = document.getElementById('operatorsList')!;
+    const operatorsList = getElementById('operatorsList');
 
     if (operators.length === 0) {
       operatorsList.innerHTML = '<p class="placeholder">No operators match your search.</p>';
@@ -237,7 +238,7 @@ export function initFormulasApp(): void {
   }
 
   function updateCount(showing: number, total: number): void {
-    const operatorCount = document.getElementById('operatorCount')!;
+    const operatorCount = getElementById('operatorCount');
     operatorCount.textContent = showing === total ? `${total} operators` : `${showing} / ${total} operators`;
   }
 }

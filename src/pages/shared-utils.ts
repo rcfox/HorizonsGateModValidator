@@ -3,6 +3,92 @@
  */
 
 // ============================================================================
+// DOM Utilities
+// ============================================================================
+
+/**
+ * Assert that a value is an instance of a given type
+ * @throws Error if value is not an instance of type
+ */
+export function assertInstanceOf<T>(value: unknown, type: new (...args: unknown[]) => T, context?: string): T {
+  if (!(value instanceof type)) {
+    const got = value?.constructor?.name ?? typeof value;
+    const message = context
+      ? `${context}: Expected ${type.name}, got ${got}`
+      : `Expected ${type.name}, got ${got}`;
+    throw new Error(message);
+  }
+  return value;
+}
+
+/**
+ * Get an element by ID and verify it's the correct type
+ * @throws Error if element not found or wrong type
+ */
+export function getElementByIdAs<T extends HTMLElement>(id: string, type: new (...args: unknown[]) => T): T {
+  const element = document.getElementById(id);
+  if (!element) {
+    throw new Error(`Element with id '${id}' not found`);
+  }
+  if (!(element instanceof type)) {
+    throw new Error(`Element with id '${id}' is not a ${type.name}, got ${element.constructor.name}`);
+  }
+  return element;
+}
+
+/**
+ * Get an element by ID (any type) and verify it exists
+ * @throws Error if element not found
+ */
+export function getElementById(id: string): HTMLElement {
+  const element = document.getElementById(id);
+  if (!element) {
+    throw new Error(`Element with id '${id}' not found`);
+  }
+  return element;
+}
+
+/**
+ * Query all elements matching selector and verify they're the correct type
+ * @throws Error if any element is wrong type
+ */
+export function querySelectorAllAs<T extends HTMLElement>(
+  selector: string,
+  type: new (...args: unknown[]) => T,
+  parent: ParentNode = document
+): T[] {
+  const elements = Array.from(parent.querySelectorAll(selector));
+  return elements.map((element, index) => {
+    if (!(element instanceof type)) {
+      throw new Error(
+        `Element at index ${index} matching selector '${selector}' is not a ${type.name}, got ${element.constructor.name}`
+      );
+    }
+    return element;
+  });
+}
+
+/**
+ * Query single element matching selector and verify it's the correct type
+ * @throws Error if element is wrong type
+ * @returns Element or null if not found
+ */
+export function querySelectorAs<T extends HTMLElement>(
+  selector: string,
+  type: new (...args: unknown[]) => T,
+  parent: ParentNode = document
+): T | null {
+  const element = parent.querySelector(selector);
+  if (!element) {
+    return null;
+  }
+  if (!(element instanceof type)) {
+    throw new Error(`Element matching selector '${selector}' is not a ${type.name}, got ${element.constructor.name}`);
+  }
+  return element;
+}
+
+// ============================================================================
 // Theme Management
 // ============================================================================
 
@@ -65,9 +151,9 @@ export function setupSearch(config: SearchConfig): {
   highlightMatch: (text: string) => string;
   searchTerm: string;
 } {
-  const searchInput = document.getElementById(config.searchInputId) as HTMLInputElement;
-  const clearButton = document.getElementById(config.clearButtonId) as HTMLButtonElement;
-  const highlightToggle = document.getElementById(config.highlightToggleId) as HTMLInputElement;
+  const searchInput = getElementByIdAs(config.searchInputId, HTMLInputElement);
+  const clearButton = getElementByIdAs(config.clearButtonId, HTMLButtonElement);
+  const highlightToggle = getElementByIdAs(config.highlightToggleId, HTMLInputElement);
   const debounceMs = config.debounceMs || 300;
 
   let highlightEnabled = localStorage.getItem('highlightEnabled') !== 'false';
@@ -81,17 +167,18 @@ export function setupSearch(config: SearchConfig): {
 
   // Setup search input with debouncing
   if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
+    searchInput.addEventListener('input', e => {
+      const target = assertInstanceOf(e.target, HTMLInputElement, 'Search input event');
       if (searchTimeout !== null) {
         clearTimeout(searchTimeout);
       }
       searchTimeout = window.setTimeout(() => {
-        searchTerm = (e.target as HTMLInputElement).value.toLowerCase().trim();
+        searchTerm = target.value.toLowerCase().trim();
         config.onSearch(searchTerm);
       }, debounceMs);
 
       if (clearButton) {
-        clearButton.style.display = (e.target as HTMLInputElement).value ? 'block' : 'none';
+        clearButton.style.display = target.value ? 'block' : 'none';
       }
     });
   }
@@ -109,15 +196,16 @@ export function setupSearch(config: SearchConfig): {
 
   // Setup highlight toggle
   if (highlightToggle) {
-    highlightToggle.addEventListener('change', (e) => {
-      highlightEnabled = (e.target as HTMLInputElement).checked;
+    highlightToggle.addEventListener('change', e => {
+      const target = assertInstanceOf(e.target, HTMLInputElement, 'Highlight toggle event');
+      highlightEnabled = target.checked;
       localStorage.setItem('highlightEnabled', highlightEnabled.toString());
       config.onSearch(searchTerm); // Re-render
     });
   }
 
   // Keyboard shortcut (Ctrl+F / Cmd+F)
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', e => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
       e.preventDefault();
       if (searchInput) {
@@ -147,26 +235,22 @@ export function setupSearch(config: SearchConfig): {
 // Expand/Collapse
 // ============================================================================
 
-export function setupExpandCollapse(
-  itemSelector: string,
-  expandBtnId: string,
-  collapseBtnId: string
-): void {
+export function setupExpandCollapse(itemSelector: string, expandBtnId: string, collapseBtnId: string): void {
   const expandBtn = document.getElementById(expandBtnId);
   const collapseBtn = document.getElementById(collapseBtnId);
 
   if (expandBtn) {
     expandBtn.addEventListener('click', () => {
-      document.querySelectorAll(itemSelector).forEach((details) => {
-        (details as HTMLDetailsElement).open = true;
+      querySelectorAllAs(itemSelector, HTMLDetailsElement).forEach(details => {
+        details.open = true;
       });
     });
   }
 
   if (collapseBtn) {
     collapseBtn.addEventListener('click', () => {
-      document.querySelectorAll(itemSelector).forEach((details) => {
-        (details as HTMLDetailsElement).open = false;
+      querySelectorAllAs(itemSelector, HTMLDetailsElement).forEach(details => {
+        details.open = false;
       });
     });
   }
@@ -180,8 +264,9 @@ export function setupCopyButtons(containerSelector: string): void {
   const container = document.querySelector(containerSelector);
   if (!container) return;
 
-  container.addEventListener('click', async (e) => {
-    const btn = (e.target as HTMLElement).closest('.copy-link-btn');
+  container.addEventListener('click', async e => {
+    const target = assertInstanceOf(e.target, HTMLElement, 'Copy button click event');
+    const btn = target.closest('.copy-link-btn');
     if (!btn) return;
 
     e.stopPropagation();
