@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 /**
- * Build script to bundle the validator and tasks app into single JS files for the browser
+ * Build script to bundle the validator and browser apps into JS files
  */
 
 import * as esbuild from 'esbuild';
 
-// Build validator bundle
+// Build validator bundle (used by app.ts as global ModValidator object)
 await esbuild.build({
   entryPoints: ['src/index.ts'],
   bundle: true,
@@ -24,11 +24,11 @@ await esbuild.build({
 
 console.log('✅ Bundle created: public/validator.bundle.js');
 
-// Build tasks bundle
+// Build main app bundle (includes all page modules)
 await esbuild.build({
-  entryPoints: ['src/tasks-app.ts'],
+  entryPoints: ['src/pages/index.ts'],
   bundle: true,
-  outfile: 'public/tasks.bundle.js',
+  outfile: 'public/app.bundle.js',
   format: 'iife',
   platform: 'browser',
   target: 'es2020',
@@ -39,21 +39,4 @@ await esbuild.build({
   minify: false, // Set to true for production
 });
 
-console.log('✅ Bundle created: public/tasks.bundle.js');
-
-// Build formulas bundle
-await esbuild.build({
-  entryPoints: ['src/formulas-app.ts'],
-  bundle: true,
-  outfile: 'public/formulas.bundle.js',
-  format: 'iife',
-  platform: 'browser',
-  target: 'es2020',
-  loader: {
-    '.json': 'json',
-  },
-  sourcemap: true,
-  minify: false, // Set to true for production
-});
-
-console.log('✅ Bundle created: public/formulas.bundle.js');
+console.log('✅ Bundle created: public/app.bundle.js');
