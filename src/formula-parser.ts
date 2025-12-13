@@ -22,14 +22,10 @@ import {
   resolveOperatorAlias,
   getAlternateDelimiters,
   getDelegatesTo,
-} from "./formula-metadata.js";
+} from './formula-metadata.js';
 
 // Re-export validator for convenience
-export {
-  validateAST,
-  formatValidationErrors,
-  type ValidationError,
-} from "./formula-ast-validator.js";
+export { validateAST, formatValidationErrors, type ValidationError } from './formula-ast-validator.js';
 
 export type ASTNode =
   | LiteralNode
@@ -41,57 +37,57 @@ export type ASTNode =
   | UnaryOperationNode;
 
 export interface LiteralNode {
-  type: "literal";
+  type: 'literal';
   value: number;
 }
 
 export interface VariableNode {
-  type: "variable";
+  type: 'variable';
   name: string; // 'x', 'X'
 }
 
 export interface FunctionCallNode {
-  type: "function";
+  type: 'function';
   name: string; // e.g., 'c', 't', 'min', 'max', 'lessThan', etc.
   args: FunctionArg[]; // Colon-separated arguments
-  body?: ASTNode; // For functions that take formula expressions (min, max, lessThan, etc.)
+  body?: ASTNode | undefined; // For functions that take formula expressions (min, max, lessThan, etc.)
 }
 
 export type FunctionArg = StringArg | FunctionStyleArg;
 
 export interface StringArg {
-  type: "string";
+  type: 'string';
   value: string; // Simple string argument like "HP" in c:HP
 }
 
 export interface FunctionStyleArg {
-  type: "functionStyle";
+  type: 'functionStyle';
   name: string; // Function name like "distance" in m:distance(32)
   params: ASTNode[]; // Parameters like [Literal(32)]
 }
 
 export interface GlobalFormulaNode {
-  type: "global";
+  type: 'global';
   name: string;
-  argument?: ASTNode; // Optional parenthesized argument
+  argument?: ASTNode | undefined; // Optional parenthesized argument
 }
 
 export interface MathFunctionNode {
-  type: "mathFunction";
+  type: 'mathFunction';
   name: string; // e.g., 'distance', 'evasionFacing', etc.
-  argument?: ASTNode; // Optional parenthesized argument
+  argument?: ASTNode | undefined; // Optional parenthesized argument
 }
 
 export interface BinaryOperationNode {
-  type: "binaryOp";
-  operator: "+" | "-" | "*" | "/" | "%";
+  type: 'binaryOp';
+  operator: '+' | '-' | '*' | '/' | '%';
   left: ASTNode;
   right: ASTNode;
 }
 
 export interface UnaryOperationNode {
-  type: "unaryOp";
-  operator: "-" | "+";
+  type: 'unaryOp';
+  operator: '-' | '+';
   operand: ASTNode;
 }
 
@@ -105,7 +101,7 @@ function tokenizeFormula(formula: string): {
   positions: number[];
 } {
   // Remove all whitespace (matches C# behavior)
-  const cleanFormula = formula.replace(/\s+/g, "");
+  const cleanFormula = formula.replace(/\s+/g, '');
 
   // Parse character by character to properly handle unary operators
   const operands: string[] = [];
@@ -113,20 +109,23 @@ function tokenizeFormula(formula: string): {
   const positions: number[] = [];
 
   let i = 0;
-  let currentOperand = "";
+  let currentOperand = '';
   let currentOperandStart = 0;
   let justPushedOperand = false;
 
   while (i < cleanFormula.length) {
     const char = cleanFormula[i];
+    if (!char) {
+      throw new Error(`Invalid char in formula ${cleanFormula} at ${i}`);
+    }
 
     // Check if this is an operator
-    if ("+-*/%".includes(char)) {
+    if ('+-*/%'.includes(char)) {
       // Save current operand if we have one
       if (currentOperand) {
         operands.push(currentOperand);
         positions.push(currentOperandStart);
-        currentOperand = "";
+        currentOperand = '';
         justPushedOperand = true;
       } else {
         justPushedOperand = false;
@@ -135,13 +134,13 @@ function tokenizeFormula(formula: string): {
       // Check if this is a unary minus (at start or after another operator)
       // If we just pushed an operand, this must be a binary operator
       const prevIsOperator = !justPushedOperand;
-      if (char === "-" && prevIsOperator) {
+      if (char === '-' && prevIsOperator) {
         // Unary minus
-        operators.push("unary-");
-      } else if (char === "+" && prevIsOperator) {
+        operators.push('unary-');
+      } else if (char === '+' && prevIsOperator) {
         // Unary plus - this crashes the game!
         throw new Error(
-          `Invalid syntax: unary '+' is not supported by the game. Use '-' for negation or remove the '+'.`,
+          `Invalid syntax: unary '+' is not supported by the game. Use '-' for negation or remove the '+'.`
         );
       } else {
         // Binary operator
@@ -174,38 +173,36 @@ function parseOperand(operand: string): ASTNode {
   // Check if it's a literal number
   const numValue = parseFloat(operand);
   if (!isNaN(numValue) && operand === numValue.toString()) {
-    return { type: "literal", value: numValue };
+    return { type: 'literal', value: numValue };
   }
 
   // Check if it's the 'x' or 'X' variable
-  if (operand === "x" || operand === "X") {
-    return { type: "variable", name: operand };
+  if (operand === 'x' || operand === 'X') {
+    return { type: 'variable', name: operand };
   }
 
   // Check if it contains colons (function call with arguments)
   // This must be checked BEFORE parentheses because operators like m:distance(32)
   // have colons and should be parsed as function calls with colon-separated args
-  if (operand.includes(":")) {
+  if (operand.includes(':')) {
     return parseFunctionCall(operand);
   }
 
   // Check if it contains a left parenthesis (global formula or math function)
-  if (operand.includes("(")) {
+  if (operand.includes('(')) {
     return parseParenthesizedOperand(operand);
   }
 
   // If no special syntax, treat as a global formula reference or math function name
-  return { type: "global", name: operand };
+  return { type: 'global', name: operand };
 }
 
 /**
  * Parses an operand with parentheses: name(arg)
  * Used for function-style operators (determined by isFunctionStyle in formula.json)
  */
-function parseParenthesizedOperand(
-  operand: string,
-): GlobalFormulaNode | MathFunctionNode {
-  const parenIndex = operand.indexOf("(");
+function parseParenthesizedOperand(operand: string): GlobalFormulaNode | MathFunctionNode {
+  const parenIndex = operand.indexOf('(');
   const name = operand.substring(0, parenIndex);
   const argString = operand.substring(parenIndex + 1, operand.length - 1); // Remove '(' and ')'
 
@@ -213,9 +210,9 @@ function parseParenthesizedOperand(
   let argument: ASTNode | undefined;
   const numValue = parseFloat(argString);
   if (!isNaN(numValue) && argString === numValue.toString()) {
-    argument = { type: "literal", value: numValue };
-  } else if (argString === "x" || argString === "X") {
-    argument = { type: "variable", name: argString };
+    argument = { type: 'literal', value: numValue };
+  } else if (argString === 'x' || argString === 'X') {
+    argument = { type: 'variable', name: argString };
   } else if (argString) {
     // Recursively parse the argument as a formula
     argument = parseFormula(argString);
@@ -225,9 +222,9 @@ function parseParenthesizedOperand(
   // Function-style operators use parentheses: m:distance(5), d(gswordDmg)
   // Otherwise, it's a global formula reference
   if (isFunctionStyle(name)) {
-    return { type: "mathFunction", name, argument };
+    return { type: 'mathFunction', name, argument };
   } else {
-    return { type: "global", name, argument };
+    return { type: 'global', name, argument };
   }
 }
 
@@ -235,10 +232,8 @@ function parseParenthesizedOperand(
  * Parses a function-style argument like "distance(32)" or "rand(100)"
  * Returns the function name and parsed parameters
  */
-function parseFunctionStyleArg(
-  arg: string,
-): { name: string; params: ASTNode[] } | null {
-  const parenIndex = arg.indexOf("(");
+function parseFunctionStyleArg(arg: string): { name: string; params: ASTNode[] } | null {
+  const parenIndex = arg.indexOf('(');
   if (parenIndex === -1) {
     return null;
   }
@@ -248,19 +243,19 @@ function parseFunctionStyleArg(
 
   // Split parameters by comma (for multi-param functions)
   const paramStrings = paramString
-    .split(",")
-    .map((s) => s.trim())
-    .filter((s) => s);
-  const params: ASTNode[] = paramStrings.map((param) => {
+    .split(',')
+    .map(s => s.trim())
+    .filter(s => s);
+  const params: ASTNode[] = paramStrings.map(param => {
     // Try to parse as number
     const numValue = parseFloat(param);
     if (!isNaN(numValue) && param === numValue.toString()) {
-      return { type: "literal", value: numValue };
+      return { type: 'literal', value: numValue };
     }
 
     // Try to parse as variable
-    if (param === "x" || param === "X") {
-      return { type: "variable", name: param };
+    if (param === 'x' || param === 'X') {
+      return { type: 'variable', name: param };
     }
 
     // Otherwise parse as formula
@@ -275,24 +270,22 @@ function parseFunctionStyleArg(
  */
 function splitByDelimitersRespectingParens(str: string, additionalDelimiters: string[] = []): string[] {
   const parts: string[] = [];
-  let current = "";
+  let current = '';
   let parenDepth = 0;
 
-  const allDelimiters = new Set([":", ...additionalDelimiters]);
+  const allDelimiters = new Set([':', ...additionalDelimiters]);
 
-  for (let i = 0; i < str.length; i++) {
-    const char = str[i];
-
-    if (char === "(") {
+  for (const char of str) {
+    if (char === '(') {
       parenDepth++;
       current += char;
-    } else if (char === ")") {
+    } else if (char === ')') {
       parenDepth--;
       current += char;
     } else if (allDelimiters.has(char) && parenDepth === 0) {
       // Delimiter at top level - this is a separator
       parts.push(current);
-      current = "";
+      current = '';
     } else {
       current += char;
     }
@@ -332,8 +325,7 @@ function parseFunctionCall(operand: string): FunctionCallNode {
     const argCount = getArgCount(functionName);
     const nonFormulaArgs = rawArgs.slice(0, argCount);
 
-    const functionPrefix =
-      functionName + ":" + nonFormulaArgs.join(":") + (argCount > 0 ? ":" : "");
+    const functionPrefix = functionName + ':' + nonFormulaArgs.join(':') + (argCount > 0 ? ':' : '');
     const bodyString = operand.substring(functionPrefix.length);
 
     if (bodyString) {
@@ -347,20 +339,20 @@ function parseFunctionCall(operand: string): FunctionCallNode {
   // support function-style arguments with parentheses
   const canonicalFunctionName = resolveOperatorAlias(functionName);
   const delegatesTo = getDelegatesTo(functionName);
-  const isMathOperator = canonicalFunctionName === "m" || canonicalFunctionName === "d" ||
-                         delegatesTo === "m" || delegatesTo === "d";
-  const args: FunctionArg[] = rawArgs.map((arg) => {
-    if (isMathOperator && arg.includes("(")) {
+  const isMathOperator =
+    canonicalFunctionName === 'm' || canonicalFunctionName === 'd' || delegatesTo === 'm' || delegatesTo === 'd';
+  const args: FunctionArg[] = rawArgs.map(arg => {
+    if (isMathOperator && arg.includes('(')) {
       const parsed = parseFunctionStyleArg(arg);
       if (parsed) {
-        return { type: "functionStyle", ...parsed };
+        return { type: 'functionStyle', ...parsed };
       }
     }
-    return { type: "string", value: arg };
+    return { type: 'string', value: arg };
   });
 
   return {
-    type: "function",
+    type: 'function',
     name: functionName,
     args,
     body,
@@ -374,19 +366,33 @@ function parseFunctionCall(operand: string): FunctionCallNode {
  */
 function buildOperationTree(operands: ASTNode[], operators: string[]): ASTNode {
   if (operands.length === 1 && operators.length === 0) {
-    return operands[0];
+    const result = operands[0];
+    if (!result) {
+      throw new Error('Single operand is undefined');
+    }
+    return result;
   }
 
   // First, handle unary operators (highest precedence, right-to-left)
   // Unary operators are marked as "unary-"
   // When we have "unary-" at index i, it applies to operands[i]
   for (let i = operators.length - 1; i >= 0; i--) {
-    if (operators[i].startsWith("unary")) {
-      const unaryOp = operators[i].substring(5) as "-" | "+"; // Remove "unary" prefix
+    const op = operators[i];
+    if (!op) {
+      throw new Error(`Missing operator at index ${i}`);
+    }
+
+    if (op.startsWith('unary')) {
+      const unaryOp = op.substring('unary'.length) as '-' | '+'; // Remove "unary" prefix
+      const operand = operands[i];
+      if (!operand) {
+        throw new Error(`Missing operand for unary operator at index ${i}`);
+      }
+
       const unaryNode: UnaryOperationNode = {
-        type: "unaryOp",
+        type: 'unaryOp',
         operator: unaryOp,
-        operand: operands[i],
+        operand: operand,
       };
       // Replace the operand with the unary node
       operands[i] = unaryNode;
@@ -396,20 +402,38 @@ function buildOperationTree(operands: ASTNode[], operators: string[]): ASTNode {
   }
 
   if (operands.length === 1) {
-    return operands[0];
+    const result = operands[0];
+    if (!result) {
+      throw new Error('Formula parsing resulted in undefined operand');
+    }
+    return result;
   }
 
   // Second pass: handle *, /, % (higher precedence)
-  const highPrecedenceOps = ["*", "/", "%"];
-  while (operators.some((op) => highPrecedenceOps.includes(op))) {
-    const index = operators.findIndex((op) => highPrecedenceOps.includes(op));
+  const highPrecedenceOps = ['*', '/', '%'];
+  while (operators.some(op => highPrecedenceOps.includes(op))) {
+    const index = operators.findIndex(op => highPrecedenceOps.includes(op));
     if (index === -1) break;
 
+    const op = operators[index];
+    const left = operands[index];
+    const right = operands[index + 1];
+
+    if (!op) {
+      throw new Error(`Missing operator at index ${index}`);
+    }
+    if (!left) {
+      throw new Error(`Missing left operand for operator '${op}' at index ${index}`);
+    }
+    if (!right) {
+      throw new Error(`Missing right operand for operator '${op}' at index ${index}`);
+    }
+
     const newNode: BinaryOperationNode = {
-      type: "binaryOp",
-      operator: operators[index] as "+" | "-" | "*" | "/" | "%",
-      left: operands[index],
-      right: operands[index + 1],
+      type: 'binaryOp',
+      operator: op as '*' | '/' | '%',
+      left: left,
+      right: right,
     };
 
     operands.splice(index, 2, newNode);
@@ -418,18 +442,36 @@ function buildOperationTree(operands: ASTNode[], operators: string[]): ASTNode {
 
   // Third pass: handle +, - (lower precedence)
   while (operators.length > 0) {
+    const op = operators[0];
+    const left = operands[0];
+    const right = operands[1];
+
+    if (!op) {
+      throw new Error('Missing operator in final pass');
+    }
+    if (!left) {
+      throw new Error(`Missing left operand for operator '${op}'`);
+    }
+    if (!right) {
+      throw new Error(`Missing right operand for operator '${op}'`);
+    }
+
     const newNode: BinaryOperationNode = {
-      type: "binaryOp",
-      operator: operators[0] as "+" | "-" | "*" | "/" | "%",
-      left: operands[0],
-      right: operands[1],
+      type: 'binaryOp',
+      operator: op as '+' | '-',
+      left: left,
+      right: right,
     };
 
     operands.splice(0, 2, newNode);
     operators.splice(0, 1);
   }
 
-  return operands[0];
+  const finalResult = operands[0];
+  if (!finalResult) {
+    throw new Error('Formula parsing completed with no result');
+  }
+  return finalResult;
 }
 
 /**
@@ -442,18 +484,17 @@ export function parseFormula(formula: string): ASTNode {
   // Valid: c:HP, m:distance(32), d:gswordDmg
   const invalidAfterColonPattern = /(\w+):([^a-zA-Z0-9])/;
   const invalidMatch = formula.match(invalidAfterColonPattern);
-  if (invalidMatch) {
-    const operatorName = invalidMatch[1];
-    const invalidChar = invalidMatch[2];
+  if (invalidMatch?.length === 3) {
+    const [_, operatorName, invalidChar] = invalidMatch;
 
     let errorMsg = `Invalid syntax: '${operatorName}:${invalidChar}' - `;
-    if (invalidChar === "(") {
+    if (invalidChar === '(') {
       errorMsg += `parentheses cannot appear immediately after colon.`;
-    } else if ("+-*/%".includes(invalidChar)) {
+    } else if ('+-*/%'.includes(invalidChar ?? 'placeholder')) {
       errorMsg += `math operator cannot appear immediately after colon.`;
-    } else if (invalidChar === " ") {
+    } else if (invalidChar === ' ') {
       errorMsg += `space cannot appear after colon. Remove the space.`;
-    } else if (invalidChar === "_") {
+    } else if (invalidChar === '_') {
       errorMsg += `underscore cannot appear after colon. Colon must be followed by a letter or digit.`;
     } else {
       errorMsg += `colon must be followed by a letter or digit, not '${invalidChar}'.`;
@@ -473,33 +514,29 @@ export function parseFormula(formula: string): ASTNode {
 /**
  * Pretty-prints an AST for debugging
  */
-export function printAST(node: ASTNode, indent: string = ""): string {
+export function printAST(node: ASTNode, indent: string = ''): string {
   switch (node.type) {
-    case "literal":
+    case 'literal':
       return `${indent}Literal(${node.value})`;
 
-    case "variable":
+    case 'variable':
       return `${indent}Variable(${node.name})`;
 
-    case "function":
+    case 'function':
       let funcStr = `${indent}Function(${node.name})`;
 
       // Print arguments
       if (node.args.length > 0) {
-        funcStr += "\n" + indent + "  args:";
+        funcStr += '\n' + indent + '  args:';
         node.args.forEach((arg, i) => {
-          if (arg.type === "string") {
-            funcStr += "\n" + indent + `    [${i}] "${arg.value}"`;
+          if (arg.type === 'string') {
+            funcStr += '\n' + indent + `    [${i}] "${arg.value}"`;
           } else {
             // Function-style argument with params
-            funcStr += "\n" + indent + `    [${i}] ${arg.name}(...)`;
+            funcStr += '\n' + indent + `    [${i}] ${arg.name}(...)`;
             arg.params.forEach((param, j) => {
               funcStr +=
-                "\n" +
-                printAST(param, indent + "      ").replace(
-                  indent + "      ",
-                  indent + `      param[${j}]: `,
-                );
+                '\n' + printAST(param, indent + '      ').replace(indent + '      ', indent + `      param[${j}]: `);
             });
           }
         });
@@ -507,38 +544,35 @@ export function printAST(node: ASTNode, indent: string = ""): string {
 
       // Print body if present
       if (node.body) {
-        funcStr += "\n" + indent + "  body:";
-        funcStr += "\n" + printAST(node.body, indent + "    ");
+        funcStr += '\n' + indent + '  body:';
+        funcStr += '\n' + printAST(node.body, indent + '    ');
       }
 
       return funcStr;
 
-    case "global":
+    case 'global':
       let globalStr = `${indent}GlobalFormula(${node.name})`;
       if (node.argument) {
-        globalStr += "\n" + printAST(node.argument, indent + "  ");
+        globalStr += '\n' + printAST(node.argument, indent + '  ');
       }
       return globalStr;
 
-    case "mathFunction":
+    case 'mathFunction':
       let mathStr = `${indent}MathFunction(${node.name})`;
       if (node.argument) {
-        mathStr += "\n" + printAST(node.argument, indent + "  ");
+        mathStr += '\n' + printAST(node.argument, indent + '  ');
       }
       return mathStr;
 
-    case "binaryOp":
+    case 'binaryOp':
       return (
         `${indent}BinaryOp(${node.operator})\n` +
-        printAST(node.left, indent + "  ") +
-        "\n" +
-        printAST(node.right, indent + "  ")
+        printAST(node.left, indent + '  ') +
+        '\n' +
+        printAST(node.right, indent + '  ')
       );
 
-    case "unaryOp":
-      return (
-        `${indent}UnaryOp(${node.operator})\n` +
-        printAST(node.operand, indent + "  ")
-      );
+    case 'unaryOp':
+      return `${indent}UnaryOp(${node.operator})\n` + printAST(node.operand, indent + '  ');
   }
 }

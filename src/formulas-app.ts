@@ -26,77 +26,61 @@ interface FormulasData {
   operators: FormulaOperator[];
 }
 
-import rawFormulasData from "./formula.json";
+import rawFormulasData from './formula.json';
 
 const formulasData = rawFormulasData as FormulasData;
 
 // Theme management (shared with main validator)
-const themeToggle = document.getElementById("themeToggle") as HTMLButtonElement;
+const themeToggle = document.getElementById('themeToggle') as HTMLButtonElement;
 const root = document.documentElement;
 
 // Initialize theme from localStorage or system preference
 function initTheme() {
-  const savedTheme = localStorage.getItem("theme");
-  const systemPrefersDark = window.matchMedia(
-    "(prefers-color-scheme: dark)",
-  ).matches;
-  const theme = savedTheme || (systemPrefersDark ? "dark" : "light");
+  const savedTheme = localStorage.getItem('theme');
+  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
 
-  root.setAttribute("data-theme", theme);
+  root.setAttribute('data-theme', theme);
   updateThemeIcon(theme);
 }
 
 function updateThemeIcon(theme: string) {
-  themeToggle.textContent = theme === "dark" ? "☀️" : "🌙";
+  themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
 }
 
 function toggleTheme() {
-  const currentTheme = root.getAttribute("data-theme");
-  const newTheme = currentTheme === "dark" ? "light" : "dark";
+  const currentTheme = root.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
-  root.setAttribute("data-theme", newTheme);
-  localStorage.setItem("theme", newTheme);
+  root.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
   updateThemeIcon(newTheme);
 }
 
-themeToggle.addEventListener("click", toggleTheme);
+themeToggle.addEventListener('click', toggleTheme);
 initTheme();
 
 // Sort operators alphabetically by name
-const sortedOperators = [...formulasData.operators].sort((a, b) =>
-  a.name.localeCompare(b.name),
-);
+const sortedOperators = [...formulasData.operators].sort((a, b) => a.name.localeCompare(b.name));
 
 let filteredOperators: FormulaOperator[] = sortedOperators;
-let searchTerm = "";
-let highlightEnabled = localStorage.getItem("highlightEnabled") !== "false"; // Default to true unless explicitly disabled
+let searchTerm = '';
+let highlightEnabled = localStorage.getItem('highlightEnabled') !== 'false'; // Default to true unless explicitly disabled
 
 // Render operators to the DOM
 function renderOperators(operators: FormulaOperator[]) {
-  const operatorsList = document.getElementById("operatorsList")!;
+  const operatorsList = document.getElementById('operatorsList')!;
 
   if (operators.length === 0) {
-    operatorsList.innerHTML =
-      '<p class="placeholder">No operators match your search.</p>';
+    operatorsList.innerHTML = '<p class="placeholder">No operators match your search.</p>';
     return;
   }
 
-  // Save current open state of all items
-  const openStates = new Map<string, boolean>();
-  operatorsList.querySelectorAll(".operator-item").forEach((item) => {
-    const operatorKey = item.getAttribute("data-operator-key");
-    if (operatorKey) {
-      openStates.set(operatorKey, (item as HTMLDetailsElement).open);
-    }
-  });
-
-  operatorsList.innerHTML = operators
-    .map((operator) => renderOperator(operator, openStates))
-    .join("");
+  operatorsList.innerHTML = operators.map(operator => renderOperator(operator)).join('');
 
   // Add click handlers for copy link buttons
   operatorsList.querySelectorAll('.copy-link-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
+    btn.addEventListener('click', async e => {
       e.stopPropagation();
       const url = (e.target as HTMLElement).getAttribute('data-url');
       if (url) {
@@ -117,15 +101,10 @@ function renderOperators(operators: FormulaOperator[]) {
   });
 }
 
-function renderOperator(
-  operator: FormulaOperator,
-  openStates: Map<string, boolean>,
-): string {
+function renderOperator(operator: FormulaOperator): string {
   const hasAliases = operator.aliases && operator.aliases.length > 0;
 
-  const issueTitle = encodeURIComponent(
-    `[Formula Documentation] Issue with "${operator.name}" operator`,
-  );
+  const issueTitle = encodeURIComponent(`[Formula Documentation] Issue with "${operator.name}" operator`);
   const issueBody = encodeURIComponent(`**Operator Name:** \`${operator.name}\`
 
 **Issue Description:**
@@ -145,33 +124,30 @@ function renderOperator(
       const operatorKey = `${operator.name}-use-${useIndex}`;
       const operatorUrl = `${window.location.origin}${window.location.pathname}?operator=${encodeURIComponent(operator.name)}`;
       const hasArguments = use.arguments && use.arguments.length > 0;
-      const hasRequires = use.requires && use.requires.length > 0;
 
       // Build operator signature
       let signature: string;
       if (operator.isFunctionStyle) {
         if (!use.arguments || use.arguments.length === 0) {
           signature = operator.name;
-        } else if (operator.name.startsWith("m:")) {
+        } else if (operator.name.startsWith('m:')) {
           // Special case: m: prefix - all arguments go inside parentheses
-          const allArgs = use.arguments.map((arg) => arg.name).join(":");
+          const allArgs = use.arguments.map(arg => arg.name).join(':');
           signature = `${operator.name}(${allArgs})`;
         } else if (use.arguments.length === 1) {
-          signature = `${operator.name}:${use.arguments[0].name}`;
+          signature = `${operator.name}:${use.arguments[0]?.name}`;
         } else {
           // Multiple arguments: first arg outside parentheses, rest inside
-          const firstArg = use.arguments[0].name;
+          const firstArg = use.arguments[0]?.name;
           const restArgs = use.arguments
             .slice(1)
-            .map((arg) => arg.name)
-            .join(":");
+            .map(arg => arg.name)
+            .join(':');
           signature = `${operator.name}:${firstArg}(${restArgs})`;
         }
       } else {
         // Operator style: all args with colons
-        const argNames = use.arguments
-          ? use.arguments.map((arg) => arg.name).join(":")
-          : "";
+        const argNames = use.arguments ? use.arguments.map(arg => arg.name).join(':') : '';
         signature = argNames ? `${operator.name}:${argNames}` : operator.name;
       }
 
@@ -205,11 +181,11 @@ function renderOperator(
             <div class="info-section">
               <h4 class="info-header">Aliases</h4>
               <div class="info-content">
-                <code class="info-code">${operator.aliases!.map((a) => highlightMatch(a)).join(", ")}</code>
+                <code class="info-code">${operator.aliases!.map(a => highlightMatch(a)).join(', ')}</code>
               </div>
             </div>
             `
-                : ""
+                : ''
             }
           </div>
 
@@ -221,7 +197,7 @@ function renderOperator(
               <ul class="arguments-list">
                 ${use
                   .arguments!.map(
-                    (arg) => `
+                    arg => `
                   <li class="argument-item">
                     <div class="argument-header">
                       <code class="argument-name">${highlightMatch(arg.name)}</code>
@@ -229,9 +205,9 @@ function renderOperator(
                     </div>
                     <span class="argument-description">${highlightMatch(arg.description)}</span>
                   </li>
-                `,
+                `
                   )
-                  .join("")}
+                  .join('')}
               </ul>
             </div>
           `
@@ -247,7 +223,7 @@ function renderOperator(
       </details>
     `;
     })
-    .join("");
+    .join('');
 }
 
 // Search functionality
@@ -257,24 +233,18 @@ function searchOperators(query: string) {
   if (!searchTerm) {
     filteredOperators = sortedOperators;
     renderOperators(filteredOperators);
-    updateOperatorCount(
-      filteredOperators.length,
-      formulasData.operators.length,
-    );
+    updateOperatorCount(filteredOperators.length, formulasData.operators.length);
     return;
   }
 
-  filteredOperators = sortedOperators.filter((operator) => {
+  filteredOperators = sortedOperators.filter(operator => {
     // Search in operator name
     if (operator.name.toLowerCase().includes(searchTerm)) {
       return true;
     }
 
     // Search in aliases
-    if (
-      operator.aliases &&
-      operator.aliases.some((alias) => alias.toLowerCase().includes(searchTerm))
-    ) {
+    if (operator.aliases && operator.aliases.some(alias => alias.toLowerCase().includes(searchTerm))) {
       return true;
     }
 
@@ -284,7 +254,7 @@ function searchOperators(query: string) {
     }
 
     // Search in uses
-    return operator.uses.some((use) => {
+    return operator.uses.some(use => {
       // Search in description
       if (use.description.toLowerCase().includes(searchTerm)) {
         return true;
@@ -304,20 +274,17 @@ function searchOperators(query: string) {
       if (
         use.arguments &&
         use.arguments.some(
-          (arg) =>
+          arg =>
             arg.name.toLowerCase().includes(searchTerm) ||
             arg.type.toLowerCase().includes(searchTerm) ||
-            arg.description.toLowerCase().includes(searchTerm),
+            arg.description.toLowerCase().includes(searchTerm)
         )
       ) {
         return true;
       }
 
       // Search in requires
-      if (
-        use.requires &&
-        use.requires.some((req) => req.toLowerCase().includes(searchTerm))
-      ) {
+      if (use.requires && use.requires.some(req => req.toLowerCase().includes(searchTerm))) {
         return true;
       }
 
@@ -336,25 +303,25 @@ function highlightMatch(text: string): string {
   }
 
   const escapedText = escapeHtml(text);
-  const regex = new RegExp(`(${escapeRegex(searchTerm)})`, "gi");
-  return escapedText.replace(regex, "<mark>$1</mark>");
+  const regex = new RegExp(`(${escapeRegex(searchTerm)})`, 'gi');
+  return escapedText.replace(regex, '<mark>$1</mark>');
 }
 
 // Escape HTML to prevent XSS
 function escapeHtml(text: string): string {
-  const div = document.createElement("div");
+  const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
 }
 
 // Escape regex special characters
 function escapeRegex(text: string): string {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 // Update operator count display
 function updateOperatorCount(showing: number, total: number) {
-  const operatorCount = document.getElementById("operatorCount")!;
+  const operatorCount = document.getElementById('operatorCount')!;
   if (showing === total) {
     operatorCount.textContent = `${total} operators`;
   } else {
@@ -364,61 +331,55 @@ function updateOperatorCount(showing: number, total: number) {
 
 // Expand/collapse all functionality
 function expandAll() {
-  document.querySelectorAll(".operator-item").forEach((details) => {
+  document.querySelectorAll('.operator-item').forEach(details => {
     (details as HTMLDetailsElement).open = true;
   });
 }
 
 function collapseAll() {
-  document.querySelectorAll(".operator-item").forEach((details) => {
+  document.querySelectorAll('.operator-item').forEach(details => {
     (details as HTMLDetailsElement).open = false;
   });
 }
 
 // Event listeners
-const searchInput = document.getElementById("searchInput") as HTMLInputElement;
-const clearSearch = document.getElementById("clearSearch") as HTMLButtonElement;
-const expandAllBtn = document.getElementById("expandAll") as HTMLButtonElement;
-const collapseAllBtn = document.getElementById(
-  "collapseAll",
-) as HTMLButtonElement;
-const highlightToggle = document.getElementById(
-  "highlightToggle",
-) as HTMLInputElement;
+const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+const clearSearch = document.getElementById('clearSearch') as HTMLButtonElement;
+const expandAllBtn = document.getElementById('expandAll') as HTMLButtonElement;
+const collapseAllBtn = document.getElementById('collapseAll') as HTMLButtonElement;
+const highlightToggle = document.getElementById('highlightToggle') as HTMLInputElement;
 
 // Debounced search
 let searchTimeout: number;
-searchInput.addEventListener("input", (e) => {
+searchInput.addEventListener('input', e => {
   clearTimeout(searchTimeout);
   searchTimeout = window.setTimeout(() => {
     searchOperators((e.target as HTMLInputElement).value);
   }, 300);
 
   // Show/hide clear button
-  clearSearch.style.display = (e.target as HTMLInputElement).value
-    ? "block"
-    : "none";
+  clearSearch.style.display = (e.target as HTMLInputElement).value ? 'block' : 'none';
 });
 
-clearSearch.addEventListener("click", () => {
-  searchInput.value = "";
-  clearSearch.style.display = "none";
-  searchOperators("");
+clearSearch.addEventListener('click', () => {
+  searchInput.value = '';
+  clearSearch.style.display = 'none';
+  searchOperators('');
   searchInput.focus();
 });
 
-expandAllBtn.addEventListener("click", expandAll);
-collapseAllBtn.addEventListener("click", collapseAll);
+expandAllBtn.addEventListener('click', expandAll);
+collapseAllBtn.addEventListener('click', collapseAll);
 
-highlightToggle.addEventListener("change", (e) => {
+highlightToggle.addEventListener('change', e => {
   highlightEnabled = (e.target as HTMLInputElement).checked;
-  localStorage.setItem("highlightEnabled", highlightEnabled.toString());
+  localStorage.setItem('highlightEnabled', highlightEnabled.toString());
   renderOperators(filteredOperators);
 });
 
 // Keyboard shortcut for search (Ctrl+F or Cmd+F)
-document.addEventListener("keydown", (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key === "f") {
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
     e.preventDefault();
     searchInput.focus();
     searchInput.select();
@@ -428,13 +389,10 @@ document.addEventListener("keydown", (e) => {
 // Initialize
 highlightToggle.checked = highlightEnabled;
 renderOperators(filteredOperators);
-updateOperatorCount(
-  formulasData.operators.length,
-  formulasData.operators.length,
-);
+updateOperatorCount(formulasData.operators.length, formulasData.operators.length);
 
 // Display game version
-const gameVersionElement = document.getElementById("gameVersion")!;
+const gameVersionElement = document.getElementById('gameVersion')!;
 gameVersionElement.textContent = `Up to date for v${formulasData.gameVersion}`;
 
 // Handle URL parameter to auto-expand and scroll to operator
@@ -464,15 +422,15 @@ if (operatorParam) {
 
     if (operatorElements.length > 0) {
       // Expand all uses of this operator
-      operatorElements.forEach((element) => {
+      operatorElements.forEach(element => {
         (element as HTMLDetailsElement).open = true;
       });
 
       // Scroll to the first one with a slight delay to ensure DOM is ready
       setTimeout(() => {
-        operatorElements[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        operatorElements[0]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         // Add a highlight effect
-        operatorElements.forEach((element) => {
+        operatorElements.forEach(element => {
           element.classList.add('operator-highlight');
           setTimeout(() => {
             element.classList.remove('operator-highlight');

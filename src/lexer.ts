@@ -41,23 +41,26 @@ export class ModLexer {
 
   private advance(): string {
     const char = this.source[this.current];
+    if (!char) {
+      throw new Error('Advanced to invalid char');
+    }
     this.current++;
     this.column++;
     return char;
   }
 
   private peek(): string {
-    if (this.isAtEnd()) return '\0';
-    return this.source[this.current];
-  }
-
-  private peekNext(): string {
-    if (this.current + 1 >= this.source.length) return '\0';
-    return this.source[this.current + 1];
+    if (this.isAtEnd()) {
+      return '\0';
+    }
+    const char = this.source[this.current];
+    if (!char) {
+      throw new Error('Peeked at invalid char');
+    }
+    return char;
   }
 
   private scanToken(): void {
-    const startColumn = this.column;
     const char = this.advance();
 
     switch (char) {
@@ -100,16 +103,16 @@ export class ModLexer {
           this.scanComment();
         } else {
           // Part of a value (negative number, formula operator, or text containing --)
-          this.scanValue(char);
+          this.scanValue();
         }
         break;
       default:
         // Scan identifier or value
         if (this.isAlphaNumeric(char) || char === '!' || char === '_') {
-          this.scanIdentifierOrValue(char);
+          this.scanIdentifierOrValue();
         } else {
           // Could be part of a complex value (formula, etc.)
-          this.scanValue(char);
+          this.scanValue();
         }
         break;
     }
@@ -125,7 +128,7 @@ export class ModLexer {
     this.addToken(TokenType.COMMENT, value);
   }
 
-  private scanIdentifierOrValue(firstChar: string): void {
+  private scanIdentifierOrValue(): void {
     const start = this.current - 1;
 
     // Continue until we hit a delimiter
@@ -137,7 +140,7 @@ export class ModLexer {
     this.addToken(TokenType.IDENTIFIER, value);
   }
 
-  private scanValue(firstChar: string): void {
+  private scanValue(): void {
     const start = this.current - 1;
 
     // Scan until semicolon or newline (values can contain spaces in formulas)

@@ -120,14 +120,14 @@ export interface Correction {
 export interface ValidationMessage {
   severity: ValidationSeverity;
   message: string;
-  line?: number;
-  context?: string;
+  line: number;
+  context?: string | undefined;
   suggestion?: string | undefined; // Override text for corrections (e.g., "Add a semicolon" instead of "Did you mean:")
-  correctionIcon?: string; // Override icon for corrections (e.g., "🔧" for fixes, default "💡" for typos)
-  corrections?: Correction[]; // Suggested corrections for typos
-  formulaReference?: string; // Operator name for linking to formula reference page
-  documentationUrl?: string; // External documentation URL
-  documentationLabel?: string; // Label for the documentation link
+  correctionIcon?: string | undefined; // Override icon for corrections (e.g., "🔧" for fixes, default "💡" for typos)
+  corrections?: Correction[] | undefined; // Suggested corrections for typos
+  formulaReference?: string | undefined; // Operator name for linking to formula reference page
+  documentationUrl?: string | undefined; // External documentation URL
+  documentationLabel?: string | undefined; // Label for the documentation link
 }
 
 export interface ValidationResult {

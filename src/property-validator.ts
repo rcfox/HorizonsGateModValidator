@@ -3,14 +3,13 @@
  * Validates that property values match their expected types
  */
 
-import { FieldType, ValidationMessage, ModSchema, PropertyInfo } from './types.js';
-import { FormulaValidator } from './formula-validator.js';
+import { FieldType, ValidationMessage, PropertyInfo } from './types.js';
+import { validateFormula } from './formula-validator.js';
 import { findSimilar, MAX_EDIT_DISTANCE } from './string-similarity.js';
 import modSchemaData from './mod-schema.json' with { type: 'json' };
 import type { SchemaData } from './types.js';
 
 export class PropertyValidator {
-  private formulaValidator = new FormulaValidator();
   private enums: Record<string, Record<string, number>>;
 
   constructor() {
@@ -26,7 +25,7 @@ export class PropertyValidator {
     value: string,
     expectedType: FieldType,
     propInfo: PropertyInfo,
-    className?: string
+    className: string
   ): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
     const line = propInfo.valueStartLine;
@@ -119,9 +118,7 @@ export class PropertyValidator {
         break;
 
       case 'Formula':
-        const formulaResult = this.formulaValidator.validate(cleanValue, propInfo);
-        messages.push(...formulaResult.errors);
-        messages.push(...formulaResult.warnings);
+        messages.push(...validateFormula(cleanValue, propInfo));
         break;
 
       case 'List<string>':
@@ -145,16 +142,14 @@ export class PropertyValidator {
         break;
 
       case 'List<Formula>':
-        const listFormulaResult = this.formulaValidator.validate(cleanValue, propInfo);
-        messages.push(...listFormulaResult.errors);
-        messages.push(...listFormulaResult.warnings);
+        messages.push(...validateFormula(cleanValue, propInfo));
         break;
 
       default:
         // Check if this is an enum type (direct or namespaced)
         let resolvedEnumType = this.resolveEnumName(expectedType, className);
         if (resolvedEnumType) {
-          messages.push(...this.validateEnum(propertyName, cleanValue, resolvedEnumType, propInfo, className));
+          messages.push(...this.validateEnum(propertyName, cleanValue, resolvedEnumType, propInfo));
           break;
         }
 
@@ -162,6 +157,9 @@ export class PropertyValidator {
         const listEnumMatch = expectedType.match(/^(?:List|HashSet)<(\w+)>$/);
         if (listEnumMatch) {
           const enumName = listEnumMatch[1];
+          if (!enumName) {
+            throw new Error(`Failed to extract enum name from type '${expectedType}'`);
+          }
           // Try to find the enum (might be namespaced)
           const resolvedEnumName = this.resolveEnumName(enumName, className);
 
@@ -172,7 +170,7 @@ export class PropertyValidator {
               .map(p => p.trim())
               .filter(p => p.length > 0);
             for (const part of parts) {
-              messages.push(...this.validateEnum(propertyName, part, resolvedEnumName, propInfo, className));
+              messages.push(...this.validateEnum(propertyName, part, resolvedEnumName, propInfo));
             }
             break;
           }
@@ -222,13 +220,11 @@ export class PropertyValidator {
    * Resolve an enum name to its actual key in the enums registry
    * Tries className.enumName first, then just enumName
    */
-  private resolveEnumName(enumName: string, className?: string): string | null {
-    // First try the namespaced version if we have a className
-    if (className) {
-      const namespacedName = `${className}.${enumName}`;
-      if (this.enums[namespacedName]) {
-        return namespacedName;
-      }
+  private resolveEnumName(enumName: string, className: string): string | null {
+    // First try the namespaced version
+    const namespacedName = `${className}.${enumName}`;
+    if (this.enums[namespacedName]) {
+      return namespacedName;
     }
 
     // Fall back to the simple name
@@ -243,8 +239,7 @@ export class PropertyValidator {
     propertyName: string,
     value: string,
     enumName: string,
-    propInfo: PropertyInfo,
-    className?: string
+    propInfo: PropertyInfo
   ): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
     const line = propInfo.valueStartLine;
@@ -336,7 +331,7 @@ export class PropertyValidator {
     return messages;
   }
 
-  private validateVector2(name: string, value: string, line?: number): ValidationMessage[] {
+  private validateVector2(name: string, value: string, line: number): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
     const parts = value.split(',').map(p => p.trim());
 
@@ -350,28 +345,36 @@ export class PropertyValidator {
       return messages;
     }
 
-    if (!this.isValidFloat(parts[0])) {
+    const x = parts[0];
+    if (!x) {
+      throw new Error(`Missing X component for Vector2 at index 0`);
+    }
+    if (!this.isValidFloat(x)) {
       messages.push({
         severity: 'error',
         message: `Invalid Vector2 X value for ${name}`,
         line,
-        context: `Expected number, got '${parts[0]}'`,
+        context: `Expected number, got '${x}'`,
       });
     }
 
-    if (!this.isValidFloat(parts[1])) {
+    const y = parts[1];
+    if (!y) {
+      throw new Error(`Missing Y component for Vector2 at index 1`);
+    }
+    if (!this.isValidFloat(y)) {
       messages.push({
         severity: 'error',
         message: `Invalid Vector2 Y value for ${name}`,
         line,
-        context: `Expected number, got '${parts[1]}'`,
+        context: `Expected number, got '${y}'`,
       });
     }
 
     return messages;
   }
 
-  private validateVector3(name: string, value: string, line?: number): ValidationMessage[] {
+  private validateVector3(name: string, value: string, line: number): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
     const parts = value.split(',').map(p => p.trim());
 
@@ -386,12 +389,16 @@ export class PropertyValidator {
     }
 
     for (let i = 0; i < 3; i++) {
-      if (!this.isValidFloat(parts[i])) {
+      const component = parts[i];
+      if (!component) {
+        throw new Error(`Missing component for Vector3 at index ${i}`);
+      }
+      if (!this.isValidFloat(component)) {
         messages.push({
           severity: 'error',
           message: `Invalid Vector3 component ${i} for ${name}`,
           line,
-          context: `Expected number, got '${parts[i]}'`,
+          context: `Expected number, got '${component}'`,
         });
       }
     }
@@ -399,7 +406,7 @@ export class PropertyValidator {
     return messages;
   }
 
-  private validateRectangle(name: string, value: string, line?: number): ValidationMessage[] {
+  private validateRectangle(name: string, value: string, line: number): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
     const parts = value.split(',').map(p => p.trim());
 
@@ -414,12 +421,16 @@ export class PropertyValidator {
     }
 
     for (let i = 0; i < 4; i++) {
-      if (!this.isValidInteger(parts[i])) {
+      const component = parts[i];
+      if (!component) {
+        throw new Error(`Missing component for Rectangle at index ${i}`);
+      }
+      if (!this.isValidInteger(component)) {
         messages.push({
           severity: 'error',
           message: `Invalid Rectangle component ${i} for ${name}`,
           line,
-          context: `Expected integer, got '${parts[i]}'`,
+          context: `Expected integer, got '${component}'`,
         });
       }
     }
@@ -427,19 +438,19 @@ export class PropertyValidator {
     return messages;
   }
 
-  private validateTileCoord(name: string, value: string, line?: number): ValidationMessage[] {
+  private validateTileCoord(name: string, value: string, line: number): ValidationMessage[] {
     // TileCoord is same as Vector2
     return this.validateVector2(name, value, line);
   }
 
-  private validateListString(name: string, value: string, isOverwrite: boolean, line?: number): ValidationMessage[] {
+  private validateListString(_name: string, _value: string, _isOverwrite: boolean, _line: number): ValidationMessage[] {
     // Strings in lists are comma-separated
     // With ! prefix, it overwrites the list, otherwise appends
     // Empty strings are allowed if it's a single append
     return [];
   }
 
-  private validateListInteger(name: string, value: string, isOverwrite: boolean, line?: number): ValidationMessage[] {
+  private validateListInteger(name: string, value: string, isOverwrite: boolean, line: number): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
 
     if (isOverwrite) {
@@ -473,7 +484,7 @@ export class PropertyValidator {
     return messages;
   }
 
-  private validateListFloat(name: string, value: string, isOverwrite: boolean, line?: number): ValidationMessage[] {
+  private validateListFloat(name: string, value: string, isOverwrite: boolean, line: number): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
 
     if (isOverwrite) {

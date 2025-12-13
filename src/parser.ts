@@ -47,7 +47,8 @@ export class ModParser {
       } else {
         // Unexpected token outside of object definition
         const token = this.peek();
-        this.addError({
+        this.errors.push({
+          severity: 'error',
           message: 'Unexpected token outside object definition',
           line: token.line,
           context: `Found ${token.value}, expected [ObjectType]`,
@@ -65,7 +66,8 @@ export class ModParser {
 
     // Get object type name
     if (!this.check(TokenType.IDENTIFIER)) {
-      this.addError({
+      this.errors.push({
+        severity: 'error',
         message: 'Expected object type name after [',
         line: this.peek().line,
         context: `Found ${this.peek().value}`,
@@ -82,7 +84,8 @@ export class ModParser {
 
     // Expect closing bracket
     if (!this.check(TokenType.RIGHT_BRACKET)) {
-      this.addError({
+      this.errors.push({
+        severity: 'error',
         message: 'Expected ] after object type name',
         line: this.peek().line,
         context: `Found ${this.peek().value} in [${objectType}]`,
@@ -99,7 +102,7 @@ export class ModParser {
 
     // Parse properties until next object or EOF
     const properties = this.parseProperties();
-    const endLine = this.previous().line;
+    const endLine = this.previous()?.line ?? startLine;
 
     return {
       type: objectType,
@@ -166,7 +169,8 @@ export class ModParser {
 
     // Check for equals sign
     if (!this.check(TokenType.EQUALS)) {
-      this.addError({
+      this.errors.push({
+        severity: 'error',
         message: `Expected = after property name '${propertyName}'`,
         line: propertyLine,
         context: `Found ${this.peek().value}`,
@@ -218,8 +222,8 @@ export class ModParser {
 
         // Look ahead to see if this is KEY=VALUE pattern
         if (this.check(TokenType.IDENTIFIER)) {
-          const lookahead = this.current + 1;
-          if (lookahead < this.tokens.length && this.tokens[lookahead].type === TokenType.EQUALS) {
+          const nextToken = this.peekNext();
+          if (nextToken?.type === TokenType.EQUALS) {
             // This is a new property, stop here
             break;
           }
@@ -267,7 +271,8 @@ export class ModParser {
       const shouldHaveSemicolon = this.shouldWarnAboutMissingSemicolon(value);
 
       if (shouldHaveSemicolon) {
-        this.addError({
+        this.errors.push({
+          severity: 'error',
           message: `Property '${propertyName} = ${value}' does not end with semicolon`,
           line: propertyLine,
           context: 'Add ; at the end of the line',
@@ -331,8 +336,8 @@ export class ModParser {
       shouldWarn = true;
     } else if (this.check(TokenType.IDENTIFIER)) {
       // Check if this looks like KEY=VALUE pattern
-      const lookahead = this.current + 1;
-      if (lookahead < this.tokens.length && this.tokens[lookahead].type === TokenType.EQUALS) {
+      const nextToken = this.peekNext();
+      if (nextToken?.type === TokenType.EQUALS) {
         // Next is KEY=VALUE - should have had semicolon
         shouldWarn = true;
       }
@@ -365,13 +370,21 @@ export class ModParser {
   }
 
   private check(type: TokenType): boolean {
-    if (this.isAtEnd()) return false;
+    if (this.isAtEnd()) {
+      return false;
+    }
     return this.peek().type === type;
   }
 
   private advance(): Token {
-    if (!this.isAtEnd()) this.current++;
-    return this.previous();
+    if (!this.isAtEnd()) {
+      this.current++;
+    }
+    const token = this.previous();
+    if (!token) {
+      throw new Error('Advanced to invalid token');
+    }
+    return token;
   }
 
   private isAtEnd(): boolean {
@@ -379,24 +392,32 @@ export class ModParser {
   }
 
   private peek(): Token {
-    return this.tokens[this.current];
+    const token = this.tokens[this.current];
+    if (!token) {
+      throw new Error('Peeked at invalid token');
+    }
+    return token;
   }
 
-  private previous(): Token {
-    return this.tokens[this.current - 1];
+  private peekNext(): Token | null {
+    if (this.tokens.length < this.current + 1) {
+      return null;
+    }
+    const token = this.tokens[this.current + 1];
+    if (!token) {
+      throw new Error('Peeked at invalid token');
+    }
+    return token;
   }
 
-  private addError(msg: Omit<ValidationMessage, 'severity'>): void {
-    this.errors.push({
-      ...msg,
-      severity: 'error',
-    });
-  }
-
-  private addWarning(msg: Omit<ValidationMessage, 'severity'>): void {
-    this.errors.push({
-      ...msg,
-      severity: 'warning',
-    });
+  private previous(): Token | null {
+    if (this.current - 1 < 0) {
+      return null;
+    }
+    const token = this.tokens[this.current - 1];
+    if (!token) {
+      throw new Error('Peeked at invalid token');
+    }
+    return token;
   }
 }

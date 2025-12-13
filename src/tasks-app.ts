@@ -43,20 +43,15 @@ interface Task {
   optional: TaskArgument[];
 }
 
-interface TasksData {
-  gameVersion: string;
-  tasks: Task[];
-}
-
 // Convert array notation to user-friendly variable names
 function convertToFriendlyNames(text: string): string {
   return text
     // tileCoords with property access (must come first, most specific)
-    .replace(/tileCoords\[(\d+)\]\.X/g, (match, num) => {
+    .replace(/tileCoords\[(\d+)\]\.X/g, (_match, num) => {
       const n = parseInt(num);
       return n === 0 ? 'xValue' : `xValue${n + 1}`;
     })
-    .replace(/tileCoords\[(\d+)\]\.Y/g, (match, num) => {
+    .replace(/tileCoords\[(\d+)\]\.Y/g, (_match, num) => {
       const n = parseInt(num);
       return n === 0 ? 'yValue' : `yValue${n + 1}`;
     })
@@ -68,7 +63,7 @@ function convertToFriendlyNames(text: string): string {
     // strings (specific indexes first, then general)
     .replace(/strings\[0\]/g, 'sValue')
     .replace(/strings\[1\]/g, 'sValue2')
-    .replace(/strings\[(\d+)\]/g, (match, num) => {
+    .replace(/strings\[(\d+)\]/g, (_match, num) => {
       const n = parseInt(num);
       return n === 0 ? 'sValue' : `sValue${n + 1}`;
     })
@@ -76,7 +71,7 @@ function convertToFriendlyNames(text: string): string {
     // floats
     .replace(/floats\[0\]/g, 'fValue')
     .replace(/floats\[1\]/g, 'fValue2')
-    .replace(/floats\[(\d+)\]/g, (match, num) => {
+    .replace(/floats\[(\d+)\]/g, (_match, num) => {
       const n = parseInt(num);
       return n === 0 ? 'fValue' : `fValue${n + 1}`;
     })
@@ -84,7 +79,7 @@ function convertToFriendlyNames(text: string): string {
     // bools
     .replace(/bools\[0\]/g, 'bValue1')
     .replace(/bools\[1\]/g, 'bValue2')
-    .replace(/bools\[(\d+)\]/g, (match, num) => `bValue${parseInt(num) + 1}`);
+    .replace(/bools\[(\d+)\]/g, (_match, num) => `bValue${parseInt(num) + 1}`);
 }
 
 // Convert task data to use friendly names
