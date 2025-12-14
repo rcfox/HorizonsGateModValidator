@@ -347,9 +347,13 @@ export class PropertyValidator {
 
     const x = parts[0];
     if (!x) {
-      throw new Error(`Missing X component for Vector2 at index 0`);
-    }
-    if (!this.isValidFloat(x)) {
+      messages.push({
+        severity: 'error',
+        message: `Missing X component for Vector2 in ${name}`,
+        line,
+        context: `Expected format: x,y`,
+      });
+    } else if (!this.isValidFloat(x)) {
       messages.push({
         severity: 'error',
         message: `Invalid Vector2 X value for ${name}`,
@@ -360,9 +364,13 @@ export class PropertyValidator {
 
     const y = parts[1];
     if (!y) {
-      throw new Error(`Missing Y component for Vector2 at index 1`);
-    }
-    if (!this.isValidFloat(y)) {
+      messages.push({
+        severity: 'error',
+        message: `Missing Y component for Vector2 in ${name}`,
+        line,
+        context: `Expected format: x,y`,
+      });
+    } else if (!this.isValidFloat(y)) {
       messages.push({
         severity: 'error',
         message: `Invalid Vector2 Y value for ${name}`,
@@ -388,15 +396,20 @@ export class PropertyValidator {
       return messages;
     }
 
+    const componentNames = ['X', 'Y', 'Z'];
     for (let i = 0; i < 3; i++) {
       const component = parts[i];
       if (!component) {
-        throw new Error(`Missing component for Vector3 at index ${i}`);
-      }
-      if (!this.isValidFloat(component)) {
         messages.push({
           severity: 'error',
-          message: `Invalid Vector3 component ${i} for ${name}`,
+          message: `Missing ${componentNames[i]} component for Vector3 in ${name}`,
+          line,
+          context: `Expected format: x,y,z`,
+        });
+      } else if (!this.isValidFloat(component)) {
+        messages.push({
+          severity: 'error',
+          message: `Invalid Vector3 ${componentNames[i]} value for ${name}`,
           line,
           context: `Expected number, got '${component}'`,
         });
@@ -420,15 +433,20 @@ export class PropertyValidator {
       return messages;
     }
 
+    const componentNames = ['X', 'Y', 'Width', 'Height'];
     for (let i = 0; i < 4; i++) {
       const component = parts[i];
       if (!component) {
-        throw new Error(`Missing component for Rectangle at index ${i}`);
-      }
-      if (!this.isValidInteger(component)) {
         messages.push({
           severity: 'error',
-          message: `Invalid Rectangle component ${i} for ${name}`,
+          message: `Missing ${componentNames[i]} component for Rectangle in ${name}`,
+          line,
+          context: `Expected format: x,y,width,height`,
+        });
+      } else if (!this.isValidInteger(component)) {
+        messages.push({
+          severity: 'error',
+          message: `Invalid Rectangle ${componentNames[i]} value for ${name}`,
           line,
           context: `Expected integer, got '${component}'`,
         });
