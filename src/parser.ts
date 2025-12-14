@@ -401,7 +401,7 @@ export class ModParser {
   }
 
   private peekNext(): Token | null {
-    if (this.tokens.length < this.current + 1) {
+    if (this.current + 1 >= this.tokens.length) {
       return null;
     }
     const token = this.tokens[this.current + 1];
