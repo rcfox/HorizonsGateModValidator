@@ -47,11 +47,12 @@ export interface ClassSchema {
 export type ModSchema = Record<string, ClassSchema>;
 
 /**
- * Schema data file format (includes schema, type aliases, and enums)
+ * Schema data file format (includes schema, type aliases, functional aliases, and enums)
  */
 export interface SchemaData {
   schema: ModSchema;
   typeAliases: Record<string, string>;
+  functionalAliases: Record<string, string>;
   enums: Record<string, Record<string, number>>;
 }
 

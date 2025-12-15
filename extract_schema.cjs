@@ -366,13 +366,14 @@ function extractVirtualProperties(filePath, className) {
 }
 
 /**
- * Parse DataManager case statements to extract type->class mappings
+ * Parse DataManager case statements to extract type->class mappings and functional aliases
  * Handles consecutive case statements that fall through to the same code
  * @param {string} content - The DataManager.cs file content
- * @returns {Map<string, string>} Map of type names to class names
+ * @returns {{ typesToClass: Map<string, string>, functionalAliases: Map<string, string> }}
  */
 function parseDataManagerCases(content) {
   const typesToClass = new Map();
+  const functionalAliases = new Map();
 
   // Find all case statements - handling consecutive cases that fall through
   const allCaseMatches = [...content.matchAll(/case\s+"([^"]+)":/g)];
@@ -421,10 +422,19 @@ function parseDataManagerCases(content) {
       }
     }
 
+    // Functional aliases: if there are multiple cases that fall through,
+    // the first case is the canonical name
+    if (caseNames.length > 1) {
+      const canonicalName = caseNames[0];
+      for (let j = 1; j < caseNames.length; j++) {
+        functionalAliases.set(caseNames[j], canonicalName);
+      }
+    }
+
     processedIndices.add(i);
   }
 
-  return typesToClass;
+  return { typesToClass, functionalAliases };
 }
 
 function extractTypeAliases(dataManagerPath) {
@@ -446,7 +456,7 @@ function extractTypeAliases(dataManagerPath) {
   }
 
   const functionBody = createDataMatch[0];
-  const typesToClass = parseDataManagerCases(functionBody);
+  const { typesToClass } = parseDataManagerCases(functionBody);
 
   const aliases = {};
 
@@ -456,6 +466,38 @@ function extractTypeAliases(dataManagerPath) {
       aliases[typeName] = className;
       console.log(`  Found alias: ${typeName} -> ${className}`);
     }
+  }
+
+  return aliases;
+}
+
+function extractFunctionalAliases(dataManagerPath) {
+  console.log('\nExtracting functional aliases from DataManager.cs...');
+
+  if (!fs.existsSync(dataManagerPath)) {
+    console.warn('Warning: DataManager.cs not found, skipping functional alias extraction');
+    return {};
+  }
+
+  const content = fs.readFileSync(dataManagerPath, 'utf-8');
+
+  // Extract only the createDataFromDict function
+  const createDataMatch = content.match(/public static bool createDataFromDict\(string type, Dictionary<string, string> valuesDict\)[\s\S]*?(?=\n\tpublic static|$)/);
+
+  if (!createDataMatch) {
+    console.warn('Could not find createDataFromDict function');
+    return {};
+  }
+
+  const functionBody = createDataMatch[0];
+  const { functionalAliases } = parseDataManagerCases(functionBody);
+
+  const aliases = {};
+
+  // Convert to aliases object
+  for (const [aliasName, canonicalName] of functionalAliases) {
+    aliases[aliasName] = canonicalName;
+    console.log(`  Found functional alias: ${aliasName} -> ${canonicalName}`);
   }
 
   return aliases;
@@ -653,7 +695,7 @@ function discoverTypesFromDataManager(dataManagerPath) {
   }
 
   const functionBody = createDataMatch[0];
-  const typesToClass = parseDataManagerCases(functionBody);
+  const { typesToClass } = parseDataManagerCases(functionBody);
 
   // Log discovered types
   for (const [typeName, className] of typesToClass) {
@@ -909,7 +951,10 @@ function extractSchema(tacticsDir) {
     enums['AoEPreset'] = aoePresets;
   }
 
-  return { schema, typeAliases, enums };
+  // Extract functional aliases from DataManager.cs
+  const functionalAliases = extractFunctionalAliases(dataManagerPath);
+
+  return { schema, typeAliases, functionalAliases, enums };
 }
 
 /**
@@ -1065,12 +1110,13 @@ function addCommonVirtualProperties(schema, dataManagerVirtualProps) {
 
 // Main execution
 const tacticsDir = path.join(__dirname, '../Tactics');
-const { schema, typeAliases, enums } = extractSchema(tacticsDir);
+const { schema, typeAliases, functionalAliases, enums } = extractSchema(tacticsDir);
 
 // Output combined schema, aliases, and enums as JSON
 const combinedOutput = {
   schema: schema,
   typeAliases: typeAliases,
+  functionalAliases: functionalAliases,
   enums: enums
 };
 
@@ -1080,6 +1126,7 @@ fs.writeFileSync(outputPath, JSON.stringify(combinedOutput, null, 2));
 console.log(`\n✅ Schema extracted to ${outputPath}`);
 console.log(`Extracted ${Object.keys(schema).length} classes`);
 console.log(`Extracted ${Object.keys(typeAliases).length} type aliases`);
+console.log(`Extracted ${Object.keys(functionalAliases).length} functional aliases`);
 console.log(`Extracted ${Object.keys(enums).length} enums`);
 
 // Also output TypeScript type definitions

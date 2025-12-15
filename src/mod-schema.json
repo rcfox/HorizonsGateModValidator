@@ -8115,6 +8115,20 @@
     "drawOrderFXLight": "Light",
     "actTimer": "ActTimer"
   },
+  "functionalAliases": {
+    "ActorTypeAOE": "ActorTypeAoE",
+    "ActorTypeDetectAoE": "ActorTypeAoE",
+    "ActorTypeDetectAOE": "ActorTypeAoE",
+    "ActorAoE": "ActorAOE",
+    "GlobalAOE": "GlobalAoE",
+    "ActorContainer": "ActorInventory",
+    "ActorGateContainer": "ActorGateInventory",
+    "ActionAOE": "ActionAoE",
+    "AvAffecterAOE": "AvAffecterAoE",
+    "FormulaGlobal": "GlobalFormula",
+    "Screentint": "ScreenTint",
+    "ElementAssociations": "ElementAssociation"
+  },
   "enums": {
     "ShadowType": {
       "Solid": 1,

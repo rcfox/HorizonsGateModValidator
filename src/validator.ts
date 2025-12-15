@@ -12,16 +12,22 @@ import modSchemaData from './mod-schema.json' with { type: 'json' };
 export class ModValidator {
   private schema: ModSchema;
   private typeAliases: Record<string, string>;
+  private functionalAliases: Record<string, string>;
   private propertyValidator = new PropertyValidator();
 
   constructor() {
     const data = modSchemaData as SchemaData;
     this.schema = data.schema;
     this.typeAliases = data.typeAliases;
+    this.functionalAliases = data.functionalAliases;
   }
 
   private resolveTypeAlias(typeName: string): string {
     return this.typeAliases[typeName] || typeName;
+  }
+
+  private resolveFunctionalAlias(typeName: string): string {
+    return this.functionalAliases[typeName] || typeName;
   }
 
   validate(content: string): ValidationResult {
@@ -238,20 +244,7 @@ export class ModValidator {
   private validateActionStructures(objects: ParsedObject[]): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
 
-    function normalizeTypeName(typeName: string): string {
-      switch (typeName) {
-        case 'ActionAOE':
-          return 'ActionAoE';
-        case 'AvAffecterAOE':
-          return 'AvAffecterAoE';
-        case 'ActorValueAffecter':
-          return 'AvAffecter';
-        default:
-          return typeName;
-      }
-    }
-
-    function validateActionId(obj: ParsedObject, actionId: string): boolean {
+    const validateActionId = (obj: ParsedObject, actionId: string): boolean => {
       const idProp = obj.properties.get('ID');
       if (!idProp) {
         messages.push({
@@ -291,9 +284,9 @@ export class ModValidator {
         return false;
       }
       return true;
-    }
+    };
 
-    function validateAction(action: ParsedObject): boolean {
+    const validateAction = (action: ParsedObject): boolean => {
       const actionId = action.properties.get('ID')?.value;
       if (!actionId) {
         // We have another check for ID existing elsewhere.
@@ -345,10 +338,10 @@ export class ModValidator {
         firstAvAffecter = false;
       }
       return true;
-    }
+    };
 
-    function validateActionAoE(obj: ParsedObject, actionId: string): boolean {
-      const nextType = normalizeTypeName(obj.type);
+    const validateActionAoE = (obj: ParsedObject, actionId: string): boolean => {
+      const nextType = this.resolveFunctionalAlias(obj.type);
       if (nextType !== 'ActionAoE') {
         messages.push({
           severity: 'error',
@@ -363,10 +356,10 @@ export class ModValidator {
       }
 
       return true;
-    }
+    };
 
-    function validateAvAffecter(obj: ParsedObject, actionId: string, firstAvAffecter: boolean): boolean {
-      const nextType = normalizeTypeName(obj.type);
+    const validateAvAffecter = (obj: ParsedObject, actionId: string, firstAvAffecter: boolean): boolean => {
+      const nextType = this.resolveFunctionalAlias(obj.type);
       if (nextType !== 'AvAffecter') {
         if (!firstAvAffecter) {
           // If this isn't the first AvAffecter, being a different type isn't an error,
@@ -386,10 +379,10 @@ export class ModValidator {
       }
 
       return true;
-    }
+    };
 
-    function validateAvAffecterAoE(obj: ParsedObject, actionId: string): boolean {
-      const nextType = normalizeTypeName(obj.type);
+    const validateAvAffecterAoE = (obj: ParsedObject, actionId: string): boolean => {
+      const nextType = this.resolveFunctionalAlias(obj.type);
       if (nextType !== 'AvAffecterAoE') {
         messages.push({
           severity: 'error',
@@ -404,9 +397,9 @@ export class ModValidator {
       }
 
       return true;
-    }
+    };
 
-    const actions = objects.filter(obj => normalizeTypeName(obj.type) === 'Action');
+    const actions = objects.filter(obj => this.resolveFunctionalAlias(obj.type) === 'Action');
     for (const action of actions) {
       validateAction(action);
     }
