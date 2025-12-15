@@ -314,12 +314,22 @@ export function initValidatorApp(): void {
   /**
    * Replace text in textarea using execCommand to make it undoable with Ctrl+Z
    */
-  function replaceTextUndoable(textarea: HTMLTextAreaElement, start: number, end: number, replacement: string): void {
+  function replaceTextUndoable(
+    textarea: HTMLTextAreaElement,
+    start: number,
+    end: number,
+    replacement: string
+  ): boolean {
     // Focus the textarea
     textarea.focus();
 
     // Select the text to replace
     textarea.setSelectionRange(start, end);
+
+    const current = textarea.value.slice(start, end);
+    if (current === replacement) {
+      return false;
+    }
 
     // Replace using execCommand to make it undoable
     // Note: execCommand is deprecated but still the only way to get undo/redo support
@@ -327,6 +337,8 @@ export function initValidatorApp(): void {
 
     // Select the inserted text to show what was changed
     textarea.setSelectionRange(start, start + replacement.length);
+
+    return true;
   }
 
   function applyCorrection(correction: Correction): void {
@@ -365,11 +377,13 @@ export function initValidatorApp(): void {
     absoluteEnd += endColumn;
 
     // Replace text (undoably)
-    replaceTextUndoable(modInput, absoluteStart, absoluteEnd, replacementText);
+    const didReplace = replaceTextUndoable(modInput, absoluteStart, absoluteEnd, replacementText);
 
-    // Update and re-validate
-    updateLineNumbers();
-    handleValidate();
+    if (didReplace) {
+      // Update and re-validate
+      updateLineNumbers();
+      handleValidate();
+    }
 
     // Scroll to and select the corrected text
     scrollToLine(startLine, {
