@@ -36,6 +36,25 @@ export interface FieldSchema {
   pattern?: boolean;
 }
 
+/**
+ * Object category determines how the object is used in the game:
+ *
+ * - 'definition': Template types stored in Data collections (e.g., ActorType, ItemType)
+ *   These define reusable templates that other objects reference by ID.
+ *   Requires a unique ID property.
+ *
+ * - 'instance': Standalone objects created from templates (e.g., Actor, Item)
+ *   These are individual instances that reference a definition type by ID.
+ *   Actor instances reference ActorType, Item instances reference ItemType.
+ *   Requires an ID property that references the template type.
+ *
+ * - 'nested': Component objects that are parts of other objects (e.g., Container, Location)
+ *   These are nested within or attached to other objects and don't stand alone.
+ *   May or may not have an ID depending on usage.
+ *
+ * - 'special': Types with special handling that don't fit normal patterns (e.g., Zone, HeightMap)
+ *   These have custom loading/processing logic.
+ */
 export type ObjectCategory = 'definition' | 'nested' | 'instance' | 'special';
 
 export interface ClassSchema {

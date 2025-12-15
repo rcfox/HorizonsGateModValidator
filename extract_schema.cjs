@@ -728,9 +728,14 @@ function categorizeClass(className, dataManagerContent) {
   const firstMatch = matches[0];
 
   // Definition: Stored in Data.xxxTypes[value] or Data.xxx[value] collections
+  // Also includes GameState collections like Game1.currentGameState.locations[zone][value]
   // Pattern: Data.actorTypes[value] = new ActorType(...)
-  const definitionPattern = new RegExp(`Data\\.\\w+\\[\\w+\\]\\s*=\\s*new\\s+${className}\\(`);
-  if (definitionPattern.test(firstMatch.code)) {
+  // Pattern: Data.dialogNodes[value] = mostRecentDialogNode (where DialogNode was created)
+  // Pattern: Game1.currentGameState.locations[zone].Add(value, new Location(...))
+  const definitionPattern = new RegExp(`Data\\.\\w+\\[\\w+\\]\\s*=\\s*(?:new\\s+${className}\\(|\\w+)`);
+  const gameStateCollectionPattern = new RegExp(`(?:Game1\\.currentGameState|currentGameState)\\.\\w+\\[.+?\\]\\.(?:Add|\\[\\w+\\]\\s*=)\\([^)]*(?:value|${className})`);
+
+  if (definitionPattern.test(firstMatch.code) || gameStateCollectionPattern.test(firstMatch.code)) {
     return 'definition';
   }
 
@@ -755,8 +760,24 @@ function categorizeClass(className, dataManagerContent) {
     return 'nested';
   }
 
+  // Check if object is created but NOT stored in Data collection
+  // Pattern: ClassName varName = new ClassName(...) without Data.xxx[value] =
+  const variableCreationPattern = new RegExp(`${className}\\s+\\w+\\s*=\\s*new\\s+${className}\\(`);
+  const isCreatedAsVariable = variableCreationPattern.test(firstMatch.code);
+  const isStoredInData = new RegExp(`Data\\.\\w+\\[`).test(firstMatch.code);
+
+  if (isCreatedAsVariable && !isStoredInData) {
+    // Object is created but not stored in Data
+    // If it's added to collections/zones, it's an instance (like Item, which is an instance of ItemType)
+    const addToCollectionPattern = /\.(?:Add|addItem|add)\(/;
+    if (addToCollectionPattern.test(firstMatch.code)) {
+      return 'instance';
+    }
+  }
+
   // If the case name matches the class name and we couldn't categorize it, likely a definition
-  if (firstMatch.caseType === className) {
+  // But only if it's actually stored in a Data collection
+  if (firstMatch.caseType === className && isStoredInData) {
     return 'definition';
   }
 

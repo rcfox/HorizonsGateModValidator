@@ -2473,7 +2473,7 @@
       "supportsCloneFrom": true
     },
     "Item": {
-      "category": "definition",
+      "category": "instance",
       "fields": [
         {
           "name": "ID",
@@ -2690,7 +2690,7 @@
       "supportsCloneFrom": false
     },
     "DialogNode": {
-      "category": "instance",
+      "category": "definition",
       "fields": [
         {
           "name": "ID",
