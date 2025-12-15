@@ -6446,7 +6446,7 @@
       "required": [
         {
           "name": "strings[0]",
-          "description": "The weather type name to set (must be a valid WeatherType enum value)"
+          "description": "The weather type name to set. Must be one of: none, rain, storm, snow, gale, krill"
         }
       ],
       "optional": []
