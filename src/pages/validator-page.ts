@@ -156,7 +156,7 @@ export function initValidatorApp(): void {
 
     // Add position data attributes if corrections are available
     let positionAttrs = '';
-    if (msg.corrections && msg.corrections.length > 0) {
+    if (msg.corrections && msg.corrections?.[0]?.startLine === msg.line) {
       const firstCorrection = msg.corrections[0];
       if (firstCorrection) {
         positionAttrs = `data-start-line="${firstCorrection.startLine}" data-start-column="${firstCorrection.startColumn}" data-end-line="${firstCorrection.endLine}" data-end-column="${firstCorrection.endColumn}"`;

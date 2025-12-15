@@ -36,8 +36,9 @@ export class ModValidator {
     const { objects, errors: parseErrors } = parser.parse();
     const objMessages = objects.flatMap(obj => this.validateObject(obj));
     const structureMessages = this.validateActionStructures(objects);
+    const duplicateIdMessages = this.checkDuplicateIds(objects);
 
-    const allMessages = [...parseErrors, ...objMessages, ...structureMessages];
+    const allMessages = [...parseErrors, ...objMessages, ...structureMessages, ...duplicateIdMessages];
 
     const errors = allMessages.filter(m => m.severity === 'error');
     const warnings = allMessages.filter(m => m.severity === 'warning');
@@ -49,6 +50,59 @@ export class ModValidator {
       warnings,
       info,
     };
+  }
+
+  private checkDuplicateIds(objects: ParsedObject[]): ValidationMessage[] {
+    const messages: ValidationMessage[] = [];
+    const objectIds: Map<string, Map<string, ParsedObject[]>> = new Map();
+
+    for (const obj of objects) {
+      const classSchema = this.schema[this.resolveTypeAlias(obj.type)];
+      if (classSchema?.category !== 'definition') {
+        continue;
+      }
+
+      const objId = obj.properties.get('ID')?.value;
+      if (!objId) {
+        continue;
+      }
+
+      // Treat things like ActionAoE and ActionAOE as the same.
+      const resolvedType = this.resolveFunctionalAlias(obj.type);
+      if (!objectIds.has(resolvedType)) {
+        objectIds.set(resolvedType, new Map());
+      }
+      const typeIds = objectIds.get(resolvedType);
+      if (!typeIds) {
+        throw new Error(`Type IDs for ${resolvedType} not initialized`);
+      }
+
+      const objsWithSameId = typeIds.get(objId);
+      const firstUse = objsWithSameId?.[0]?.properties.get('ID');
+      if (firstUse) {
+        messages.push({
+          severity: 'warning',
+          message: `Duplicate ID '${objId}' for ${resolvedType}.`,
+          line: obj.properties.get('ID')?.valueStartLine ?? obj.startLine,
+          suggestion: `First use of this ID on line ${firstUse.valueStartLine}.`,
+          correctionIcon: '🎯',
+          corrections: [
+            {
+              // Make a fake correction that replaces the text with what's already there.
+              // This is just to allow us to easily jump to the original definition from the error message.
+              startColumn: firstUse.valueStartColumn,
+              startLine: firstUse.valueStartLine,
+              endColumn: firstUse.valueEndColumn,
+              endLine: firstUse.valueEndLine,
+              replacementText: firstUse.value,
+            },
+          ],
+        });
+      }
+      typeIds.set(objId, [...(objsWithSameId ?? []), obj]);
+    }
+
+    return messages;
   }
 
   private validateObject(obj: ParsedObject): ValidationMessage[] {
