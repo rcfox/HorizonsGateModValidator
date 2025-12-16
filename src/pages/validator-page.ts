@@ -192,9 +192,19 @@ function findFirstFileByDepth(root: FileNode): string | null {
   return textFiles[0]?.path || null;
 }
 
+// Track if the app has been initialized to prevent duplicate listeners
+let isInitialized = false;
+
 export function initValidatorApp(): void {
   // Check if we're on the validator page
   if (!document.getElementById('modInput')) return;
+
+  // Prevent duplicate initialization
+  if (isInitialized) {
+    console.warn('Validator app already initialized');
+    return;
+  }
+  isInitialized = true;
 
   // Theme management
   initTheme('mod-validator-theme');
@@ -276,11 +286,19 @@ export function initValidatorApp(): void {
   // Resize handles
   let resizeHandle1: HTMLElement | null = null;
   let resizeHandle2: HTMLElement | null = null;
+  let resizeListeners: { move: (e: MouseEvent) => void; up: () => void } | null = null;
 
   function createResizeHandles(): void {
     // Remove existing handles
     resizeHandle1?.remove();
     resizeHandle2?.remove();
+
+    // Clean up old listeners if they exist
+    if (resizeListeners) {
+      document.removeEventListener('mousemove', resizeListeners.move);
+      document.removeEventListener('mouseup', resizeListeners.up);
+      resizeListeners = null;
+    }
 
     if (!fileManager) return;
 
@@ -373,13 +391,29 @@ export function initValidatorApp(): void {
         currentHandle = null;
         document.body.style.cursor = '';
         document.body.style.userSelect = '';
+
+        // Remove listeners after resize completes
+        if (resizeListeners) {
+          document.removeEventListener('mousemove', resizeListeners.move);
+          document.removeEventListener('mouseup', resizeListeners.up);
+          resizeListeners = null;
+        }
       }
     };
 
-    resizeHandle1.addEventListener('mousedown', e => startResize(e, resizeHandle1!));
-    resizeHandle2.addEventListener('mousedown', e => startResize(e, resizeHandle2!));
-    document.addEventListener('mousemove', doResize);
-    document.addEventListener('mouseup', stopResize);
+    if (resizeHandle1 && resizeHandle2) {
+      // Capture handles in non-null variables for the closures
+      const handle1 = resizeHandle1;
+      const handle2 = resizeHandle2;
+
+      handle1.addEventListener('mousedown', e => startResize(e, handle1));
+      handle2.addEventListener('mousedown', e => startResize(e, handle2));
+
+      // Store listener references for cleanup
+      resizeListeners = { move: doResize, up: stopResize };
+      document.addEventListener('mousemove', doResize);
+      document.addEventListener('mouseup', stopResize);
+    }
   }
 
   function updateResizeHandlePositions(): void {
@@ -400,47 +434,65 @@ export function initValidatorApp(): void {
     }
   }
 
-  // Drag and drop support
+  // Drag and drop support with AbortController for cleanup
+  const dragDropController = new AbortController();
   let dragCounter = 0;
-  document.addEventListener('dragenter', e => {
-    e.preventDefault();
-    dragCounter++;
-    showDragOverlay();
-  });
 
-  document.addEventListener('dragleave', e => {
-    e.preventDefault();
-    dragCounter--;
-    if (dragCounter === 0) {
+  document.addEventListener(
+    'dragenter',
+    e => {
+      e.preventDefault();
+      dragCounter++;
+      showDragOverlay();
+    },
+    { signal: dragDropController.signal }
+  );
+
+  document.addEventListener(
+    'dragleave',
+    e => {
+      e.preventDefault();
+      dragCounter--;
+      if (dragCounter === 0) {
+        hideDragOverlay();
+      }
+    },
+    { signal: dragDropController.signal }
+  );
+
+  document.addEventListener(
+    'dragover',
+    e => {
+      e.preventDefault();
+    },
+    { signal: dragDropController.signal }
+  );
+
+  document.addEventListener(
+    'drop',
+    async e => {
+      e.preventDefault();
+      dragCounter = 0;
       hideDragOverlay();
-    }
-  });
 
-  document.addEventListener('dragover', e => {
-    e.preventDefault();
-  });
+      const items = Array.from(e.dataTransfer?.items || []);
+      const files: File[] = [];
 
-  document.addEventListener('drop', async e => {
-    e.preventDefault();
-    dragCounter = 0;
-    hideDragOverlay();
-
-    const items = Array.from(e.dataTransfer?.items || []);
-    const files: File[] = [];
-
-    for (const item of items) {
-      if (item.kind === 'file') {
-        const entry = item.webkitGetAsEntry();
-        if (entry) {
-          await collectFiles(entry, files);
+      for (const item of items) {
+        if (item.kind === 'file') {
+          const entry = item.webkitGetAsEntry();
+          if (entry) {
+            await collectFiles(entry, files);
+          }
         }
       }
-    }
 
-    if (files.length > 0) {
-      await handleFilesUpload(files);
-    }
-  });
+      if (files.length > 0) {
+        await handleFilesUpload(files);
+      }
+    },
+    { signal: dragDropController.signal }
+  );
 
   async function collectFiles(entry: FileSystemEntry, files: File[]): Promise<void> {
     if (entry.isFile) {
@@ -528,17 +580,28 @@ export function initValidatorApp(): void {
 
     // Load text file contents
     const textFiles = Array.from(fileManager.files.values()).filter(f => f.isTextFile);
-    await Promise.all(
-      textFiles.map(async fileNode => {
-        const file = files.find(f => {
-          const path = f.webkitRelativePath || f.name;
-          return path === fileNode.path;
-        });
-        if (file) {
-          fileNode.content = await file.text();
-        }
-      })
-    );
+
+    // Create a map for O(1) lookups instead of O(n) find operations
+    const fileMap = new Map(files.map(f => [f.webkitRelativePath || f.name, f]));
+
+    // Process in batches to avoid memory exhaustion with large file sets
+    const BATCH_SIZE = 10;
+    for (let i = 0; i < textFiles.length; i += BATCH_SIZE) {
+      const batch = textFiles.slice(i, i + BATCH_SIZE);
+      await Promise.all(
+        batch.map(async fileNode => {
+          const file = fileMap.get(fileNode.path);
+          if (file) {
+            try {
+              fileNode.content = await file.text();
+            } catch (error) {
+              console.error(`Failed to read file ${fileNode.path}:`, error);
+              fileNode.content = ''; // Fallback to empty
+            }
+          }
+        })
+      );
+    }
 
     // Show file tree
     fileTreeContainer.style.display = 'flex';
