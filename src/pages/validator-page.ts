@@ -763,36 +763,53 @@ export function initValidatorApp(): void {
   async function handleDownloadZip(): Promise<void> {
     if (!fileManager || !fileTree) return;
 
-    const zip = new JSZip();
+    try {
+      const zip = new JSZip();
 
-    // Add all files to zip
-    for (const [path, fileNode] of fileManager.files) {
-      if (fileNode.type === 'file') {
-        if (fileNode.isTextFile && fileNode.content !== undefined) {
-          // Save current file if it's the active one
-          if (path === fileManager.currentFilePath) {
-            fileNode.content = modInput.value;
+      // Add all files to zip
+      for (const [path, fileNode] of fileManager.files) {
+        if (fileNode.type === 'file') {
+          if (fileNode.isTextFile && fileNode.content !== undefined) {
+            // Save current file if it's the active one
+            if (path === fileManager.currentFilePath) {
+              try {
+                fileNode.content = modInput.value;
+              } catch (error) {
+                console.error(`Failed to save current file ${path}:`, error);
+              }
+            }
+            zip.file(path, fileNode.content);
+          } else if (fileNode.file) {
+            // Add non-text files
+            zip.file(path, fileNode.file);
           }
-          zip.file(path, fileNode.content);
-        } else if (fileNode.file) {
-          // Add non-text files
-          zip.file(path, fileNode.file);
         }
       }
+
+      // Generate zip with compression
+      const blob = await zip.generateAsync({
+        type: 'blob',
+        compression: 'DEFLATE',
+      });
+
+      // Validate blob was created successfully
+      if (!blob || blob.size === 0) {
+        throw new Error('Generated ZIP file is empty');
+      }
+
+      // Download
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${fileManager.rootName}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to generate ZIP:', error);
+      alert('Failed to create ZIP file. The file set may be too large or a file could not be read.');
     }
-
-    // Generate zip
-    const blob = await zip.generateAsync({ type: 'blob' });
-
-    // Download
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${fileManager.rootName}.zip`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   }
 
   function handleValidate(): void {
