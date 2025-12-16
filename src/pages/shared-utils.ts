@@ -7,6 +7,17 @@
 // ============================================================================
 
 /**
+ * Assert that a value is defined (not null or undefined)
+ * @throws Error if value is null or undefined
+ */
+export function assertDefined<T>(value: T | undefined | null, errorMessage: string): T {
+  if (value === undefined || value === null) {
+    throw new Error(errorMessage);
+  }
+  return value;
+}
+
+/**
  * Assert that a value is an instance of a given type
  * @throws Error if value is not an instance of type
  */

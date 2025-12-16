@@ -20,6 +20,45 @@ main {
     min-height: 0;
 }
 
+/* Three-column layout when file tree is visible */
+main.with-file-tree {
+    grid-template-columns: 250px 1fr 1fr;
+    position: relative;
+}
+
+/* Resize handles */
+.resize-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    cursor: col-resize;
+    z-index: 10;
+    transition: background-color 0.2s;
+}
+
+.resize-handle::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 40px;
+    background-color: var(--border-color);
+    border-radius: 1px;
+}
+
+.resize-handle:hover::before,
+.resize-handle.active::before {
+    background-color: var(--primary-color);
+    width: 3px;
+}
+
+.resize-handle.active {
+    background-color: rgba(74, 144, 226, 0.1);
+}
+
 .editor-section,
 .results-section {
     background: var(--surface-color);
@@ -34,13 +73,12 @@ main {
 
 /* Editor with line numbers */
 .editor-wrapper {
-    display: grid;
-    grid-template-columns: auto 1fr;
+    display: flex;
     flex: 1;
     border: 1px solid var(--border-color);
     border-radius: 4px;
     background-color: var(--code-bg);
-    overflow: auto;
+    overflow: hidden;
     min-height: 0;
     position: relative;
 }
@@ -56,10 +94,12 @@ main {
     user-select: none;
     border-right: 1px solid var(--border-color);
     white-space: nowrap;
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
 }
 
 #modInput {
-    width: 100%;
     padding: 15px;
     font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
     font-size: 14px;
@@ -68,8 +108,10 @@ main {
     resize: none;
     background-color: transparent;
     color: var(--text-color);
-    overflow: hidden;
+    overflow: auto;
     white-space: pre;
+    box-sizing: border-box;
+    flex: 1;
 }
 
 #modInput:focus {
@@ -228,8 +270,152 @@ main {
     font-family: monospace;
 }
 
+/* File tree styles */
+.file-tree-section {
+    background: var(--surface-color);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.file-tree-content {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+}
+
+.file-tree-item {
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+    transition: background-color 0.15s;
+}
+
+.file-tree-item:hover {
+    background-color: rgba(74, 144, 226, 0.1);
+}
+
+.file-tree-item.active {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+}
+
+.file-tree-item.directory {
+    font-weight: 500;
+}
+
+.file-tree-item .icon {
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.file-tree-item .name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-tree-item.collapsed .children {
+    display: none;
+}
+
+.file-tree-children {
+    margin-left: 16px;
+}
+
+/* Upload dropdown */
+.upload-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.upload-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    margin-top: 4px;
+    z-index: 1000;
+    min-width: 150px;
+}
+
+.upload-menu-item {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-color);
+    transition: background-color 0.15s;
+}
+
+.upload-menu-item:hover {
+    background-color: rgba(74, 144, 226, 0.1);
+}
+
+.upload-menu-item:first-child {
+    border-radius: 4px 4px 0 0;
+}
+
+.upload-menu-item:last-child {
+    border-radius: 0 0 4px 4px;
+}
+
+/* Drag and drop overlay */
+.drag-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(74, 144, 226, 0.9);
+    display: flex;
+    align-items: center;
+    justify-center;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+.drag-overlay-content {
+    background: white;
+    color: var(--primary-color);
+    padding: 40px;
+    border-radius: 12px;
+    font-size: 24px;
+    font-weight: 600;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
 @media (max-width: 1024px) {
     main {
         grid-template-columns: 1fr;
+    }
+
+    main.with-file-tree {
+        grid-template-columns: 200px 1fr;
+    }
+
+    .results-section {
+        display: none;
     }
 }

@@ -3,8 +3,16 @@
  * Uses the bundled validator from validator.bundle.js
  */
 
-import { initTheme, escapeHtml, getElementByIdAs, assertInstanceOf } from './shared-utils.js';
+import {
+  initTheme,
+  escapeHtml,
+  getElementByIdAs,
+  assertInstanceOf,
+  querySelectorAs,
+  assertDefined,
+} from './shared-utils.js';
 import type { ValidationResult, ValidationMessage, Correction } from '../types.js';
+import JSZip from 'jszip';
 
 // Global ModValidator from bundle
 declare global {
@@ -16,6 +24,24 @@ declare global {
       };
     };
   }
+}
+
+// File tree types
+interface FileNode {
+  name: string;
+  path: string;
+  type: 'file' | 'directory';
+  content?: string; // For files
+  file?: File; // Original File object for non-text files
+  children?: FileNode[]; // For directories
+  validationResult?: ValidationResult; // Cached validation result
+  isTextFile?: boolean; // Whether this is a text file that should be validated
+}
+
+interface FileManager {
+  rootName: string;
+  files: Map<string, FileNode>; // Map of path to FileNode for quick lookup
+  currentFilePath: string | null;
 }
 
 // Sample mod code
@@ -45,6 +71,127 @@ const SAMPLE_MOD = `[Action] ID=greatswordAttack;
 	coneAngle=g:foo;
 `;
 
+// File manager helper functions
+function isTextFile(filename: string): boolean {
+  return filename.toLowerCase().endsWith('.txt');
+}
+
+function buildFileTree(files: File[]): FileNode {
+  const root: FileNode = {
+    name: 'root',
+    path: '',
+    type: 'directory',
+    children: [],
+  };
+
+  for (const file of files) {
+    const parts = file.webkitRelativePath ? file.webkitRelativePath.split('/') : [file.name];
+    let current = root;
+
+    // Build directory structure
+    for (let i = 0; i < parts.length - 1; i++) {
+      const partName = parts[i];
+      if (!partName) continue;
+
+      let child = current.children?.find(c => c.name === partName && c.type === 'directory');
+      if (!child) {
+        child = {
+          name: partName,
+          path: parts.slice(0, i + 1).join('/'),
+          type: 'directory',
+          children: [],
+        };
+        const children = assertDefined(current.children, 'Current node should have children array');
+        children.push(child);
+      }
+      current = child;
+    }
+
+    // Add file
+    const fileName = assertDefined(parts[parts.length - 1], 'File path should have at least one component');
+
+    const filePath = parts.join('/');
+    const isText = isTextFile(fileName);
+
+    const fileNode: FileNode = {
+      name: fileName,
+      path: filePath,
+      type: 'file',
+      isTextFile: isText,
+    };
+
+    if (isText) {
+      fileNode.content = ''; // Will be loaded asynchronously
+    } else {
+      fileNode.file = file; // Store original file for non-text files
+    }
+
+    const children = assertDefined(current.children, 'Current node should have children array');
+    children.push(fileNode);
+  }
+
+  // Sort children: directories first, then files, alphabetically
+  function sortChildren(node: FileNode): void {
+    if (node.children) {
+      node.children.sort((a, b) => {
+        if (a.type !== b.type) {
+          return a.type === 'directory' ? -1 : 1;
+        }
+        return a.name.localeCompare(b.name);
+      });
+      node.children.forEach(sortChildren);
+    }
+  }
+  sortChildren(root);
+
+  return root;
+}
+
+function flattenFileTree(root: FileNode): Map<string, FileNode> {
+  const map = new Map<string, FileNode>();
+
+  function traverse(node: FileNode): void {
+    if (node.path) {
+      map.set(node.path, node);
+    }
+    if (node.children) {
+      node.children.forEach(traverse);
+    }
+  }
+
+  traverse(root);
+  return map;
+}
+
+function findFirstFileByDepth(root: FileNode): string | null {
+  // Find first text file at root level, then alphabetically
+  const textFiles: FileNode[] = [];
+
+  function findTextFiles(node: FileNode, depth: number): void {
+    if (node.type === 'file' && node.isTextFile) {
+      textFiles.push({ ...node, path: node.path }); // Add depth info implicitly by order
+    }
+    if (node.children && depth < 10) {
+      // Limit depth to prevent infinite loops
+      node.children.forEach(child => findTextFiles(child, depth + 1));
+    }
+  }
+
+  findTextFiles(root, 0);
+
+  // Sort by path depth (fewer slashes = shallower), then alphabetically
+  textFiles.sort((a, b) => {
+    const depthA = a.path.split('/').length;
+    const depthB = b.path.split('/').length;
+    if (depthA !== depthB) {
+      return depthA - depthB;
+    }
+    return a.path.localeCompare(b.path);
+  });
+
+  return textFiles[0]?.path || null;
+}
+
 export function initValidatorApp(): void {
   // Check if we're on the validator page
   if (!document.getElementById('modInput')) return;
@@ -53,6 +200,10 @@ export function initValidatorApp(): void {
   initTheme('mod-validator-theme');
 
   const validator = new window.ModValidator.ModValidator();
+
+  // File manager state
+  let fileManager: FileManager | null = null;
+  let fileTree: FileNode | null = null;
 
   // DOM elements
   const modInput = getElementByIdAs('modInput', HTMLTextAreaElement);
@@ -63,10 +214,53 @@ export function initValidatorApp(): void {
   const validationStatus = getElementByIdAs('validationStatus', HTMLDivElement);
   const lineNumbers = getElementByIdAs('lineNumbers', HTMLDivElement);
 
+  // New elements for file tree
+  const fileTreeContainer = getElementByIdAs('fileTree', HTMLDivElement);
+  const fileTreeContent = getElementByIdAs('fileTreeContent', HTMLDivElement);
+  const uploadFilesBtn = getElementByIdAs('uploadFilesBtn', HTMLButtonElement);
+  const uploadDirBtn = getElementByIdAs('uploadDirBtn', HTMLButtonElement);
+  const fileInput = getElementByIdAs('fileInput', HTMLInputElement);
+  const dirInput = getElementByIdAs('dirInput', HTMLInputElement);
+  const downloadZipBtn = getElementByIdAs('downloadZipBtn', HTMLButtonElement);
+  const mainContainer = getElementByIdAs('main', HTMLElement);
+
   // Event listeners
   validateBtn.addEventListener('click', handleValidate);
   clearBtn.addEventListener('click', handleClear);
   loadSampleBtn.addEventListener('click', handleLoadSample);
+  uploadFilesBtn.addEventListener('click', () => fileInput.click());
+  uploadDirBtn.addEventListener('click', () => dirInput.click());
+  fileInput.addEventListener('change', handleFileInputChange);
+  dirInput.addEventListener('change', handleFileInputChange);
+  downloadZipBtn.addEventListener('click', handleDownloadZip);
+
+  // Handle upload dropdown with delay
+  const uploadDropdown = querySelectorAs('.upload-dropdown', HTMLElement);
+  const uploadMenu = querySelectorAs('.upload-menu', HTMLElement);
+  let hideMenuTimeout: number | undefined;
+
+  if (uploadDropdown && uploadMenu) {
+    const showMenu = () => {
+      clearTimeout(hideMenuTimeout);
+      uploadMenu.style.display = 'block';
+    };
+
+    const hideMenuWithDelay = () => {
+      hideMenuTimeout = window.setTimeout(() => {
+        uploadMenu.style.display = 'none';
+      }, 500);
+    };
+
+    uploadDropdown.addEventListener('mouseenter', showMenu);
+    uploadDropdown.addEventListener('mouseleave', hideMenuWithDelay);
+    uploadMenu.addEventListener('mouseenter', showMenu);
+    uploadMenu.addEventListener('mouseleave', hideMenuWithDelay);
+  }
+
+  // Sync line numbers scroll with textarea scroll
+  modInput.addEventListener('scroll', () => {
+    lineNumbers.scrollTop = modInput.scrollTop;
+  });
 
   // Auto-validate on input (debounced)
   let validateTimeout: number | undefined;
@@ -78,6 +272,465 @@ export function initValidatorApp(): void {
 
   // Initialize line numbers
   updateLineNumbers();
+
+  // Resize handles
+  let resizeHandle1: HTMLElement | null = null;
+  let resizeHandle2: HTMLElement | null = null;
+
+  function createResizeHandles(): void {
+    // Remove existing handles
+    resizeHandle1?.remove();
+    resizeHandle2?.remove();
+
+    if (!fileManager) return;
+
+    // Create resize handle between tree and editor
+    resizeHandle1 = document.createElement('div');
+    resizeHandle1.className = 'resize-handle';
+    resizeHandle1.id = 'resize-handle-1';
+
+    // Create resize handle between editor and results
+    resizeHandle2 = document.createElement('div');
+    resizeHandle2.className = 'resize-handle';
+    resizeHandle2.id = 'resize-handle-2';
+
+    mainContainer.appendChild(resizeHandle1);
+    mainContainer.appendChild(resizeHandle2);
+
+    // Position the handles
+    updateResizeHandlePositions();
+
+    // Add resize listeners
+    let isResizing = false;
+    let currentHandle: HTMLElement | null = null;
+    let startX = 0;
+    let startWidths: number[] = [];
+
+    const startResize = (e: MouseEvent, handle: HTMLElement) => {
+      isResizing = true;
+      currentHandle = handle;
+      startX = e.clientX;
+      handle.classList.add('active');
+
+      // Get current column widths
+      const computedStyle = window.getComputedStyle(mainContainer);
+      const columns = computedStyle.gridTemplateColumns.split(' ');
+      startWidths = columns.map(col => parseFloat(col));
+
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    };
+
+    const doResize = (e: MouseEvent) => {
+      if (!isResizing || !currentHandle) return;
+
+      const deltaX = e.clientX - startX;
+      const containerWidth = mainContainer.offsetWidth;
+
+      if (currentHandle === resizeHandle1) {
+        // Resize between tree and editor
+        const firstWidth = assertDefined(startWidths[0], 'First column width should be defined');
+
+        const treeWidthPx = firstWidth + deltaX;
+        const treeWidthPercent = (treeWidthPx / containerWidth) * 100;
+
+        // Clamp between 150px and 40% of container
+        const minTreeWidth = (150 / containerWidth) * 100;
+        const maxTreeWidth = 40;
+        const clampedTreeWidth = Math.max(minTreeWidth, Math.min(maxTreeWidth, treeWidthPercent));
+
+        mainContainer.style.gridTemplateColumns = `${clampedTreeWidth}% 1fr 1fr`;
+      } else if (currentHandle === resizeHandle2) {
+        // Resize between editor and results
+        // For middle column resize, we need to calculate based on the remaining space
+        const secondWidth = assertDefined(startWidths[1], 'Second column width should be defined');
+
+        const editorWidthPx = secondWidth + deltaX;
+        const treeWidth = mainContainer.style.gridTemplateColumns.split(' ')[0] || '250px';
+
+        // Calculate remaining space after tree
+        const treeWidthPx = treeWidth.includes('%')
+          ? (parseFloat(treeWidth) / 100) * containerWidth
+          : parseFloat(treeWidth);
+
+        const remainingWidth = containerWidth - treeWidthPx;
+        const editorWidthPercent = (editorWidthPx / remainingWidth) * 100;
+
+        // Clamp between 30% and 70% of remaining space
+        const clampedEditorWidth = Math.max(30, Math.min(70, editorWidthPercent));
+        const resultsWidth = 100 - clampedEditorWidth;
+
+        mainContainer.style.gridTemplateColumns = `${treeWidth} ${clampedEditorWidth}% ${resultsWidth}%`;
+      }
+
+      updateResizeHandlePositions();
+    };
+
+    const stopResize = () => {
+      if (isResizing) {
+        isResizing = false;
+        currentHandle?.classList.remove('active');
+        currentHandle = null;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    };
+
+    resizeHandle1.addEventListener('mousedown', e => startResize(e, resizeHandle1!));
+    resizeHandle2.addEventListener('mousedown', e => startResize(e, resizeHandle2!));
+    document.addEventListener('mousemove', doResize);
+    document.addEventListener('mouseup', stopResize);
+  }
+
+  function updateResizeHandlePositions(): void {
+    if (!resizeHandle1 || !resizeHandle2) return;
+
+    const fileTreeRect = fileTreeContainer.getBoundingClientRect();
+    const editorRect = document.querySelector('.editor-section')?.getBoundingClientRect();
+    const mainRect = mainContainer.getBoundingClientRect();
+
+    if (fileTreeRect && mainRect) {
+      const handle1Left = fileTreeRect.right - mainRect.left - 4;
+      resizeHandle1.style.left = `${handle1Left}px`;
+    }
+
+    if (editorRect && mainRect) {
+      const handle2Left = editorRect.right - mainRect.left - 4;
+      resizeHandle2.style.left = `${handle2Left}px`;
+    }
+  }
+
+  // Drag and drop support
+  let dragCounter = 0;
+  document.addEventListener('dragenter', e => {
+    e.preventDefault();
+    dragCounter++;
+    showDragOverlay();
+  });
+
+  document.addEventListener('dragleave', e => {
+    e.preventDefault();
+    dragCounter--;
+    if (dragCounter === 0) {
+      hideDragOverlay();
+    }
+  });
+
+  document.addEventListener('dragover', e => {
+    e.preventDefault();
+  });
+
+  document.addEventListener('drop', async e => {
+    e.preventDefault();
+    dragCounter = 0;
+    hideDragOverlay();
+
+    const items = Array.from(e.dataTransfer?.items || []);
+    const files: File[] = [];
+
+    for (const item of items) {
+      if (item.kind === 'file') {
+        const entry = item.webkitGetAsEntry();
+        if (entry) {
+          await collectFiles(entry, files);
+        }
+      }
+    }
+
+    if (files.length > 0) {
+      await handleFilesUpload(files);
+    }
+  });
+
+  async function collectFiles(entry: FileSystemEntry, files: File[]): Promise<void> {
+    if (entry.isFile) {
+      const fileEntry = entry as FileSystemFileEntry;
+      await new Promise<void>(resolve => {
+        fileEntry.file(file => {
+          // Add webkitRelativePath for consistency
+          Object.defineProperty(file, 'webkitRelativePath', {
+            writable: true,
+            value: entry.fullPath.slice(1), // Remove leading /
+          });
+          files.push(file);
+          resolve();
+        });
+      });
+    } else if (entry.isDirectory) {
+      const dirEntry = entry as FileSystemDirectoryEntry;
+      const reader = dirEntry.createReader();
+      await new Promise<void>(resolve => {
+        reader.readEntries(async entries => {
+          for (const childEntry of entries) {
+            await collectFiles(childEntry, files);
+          }
+          resolve();
+        });
+      });
+    }
+  }
+
+  function showDragOverlay(): void {
+    let overlay = document.getElementById('dragOverlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'dragOverlay';
+      overlay.className = 'drag-overlay';
+      overlay.innerHTML = '<div class="drag-overlay-content">Drop files or folders here</div>';
+      document.body.appendChild(overlay);
+    }
+  }
+
+  function hideDragOverlay(): void {
+    const overlay = document.getElementById('dragOverlay');
+    if (overlay) {
+      overlay.remove();
+    }
+  }
+
+  async function handleFileInputChange(e: Event): Promise<void> {
+    const input = e.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const filesArray = Array.from(input.files);
+      await handleFilesUpload(filesArray);
+    }
+    // Reset input so the same files can be selected again
+    input.value = '';
+  }
+
+  async function handleFilesUpload(files: File[]): Promise<void> {
+    // Confirm if replacing existing files
+    if (fileManager) {
+      const proceed = confirm('This will replace all currently loaded files. Do you want to proceed?');
+      if (!proceed) return;
+    }
+
+    // Warn if too many files
+    if (files.length > 100) {
+      const proceed = confirm(
+        `You are about to upload ${files.length} files. This may take a moment and could slow down the validator. Do you want to proceed?`
+      );
+      if (!proceed) return;
+    }
+
+    // Build file tree
+    fileTree = buildFileTree(files);
+
+    // Determine root name from first file's path
+    const firstFile = assertDefined(files[0], 'Files array should not be empty');
+    const path = firstFile.webkitRelativePath || firstFile.name;
+    const parts = path.split('/');
+    fileManager = {
+      rootName: parts.length > 1 ? assertDefined(parts[0], 'File path should have root directory') : 'mod-files',
+      files: flattenFileTree(fileTree),
+      currentFilePath: null,
+    };
+
+    // Load text file contents
+    const textFiles = Array.from(fileManager.files.values()).filter(f => f.isTextFile);
+    await Promise.all(
+      textFiles.map(async fileNode => {
+        const file = files.find(f => {
+          const path = f.webkitRelativePath || f.name;
+          return path === fileNode.path;
+        });
+        if (file) {
+          fileNode.content = await file.text();
+        }
+      })
+    );
+
+    // Show file tree
+    fileTreeContainer.style.display = 'flex';
+    mainContainer.classList.add('with-file-tree');
+    downloadZipBtn.style.display = 'inline-block';
+
+    // Update buttons
+    clearBtn.textContent = 'Close All';
+    loadSampleBtn.style.display = 'none';
+
+    // Render file tree
+    renderFileTree();
+
+    // Create resize handles
+    createResizeHandles();
+
+    // Select first file by depth
+    const firstFilePath = findFirstFileByDepth(fileTree);
+    if (firstFilePath) {
+      await selectFile(firstFilePath);
+    }
+
+    // Validate all text files on upload
+    await validateAllFiles();
+  }
+
+  function renderFileTree(): void {
+    if (!fileTree || !fileManager) return;
+
+    fileTreeContent.innerHTML = '';
+    renderFileNode(fileTree, fileTreeContent, 0);
+  }
+
+  function renderFileNode(node: FileNode, container: HTMLElement, depth: number): void {
+    if (node.children) {
+      // Render directory and its children
+      for (const child of node.children) {
+        const itemDiv = document.createElement('div');
+
+        if (child.type === 'directory') {
+          itemDiv.className = 'file-tree-item directory collapsed';
+          itemDiv.innerHTML = `
+            <span class="icon">▸</span>
+            <span class="name">${escapeHtml(child.name)}</span>
+          `;
+
+          const childrenDiv = document.createElement('div');
+          childrenDiv.className = 'file-tree-children';
+          childrenDiv.style.display = 'none';
+
+          itemDiv.addEventListener('click', e => {
+            e.stopPropagation();
+            const icon = itemDiv.querySelector('.icon');
+            if (itemDiv.classList.contains('collapsed')) {
+              itemDiv.classList.remove('collapsed');
+              if (icon) icon.textContent = '▾';
+              childrenDiv.style.display = 'block';
+            } else {
+              itemDiv.classList.add('collapsed');
+              if (icon) icon.textContent = '▸';
+              childrenDiv.style.display = 'none';
+            }
+          });
+
+          container.appendChild(itemDiv);
+          container.appendChild(childrenDiv);
+          renderFileNode(child, childrenDiv, depth + 1);
+        } else {
+          // File
+          const icon = child.isTextFile ? '📄' : '📎';
+          itemDiv.className = 'file-tree-item';
+          itemDiv.dataset['path'] = child.path;
+          itemDiv.innerHTML = `
+            <span class="icon">${icon}</span>
+            <span class="name">${escapeHtml(child.name)}</span>
+          `;
+
+          if (child.isTextFile) {
+            const filePath = child.path;
+            itemDiv.addEventListener('click', () => selectFile(filePath));
+          } else {
+            itemDiv.style.opacity = '0.6';
+            itemDiv.style.cursor = 'default';
+          }
+
+          container.appendChild(itemDiv);
+        }
+      }
+    }
+  }
+
+  async function selectFile(path: string): Promise<void> {
+    if (!fileManager) return;
+
+    // Save current file content if there's a current file
+    if (fileManager.currentFilePath) {
+      const currentFile = fileManager.files.get(fileManager.currentFilePath);
+      if (currentFile && currentFile.isTextFile) {
+        currentFile.content = modInput.value;
+      }
+    }
+
+    // Load new file
+    const fileNode = fileManager.files.get(path);
+    if (!fileNode || !fileNode.isTextFile) return;
+
+    fileManager.currentFilePath = path;
+    modInput.value = fileNode.content || '';
+    updateLineNumbers();
+
+    // Expand parent directories to show the selected file
+    const pathParts = path.split('/');
+    for (let i = 1; i < pathParts.length; i++) {
+      const partialPath = pathParts.slice(0, i).join('/');
+      document.querySelectorAll('.file-tree-item.directory').forEach(dirItem => {
+        const dirPath = dirItem.querySelector('.name')?.textContent;
+        if (dirPath && partialPath.endsWith(dirPath)) {
+          dirItem.classList.remove('collapsed');
+          const icon = dirItem.querySelector('.icon');
+          if (icon) icon.textContent = '▾';
+          const nextSibling = dirItem.nextElementSibling;
+          if (nextSibling && nextSibling.classList.contains('file-tree-children')) {
+            assertInstanceOf(nextSibling, HTMLElement, 'File tree children container').style.display = 'block';
+          }
+        }
+      });
+    }
+
+    // Update active state in tree
+    document.querySelectorAll('.file-tree-item').forEach(item => {
+      if (item.getAttribute('data-path') === path) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+
+    // Display cached validation results if available
+    if (fileNode.validationResult) {
+      displayResults(fileNode.validationResult);
+    } else {
+      // Validate this file
+      handleValidate();
+    }
+  }
+
+  async function validateAllFiles(): Promise<void> {
+    if (!fileManager) return;
+
+    const textFiles = Array.from(fileManager.files.values()).filter(f => f.isTextFile);
+
+    for (const fileNode of textFiles) {
+      if (fileNode.content) {
+        fileNode.validationResult = validator.validate(fileNode.content);
+      }
+    }
+  }
+
+  async function handleDownloadZip(): Promise<void> {
+    if (!fileManager || !fileTree) return;
+
+    const zip = new JSZip();
+
+    // Add all files to zip
+    for (const [path, fileNode] of fileManager.files) {
+      if (fileNode.type === 'file') {
+        if (fileNode.isTextFile && fileNode.content !== undefined) {
+          // Save current file if it's the active one
+          if (path === fileManager.currentFilePath) {
+            fileNode.content = modInput.value;
+          }
+          zip.file(path, fileNode.content);
+        } else if (fileNode.file) {
+          // Add non-text files
+          zip.file(path, fileNode.file);
+        }
+      }
+    }
+
+    // Generate zip
+    const blob = await zip.generateAsync({ type: 'blob' });
+
+    // Download
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${fileManager.rootName}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
 
   function handleValidate(): void {
     const content = modInput.value;
@@ -98,6 +751,14 @@ export function initValidatorApp(): void {
       const result = validator.validate(content);
       displayResults(result);
 
+      // Cache result if in multi-file mode
+      if (fileManager && fileManager.currentFilePath) {
+        const currentFile = fileManager.files.get(fileManager.currentFilePath);
+        if (currentFile) {
+          currentFile.validationResult = result;
+        }
+      }
+
       // Remove loading state
       validateBtn.classList.remove('loading');
       validateBtn.textContent = 'Validate';
@@ -105,12 +766,44 @@ export function initValidatorApp(): void {
   }
 
   function handleClear(): void {
-    modInput.value = '';
-    updateLineNumbers();
-    resultsContainer.innerHTML =
-      '<p class="placeholder">No validation results yet. Paste your mod code and click "Validate".</p>';
-    validationStatus.textContent = '';
-    validationStatus.className = 'status';
+    if (fileManager) {
+      // Confirm before closing all files
+      const proceed = confirm(
+        'This will close all loaded files. Any unsaved changes will be lost. Do you want to proceed?'
+      );
+      if (!proceed) return;
+
+      // Close all files
+      fileManager = null;
+      fileTree = null;
+      fileTreeContainer.style.display = 'none';
+      mainContainer.classList.remove('with-file-tree');
+      mainContainer.style.gridTemplateColumns = ''; // Reset grid columns
+      downloadZipBtn.style.display = 'none';
+      clearBtn.textContent = 'Clear';
+      loadSampleBtn.style.display = 'inline-block';
+
+      // Remove resize handles
+      resizeHandle1?.remove();
+      resizeHandle2?.remove();
+      resizeHandle1 = null;
+      resizeHandle2 = null;
+
+      modInput.value = '';
+      updateLineNumbers();
+      resultsContainer.innerHTML =
+        '<p class="placeholder">No validation results yet. Paste your mod code and click "Validate".</p>';
+      validationStatus.textContent = '';
+      validationStatus.className = 'status';
+    } else {
+      // Single file mode - just clear
+      modInput.value = '';
+      updateLineNumbers();
+      resultsContainer.innerHTML =
+        '<p class="placeholder">No validation results yet. Paste your mod code and click "Validate".</p>';
+      validationStatus.textContent = '';
+      validationStatus.className = 'status';
+    }
   }
 
   function handleLoadSample(): void {
@@ -278,20 +971,17 @@ export function initValidatorApp(): void {
       // Calculate absolute character positions
       let absoluteStart = 0;
       for (let i = 0; i < startLine - 1; i++) {
-        const line = lines[i];
-        if (line === undefined) {
-          throw new Error(`Line ${i} is undefined when calculating position for startLine ${startLine}`);
-        }
+        const line = assertDefined(
+          lines[i],
+          `Line ${i} is undefined when calculating position for startLine ${startLine}`
+        );
         absoluteStart += line.length + 1; // +1 for newline
       }
       absoluteStart += startColumn;
 
       let absoluteEnd = 0;
       for (let i = 0; i < endLine - 1; i++) {
-        const line = lines[i];
-        if (line === undefined) {
-          throw new Error(`Line ${i} is undefined when calculating position for endLine ${endLine}`);
-        }
+        const line = assertDefined(lines[i], `Line ${i} is undefined when calculating position for endLine ${endLine}`);
         absoluteEnd += line.length + 1;
       }
       absoluteEnd += endColumn;
@@ -301,13 +991,14 @@ export function initValidatorApp(): void {
       // Fallback: select the entire line
       let charPosition = 0;
       for (let i = 0; i < lineNumber - 1; i++) {
-        const line = lines[i];
-        if (line === undefined) {
-          throw new Error(`Line ${i} is undefined when calculating position for lineNumber ${lineNumber}`);
-        }
+        const line = assertDefined(
+          lines[i],
+          `Line ${i} is undefined when calculating position for lineNumber ${lineNumber}`
+        );
         charPosition += line.length + 1; // +1 for newline
       }
-      modInput.setSelectionRange(charPosition, charPosition + (lines[lineNumber - 1]?.length || 0));
+      const lineLength = lines[lineNumber - 1]?.length || 0;
+      modInput.setSelectionRange(charPosition, charPosition + lineLength);
     }
   }
 
@@ -358,20 +1049,14 @@ export function initValidatorApp(): void {
     // Calculate absolute character positions
     let absoluteStart = 0;
     for (let i = 0; i < startLine - 1; i++) {
-      const line = lines[i];
-      if (line === undefined) {
-        throw new Error(`Line ${i} is undefined when applying correction at startLine ${startLine}`);
-      }
+      const line = assertDefined(lines[i], `Line ${i} is undefined when applying correction at startLine ${startLine}`);
       absoluteStart += line.length + 1; // +1 for newline
     }
     absoluteStart += startColumn;
 
     let absoluteEnd = 0;
     for (let i = 0; i < endLine - 1; i++) {
-      const line = lines[i];
-      if (line === undefined) {
-        throw new Error(`Line ${i} is undefined when applying correction at endLine ${endLine}`);
-      }
+      const line = assertDefined(lines[i], `Line ${i} is undefined when applying correction at endLine ${endLine}`);
       absoluteEnd += line.length + 1;
     }
     absoluteEnd += endColumn;
