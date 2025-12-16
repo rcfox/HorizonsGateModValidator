@@ -528,7 +528,12 @@ export function initValidatorApp(): void {
       overlay = document.createElement('div');
       overlay.id = 'dragOverlay';
       overlay.className = 'drag-overlay';
-      overlay.innerHTML = '<div class="drag-overlay-content">Drop files or folders here</div>';
+
+      const content = document.createElement('div');
+      content.className = 'drag-overlay-content';
+      content.textContent = 'Drop files or folders here';
+      overlay.appendChild(content);
+
       document.body.appendChild(overlay);
     }
   }
@@ -643,10 +648,17 @@ export function initValidatorApp(): void {
 
         if (child.type === 'directory') {
           itemDiv.className = 'file-tree-item directory collapsed';
-          itemDiv.innerHTML = `
-            <span class="icon">▸</span>
-            <span class="name">${escapeHtml(child.name)}</span>
-          `;
+
+          const iconSpan = document.createElement('span');
+          iconSpan.className = 'icon';
+          iconSpan.textContent = '▸';
+
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'name';
+          nameSpan.textContent = child.name; // No escaping needed with textContent
+
+          itemDiv.appendChild(iconSpan);
+          itemDiv.appendChild(nameSpan);
 
           const childrenDiv = document.createElement('div');
           childrenDiv.className = 'file-tree-children';
@@ -674,10 +686,17 @@ export function initValidatorApp(): void {
           const icon = child.isTextFile ? '📄' : '📎';
           itemDiv.className = 'file-tree-item';
           itemDiv.dataset['path'] = child.path;
-          itemDiv.innerHTML = `
-            <span class="icon">${icon}</span>
-            <span class="name">${escapeHtml(child.name)}</span>
-          `;
+
+          const iconSpan = document.createElement('span');
+          iconSpan.className = 'icon';
+          iconSpan.textContent = icon;
+
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'name';
+          nameSpan.textContent = child.name; // No escaping needed with textContent
+
+          itemDiv.appendChild(iconSpan);
+          itemDiv.appendChild(nameSpan);
 
           if (child.isTextFile) {
             const filePath = child.path;
