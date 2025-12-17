@@ -1,5 +1,12 @@
 /* Validator page specific styles (index.html only) */
 
+/* Z-index layers - centralized for easy management */
+:root {
+    --z-resize-handle: 10;
+    --z-dropdown: 1000;
+    --z-overlay: 10000;
+}
+
 /* Two-column layout */
 body {
     height: 100vh;
@@ -33,7 +40,7 @@ main.with-file-tree {
     bottom: 0;
     width: 8px;
     cursor: col-resize;
-    z-index: 10;
+    z-index: var(--z-resize-handle);
     transition: background-color 0.2s;
 }
 
@@ -352,7 +359,7 @@ main.with-file-tree {
     border-radius: 4px;
     box-shadow: var(--shadow);
     margin-top: 4px;
-    z-index: 1000;
+    z-index: var(--z-dropdown);
     min-width: 150px;
 }
 
@@ -392,7 +399,7 @@ main.with-file-tree {
     display: flex;
     align-items: center;
     justify-center;
-    z-index: 10000;
+    z-index: var(--z-overlay);
     pointer-events: none;
 }
 
