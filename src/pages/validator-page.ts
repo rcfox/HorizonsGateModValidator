@@ -677,6 +677,7 @@ export function initValidatorApp(): void {
 
     // Process in batches to avoid memory exhaustion with large file sets
     const BATCH_SIZE = 10;
+    const failures: string[] = [];
     for (let i = 0; i < textFiles.length; i += BATCH_SIZE) {
       const batch = textFiles.slice(i, i + BATCH_SIZE);
       await Promise.all(
@@ -687,11 +688,17 @@ export function initValidatorApp(): void {
               fileNode.content = await file.text();
             } catch (error) {
               console.error(`Failed to read file ${fileNode.path}:`, error);
-              fileNode.content = ''; // Fallback to empty
+              failures.push(fileNode.path);
+              fileNode.content = '-- This file failed to load.';
             }
           }
         })
       );
+    }
+
+    // Notify user if any files failed to load
+    if (failures.length > 0) {
+      alert(`Warning: ${failures.length} file(s) failed to load:\n${failures.join('\n')}`);
     }
 
     // Show file tree
