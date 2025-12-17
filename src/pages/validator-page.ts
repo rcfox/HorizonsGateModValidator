@@ -729,7 +729,8 @@ export function initValidatorApp(): void {
   function renderFileTree(): void {
     if (!fileTree || !fileManager) return;
 
-    fileTreeContent.innerHTML = '';
+    // Clear existing content and its event listeners
+    fileTreeContent.replaceChildren();
     renderFileNode(fileTree, fileTreeContent, 0);
   }
 
