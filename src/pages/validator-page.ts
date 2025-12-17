@@ -26,17 +26,30 @@ declare global {
   }
 }
 
-// File tree types
-interface FileNode {
+// File tree types - discriminated union on 'type' field
+interface FileNodeTextFile {
+  type: 'text-file';
   name: string;
   path: string;
-  type: 'file' | 'directory';
-  content?: string; // For files
-  file?: File; // Original File object for non-text files
-  children?: FileNode[]; // For directories
-  validationResult?: ValidationResult; // Cached validation result
-  isTextFile?: boolean; // Whether this is a text file that should be validated
+  content: string; // Empty string initially, loaded asynchronously
+  validationResult: ValidationResult | null; // null until validated
 }
+
+interface FileNodeBinaryFile {
+  type: 'binary-file';
+  name: string;
+  path: string;
+  file: File; // Original File object for download
+}
+
+interface FileNodeDirectory {
+  type: 'directory';
+  name: string;
+  path: string;
+  childrenMap: Map<string, FileNode>; // Maintains insertion/sort order
+}
+
+type FileNode = FileNodeTextFile | FileNodeBinaryFile | FileNodeDirectory;
 
 interface FileManager {
   rootName: string;
@@ -76,35 +89,40 @@ function isTextFile(filename: string): boolean {
   return filename.toLowerCase().endsWith('.txt');
 }
 
-function buildFileTree(files: File[]): FileNode {
-  const root: FileNode = {
+function buildFileTree(files: File[]): FileNodeDirectory {
+  const root: FileNodeDirectory = {
     name: 'root',
     path: '',
     type: 'directory',
-    children: [],
+    childrenMap: new Map(),
   };
 
   for (const file of files) {
     const parts = file.webkitRelativePath ? file.webkitRelativePath.split('/') : [file.name];
-    let current = root;
+    let current: FileNodeDirectory = root;
 
     // Build directory structure
     for (let i = 0; i < parts.length - 1; i++) {
       const partName = parts[i];
       if (!partName) continue;
 
-      let child = current.children?.find(c => c.name === partName && c.type === 'directory');
+      // Use childrenMap for O(1) lookup
+      let child = current.childrenMap.get(partName);
       if (!child) {
-        child = {
+        const newDir: FileNodeDirectory = {
           name: partName,
           path: parts.slice(0, i + 1).join('/'),
           type: 'directory',
-          children: [],
+          childrenMap: new Map(),
         };
-        const children = assertDefined(current.children, 'Current node should have children array');
-        children.push(child);
+        current.childrenMap.set(partName, newDir);
+        child = newDir;
       }
-      current = child;
+
+      // Type assertion: we know directories only contain directories until the last part
+      if (child.type === 'directory') {
+        current = child;
+      }
     }
 
     // Add file
@@ -113,33 +131,46 @@ function buildFileTree(files: File[]): FileNode {
     const filePath = parts.join('/');
     const isText = isTextFile(fileName);
 
-    const fileNode: FileNode = {
-      name: fileName,
-      path: filePath,
-      type: 'file',
-      isTextFile: isText,
-    };
+    const fileNode: FileNode = isText
+      ? {
+          type: 'text-file',
+          name: fileName,
+          path: filePath,
+          content: '', // Will be loaded asynchronously
+          validationResult: null, // Not validated yet
+        }
+      : {
+          type: 'binary-file',
+          name: fileName,
+          path: filePath,
+          file: file, // Store original file for download
+        };
 
-    if (isText) {
-      fileNode.content = ''; // Will be loaded asynchronously
-    } else {
-      fileNode.file = file; // Store original file for non-text files
-    }
-
-    const children = assertDefined(current.children, 'Current node should have children array');
-    children.push(fileNode);
+    current.childrenMap.set(fileName, fileNode);
   }
 
   // Sort children: directories first, then files, alphabetically
-  function sortChildren(node: FileNode): void {
-    if (node.children) {
-      node.children.sort((a, b) => {
-        if (a.type !== b.type) {
-          return a.type === 'directory' ? -1 : 1;
-        }
-        return a.name.localeCompare(b.name);
-      });
-      node.children.forEach(sortChildren);
+  function sortChildren(node: FileNodeDirectory): void {
+    // Convert to array, sort, then rebuild map to maintain sorted order
+    const childArray = Array.from(node.childrenMap.values());
+    childArray.sort((a, b) => {
+      // Directories first, then files (text and binary treated equally)
+      const aIsDir = a.type === 'directory';
+      const bIsDir = b.type === 'directory';
+      if (aIsDir !== bIsDir) {
+        return aIsDir ? -1 : 1;
+      }
+      return a.name.localeCompare(b.name);
+    });
+
+    // Rebuild map with sorted insertion order
+    node.childrenMap.clear();
+    for (const child of childArray) {
+      node.childrenMap.set(child.name, child);
+      // Recursively sort children if this is a directory
+      if (child.type === 'directory') {
+        sortChildren(child);
+      }
     }
   }
   sortChildren(root);
@@ -147,15 +178,15 @@ function buildFileTree(files: File[]): FileNode {
   return root;
 }
 
-function flattenFileTree(root: FileNode): Map<string, FileNode> {
+function flattenFileTree(root: FileNodeDirectory): Map<string, FileNode> {
   const map = new Map<string, FileNode>();
 
   function traverse(node: FileNode): void {
     if (node.path) {
       map.set(node.path, node);
     }
-    if (node.children) {
-      node.children.forEach(traverse);
+    if (node.type === 'directory') {
+      node.childrenMap.forEach(traverse);
     }
   }
 
@@ -163,17 +194,17 @@ function flattenFileTree(root: FileNode): Map<string, FileNode> {
   return map;
 }
 
-function findFirstFileByDepth(root: FileNode): string | null {
+function findFirstFileByDepth(root: FileNodeDirectory): string | null {
   // Find first text file at root level, then alphabetically
-  const textFiles: FileNode[] = [];
+  const textFiles: FileNodeTextFile[] = [];
 
   function findTextFiles(node: FileNode, depth: number): void {
-    if (node.type === 'file' && node.isTextFile) {
-      textFiles.push({ ...node, path: node.path }); // Add depth info implicitly by order
+    if (node.type === 'text-file') {
+      textFiles.push(node);
     }
-    if (node.children && depth < 10) {
+    if (node.type === 'directory' && depth < 10) {
       // Limit depth to prevent infinite loops
-      node.children.forEach(child => findTextFiles(child, depth + 1));
+      node.childrenMap.forEach(child => findTextFiles(child, depth + 1));
     }
   }
 
@@ -213,7 +244,7 @@ export function initValidatorApp(): void {
 
   // File manager state
   let fileManager: FileManager | null = null;
-  let fileTree: FileNode | null = null;
+  let fileTree: FileNodeDirectory | null = null;
 
   // DOM elements
   const modInput = getElementByIdAs('modInput', HTMLTextAreaElement);
@@ -511,14 +542,26 @@ export function initValidatorApp(): void {
     } else if (entry.isDirectory) {
       const dirEntry = entry as FileSystemDirectoryEntry;
       const reader = dirEntry.createReader();
-      await new Promise<void>(resolve => {
-        reader.readEntries(async entries => {
-          for (const childEntry of entries) {
-            await collectFiles(childEntry, files);
-          }
-          resolve();
-        });
-      });
+
+      // Read all entries (may require multiple calls due to browser batching)
+      const readAllEntries = async (): Promise<FileSystemEntry[]> => {
+        const allEntries: FileSystemEntry[] = [];
+        let batch: FileSystemEntry[];
+
+        do {
+          batch = await new Promise<FileSystemEntry[]>(resolve => {
+            reader.readEntries(resolve);
+          });
+          allEntries.push(...batch);
+        } while (batch.length > 0); // Keep reading until empty
+
+        return allEntries;
+      };
+
+      const allEntries = await readAllEntries();
+      for (const childEntry of allEntries) {
+        await collectFiles(childEntry, files);
+      }
     }
   }
 
@@ -584,7 +627,9 @@ export function initValidatorApp(): void {
     };
 
     // Load text file contents
-    const textFiles = Array.from(fileManager.files.values()).filter(f => f.isTextFile);
+    const textFiles = Array.from(fileManager.files.values()).filter(
+      (f): f is FileNodeTextFile => f.type === 'text-file'
+    );
 
     // Create a map for O(1) lookups instead of O(n) find operations
     const fileMap = new Map(files.map(f => [f.webkitRelativePath || f.name, f]));
@@ -640,14 +685,14 @@ export function initValidatorApp(): void {
     renderFileNode(fileTree, fileTreeContent, 0);
   }
 
-  function renderFileNode(node: FileNode, container: HTMLElement, depth: number): void {
-    if (node.children) {
-      // Render directory and its children
-      for (const child of node.children) {
+  function renderFileNode(node: FileNodeDirectory, container: HTMLElement, depth: number): void {
+    // Render directory and its children
+    for (const child of node.childrenMap.values()) {
         const itemDiv = document.createElement('div');
 
         if (child.type === 'directory') {
           itemDiv.className = 'file-tree-item directory collapsed';
+          itemDiv.dataset['path'] = child.path; // Store full path for accurate matching
 
           const iconSpan = document.createElement('span');
           iconSpan.className = 'icon';
@@ -682,8 +727,8 @@ export function initValidatorApp(): void {
           container.appendChild(childrenDiv);
           renderFileNode(child, childrenDiv, depth + 1);
         } else {
-          // File
-          const icon = child.isTextFile ? '📄' : '📎';
+          // File (text or binary)
+          const icon = child.type === 'text-file' ? '📄' : '📎';
           itemDiv.className = 'file-tree-item';
           itemDiv.dataset['path'] = child.path;
 
@@ -698,7 +743,7 @@ export function initValidatorApp(): void {
           itemDiv.appendChild(iconSpan);
           itemDiv.appendChild(nameSpan);
 
-          if (child.isTextFile) {
+          if (child.type === 'text-file') {
             const filePath = child.path;
             itemDiv.addEventListener('click', () => selectFile(filePath));
           } else {
@@ -709,7 +754,6 @@ export function initValidatorApp(): void {
           container.appendChild(itemDiv);
         }
       }
-    }
   }
 
   async function selectFile(path: string): Promise<void> {
@@ -718,17 +762,17 @@ export function initValidatorApp(): void {
     // Save current file content if there's a current file
     if (fileManager.currentFilePath) {
       const currentFile = fileManager.files.get(fileManager.currentFilePath);
-      if (currentFile && currentFile.isTextFile) {
+      if (currentFile?.type === 'text-file') {
         currentFile.content = modInput.value;
       }
     }
 
     // Load new file
     const fileNode = fileManager.files.get(path);
-    if (!fileNode || !fileNode.isTextFile) return;
+    if (!fileNode || fileNode.type !== 'text-file') return;
 
     fileManager.currentFilePath = path;
-    modInput.value = fileNode.content || '';
+    modInput.value = fileNode.content;
     updateLineNumbers();
 
     // Expand parent directories to show the selected file
@@ -736,13 +780,14 @@ export function initValidatorApp(): void {
     for (let i = 1; i < pathParts.length; i++) {
       const partialPath = pathParts.slice(0, i).join('/');
       document.querySelectorAll('.file-tree-item.directory').forEach(dirItem => {
-        const dirPath = dirItem.querySelector('.name')?.textContent;
-        if (dirPath && partialPath.endsWith(dirPath)) {
+        // Compare full paths instead of just names to avoid incorrect matches
+        const dirItemPath = dirItem.getAttribute('data-path');
+        if (dirItemPath === partialPath) {
           dirItem.classList.remove('collapsed');
           const icon = dirItem.querySelector('.icon');
           if (icon) icon.textContent = '▾';
           const nextSibling = dirItem.nextElementSibling;
-          if (nextSibling && nextSibling.classList.contains('file-tree-children')) {
+          if (nextSibling?.classList.contains('file-tree-children')) {
             assertInstanceOf(nextSibling, HTMLElement, 'File tree children container').style.display = 'block';
           }
         }
@@ -770,7 +815,9 @@ export function initValidatorApp(): void {
   async function validateAllFiles(): Promise<void> {
     if (!fileManager) return;
 
-    const textFiles = Array.from(fileManager.files.values()).filter(f => f.isTextFile);
+    const textFiles = Array.from(fileManager.files.values()).filter(
+      (f): f is FileNodeTextFile => f.type === 'text-file'
+    );
 
     for (const fileNode of textFiles) {
       if (fileNode.content) {
@@ -787,21 +834,20 @@ export function initValidatorApp(): void {
 
       // Add all files to zip
       for (const [path, fileNode] of fileManager.files) {
-        if (fileNode.type === 'file') {
-          if (fileNode.isTextFile && fileNode.content !== undefined) {
-            // Save current file if it's the active one
-            if (path === fileManager.currentFilePath) {
-              try {
-                fileNode.content = modInput.value;
-              } catch (error) {
-                console.error(`Failed to save current file ${path}:`, error);
-              }
+        if (fileNode.type === 'text-file') {
+          // Save current file if it's the active one
+          if (path === fileManager.currentFilePath) {
+            try {
+              fileNode.content = modInput.value;
+            } catch (error) {
+              console.error(`Failed to save current file ${path}:`, error);
             }
-            zip.file(path, fileNode.content);
-          } else if (fileNode.file) {
-            // Add non-text files
-            zip.file(path, fileNode.file);
           }
+          // Add text file content
+          zip.file(path, fileNode.content);
+        } else if (fileNode.type === 'binary-file') {
+          // Add non-text files
+          zip.file(path, fileNode.file);
         }
       }
 
@@ -851,9 +897,9 @@ export function initValidatorApp(): void {
       displayResults(result);
 
       // Cache result if in multi-file mode
-      if (fileManager && fileManager.currentFilePath) {
+      if (fileManager?.currentFilePath) {
         const currentFile = fileManager.files.get(fileManager.currentFilePath);
-        if (currentFile) {
+        if (currentFile?.type === 'text-file') {
           currentFile.validationResult = result;
         }
       }
