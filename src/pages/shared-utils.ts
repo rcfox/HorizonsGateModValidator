@@ -24,9 +24,7 @@ export function assertDefined<T>(value: T | undefined | null, errorMessage: stri
 export function assertInstanceOf<T>(value: unknown, type: new (...args: unknown[]) => T, context?: string): T {
   if (!(value instanceof type)) {
     const got = value?.constructor?.name ?? typeof value;
-    const message = context
-      ? `${context}: Expected ${type.name}, got ${got}`
-      : `Expected ${type.name}, got ${got}`;
+    const message = context ? `${context}: Expected ${type.name}, got ${got}` : `Expected ${type.name}, got ${got}`;
     throw new Error(message);
   }
   return value;
@@ -88,10 +86,10 @@ export function querySelectorAs<T extends HTMLElement>(
   selector: string,
   type: new (...args: unknown[]) => T,
   parent: ParentNode = document
-): T | null {
+): T {
   const element = parent.querySelector(selector);
   if (!element) {
-    return null;
+    throw new Error(`Element matching selector '${selector}' was not found.`);
   }
   if (!(element instanceof type)) {
     throw new Error(`Element matching selector '${selector}' is not a ${type.name}, got ${element.constructor.name}`);

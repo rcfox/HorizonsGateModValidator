@@ -284,23 +284,21 @@ export function initValidatorApp(): void {
   const uploadMenu = querySelectorAs('.upload-menu', HTMLElement);
   let hideMenuTimeout: number | undefined;
 
-  if (uploadDropdown && uploadMenu) {
-    const showMenu = () => {
-      clearTimeout(hideMenuTimeout);
-      uploadMenu.style.display = 'block';
-    };
+  const showMenu = () => {
+    clearTimeout(hideMenuTimeout);
+    uploadMenu.style.display = 'block';
+  };
 
-    const hideMenuWithDelay = () => {
-      hideMenuTimeout = window.setTimeout(() => {
-        uploadMenu.style.display = 'none';
-      }, 500);
-    };
+  const hideMenuWithDelay = () => {
+    hideMenuTimeout = window.setTimeout(() => {
+      uploadMenu.style.display = 'none';
+    }, 500);
+  };
 
-    uploadDropdown.addEventListener('mouseenter', showMenu);
-    uploadDropdown.addEventListener('mouseleave', hideMenuWithDelay);
-    uploadMenu.addEventListener('mouseenter', showMenu);
-    uploadMenu.addEventListener('mouseleave', hideMenuWithDelay);
-  }
+  uploadDropdown.addEventListener('mouseenter', showMenu);
+  uploadDropdown.addEventListener('mouseleave', hideMenuWithDelay);
+  uploadMenu.addEventListener('mouseenter', showMenu);
+  uploadMenu.addEventListener('mouseleave', hideMenuWithDelay);
 
   // Sync line numbers scroll with textarea scroll
   modInput.addEventListener('scroll', () => {
@@ -322,7 +320,6 @@ export function initValidatorApp(): void {
   let resizeHandle1: HTMLElement | null = null;
   let resizeHandle2: HTMLElement | null = null;
   let resizeListeners: { move: (e: MouseEvent) => void; up: () => void } | null = null;
-
 
   function createResizeHandles(): void {
     // Remove existing handles
