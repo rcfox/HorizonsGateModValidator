@@ -404,13 +404,14 @@ main.with-file-tree {
 }
 
 .drag-overlay-content {
-    background: white;
+    background: var(--surface-color);
     color: var(--primary-color);
     padding: 40px;
     border-radius: 12px;
     font-size: 24px;
     font-weight: 600;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    border: 2px solid var(--primary-color);
 }
 
 @media (max-width: 1024px) {
