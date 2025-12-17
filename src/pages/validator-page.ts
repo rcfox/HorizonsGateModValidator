@@ -57,6 +57,9 @@ interface FileManager {
   currentFilePath: string | null;
 }
 
+// Reasonable limit for mod directory structures
+const MAX_DIRECTORY_DEPTH = 32;
+
 // Sample mod code
 const SAMPLE_MOD = `[Action] ID=greatswordAttack;
 	applyWeaponBuffs=tru;
@@ -84,9 +87,10 @@ const SAMPLE_MOD = `[Action] ID=greatswordAttack;
 	coneAngle=g:foo;
 `;
 
-// File manager helper functions
-function isTextFile(filename: string): boolean {
-  return filename.toLowerCase().endsWith('.txt');
+function getFilePath(file: File): string {
+  // Normalize path: use webkitRelativePath if available (directory uploads),
+  // otherwise use name (single file uploads)
+  return file.webkitRelativePath || file.name;
 }
 
 function buildFileTree(files: File[]): FileNodeDirectory {
@@ -98,7 +102,8 @@ function buildFileTree(files: File[]): FileNodeDirectory {
   };
 
   for (const file of files) {
-    const parts = file.webkitRelativePath ? file.webkitRelativePath.split('/') : [file.name];
+    const filePath = getFilePath(file);
+    const parts = filePath.split('/');
     let current: FileNodeDirectory = root;
 
     // Build directory structure
@@ -128,8 +133,7 @@ function buildFileTree(files: File[]): FileNodeDirectory {
     // Add file
     const fileName = assertDefined(parts[parts.length - 1], 'File path should have at least one component');
 
-    const filePath = parts.join('/');
-    const isText = isTextFile(fileName);
+    const isText = fileName.toLowerCase().endsWith('.txt');
 
     const fileNode: FileNode = isText
       ? {
@@ -202,7 +206,7 @@ function findFirstFileByDepth(root: FileNodeDirectory): string | null {
     if (node.type === 'text-file') {
       textFiles.push(node);
     }
-    if (node.type === 'directory' && depth < 10) {
+    if (node.type === 'directory' && depth < MAX_DIRECTORY_DEPTH) {
       // Limit depth to prevent infinite loops
       node.childrenMap.forEach(child => findTextFiles(child, depth + 1));
     }
@@ -631,8 +635,18 @@ export function initValidatorApp(): void {
       (f): f is FileNodeTextFile => f.type === 'text-file'
     );
 
+    // Check if any text files were found
+    if (textFiles.length === 0) {
+      alert('No .txt files found in the uploaded files. Please upload files containing mod code.');
+      // Reset state
+      fileManager = null;
+      fileTree = null;
+      return;
+    }
+
     // Create a map for O(1) lookups instead of O(n) find operations
-    const fileMap = new Map(files.map(f => [f.webkitRelativePath || f.name, f]));
+    // Use same path normalization as buildFileTree to ensure consistent matching
+    const fileMap = new Map(files.map(f => [getFilePath(f), f]));
 
     // Process in batches to avoid memory exhaustion with large file sets
     const BATCH_SIZE = 10;
@@ -688,72 +702,72 @@ export function initValidatorApp(): void {
   function renderFileNode(node: FileNodeDirectory, container: HTMLElement, depth: number): void {
     // Render directory and its children
     for (const child of node.childrenMap.values()) {
-        const itemDiv = document.createElement('div');
+      const itemDiv = document.createElement('div');
 
-        if (child.type === 'directory') {
-          itemDiv.className = 'file-tree-item directory collapsed';
-          itemDiv.dataset['path'] = child.path; // Store full path for accurate matching
+      if (child.type === 'directory') {
+        itemDiv.className = 'file-tree-item directory collapsed';
+        itemDiv.dataset['path'] = child.path; // Store full path for accurate matching
 
-          const iconSpan = document.createElement('span');
-          iconSpan.className = 'icon';
-          iconSpan.textContent = '▸';
+        const iconSpan = document.createElement('span');
+        iconSpan.className = 'icon';
+        iconSpan.textContent = '▸';
 
-          const nameSpan = document.createElement('span');
-          nameSpan.className = 'name';
-          nameSpan.textContent = child.name; // No escaping needed with textContent
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'name';
+        nameSpan.textContent = child.name; // No escaping needed with textContent
 
-          itemDiv.appendChild(iconSpan);
-          itemDiv.appendChild(nameSpan);
+        itemDiv.appendChild(iconSpan);
+        itemDiv.appendChild(nameSpan);
 
-          const childrenDiv = document.createElement('div');
-          childrenDiv.className = 'file-tree-children';
-          childrenDiv.style.display = 'none';
+        const childrenDiv = document.createElement('div');
+        childrenDiv.className = 'file-tree-children';
+        childrenDiv.style.display = 'none';
 
-          itemDiv.addEventListener('click', e => {
-            e.stopPropagation();
-            const icon = itemDiv.querySelector('.icon');
-            if (itemDiv.classList.contains('collapsed')) {
-              itemDiv.classList.remove('collapsed');
-              if (icon) icon.textContent = '▾';
-              childrenDiv.style.display = 'block';
-            } else {
-              itemDiv.classList.add('collapsed');
-              if (icon) icon.textContent = '▸';
-              childrenDiv.style.display = 'none';
-            }
-          });
-
-          container.appendChild(itemDiv);
-          container.appendChild(childrenDiv);
-          renderFileNode(child, childrenDiv, depth + 1);
-        } else {
-          // File (text or binary)
-          const icon = child.type === 'text-file' ? '📄' : '📎';
-          itemDiv.className = 'file-tree-item';
-          itemDiv.dataset['path'] = child.path;
-
-          const iconSpan = document.createElement('span');
-          iconSpan.className = 'icon';
-          iconSpan.textContent = icon;
-
-          const nameSpan = document.createElement('span');
-          nameSpan.className = 'name';
-          nameSpan.textContent = child.name; // No escaping needed with textContent
-
-          itemDiv.appendChild(iconSpan);
-          itemDiv.appendChild(nameSpan);
-
-          if (child.type === 'text-file') {
-            const filePath = child.path;
-            itemDiv.addEventListener('click', () => selectFile(filePath));
+        itemDiv.addEventListener('click', e => {
+          e.stopPropagation();
+          const icon = itemDiv.querySelector('.icon');
+          if (itemDiv.classList.contains('collapsed')) {
+            itemDiv.classList.remove('collapsed');
+            if (icon) icon.textContent = '▾';
+            childrenDiv.style.display = 'block';
           } else {
-            itemDiv.style.opacity = '0.6';
-            itemDiv.style.cursor = 'default';
+            itemDiv.classList.add('collapsed');
+            if (icon) icon.textContent = '▸';
+            childrenDiv.style.display = 'none';
           }
+        });
 
-          container.appendChild(itemDiv);
+        container.appendChild(itemDiv);
+        container.appendChild(childrenDiv);
+        renderFileNode(child, childrenDiv, depth + 1);
+      } else {
+        // File (text or binary)
+        const icon = child.type === 'text-file' ? '📄' : '📎';
+        itemDiv.className = 'file-tree-item';
+        itemDiv.dataset['path'] = child.path;
+
+        const iconSpan = document.createElement('span');
+        iconSpan.className = 'icon';
+        iconSpan.textContent = icon;
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'name';
+        nameSpan.textContent = child.name; // No escaping needed with textContent
+
+        itemDiv.appendChild(iconSpan);
+        itemDiv.appendChild(nameSpan);
+
+        if (child.type === 'text-file') {
+          const filePath = child.path;
+          itemDiv.addEventListener('click', () => selectFile(filePath));
+        } else {
+          itemDiv.style.opacity = '0.6';
+          itemDiv.style.cursor = 'default';
         }
+
+        container.appendChild(itemDiv);
       }
+    }
   }
 
   async function selectFile(path: string): Promise<void> {
@@ -775,11 +789,15 @@ export function initValidatorApp(): void {
     modInput.value = fileNode.content;
     updateLineNumbers();
 
+    // Cache DOM queries to avoid repeated querySelectorAll calls
+    const allDirItems = document.querySelectorAll('.file-tree-item.directory');
+    const allTreeItems = document.querySelectorAll('.file-tree-item');
+
     // Expand parent directories to show the selected file
     const pathParts = path.split('/');
     for (let i = 1; i < pathParts.length; i++) {
       const partialPath = pathParts.slice(0, i).join('/');
-      document.querySelectorAll('.file-tree-item.directory').forEach(dirItem => {
+      allDirItems.forEach(dirItem => {
         // Compare full paths instead of just names to avoid incorrect matches
         const dirItemPath = dirItem.getAttribute('data-path');
         if (dirItemPath === partialPath) {
@@ -795,7 +813,7 @@ export function initValidatorApp(): void {
     }
 
     // Update active state in tree
-    document.querySelectorAll('.file-tree-item').forEach(item => {
+    allTreeItems.forEach(item => {
       if (item.getAttribute('data-path') === path) {
         item.classList.add('active');
       } else {
