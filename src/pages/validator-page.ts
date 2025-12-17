@@ -823,32 +823,41 @@ export function initValidatorApp(): void {
     modInput.value = fileNode.content;
     updateLineNumbers();
 
-    // Cache DOM queries to avoid repeated querySelectorAll calls
+    // Build maps for O(1) lookups instead of O(n) iteration
     const allDirItems = document.querySelectorAll('.file-tree-item.directory');
     const allTreeItems = document.querySelectorAll('.file-tree-item');
+
+    const dirItemMap = new Map<string, Element>();
+    allDirItems.forEach(item => {
+      const itemPath = item.getAttribute('data-path');
+      if (itemPath) dirItemMap.set(itemPath, item);
+    });
+
+    const treeItemMap = new Map<string, Element>();
+    allTreeItems.forEach(item => {
+      const itemPath = item.getAttribute('data-path');
+      if (itemPath) treeItemMap.set(itemPath, item);
+    });
 
     // Expand parent directories to show the selected file
     const pathParts = path.split('/');
     for (let i = 1; i < pathParts.length; i++) {
       const partialPath = pathParts.slice(0, i).join('/');
-      allDirItems.forEach(dirItem => {
-        // Compare full paths instead of just names to avoid incorrect matches
-        const dirItemPath = dirItem.getAttribute('data-path');
-        if (dirItemPath === partialPath) {
-          dirItem.classList.remove('collapsed');
-          const icon = dirItem.querySelector('.icon');
-          if (icon) icon.textContent = '▾';
-          const nextSibling = dirItem.nextElementSibling;
-          if (nextSibling?.classList.contains('file-tree-children')) {
-            assertInstanceOf(nextSibling, HTMLElement, 'File tree children container').style.display = 'block';
-          }
+      const dirItem = dirItemMap.get(partialPath);
+      if (dirItem) {
+        dirItem.classList.remove('collapsed');
+        const icon = dirItem.querySelector('.icon');
+        if (icon) icon.textContent = '▾';
+        const nextSibling = dirItem.nextElementSibling;
+        if (nextSibling?.classList.contains('file-tree-children')) {
+          assertInstanceOf(nextSibling, HTMLElement, 'File tree children container').style.display = 'block';
         }
-      });
+      }
     }
 
     // Update active state in tree
-    allTreeItems.forEach(item => {
-      if (item.getAttribute('data-path') === path) {
+    treeItemMap.forEach((item, itemPath) => {
+      if (itemPath === path) {
         item.classList.add('active');
       } else {
         item.classList.remove('active');
