@@ -1132,12 +1132,6 @@ export function initValidatorApp(): void {
 
     if (!editorWrapper) return;
 
-    // Calculate the position of the target line
-    const targetScrollTop = (lineNumber - 1) * lineHeight;
-
-    // Scroll the wrapper (which contains both line numbers and textarea)
-    editorWrapper.scrollTop = targetScrollTop;
-
     // Also scroll the page to ensure the editor wrapper is visible
     const editorSection = editorWrapper.closest('.editor-section');
     if (editorSection) {
@@ -1183,6 +1177,16 @@ export function initValidatorApp(): void {
       const lineLength = lines[lineNumber - 1]?.length || 0;
       modInput.setSelectionRange(charPosition, charPosition + lineLength);
     }
+
+    // After setSelectionRange causes auto-scroll, override with centered position
+    // Calculate the position of the target line, centering it in the viewport
+    const linePosition = (lineNumber - 1) * lineHeight;
+    const halfViewportHeight = modInput.clientHeight / 2;
+    const halfLineHeight = lineHeight / 2;
+    const targetScrollTop = linePosition - halfViewportHeight + halfLineHeight;
+
+    // Set scroll position on the textarea itself (not the wrapper)
+    modInput.scrollTop = targetScrollTop;
   }
 
   /**
