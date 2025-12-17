@@ -883,24 +883,34 @@ export function initValidatorApp(): void {
 
     try {
       const zip = new JSZip();
+      const failures: string[] = [];
 
       // Add all files to zip
       for (const [path, fileNode] of fileManager.files) {
-        if (fileNode.type === 'text-file') {
-          // Save current file if it's the active one
-          if (path === fileManager.currentFilePath) {
-            try {
+        try {
+          if (fileNode.type === 'text-file') {
+            // Save current file if it's the active one
+            if (path === fileManager.currentFilePath) {
               fileNode.content = modInput.value;
-            } catch (error) {
-              console.error(`Failed to save current file ${path}:`, error);
             }
+            // Add text file content
+            zip.file(path, fileNode.content);
+          } else if (fileNode.type === 'binary-file') {
+            // Add non-text files
+            zip.file(path, fileNode.file);
           }
-          // Add text file content
-          zip.file(path, fileNode.content);
-        } else if (fileNode.type === 'binary-file') {
-          // Add non-text files
-          zip.file(path, fileNode.file);
+        } catch (error) {
+          console.error(`Failed to add file ${path} to ZIP:`, error);
+          failures.push(path);
         }
+      }
+
+      // Warn about failures but continue
+      if (failures.length > 0) {
+        const proceed = confirm(
+          `Warning: ${failures.length} file(s) could not be added to the ZIP:\n${failures.join('\n')}\n\nContinue with remaining files?`
+        );
+        if (!proceed) return;
       }
 
       // Generate zip with compression
@@ -925,7 +935,8 @@ export function initValidatorApp(): void {
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Failed to generate ZIP:', error);
-      alert('Failed to create ZIP file. The file set may be too large or a file could not be read.');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(`Failed to create ZIP file: ${errorMessage}\n\nThe file set may be too large or corrupted.`);
     }
   }
 
