@@ -232,6 +232,13 @@ function findFirstFileByDepth(root: FileNodeDirectory): string | null {
 
 // Track if the app has been initialized to prevent duplicate listeners
 let isInitialized = false;
+let dragDropController: AbortController | null = null;
+
+export function cleanupValidatorApp(): void {
+  dragDropController?.abort();
+  dragDropController = null;
+  isInitialized = false;
+}
 
 export function initValidatorApp(): void {
   // Check if we're on the validator page
@@ -490,7 +497,7 @@ export function initValidatorApp(): void {
   }
 
   // Drag and drop support with AbortController for cleanup
-  const dragDropController = new AbortController();
+  dragDropController = new AbortController();
   let dragCounter = 0;
 
   document.addEventListener(
@@ -1325,3 +1332,6 @@ export function initValidatorApp(): void {
 
 // Initialize on page load
 initValidatorApp();
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', cleanupValidatorApp);
