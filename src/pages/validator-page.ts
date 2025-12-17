@@ -323,6 +323,7 @@ export function initValidatorApp(): void {
   let resizeHandle2: HTMLElement | null = null;
   let resizeListeners: { move: (e: MouseEvent) => void; up: () => void } | null = null;
 
+
   function createResizeHandles(): void {
     // Remove existing handles
     resizeHandle1?.remove();
@@ -372,6 +373,11 @@ export function initValidatorApp(): void {
 
       document.body.style.cursor = 'col-resize';
       document.body.style.userSelect = 'none';
+
+      // Add listeners for this resize operation
+      resizeListeners = { move: doResize, up: stopResize };
+      document.addEventListener('mousemove', doResize);
+      document.addEventListener('mouseup', stopResize);
     };
 
     const doResize = (e: MouseEvent) => {
@@ -380,40 +386,59 @@ export function initValidatorApp(): void {
       const deltaX = e.clientX - startX;
       const containerWidth = mainContainer.offsetWidth;
 
+      // Grid gaps (2 gaps × 20px each = 40px total)
+      const totalGapWidth = 40;
+
       if (currentHandle === resizeHandle1) {
-        // Resize between tree and editor
-        const firstWidth = assertDefined(startWidths[0], 'First column width should be defined');
+        // Resize tree, keep results the same, adjust only editor
+        const treeWidth = assertDefined(startWidths[0], 'First column width should be defined') + deltaX;
+        const resultsWidth = assertDefined(startWidths[2], 'Third column width should be defined');
 
-        const treeWidthPx = firstWidth + deltaX;
-        const treeWidthPercent = (treeWidthPx / containerWidth) * 100;
+        // Clamp tree width
+        const minTreeWidth = 150;
+        const maxTreeWidth = containerWidth * 0.4;
+        const clampedTreeWidth = Math.max(minTreeWidth, Math.min(maxTreeWidth, treeWidth));
 
-        // Clamp between 150px and 40% of container
-        const minTreeWidth = (150 / containerWidth) * 100;
-        const maxTreeWidth = 40;
-        const clampedTreeWidth = Math.max(minTreeWidth, Math.min(maxTreeWidth, treeWidthPercent));
+        // Keep results the same size, adjust only editor
+        const remainingWidth = containerWidth - clampedTreeWidth - totalGapWidth;
+        const newResultsWidth = resultsWidth;
+        const newEditorWidth = remainingWidth - newResultsWidth;
 
-        mainContainer.style.gridTemplateColumns = `${clampedTreeWidth}% 1fr 1fr`;
+        // Make sure editor doesn't get too small (at least 30% of remaining space)
+        const minEditorWidth = remainingWidth * 0.3;
+        const adjustedEditorWidth = Math.max(newEditorWidth, minEditorWidth);
+        const adjustedResultsWidth = remainingWidth - adjustedEditorWidth;
+
+        // Convert to percentages of container width
+        const treePercent = (clampedTreeWidth / containerWidth) * 100;
+        const editorPercent = (adjustedEditorWidth / containerWidth) * 100;
+        const resultsPercent = (adjustedResultsWidth / containerWidth) * 100;
+
+        mainContainer.style.gridTemplateColumns = `${treePercent}% ${editorPercent}% ${resultsPercent}%`;
       } else if (currentHandle === resizeHandle2) {
-        // Resize between editor and results
-        // For middle column resize, we need to calculate based on the remaining space
-        const secondWidth = assertDefined(startWidths[1], 'Second column width should be defined');
+        // Resize editor/results, preserve tree width
+        const treeWidth = assertDefined(startWidths[0], 'First column width should be defined');
+        const editorWidth = assertDefined(startWidths[1], 'Second column width should be defined') + deltaX;
 
-        const editorWidthPx = secondWidth + deltaX;
-        const treeWidth = mainContainer.style.gridTemplateColumns.split(' ')[0] || '250px';
+        // Calculate remaining space for editor and results (subtract tree and gaps)
+        const remainingWidth = containerWidth - treeWidth - totalGapWidth;
 
-        // Calculate remaining space after tree
-        const treeWidthPx = treeWidth.includes('%')
-          ? (parseFloat(treeWidth) / 100) * containerWidth
-          : parseFloat(treeWidth);
+        // Calculate editor as percentage of remaining space
+        const editorOfRemaining = (editorWidth / remainingWidth) * 100;
 
-        const remainingWidth = containerWidth - treeWidthPx;
-        const editorWidthPercent = (editorWidthPx / remainingWidth) * 100;
+        // Clamp between 30% and 70%
+        const clampedEditorOfRemaining = Math.max(30, Math.min(70, editorOfRemaining));
 
-        // Clamp between 30% and 70% of remaining space
-        const clampedEditorWidth = Math.max(30, Math.min(70, editorWidthPercent));
-        const resultsWidth = 100 - clampedEditorWidth;
+        // Calculate pixel widths
+        const newEditorWidth = (clampedEditorOfRemaining / 100) * remainingWidth;
+        const newResultsWidth = remainingWidth - newEditorWidth;
 
-        mainContainer.style.gridTemplateColumns = `${treeWidth} ${clampedEditorWidth}% ${resultsWidth}%`;
+        // Convert to percentages of container width
+        const treePercent = (treeWidth / containerWidth) * 100;
+        const editorPercent = (newEditorWidth / containerWidth) * 100;
+        const resultsPercent = (newResultsWidth / containerWidth) * 100;
+
+        mainContainer.style.gridTemplateColumns = `${treePercent}% ${editorPercent}% ${resultsPercent}%`;
       }
 
       updateResizeHandlePositions();
@@ -443,11 +468,6 @@ export function initValidatorApp(): void {
 
       handle1.addEventListener('mousedown', e => startResize(e, handle1));
       handle2.addEventListener('mousedown', e => startResize(e, handle2));
-
-      // Store listener references for cleanup
-      resizeListeners = { move: doResize, up: stopResize };
-      document.addEventListener('mousemove', doResize);
-      document.addEventListener('mouseup', stopResize);
     }
   }
 
