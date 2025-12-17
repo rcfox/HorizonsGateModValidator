@@ -260,6 +260,11 @@ export function initValidatorApp(): void {
   let fileManager: FileManager | null = null;
   let fileTree: FileNodeDirectory | null = null;
 
+  // Correction data storage (for XSS safety - avoid putting user data in HTML attributes)
+  const correctionsMap = new Map<string, Correction>();
+  let correctionIdCounter = 0;
+  const generateCorrectionId = (): string => `correction-${correctionIdCounter++}`;
+
   // DOM elements
   const modInput = getElementByIdAs('modInput', HTMLTextAreaElement);
   const validateBtn = getElementByIdAs('validateBtn', HTMLButtonElement);
@@ -998,6 +1003,9 @@ export function initValidatorApp(): void {
   }
 
   function displayResults(result: ValidationResult): void {
+    // Clear old corrections to prevent memory leaks
+    correctionsMap.clear();
+
     // Update status
     if (result.valid) {
       validationStatus.textContent = '✓ Valid';
@@ -1050,15 +1058,18 @@ export function initValidatorApp(): void {
       // Otherwise, show "Did you mean:" with each correction's replacementText as links
       if (msg.suggestion && msg.suggestion.trim().length > 0) {
         // Make the suggestion text itself clickable (for fixes like "Add a semicolon")
-        const correctionData = JSON.stringify(msg.corrections[0]).replace(/"/g, '&quot;');
-        const suggestionLink = `<span class="correction-link" data-correction="${correctionData}">${escapeHtml(msg.suggestion)}</span>`;
+        const correction = assertDefined(msg.corrections[0], 'First correction should exist');
+        const correctionId = generateCorrectionId();
+        correctionsMap.set(correctionId, correction);
+        const suggestionLink = `<span class="correction-link" data-correction-id="${correctionId}">${escapeHtml(msg.suggestion)}</span>`;
         correctionsHTML = `<div class="message-corrections">${icon} ${suggestionLink}</div>`;
       } else {
         // Show each correction's replacement text as separate links (for typos)
         const correctionLinks = msg.corrections
           .map(correction => {
-            const correctionData = JSON.stringify(correction).replace(/"/g, '&quot;');
-            return `<span class="correction-link" data-correction="${correctionData}">${escapeHtml(correction.replacementText)}</span>`;
+            const correctionId = generateCorrectionId();
+            correctionsMap.set(correctionId, correction);
+            return `<span class="correction-link" data-correction-id="${correctionId}">${escapeHtml(correction.replacementText)}</span>`;
           })
           .join(', ');
         correctionsHTML = `<div class="message-corrections">${icon} Did you mean: ${correctionLinks}?</div>`;
@@ -1287,14 +1298,12 @@ export function initValidatorApp(): void {
     const correctionLink = target.closest('.correction-link:not(.formula-reference-link)');
     if (correctionLink) {
       e.stopPropagation();
-      const correctionData = correctionLink.getAttribute('data-correction');
+      const correctionId = correctionLink.getAttribute('data-correction-id');
 
-      if (correctionData) {
-        try {
-          const correction = JSON.parse(correctionData.replace(/&quot;/g, '"'));
+      if (correctionId) {
+        const correction = correctionsMap.get(correctionId);
+        if (correction) {
           applyCorrection(correction);
-        } catch (e) {
-          console.error('Failed to parse correction data:', e);
         }
       }
       return;
