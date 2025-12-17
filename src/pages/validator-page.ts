@@ -378,10 +378,14 @@ export function initValidatorApp(): void {
       startX = e.clientX;
       handle.classList.add('active');
 
-      // Get current column widths
-      const computedStyle = window.getComputedStyle(mainContainer);
-      const columns = computedStyle.gridTemplateColumns.split(' ');
-      startWidths = columns.map(col => parseFloat(col));
+      // Get actual computed widths in pixels from rendered elements
+      const children = Array.from(mainContainer.children).filter(
+        child =>
+          child.classList.contains('file-tree-section') ||
+          child.classList.contains('editor-section') ||
+          child.classList.contains('results-section')
+      );
+      startWidths = children.map(child => child.getBoundingClientRect().width);
 
       document.body.style.cursor = 'col-resize';
       document.body.style.userSelect = 'none';
