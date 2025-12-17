@@ -87,13 +87,17 @@ const SAMPLE_MOD = `[Action] ID=greatswordAttack;
 	coneAngle=g:foo;
 `;
 
-function getFilePath(file: File): string {
-  // Normalize path: use webkitRelativePath if available (directory uploads),
-  // otherwise use name (single file uploads)
-  return file.webkitRelativePath || file.name;
+function filesToMap(files: File[]): Map<string, File> {
+  const fileMap = new Map<string, File>();
+  for (const file of files) {
+    // Use webkitRelativePath if available (directory uploads), otherwise use name (single file uploads)
+    const path = file.webkitRelativePath || file.name;
+    fileMap.set(path, file);
+  }
+  return fileMap;
 }
 
-function buildFileTree(files: File[]): FileNodeDirectory {
+function buildFileTree(fileMap: Map<string, File>): FileNodeDirectory {
   const root: FileNodeDirectory = {
     name: 'root',
     path: '',
@@ -101,8 +105,7 @@ function buildFileTree(files: File[]): FileNodeDirectory {
     childrenMap: new Map(),
   };
 
-  for (const file of files) {
-    const filePath = getFilePath(file);
+  for (const [filePath, file] of fileMap) {
     const parts = filePath.split('/');
     let current: FileNodeDirectory = root;
 
@@ -528,35 +531,32 @@ export function initValidatorApp(): void {
       hideDragOverlay();
 
       const items = Array.from(e.dataTransfer?.items || []);
-      const files: File[] = [];
+      const fileMap = new Map<string, File>();
 
       for (const item of items) {
         if (item.kind === 'file') {
           const entry = item.webkitGetAsEntry();
           if (entry) {
-            await collectFiles(entry, files);
+            await collectFiles(entry, fileMap);
           }
         }
       }
 
-      if (files.length > 0) {
-        await handleFilesUpload(files);
+      if (fileMap.size > 0) {
+        await handleFilesUpload(fileMap);
       }
     },
     { signal: dragDropController.signal }
   );
 
-  async function collectFiles(entry: FileSystemEntry, files: File[]): Promise<void> {
+  async function collectFiles(entry: FileSystemEntry, fileMap: Map<string, File>): Promise<void> {
     if (entry.isFile) {
       const fileEntry = entry as FileSystemFileEntry;
       await new Promise<void>(resolve => {
         fileEntry.file(file => {
-          // Add webkitRelativePath for consistency
-          Object.defineProperty(file, 'webkitRelativePath', {
-            writable: true,
-            value: entry.fullPath.slice(1), // Remove leading /
-          });
-          files.push(file);
+          // Use entry.fullPath (without leading /) as the map key
+          const path = entry.fullPath.slice(1);
+          fileMap.set(path, file);
           resolve();
         });
       });
@@ -581,7 +581,7 @@ export function initValidatorApp(): void {
 
       const allEntries = await readAllEntries();
       for (const childEntry of allEntries) {
-        await collectFiles(childEntry, files);
+        await collectFiles(childEntry, fileMap);
       }
     }
   }
@@ -610,16 +610,17 @@ export function initValidatorApp(): void {
   }
 
   async function handleFileInputChange(e: Event): Promise<void> {
-    const input = e.target as HTMLInputElement;
+    const input = assertInstanceOf(e.target, HTMLInputElement);
     if (input.files && input.files.length > 0) {
       const filesArray = Array.from(input.files);
-      await handleFilesUpload(filesArray);
+      const fileMap = filesToMap(filesArray);
+      await handleFilesUpload(fileMap);
     }
     // Reset input so the same files can be selected again
     input.value = '';
   }
 
-  async function handleFilesUpload(files: File[]): Promise<void> {
+  async function handleFilesUpload(fileMap: Map<string, File>): Promise<void> {
     // Confirm if replacing existing files
     if (fileManager) {
       const proceed = confirm('This will replace all currently loaded files. Do you want to proceed?');
@@ -627,20 +628,19 @@ export function initValidatorApp(): void {
     }
 
     // Warn if too many files
-    if (files.length > 100) {
+    if (fileMap.size > 100) {
       const proceed = confirm(
-        `You are about to upload ${files.length} files. This may take a moment and could slow down the validator. Do you want to proceed?`
+        `You are about to upload ${fileMap.size} files. This may take a moment and could slow down the validator. Do you want to proceed?`
       );
       if (!proceed) return;
     }
 
     // Build file tree
-    fileTree = buildFileTree(files);
+    fileTree = buildFileTree(fileMap);
 
     // Determine root name from first file's path
-    const firstFile = assertDefined(files[0], 'Files array should not be empty');
-    const path = firstFile.webkitRelativePath || firstFile.name;
-    const parts = path.split('/');
+    const firstPath = assertDefined(fileMap.keys().next().value, 'File map should not be empty');
+    const parts = firstPath.split('/');
     fileManager = {
       rootName: parts.length > 1 ? assertDefined(parts[0], 'File path should have root directory') : 'mod-files',
       files: flattenFileTree(fileTree),
@@ -661,9 +661,7 @@ export function initValidatorApp(): void {
       return;
     }
 
-    // Create a map for O(1) lookups instead of O(n) find operations
-    // Use same path normalization as buildFileTree to ensure consistent matching
-    const fileMap = new Map(files.map(f => [getFilePath(f), f]));
+    // fileMap already has O(1) lookups with paths as keys
 
     // Process in batches to avoid memory exhaustion with large file sets
     const BATCH_SIZE = 10;
