@@ -336,6 +336,49 @@ export function initValidatorApp(): void {
   let resizeHandle2: HTMLElement | null = null;
   let resizeListeners: { move: (e: MouseEvent) => void; up: () => void } | null = null;
 
+  // Resize constants - derived from CSS custom properties
+  function getResizeConstants() {
+    const styles = getComputedStyle(document.documentElement);
+
+    // Create a temporary element for robust CSS value parsing
+    const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.visibility = 'hidden';
+    document.body.appendChild(tempDiv);
+
+    // Helper to parse length values (px, em, rem, etc.) to pixels
+    const parseLengthToPixels = (propertyName: string): number => {
+      tempDiv.style.width = `var(${propertyName})`;
+      return parseFloat(getComputedStyle(tempDiv).width);
+    };
+
+    // Helper to parse percentage values (returns 0-1 range)
+    const parsePercentage = (propertyName: string): number => {
+      const value = styles.getPropertyValue(propertyName).trim();
+      if (!value.includes('%')) {
+        throw new Error(`Expected percentage value for ${propertyName}, got: ${value}`);
+      }
+      return parseFloat(value) / 100;
+    };
+
+    const gridGap = parseLengthToPixels('--grid-gap');
+    const constants = {
+      TOTAL_GAP_WIDTH: gridGap * 2, // 2 gaps
+      MIN_TREE_WIDTH: parseLengthToPixels('--min-tree-width'),
+      MAX_TREE_WIDTH_PERCENT: parsePercentage('--max-tree-width-percent'),
+      MIN_EDITOR_WIDTH_PERCENT: parsePercentage('--min-editor-width-percent'),
+      MIN_SPLIT_PERCENT: parsePercentage('--min-split-percent'),
+      MAX_SPLIT_PERCENT: parsePercentage('--max-split-percent'),
+    };
+
+    // Clean up
+    document.body.removeChild(tempDiv);
+
+    return constants;
+  }
+
+  const RESIZE_CONSTANTS = getResizeConstants();
+
   function createResizeHandles(): void {
     // Remove existing handles
     resizeHandle1?.remove();
@@ -403,7 +446,7 @@ export function initValidatorApp(): void {
       const containerWidth = mainContainer.offsetWidth;
 
       // Grid gaps (2 gaps × 20px each = 40px total)
-      const totalGapWidth = 40;
+      const totalGapWidth = RESIZE_CONSTANTS.TOTAL_GAP_WIDTH;
 
       if (currentHandle === resizeHandle1) {
         // Resize tree, keep results the same, adjust only editor
@@ -411,8 +454,8 @@ export function initValidatorApp(): void {
         const resultsWidth = assertDefined(startWidths[2], 'Third column width should be defined');
 
         // Clamp tree width
-        const minTreeWidth = 150;
-        const maxTreeWidth = containerWidth * 0.4;
+        const minTreeWidth = RESIZE_CONSTANTS.MIN_TREE_WIDTH;
+        const maxTreeWidth = containerWidth * RESIZE_CONSTANTS.MAX_TREE_WIDTH_PERCENT;
         const clampedTreeWidth = Math.max(minTreeWidth, Math.min(maxTreeWidth, treeWidth));
 
         // Keep results the same size, adjust only editor
@@ -421,7 +464,7 @@ export function initValidatorApp(): void {
         const newEditorWidth = remainingWidth - newResultsWidth;
 
         // Make sure editor doesn't get too small (at least 30% of remaining space)
-        const minEditorWidth = remainingWidth * 0.3;
+        const minEditorWidth = remainingWidth * RESIZE_CONSTANTS.MIN_EDITOR_WIDTH_PERCENT;
         const adjustedEditorWidth = Math.max(newEditorWidth, minEditorWidth);
         const adjustedResultsWidth = remainingWidth - adjustedEditorWidth;
 
@@ -439,14 +482,14 @@ export function initValidatorApp(): void {
         // Calculate remaining space for editor and results (subtract tree and gaps)
         const remainingWidth = containerWidth - treeWidth - totalGapWidth;
 
-        // Calculate editor as percentage of remaining space
-        const editorOfRemaining = (editorWidth / remainingWidth) * 100;
+        // Calculate editor as fraction of remaining space
+        const editorOfRemaining = editorWidth / remainingWidth;
 
-        // Clamp between 30% and 70%
-        const clampedEditorOfRemaining = Math.max(30, Math.min(70, editorOfRemaining));
+        // Clamp between 0.3 and 0.7
+        const clampedEditorOfRemaining = Math.max(RESIZE_CONSTANTS.MIN_SPLIT_PERCENT, Math.min(RESIZE_CONSTANTS.MAX_SPLIT_PERCENT, editorOfRemaining));
 
         // Calculate pixel widths
-        const newEditorWidth = (clampedEditorOfRemaining / 100) * remainingWidth;
+        const newEditorWidth = clampedEditorOfRemaining * remainingWidth;
         const newResultsWidth = remainingWidth - newEditorWidth;
 
         // Convert to percentages of container width

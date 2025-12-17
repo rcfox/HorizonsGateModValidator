@@ -1,10 +1,23 @@
 /* Validator page specific styles (index.html only) */
 
-/* Z-index layers - centralized for easy management */
+/* Z-index layers and layout constants - centralized for easy management */
 :root {
     --z-resize-handle: 10;
     --z-dropdown: 1000;
     --z-overlay: 10000;
+
+    /* Grid layout */
+    --grid-gap: 20px;
+    --file-tree-width: 250px;
+    --editor-width: 1fr;
+    --results-width: 1fr;
+
+    /* Resize constraints (percentages stored with %, converted to 0-1 in JS) */
+    --min-tree-width: 150px;
+    --max-tree-width-percent: 40%;
+    --min-editor-width-percent: 30%;
+    --min-split-percent: 30%;
+    --max-split-percent: 70%;
 }
 
 /* Two-column layout */
@@ -21,15 +34,15 @@ body {
 
 main {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    grid-template-columns: var(--editor-width) var(--results-width);
+    gap: var(--grid-gap);
     flex: 1;
     min-height: 0;
 }
 
 /* Three-column layout when file tree is visible */
 main.with-file-tree {
-    grid-template-columns: 250px 1fr 1fr;
+    grid-template-columns: var(--file-tree-width) var(--editor-width) var(--results-width);
     position: relative;
 }
 
