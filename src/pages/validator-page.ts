@@ -680,6 +680,12 @@ export function initValidatorApp(): void {
   }
 
   async function handleFilesUpload(fileMap: Map<string, File>): Promise<void> {
+    // Check for empty upload
+    if (fileMap.size === 0) {
+      alert('No files were uploaded. Please select files or folders to upload.');
+      return;
+    }
+
     // Confirm if replacing existing files
     if (fileManager) {
       const proceed = confirm('This will replace all currently loaded files. Do you want to proceed?');
@@ -713,7 +719,12 @@ export function initValidatorApp(): void {
 
     // Check if any text files were found
     if (textFiles.length === 0) {
-      alert('No .txt files found in the uploaded files. Please upload files containing mod code.');
+      const totalFiles = fileManager.files.size;
+      const message =
+        totalFiles > 0
+          ? `No .txt files found in the uploaded files. Found ${totalFiles} binary file(s). Please upload files containing mod code.`
+          : 'No .txt files found in the uploaded files. Please upload files containing mod code.';
+      alert(message);
       // Reset state
       fileManager = null;
       fileTree = null;
