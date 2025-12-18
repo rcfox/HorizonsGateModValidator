@@ -98,7 +98,7 @@ export class ModValidator {
       }
 
       // If cloning from the same ID, that means we're extending it not duplicating it.
-      if (obj.properties.get('cloneFrom')?.value === objId) {
+      if (classSchema.supportsCloneFrom && obj.properties.get('cloneFrom')?.value === objId) {
         continue;
       }
 
