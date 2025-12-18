@@ -97,6 +97,11 @@ export class ModValidator {
         continue;
       }
 
+      // If cloning from the same ID, that means we're extending it not duplicating it.
+      if (obj.properties.get('cloneFrom')?.value === objId) {
+        continue;
+      }
+
       // Treat things like ActionAoE and ActionAOE as the same.
       const resolvedType = this.resolveFunctionalAlias(obj.type);
       if (!objectIds.has(resolvedType)) {
