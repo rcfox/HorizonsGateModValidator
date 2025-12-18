@@ -232,7 +232,6 @@ class ModValidatorCLI {
 
         return {
           file: fileResult.filePath,
-          valid: result.valid,
           errorCount: result.errors.length,
           warningCount: result.warnings.length,
           hintCount: result.hints.length,

@@ -20,7 +20,6 @@ moveCost = 1.0;
 `;
 
 const result1 = validator.validate(validMod, 'test1.txt');
-console.log('Valid:', result1.valid);
 console.log('Errors:', result1.errors.length);
 console.log('Warnings:', result1.warnings.length);
 if (result1.errors.length > 0) {
@@ -38,7 +37,6 @@ damage = 10;
 `;
 
 const result2 = validator.validate(missingSemicolon, 'test2.txt');
-console.log('Valid:', result2.valid);
 console.log('Warnings:', result2.warnings);
 console.log('');
 
@@ -51,7 +49,6 @@ value = 123;
 `;
 
 const result3 = validator.validate(unknownType, 'test3.txt');
-console.log('Valid:', result3.valid);
 console.log('Warnings:', result3.warnings);
 console.log('');
 
@@ -66,7 +63,6 @@ B = 100;
 `;
 
 const result4 = validator.validate(invalidType, 'test4.txt');
-console.log('Valid:', result4.valid);
 console.log('Errors:', result4.errors);
 console.log('');
 
@@ -81,7 +77,6 @@ damage = max:10:w:damage*2;
 `;
 
 const result5 = validator.validate(formulaMod, 'test5.txt');
-console.log('Valid:', result5.valid);
 console.log('Errors:', result5.errors.length);
 console.log('Warnings:', result5.warnings.length);
 if (result5.errors.length > 0) {
@@ -98,7 +93,6 @@ HP = 100;
 `;
 
 const result6 = validator.validate(missingID, 'test6.txt');
-console.log('Valid:', result6.valid);
 console.log('Errors:', result6.errors);
 console.log('');
 
@@ -120,7 +114,6 @@ B = 255;
 `;
 
 const result7 = validator.validate(nested, 'test7.txt');
-console.log('Valid:', result7.valid);
 console.log('Errors:', result7.errors.length);
 console.log('Warnings:', result7.warnings.length);
 console.log('');

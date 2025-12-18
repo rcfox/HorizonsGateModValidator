@@ -14,6 +14,7 @@ export class ModValidator {
   private typeAliases: Record<string, string>;
   private functionalAliases: Record<string, string>;
   private propertyValidator = new PropertyValidator();
+  private parsedObjectsCache: Map<string, ParsedObject[]> = new Map();
 
   constructor() {
     const data = modSchemaData as SchemaData;
@@ -34,11 +35,15 @@ export class ModValidator {
     const parser = new ModParser(content, filePath);
 
     const { objects, errors: parseErrors } = parser.parse();
+
+    // Cache parsed objects for cross-file validation
+    this.parsedObjectsCache.set(filePath, objects);
+
     const objMessages = objects.flatMap(obj => this.validateObject(obj));
     const structureMessages = this.validateActionStructures(objects);
-    const duplicateIdMessages = this.checkDuplicateIds(objects);
+    // NOTE: checkDuplicateIds now runs separately via getCrossFileValidationMessages()
 
-    const allMessages = [...parseErrors, ...objMessages, ...structureMessages, ...duplicateIdMessages];
+    const allMessages = [...parseErrors, ...objMessages, ...structureMessages];
 
     const errors = allMessages.filter(m => m.severity === 'error');
     const warnings = allMessages.filter(m => m.severity === 'warning');
@@ -46,7 +51,6 @@ export class ModValidator {
     const info = allMessages.filter(m => m.severity === 'info');
 
     return {
-      valid: errors.length === 0,
       errors,
       warnings,
       hints,
@@ -54,10 +58,34 @@ export class ModValidator {
     };
   }
 
+  /**
+   * Get validation messages that require checking across all files
+   * (e.g., duplicate IDs across files)
+   */
+  getCrossFileValidationMessages(): ValidationMessage[] {
+    const allObjects = Array.from(this.parsedObjectsCache.values()).flat();
+    return this.checkDuplicateIds(allObjects);
+  }
+
+  /**
+   * Clear the entire cache
+   */
+  clearCache(): void {
+    this.parsedObjectsCache.clear();
+  }
+
+  /**
+   * Remove a specific file from the cache
+   */
+  removeFromCache(filePath: string): void {
+    this.parsedObjectsCache.delete(filePath);
+  }
+
   private checkDuplicateIds(objects: ParsedObject[]): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
     const objectIds: Map<string, Map<string, ParsedObject[]>> = new Map();
 
+    // Collect all objects with IDs, grouped by type and ID
     for (const obj of objects) {
       const classSchema = this.schema[this.resolveTypeAlias(obj.type)];
       if (classSchema?.category !== 'definition') {
@@ -80,30 +108,54 @@ export class ModValidator {
       }
 
       const objsWithSameId = typeIds.get(objId);
-      const firstUse = objsWithSameId?.[0]?.properties.get('ID');
-      if (firstUse) {
+      typeIds.set(objId, [...(objsWithSameId ?? []), obj]);
+    }
+
+    // For each ID used more than once, create a single message with all locations
+    for (const [resolvedType, typeIds] of objectIds) {
+      for (const [objId, objs] of typeIds) {
+        if (objs.length <= 1) {
+          continue; // Not a duplicate
+        }
+
+        // Create corrections for all uses
+        const corrections = objs.map(obj => {
+          const idProp = obj.properties.get('ID');
+          if (!idProp) {
+            throw new Error(`Object missing ID property: ${obj.type}`);
+          }
+          return {
+            filePath: idProp.filePath,
+            startLine: idProp.valueStartLine,
+            startColumn: idProp.valueStartColumn,
+            endLine: idProp.valueEndLine,
+            endColumn: idProp.valueEndColumn,
+            replacementText: idProp.value, // Same as original (for navigation only)
+            displayText: `${idProp.filePath}:${idProp.valueStartLine}`,
+          };
+        });
+
+        // Use the first occurrence's location for the message
+        const firstObj = objs[0];
+        if (!firstObj) {
+          throw new Error('Objects array should not be empty');
+        }
+        const firstIdProp = firstObj.properties.get('ID');
+        if (!firstIdProp) {
+          throw new Error(`First object missing ID property: ${firstObj.type}`);
+        }
+
         messages.push({
           severity: 'warning',
-          message: `Duplicate ID '${objId}' for ${resolvedType}.`,
-          filePath: obj.filePath,
-          line: obj.properties.get('ID')?.valueStartLine ?? obj.startLine,
-          suggestion: `First use of this ID on line ${firstUse.valueStartLine}.`,
+          message: `ID '${objId}' for ${resolvedType} used in ${objs.length} instances`,
+          filePath: firstIdProp.filePath,
+          line: firstIdProp.valueStartLine,
+          suggestion: 'Uses:',
           correctionIcon: '🎯',
-          corrections: [
-            {
-              // Make a fake correction that replaces the text with what's already there.
-              // This is just to allow us to easily jump to the original definition from the error message.
-              filePath: firstUse.filePath,
-              startColumn: firstUse.valueStartColumn,
-              startLine: firstUse.valueStartLine,
-              endColumn: firstUse.valueEndColumn,
-              endLine: firstUse.valueEndLine,
-              replacementText: firstUse.value,
-            },
-          ],
+          corrections,
+          isCrossFile: true,
         });
       }
-      typeIds.set(objId, [...(objsWithSameId ?? []), obj]);
     }
 
     return messages;

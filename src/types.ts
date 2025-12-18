@@ -138,6 +138,7 @@ export interface Correction {
   endLine: number;
   endColumn: number;
   replacementText: string;
+  displayText?: string; // Optional display text (e.g., "filename:line")
 }
 
 export interface ValidationMessage {
@@ -149,13 +150,13 @@ export interface ValidationMessage {
   suggestion?: string | undefined; // Override text for corrections (e.g., "Add a semicolon" instead of "Did you mean:")
   correctionIcon?: string | undefined; // Override icon for corrections (e.g., "🔧" for fixes, default "💡" for typos)
   corrections?: Correction[] | undefined; // Suggested corrections for typos
+  isCrossFile?: boolean | undefined; // True if this message came from cross-file validation (e.g., duplicate IDs)
   formulaReference?: string | undefined; // Operator name for linking to formula reference page
   documentationUrl?: string | undefined; // External documentation URL
   documentationLabel?: string | undefined; // Label for the documentation link
 }
 
 export interface ValidationResult {
-  valid: boolean;
   errors: ValidationMessage[];
   warnings: ValidationMessage[];
   hints: ValidationMessage[];

@@ -21,6 +21,9 @@ declare global {
       ModValidator: new () => {
         validate: (content: string, filePath: string) => ValidationResult;
         getKnownObjectTypes: () => string[];
+        getCrossFileValidationMessages: () => ValidationMessage[];
+        clearCache: () => void;
+        removeFromCache: (filePath: string) => void;
       };
     };
   }
@@ -731,6 +734,9 @@ export function initValidatorApp(): void {
       if (!proceed) return;
     }
 
+    // Clear validator cache when loading new files
+    validator.clearCache();
+
     // Warn if too many files
     if (fileMap.size > 100) {
       const proceed = confirm(
@@ -767,6 +773,7 @@ export function initValidatorApp(): void {
       // Reset state
       fileManager = null;
       fileTree = null;
+      validator.clearCache();
       return;
     }
 
@@ -829,6 +836,7 @@ export function initValidatorApp(): void {
 
   /**
    * Get the severity class for a file based on its validation results
+   * (including cross-file messages like duplicate IDs)
    */
   function getFileSeverityClass(fileNode: FileNodeTextFile): string {
     if (!fileNode.validationResult) {
@@ -836,6 +844,8 @@ export function initValidatorApp(): void {
     }
 
     const { errors, warnings, hints, info } = fileNode.validationResult;
+
+    // ValidationResult already includes cross-file messages
     if (errors.length > 0) return 'file-error';
     if (warnings.length > 0) return 'file-warning';
     if (hints.length > 0) return 'file-hint';
@@ -1030,6 +1040,42 @@ export function initValidatorApp(): void {
     }
   }
 
+  /**
+   * Remove cross-file messages from a ValidationResult (returns new object)
+   */
+  function removeCrossFileMessages(result: ValidationResult): ValidationResult {
+    return {
+      errors: result.errors.filter(m => !m.isCrossFile),
+      warnings: result.warnings.filter(m => !m.isCrossFile),
+      hints: result.hints.filter(m => !m.isCrossFile),
+      info: result.info.filter(m => !m.isCrossFile),
+    };
+  }
+
+  /**
+   * Merge cross-file messages into a file's ValidationResult (returns new object)
+   */
+  function mergeCrossFileMessages(result: ValidationResult, filePath: string, allCrossFileMessages: ValidationMessage[]): ValidationResult {
+    // Filter cross-file messages relevant to this file
+    const relevantMessages = allCrossFileMessages.filter(msg =>
+      msg.filePath === filePath ||
+      msg.corrections?.some(c => c.filePath === filePath)
+    );
+
+    // Separate by severity
+    const crossFileErrors = relevantMessages.filter(m => m.severity === 'error');
+    const crossFileWarnings = relevantMessages.filter(m => m.severity === 'warning');
+    const crossFileHints = relevantMessages.filter(m => m.severity === 'hint');
+    const crossFileInfo = relevantMessages.filter(m => m.severity === 'info');
+
+    return {
+      errors: [...result.errors, ...crossFileErrors],
+      warnings: [...result.warnings, ...crossFileWarnings],
+      hints: [...result.hints, ...crossFileHints],
+      info: [...result.info, ...crossFileInfo],
+    };
+  }
+
   function validateAllFiles(): void {
     if (!fileManager) return;
 
@@ -1037,10 +1083,20 @@ export function initValidatorApp(): void {
       (f): f is FileNodeTextFile => f.type === 'text-file'
     );
 
-    // Validate all files and cache results
+    // Validate all files (per-file validation only)
     for (const fileNode of textFiles) {
       if (fileNode.content) {
         fileNode.validationResult = validator.validate(fileNode.content, fileNode.path);
+      }
+    }
+
+    // Get cross-file validation messages (e.g., duplicate IDs across files)
+    const crossFileMessages = validator.getCrossFileValidationMessages();
+
+    // Merge cross-file messages into each file's ValidationResult
+    for (const fileNode of textFiles) {
+      if (fileNode.validationResult) {
+        fileNode.validationResult = mergeCrossFileMessages(fileNode.validationResult, fileNode.path, crossFileMessages);
       }
     }
 
@@ -1056,7 +1112,7 @@ export function initValidatorApp(): void {
     correctionsMap.clear();
     messagesMap.clear();
 
-    // Aggregate all messages from all files
+    // Aggregate all messages from all files (ValidationResult already includes cross-file messages)
     const allMessages: ValidationMessage[] = [];
 
     for (const fileNode of textFiles) {
@@ -1169,7 +1225,7 @@ export function initValidatorApp(): void {
       (f): f is FileNodeTextFile => f.type === 'text-file'
     );
 
-    // Aggregate totals for all files
+    // Aggregate totals for all files (ValidationResult already includes cross-file messages)
     let totalErrors = 0;
     let totalWarnings = 0;
     let totalHints = 0;
@@ -1184,11 +1240,10 @@ export function initValidatorApp(): void {
       }
     }
 
-    const filesWithErrors = textFiles.filter(f => f.validationResult && f.validationResult.errors.length > 0).length;
-    const filesWithWarnings = textFiles.filter(
-      f => f.validationResult && f.validationResult.warnings.length > 0
-    ).length;
-    const filesWithHints = textFiles.filter(f => f.validationResult && f.validationResult.hints.length > 0).length;
+    // Count files with issues (ValidationResult already includes cross-file messages)
+    const filesWithErrors = textFiles.filter(f => (f.validationResult?.errors.length || 0) > 0).length;
+    const filesWithWarnings = textFiles.filter(f => (f.validationResult?.warnings.length || 0) > 0).length;
+    const filesWithHints = textFiles.filter(f => (f.validationResult?.hints.length || 0) > 0).length;
 
     const s = (count: number): string => {
       return count !== 1 ? 's' : '';
@@ -1217,6 +1272,7 @@ export function initValidatorApp(): void {
     if (fileManager.currentFilePath) {
       const currentFile = fileManager.files.get(fileManager.currentFilePath);
       if (currentFile?.type === 'text-file' && currentFile.validationResult) {
+        // ValidationResult already includes cross-file messages
         const currentErrors = currentFile.validationResult.errors.length;
         const currentWarnings = currentFile.validationResult.warnings.length;
         const currentHints = currentFile.validationResult.hints.length;
@@ -1307,22 +1363,41 @@ export function initValidatorApp(): void {
       const filePath = fileManager?.currentFilePath || 'untitled.txt';
       const result = validator.validate(content, filePath);
 
-      // Cache result if in multi-file mode
-      if (fileManager?.currentFilePath) {
-        const currentFile = fileManager.files.get(fileManager.currentFilePath);
+      if (fileManager) {
+        // Multi-file mode: update cached result and re-run cross-file validation
+        const currentFile = fileManager.files.get(fileManager.currentFilePath!);
         if (currentFile?.type === 'text-file') {
           currentFile.validationResult = result;
         }
-      }
 
-      // In multi-file mode, refresh display based on view mode
-      if (fileManager) {
+        // Remove old cross-file messages from all files
+        const textFiles = Array.from(fileManager.files.values()).filter(
+          (f): f is FileNodeTextFile => f.type === 'text-file'
+        );
+        for (const fileNode of textFiles) {
+          if (fileNode.validationResult) {
+            fileNode.validationResult = removeCrossFileMessages(fileNode.validationResult);
+          }
+        }
+
+        // Get new cross-file validation messages
+        const crossFileMessages = validator.getCrossFileValidationMessages();
+
+        // Merge new cross-file messages into all files
+        for (const fileNode of textFiles) {
+          if (fileNode.validationResult) {
+            fileNode.validationResult = mergeCrossFileMessages(fileNode.validationResult, fileNode.path, crossFileMessages);
+          }
+        }
+
+        // Refresh display and file tree
         refreshResultsDisplay();
-        // Update file tree colors based on validation results
         updateFileTreeSeverityClasses();
       } else {
-        // Single-file mode: display results for just this file
-        displayResults(result);
+        // Single-file mode: get cross-file messages and merge
+        const crossFileMessages = validator.getCrossFileValidationMessages();
+        const resultWithCrossFile = mergeCrossFileMessages(result, filePath, crossFileMessages);
+        displayResults(resultWithCrossFile);
       }
     }, 100);
   }
@@ -1386,16 +1461,31 @@ export function initValidatorApp(): void {
     correctionsMap.clear();
     messagesMap.clear();
 
-    // Update status
-    if (result.valid) {
+    // Update status (cross-file messages already included in result)
+    const hasMessages =
+      result.errors.length > 0 ||
+      result.warnings.length > 0 ||
+      result.hints.length > 0 ||
+      result.info.length > 0;
+
+    if (!hasMessages) {
       validationStatus.textContent = '✓ Valid';
       validationStatus.className = 'status success';
-    } else {
+    } else if (result.errors.length > 0) {
       validationStatus.textContent = `✗ ${result.errors.length} Error${result.errors.length !== 1 ? 's' : ''}`;
       validationStatus.className = 'status error';
+    } else if (result.warnings.length > 0) {
+      validationStatus.textContent = `⚠ ${result.warnings.length} Warning${result.warnings.length !== 1 ? 's' : ''}`;
+      validationStatus.className = 'status warning';
+    } else if (result.hints.length > 0) {
+      validationStatus.textContent = `💡 ${result.hints.length} Hint${result.hints.length !== 1 ? 's' : ''}`;
+      validationStatus.className = 'status success';
+    } else {
+      validationStatus.textContent = `ℹ ${result.info.length} Info message${result.info.length !== 1 ? 's' : ''}`;
+      validationStatus.className = 'status success';
     }
 
-    // Display messages
+    // Display all messages (cross-file messages already included)
     const messages = [...result.errors, ...result.warnings, ...result.hints, ...result.info];
 
     if (messages.length === 0) {
@@ -1431,22 +1521,34 @@ export function initValidatorApp(): void {
     if (msg.corrections && msg.corrections.length > 0) {
       const corrIcon = msg.correctionIcon || '💡';
 
-      // If there's a custom suggestion text, make the entire suggestion clickable
-      // Otherwise, show "Did you mean:" with each correction's replacementText as links
       if (msg.suggestion && msg.suggestion.trim().length > 0) {
-        // Make the suggestion text itself clickable (for fixes like "Add a semicolon")
-        const correction = assertDefined(msg.corrections[0], 'First correction should exist');
-        const correctionId = generateCorrectionId();
-        correctionsMap.set(correctionId, correction);
-        const suggestionLink = `<span class="correction-link" data-correction-id="${correctionId}">${escapeHtml(msg.suggestion)}</span>`;
-        correctionsHTML = `<div class="message-corrections">${corrIcon} ${suggestionLink}</div>`;
+        if (msg.corrections.length === 1) {
+          // Single correction with suggestion: make the suggestion text itself clickable
+          const correction = assertDefined(msg.corrections[0], 'First correction should exist');
+          const correctionId = generateCorrectionId();
+          correctionsMap.set(correctionId, correction);
+          const suggestionLink = `<span class="correction-link" data-correction-id="${correctionId}">${escapeHtml(msg.suggestion)}</span>`;
+          correctionsHTML = `<div class="message-corrections">${corrIcon} ${suggestionLink}</div>`;
+        } else {
+          // Multiple corrections with suggestion: show suggestion text followed by inline links
+          const correctionLinks = msg.corrections
+            .map(correction => {
+              const correctionId = generateCorrectionId();
+              correctionsMap.set(correctionId, correction);
+              const displayText = correction.displayText || correction.replacementText;
+              return `<span class="correction-link" data-correction-id="${correctionId}">${escapeHtml(displayText)}</span>`;
+            })
+            .join(', ');
+          correctionsHTML = `<div class="message-corrections">${corrIcon} ${escapeHtml(msg.suggestion)} ${correctionLinks}</div>`;
+        }
       } else {
-        // Show each correction's replacement text as separate links (for typos)
+        // No suggestion text: show "Did you mean:" with inline links
         const correctionLinks = msg.corrections
           .map(correction => {
             const correctionId = generateCorrectionId();
             correctionsMap.set(correctionId, correction);
-            return `<span class="correction-link" data-correction-id="${correctionId}">${escapeHtml(correction.replacementText)}</span>`;
+            const displayText = correction.displayText || correction.replacementText;
+            return `<span class="correction-link" data-correction-id="${correctionId}">${escapeHtml(displayText)}</span>`;
           })
           .join(', ');
         correctionsHTML = `<div class="message-corrections">${corrIcon} Did you mean: ${correctionLinks}?</div>`;
