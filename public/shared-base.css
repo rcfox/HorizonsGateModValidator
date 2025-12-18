@@ -6,6 +6,7 @@
     --primary-dark: #357abd;
     --success-color: #52c41a;
     --warning-color: #faad14;
+    --hint-color: #B87333;
     --error-color: #f5222d;
     --info-color: #1890ff;
 }
@@ -51,7 +52,6 @@ body {
 
 /* Container */
 .container {
-    max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
 }

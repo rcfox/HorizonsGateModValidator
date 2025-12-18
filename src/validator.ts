@@ -14,6 +14,7 @@ export class ModValidator {
   private typeAliases: Record<string, string>;
   private functionalAliases: Record<string, string>;
   private propertyValidator = new PropertyValidator();
+  private parsedObjectsCache: Map<string, ParsedObject[]> = new Map();
 
   constructor() {
     const data = modSchemaData as SchemaData;
@@ -30,32 +31,61 @@ export class ModValidator {
     return this.functionalAliases[typeName] || typeName;
   }
 
-  validate(content: string): ValidationResult {
-    const parser = new ModParser(content);
+  validate(content: string, filePath: string): ValidationResult {
+    const parser = new ModParser(content, filePath);
 
     const { objects, errors: parseErrors } = parser.parse();
+
+    // Cache parsed objects for cross-file validation
+    this.parsedObjectsCache.set(filePath, objects);
+
     const objMessages = objects.flatMap(obj => this.validateObject(obj));
     const structureMessages = this.validateActionStructures(objects);
-    const duplicateIdMessages = this.checkDuplicateIds(objects);
+    // NOTE: checkDuplicateIds now runs separately via getCrossFileValidationMessages()
 
-    const allMessages = [...parseErrors, ...objMessages, ...structureMessages, ...duplicateIdMessages];
+    const allMessages = [...parseErrors, ...objMessages, ...structureMessages];
 
     const errors = allMessages.filter(m => m.severity === 'error');
     const warnings = allMessages.filter(m => m.severity === 'warning');
+    const hints = allMessages.filter(m => m.severity === 'hint');
     const info = allMessages.filter(m => m.severity === 'info');
 
     return {
-      valid: errors.length === 0,
       errors,
       warnings,
+      hints,
       info,
     };
+  }
+
+  /**
+   * Get validation messages that require checking across all files
+   * (e.g., duplicate IDs across files)
+   */
+  getCrossFileValidationMessages(): ValidationMessage[] {
+    const allObjects = Array.from(this.parsedObjectsCache.values()).flat();
+    return this.checkDuplicateIds(allObjects);
+  }
+
+  /**
+   * Clear the entire cache
+   */
+  clearCache(): void {
+    this.parsedObjectsCache.clear();
+  }
+
+  /**
+   * Remove a specific file from the cache
+   */
+  removeFromCache(filePath: string): void {
+    this.parsedObjectsCache.delete(filePath);
   }
 
   private checkDuplicateIds(objects: ParsedObject[]): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
     const objectIds: Map<string, Map<string, ParsedObject[]>> = new Map();
 
+    // Collect all objects with IDs, grouped by type and ID
     for (const obj of objects) {
       const classSchema = this.schema[this.resolveTypeAlias(obj.type)];
       if (classSchema?.category !== 'definition') {
@@ -78,28 +108,54 @@ export class ModValidator {
       }
 
       const objsWithSameId = typeIds.get(objId);
-      const firstUse = objsWithSameId?.[0]?.properties.get('ID');
-      if (firstUse) {
+      typeIds.set(objId, [...(objsWithSameId ?? []), obj]);
+    }
+
+    // For each ID used more than once, create a single message with all locations
+    for (const [resolvedType, typeIds] of objectIds) {
+      for (const [objId, objs] of typeIds) {
+        if (objs.length <= 1) {
+          continue; // Not a duplicate
+        }
+
+        // Create corrections for all uses
+        const corrections = objs.map(obj => {
+          const idProp = obj.properties.get('ID');
+          if (!idProp) {
+            throw new Error(`Object missing ID property: ${obj.type}`);
+          }
+          return {
+            filePath: idProp.filePath,
+            startLine: idProp.valueStartLine,
+            startColumn: idProp.valueStartColumn,
+            endLine: idProp.valueEndLine,
+            endColumn: idProp.valueEndColumn,
+            replacementText: idProp.value, // Same as original (for navigation only)
+            displayText: `${idProp.filePath}:${idProp.valueStartLine}`,
+          };
+        });
+
+        // Use the first occurrence's location for the message
+        const firstObj = objs[0];
+        if (!firstObj) {
+          throw new Error('Objects array should not be empty');
+        }
+        const firstIdProp = firstObj.properties.get('ID');
+        if (!firstIdProp) {
+          throw new Error(`First object missing ID property: ${firstObj.type}`);
+        }
+
         messages.push({
           severity: 'warning',
-          message: `Duplicate ID '${objId}' for ${resolvedType}.`,
-          line: obj.properties.get('ID')?.valueStartLine ?? obj.startLine,
-          suggestion: `First use of this ID on line ${firstUse.valueStartLine}.`,
+          message: `ID '${objId}' for ${resolvedType} used in ${objs.length} instances`,
+          filePath: firstIdProp.filePath,
+          line: firstIdProp.valueStartLine,
+          suggestion: 'Uses:',
           correctionIcon: '🎯',
-          corrections: [
-            {
-              // Make a fake correction that replaces the text with what's already there.
-              // This is just to allow us to easily jump to the original definition from the error message.
-              startColumn: firstUse.valueStartColumn,
-              startLine: firstUse.valueStartLine,
-              endColumn: firstUse.valueEndColumn,
-              endLine: firstUse.valueEndLine,
-              replacementText: firstUse.value,
-            },
-          ],
+          corrections,
+          isCrossFile: true,
         });
       }
-      typeIds.set(objId, [...(objsWithSameId ?? []), obj]);
     }
 
     return messages;
@@ -115,6 +171,7 @@ export class ModValidator {
       const allTypes = [...Object.keys(this.schema), ...Object.keys(this.typeAliases)];
       const similar = findSimilar(obj.type, allTypes, MAX_EDIT_DISTANCE);
       const corrections = similar.map(s => ({
+        filePath: obj.filePath,
         startLine: obj.typeStartLine,
         startColumn: obj.typeStartColumn,
         endLine: obj.typeStartLine,
@@ -125,6 +182,7 @@ export class ModValidator {
       messages.push({
         severity: 'error',
         message: `Unknown object type: ${obj.type}`,
+        filePath: obj.filePath,
         line: obj.startLine,
         context: 'This object type is not recognized',
         corrections,
@@ -136,6 +194,7 @@ export class ModValidator {
       messages.push({
         severity: 'error',
         message: `Object type ${obj.type} requires an ID property`,
+        filePath: obj.filePath,
         line: obj.startLine,
         suggestion: 'Add: ID = yourUniqueID;',
       });
@@ -145,6 +204,7 @@ export class ModValidator {
       messages.push({
         severity: 'warning',
         message: `Object type ${obj.type} does not support cloneFrom`,
+        filePath: obj.filePath,
         line: obj.startLine,
         context: 'The cloneFrom property will be ignored',
       });
@@ -248,6 +308,7 @@ export class ModValidator {
         const allProperties = Array.from(knownFields.keys());
         const similar = findSimilar(cleanPropName, allProperties, MAX_EDIT_DISTANCE);
         const corrections = similar.map(s => ({
+          filePath: propInfo.filePath,
           startLine: propInfo.nameStartLine,
           startColumn: propInfo.nameStartColumn,
           endLine: propInfo.nameStartLine,
@@ -256,8 +317,9 @@ export class ModValidator {
         }));
 
         messages.push({
-          severity: 'error',
+          severity: 'hint',
           message: `Unknown property '${cleanPropName}' for ${typeDisplay}`,
+          filePath: propInfo.filePath,
           line: propInfo.nameStartLine,
           context: `Value: ${propValue}`,
           suggestion: corrections.length === 0 ? 'Check for typos in property name' : undefined,
@@ -304,11 +366,13 @@ export class ModValidator {
         messages.push({
           severity: 'error',
           message: `${obj.type} for Action '${actionId}' is missing ID property`,
+          filePath: obj.filePath,
           line: obj.startLine,
           suggestion: `Add: ID=${actionId};`,
           correctionIcon: '🔧',
           corrections: [
             {
+              filePath: obj.filePath,
               startLine: obj.startLine,
               startColumn: obj.typeBracketEndColumn,
               endLine: obj.startLine,
@@ -324,9 +388,11 @@ export class ModValidator {
         messages.push({
           severity: 'error',
           message: `${obj.type} ID '${idProp.value}' does not match Action ID '${actionId}'`,
+          filePath: obj.filePath,
           line: idProp.valueStartLine,
           corrections: [
             {
+              filePath: idProp.filePath,
               startLine: idProp.valueStartLine,
               startColumn: idProp.valueStartColumn,
               endLine: idProp.valueEndLine,
@@ -350,6 +416,7 @@ export class ModValidator {
         messages.push({
           severity: 'error',
           message: `Action '${actionId}' must be followed by [ActionAoE]`,
+          filePath: action.filePath,
           line: action.endLine,
         });
         return false;
@@ -363,6 +430,7 @@ export class ModValidator {
         messages.push({
           severity: 'error',
           message: `Action '${actionId}' must have at least one [AvAffecter] following after the [ActionAoE]`,
+          filePath: action.filePath,
           line: action.endLine,
         });
         return false;
@@ -379,6 +447,7 @@ export class ModValidator {
           messages.push({
             severity: 'error',
             message: `AvAffecter for Action '${actionId}' must be followed by [AvAffecterAoE]`,
+            filePath: currentObj.filePath,
             line: currentObj.endLine,
           });
           return false;
@@ -400,6 +469,7 @@ export class ModValidator {
         messages.push({
           severity: 'error',
           message: `Action '${actionId}' must be followed by [ActionAoE], but found [${obj.type}]`,
+          filePath: obj.filePath,
           line: obj.startLine,
         });
         return false;
@@ -423,6 +493,7 @@ export class ModValidator {
         messages.push({
           severity: 'error',
           message: `Action '${actionId}' expected at least one [AvAffecter], but found [${obj.type}]`,
+          filePath: obj.filePath,
           line: obj.startLine,
         });
         return false;
@@ -441,6 +512,7 @@ export class ModValidator {
         messages.push({
           severity: 'error',
           message: `AvAffecter for Action '${actionId}' must be followed by [AvAffecterAoE], but found [${obj.type}]`,
+          filePath: obj.filePath,
           line: obj.startLine,
         });
         return false;

@@ -29,15 +29,37 @@
         </ul>
       </details>
 
-      <main>
+      <main id="main">
+        <!-- File tree (hidden by default) -->
+        <div id="fileTree" class="file-tree-section" style="display: none;">
+          <div class="section-header">
+            <h2>Files</h2>
+          </div>
+          <div id="fileTreeContent" class="file-tree-content"></div>
+        </div>
+
         <div class="editor-section">
           <div class="section-header">
             <h2>Mod Code</h2>
             <div class="actions">
+              <button id="clearBtn" class="btn btn-secondary">Clear</button>
+              <div class="upload-dropdown">
+                <button id="uploadBtn" class="btn btn-secondary">
+                  Open ▾
+                </button>
+                <div class="upload-menu">
+                  <button id="uploadFilesBtn" class="upload-menu-item">Open Files</button>
+                  <button id="uploadDirBtn" class="upload-menu-item">Open Directory</button>
+                </div>
+                <input type="file" id="fileInput" style="display: none;" multiple />
+                <input type="file" id="dirInput" style="display: none;" webkitdirectory directory />
+              </div>
               <button id="loadSampleBtn" class="btn btn-secondary">
                 Load Sample
               </button>
-              <button id="clearBtn" class="btn btn-secondary">Clear</button>
+              <button id="downloadZipBtn" class="btn btn-secondary" style="display: none;">
+                Export ZIP
+              </button>
               <button id="validateBtn" class="btn btn-primary">Validate</button>
             </div>
           </div>

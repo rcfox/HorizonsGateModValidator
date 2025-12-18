@@ -31,6 +31,7 @@ export function validateFormula(formula: string, propInfo: PropertyInfo): Valida
       messages.push({
         severity: 'error',
         message: error.message,
+        filePath: propInfo.filePath,
         line: propInfo.valueStartLine,
         formulaReference: error.operatorName ?? undefined,
         corrections: corrections.length > 0 ? corrections : undefined,
@@ -42,6 +43,7 @@ export function validateFormula(formula: string, propInfo: PropertyInfo): Valida
     messages.push({
       severity: 'error',
       message: `Formula parse error: ${errorMessage}`,
+      filePath: propInfo.filePath,
       line: propInfo.valueStartLine,
     });
   }
@@ -98,6 +100,7 @@ function createCorrections(formula: string, error: ValidationError, propInfo: Pr
 
   // Create a correction for each suggestion
   return error.suggestions.map(suggestion => ({
+    filePath: propInfo.filePath,
     startLine: propInfo.valueStartLine,
     startColumn,
     endLine: propInfo.valueEndLine,

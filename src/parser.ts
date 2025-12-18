@@ -12,7 +12,10 @@ export class ModParser {
   private objects: ParsedObject[] = [];
   private errors: ValidationMessage[] = [];
 
-  constructor(private source: string) {}
+  constructor(
+    private source: string,
+    private filePath: string
+  ) {}
 
   /**
    * Parse the source into objects
@@ -51,6 +54,7 @@ export class ModParser {
         this.errors.push({
           severity: 'error',
           message: 'Unexpected token outside object definition',
+          filePath: this.filePath,
           line: token.line,
           context: `Found ${token.value}, expected [ObjectType]`,
         });
@@ -70,6 +74,7 @@ export class ModParser {
       this.errors.push({
         severity: 'error',
         message: 'Expected object type name after [',
+        filePath: this.filePath,
         line: this.peek().line,
         context: `Found ${this.peek().value}`,
       });
@@ -88,6 +93,7 @@ export class ModParser {
       this.errors.push({
         severity: 'error',
         message: 'Expected ] after object type name',
+        filePath: this.filePath,
         line: this.peek().line,
         context: `Found ${this.peek().value} in [${objectType}]`,
       });
@@ -107,6 +113,7 @@ export class ModParser {
 
     return {
       type: objectType,
+      filePath: this.filePath,
       properties,
       startLine,
       endLine,
@@ -173,6 +180,7 @@ export class ModParser {
       this.errors.push({
         severity: 'error',
         message: `Expected = after property name '${propertyName}'`,
+        filePath: this.filePath,
         line: propertyLine,
         context: `Found ${this.peek().value}`,
       });
@@ -275,12 +283,14 @@ export class ModParser {
         this.errors.push({
           severity: 'error',
           message: `Property '${propertyName} = ${value}' does not end with semicolon`,
+          filePath: this.filePath,
           line: propertyLine,
           context: 'Add ; at the end of the line',
           suggestion: 'Add a semicolon',
           correctionIcon: '🔧',
           corrections: [
             {
+              filePath: this.filePath,
               startLine: propertyLine,
               startColumn: valueEndColumn,
               endLine: propertyLine,
@@ -296,6 +306,7 @@ export class ModParser {
       key: propertyName,
       info: {
         value,
+        filePath: this.filePath,
         nameStartLine,
         nameStartColumn,
         nameEndColumn,

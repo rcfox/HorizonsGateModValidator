@@ -19,8 +19,7 @@ sprite = 0;
 moveCost = 1.0;
 `;
 
-const result1 = validator.validate(validMod);
-console.log('Valid:', result1.valid);
+const result1 = validator.validate(validMod, 'test1.txt');
 console.log('Errors:', result1.errors.length);
 console.log('Warnings:', result1.warnings.length);
 if (result1.errors.length > 0) {
@@ -37,8 +36,7 @@ name = Test Item
 damage = 10;
 `;
 
-const result2 = validator.validate(missingSemicolon);
-console.log('Valid:', result2.valid);
+const result2 = validator.validate(missingSemicolon, 'test2.txt');
 console.log('Warnings:', result2.warnings);
 console.log('');
 
@@ -50,8 +48,7 @@ ID = test;
 value = 123;
 `;
 
-const result3 = validator.validate(unknownType);
-console.log('Valid:', result3.valid);
+const result3 = validator.validate(unknownType, 'test3.txt');
 console.log('Warnings:', result3.warnings);
 console.log('');
 
@@ -65,8 +62,7 @@ G = 100;
 B = 100;
 `;
 
-const result4 = validator.validate(invalidType);
-console.log('Valid:', result4.valid);
+const result4 = validator.validate(invalidType, 'test4.txt');
 console.log('Errors:', result4.errors);
 console.log('');
 
@@ -80,8 +76,7 @@ fReq = moreThan:5:partySize;
 damage = max:10:w:damage*2;
 `;
 
-const result5 = validator.validate(formulaMod);
-console.log('Valid:', result5.valid);
+const result5 = validator.validate(formulaMod, 'test5.txt');
 console.log('Errors:', result5.errors.length);
 console.log('Warnings:', result5.warnings.length);
 if (result5.errors.length > 0) {
@@ -97,8 +92,7 @@ name = TestActor;
 HP = 100;
 `;
 
-const result6 = validator.validate(missingID);
-console.log('Valid:', result6.valid);
+const result6 = validator.validate(missingID, 'test6.txt');
 console.log('Errors:', result6.errors);
 console.log('');
 
@@ -119,8 +113,7 @@ G = 150;
 B = 255;
 `;
 
-const result7 = validator.validate(nested);
-console.log('Valid:', result7.valid);
+const result7 = validator.validate(nested, 'test7.txt');
 console.log('Errors:', result7.errors.length);
 console.log('Warnings:', result7.warnings.length);
 console.log('');

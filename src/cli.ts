@@ -28,6 +28,7 @@ class ModValidatorCLI {
   private filesWithErrors = 0;
   private totalErrors = 0;
   private totalWarnings = 0;
+  private totalHints = 0;
   private totalInfo = 0;
   private printedMessages = 0;
   private fileResults: FileResult[] = [];
@@ -40,7 +41,7 @@ class ModValidatorCLI {
 
     try {
       const content = fs.readFileSync(filePath, 'utf-8');
-      const result = this.validator.validate(content);
+      const result = this.validator.validate(content, filePath);
 
       if (result.errors.length > 0) {
         this.filesWithErrors++;
@@ -48,6 +49,7 @@ class ModValidatorCLI {
 
       this.totalErrors += result.errors.length;
       this.totalWarnings += result.warnings.length;
+      this.totalHints += result.hints.length;
       this.totalInfo += result.info.length;
 
       return { filePath, result };
@@ -117,7 +119,8 @@ class ModValidatorCLI {
     const levelOrder: Record<ValidationSeverity, number> = {
       error: 0,
       warning: 1,
-      info: 2,
+      hint: 2,
+      info: 3,
     };
 
     const minLevelValue = levelOrder[minLevel];
@@ -160,7 +163,7 @@ class ModValidatorCLI {
       }
 
       const { result } = fileResult;
-      const allMessages = [...result.errors, ...result.warnings, ...result.info];
+      const allMessages = [...result.errors, ...result.warnings, ...result.hints, ...result.info];
       const filteredMessages = this.filterMessages(allMessages, minLevel);
 
       // Output filtered messages
@@ -173,7 +176,9 @@ class ModValidatorCLI {
     // Print summary
     console.log('');
     console.log(`${this.filesProcessed} file(s) checked, ${this.filesWithErrors} file(s) with errors`);
-    console.log(`${this.totalErrors} error(s), ${this.totalWarnings} warning(s), ${this.totalInfo} info message(s)`);
+    console.log(
+      `${this.totalErrors} error(s), ${this.totalWarnings} warning(s), ${this.totalHints} hint(s), ${this.totalInfo} info message(s)`
+    );
   }
 
   /**
@@ -201,6 +206,7 @@ class ModValidatorCLI {
         filesWithErrors: this.filesWithErrors,
         totalErrors: this.totalErrors,
         totalWarnings: this.totalWarnings,
+        totalHints: this.totalHints,
         totalInfo: this.totalInfo,
       },
       files: fileResults.map((fileResult) => {
@@ -220,15 +226,15 @@ class ModValidatorCLI {
         }
 
         const { result } = fileResult;
-        const allMessages = [...result.errors, ...result.warnings, ...result.info];
+        const allMessages = [...result.errors, ...result.warnings, ...result.hints, ...result.info];
         const filteredMessages = this.filterMessages(allMessages, minLevel);
         this.printedMessages += filteredMessages.length;
 
         return {
           file: fileResult.filePath,
-          valid: result.valid,
           errorCount: result.errors.length,
           warningCount: result.warnings.length,
+          hintCount: result.hints.length,
           infoCount: result.info.length,
           messages: filteredMessages.map((msg) => this.messageToJSON(fileResult.filePath, msg)),
         };

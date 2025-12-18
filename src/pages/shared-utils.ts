@@ -7,15 +7,24 @@
 // ============================================================================
 
 /**
+ * Assert that a value is defined (not null or undefined)
+ * @throws Error if value is null or undefined
+ */
+export function assertDefined<T>(value: T | undefined | null, errorMessage: string): T {
+  if (value === undefined || value === null) {
+    throw new Error(errorMessage);
+  }
+  return value;
+}
+
+/**
  * Assert that a value is an instance of a given type
  * @throws Error if value is not an instance of type
  */
 export function assertInstanceOf<T>(value: unknown, type: new (...args: unknown[]) => T, context?: string): T {
   if (!(value instanceof type)) {
     const got = value?.constructor?.name ?? typeof value;
-    const message = context
-      ? `${context}: Expected ${type.name}, got ${got}`
-      : `Expected ${type.name}, got ${got}`;
+    const message = context ? `${context}: Expected ${type.name}, got ${got}` : `Expected ${type.name}, got ${got}`;
     throw new Error(message);
   }
   return value;
@@ -77,10 +86,10 @@ export function querySelectorAs<T extends HTMLElement>(
   selector: string,
   type: new (...args: unknown[]) => T,
   parent: ParentNode = document
-): T | null {
+): T {
   const element = parent.querySelector(selector);
   if (!element) {
-    return null;
+    throw new Error(`Element matching selector '${selector}' was not found.`);
   }
   if (!(element instanceof type)) {
     throw new Error(`Element matching selector '${selector}' is not a ${type.name}, got ${element.constructor.name}`);
