@@ -348,6 +348,35 @@ main.with-file-tree {
     white-space: nowrap;
 }
 
+/* File severity colors */
+.file-tree-item.file-error .name {
+    color: var(--error-color);
+    font-weight: 600;
+}
+
+.file-tree-item.file-warning .name {
+    color: var(--warning-color);
+    font-weight: 600;
+}
+
+.file-tree-item.file-info .name {
+    color: var(--info-color);
+    font-weight: 600;
+}
+
+.file-tree-item.file-valid .name {
+
+}
+
+.file-tree-item.file-unvalidated .name {
+    opacity: 0.7;
+}
+
+/* Override colors when active */
+.file-tree-item.active .name {
+    color: white !important;
+}
+
 .file-tree-item.collapsed .children {
     display: none;
 }

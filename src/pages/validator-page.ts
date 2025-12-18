@@ -792,6 +792,40 @@ export function initValidatorApp(): void {
     }
   }
 
+  /**
+   * Get the severity class for a file based on its validation results
+   */
+  function getFileSeverityClass(fileNode: FileNodeTextFile): string {
+    if (!fileNode.validationResult) {
+      return 'file-unvalidated';
+    }
+
+    const { errors, warnings, info } = fileNode.validationResult;
+    if (errors.length > 0) return 'file-error';
+    if (warnings.length > 0) return 'file-warning';
+    if (info.length > 0) return 'file-info';
+    return 'file-valid';
+  }
+
+  /**
+   * Update file tree severity classes after validation
+   */
+  function updateFileTreeSeverityClasses(): void {
+    if (!fileManager) return;
+
+    for (const [path, fileNode] of fileManager.files) {
+      if (fileNode.type === 'text-file') {
+        const fileElement = fileTreeContent.querySelector(`[data-path="${CSS.escape(path)}"]`);
+        if (fileElement) {
+          // Remove all severity classes
+          fileElement.classList.remove('file-error', 'file-warning', 'file-info', 'file-valid', 'file-unvalidated');
+          // Add current severity class
+          fileElement.classList.add(getFileSeverityClass(fileNode));
+        }
+      }
+    }
+  }
+
   function renderFileTree(): void {
     if (!fileTree || !fileManager) return;
 
@@ -861,6 +895,8 @@ export function initValidatorApp(): void {
         if (child.type === 'text-file') {
           const filePath = child.path;
           itemDiv.addEventListener('click', () => selectFile(filePath));
+          // Add initial severity class
+          itemDiv.classList.add(getFileSeverityClass(child));
         } else {
           itemDiv.style.opacity = '0.6';
           itemDiv.style.cursor = 'default';
@@ -930,6 +966,24 @@ export function initValidatorApp(): void {
         item.classList.remove('active');
       }
     });
+
+    // Scroll the file tree to center the selected file
+    const selectedItem = treeItemMap.get(path);
+    if (selectedItem) {
+      const itemRect = selectedItem.getBoundingClientRect();
+      const containerRect = fileTreeContent.getBoundingClientRect();
+
+      // Calculate the position to scroll to center the item
+      const itemCenter = itemRect.top + itemRect.height / 2;
+      const containerCenter = containerRect.top + containerRect.height / 2;
+      const scrollOffset = itemCenter - containerCenter;
+
+      // Smooth scroll the file tree content
+      fileTreeContent.scrollBy({
+        top: scrollOffset,
+        behavior: 'smooth'
+      });
+    }
   }
 
   function validateAllFiles(): void {
@@ -948,6 +1002,9 @@ export function initValidatorApp(): void {
 
     // Display aggregated results
     displayAggregatedResults(textFiles);
+
+    // Update file tree colors based on validation results
+    updateFileTreeSeverityClasses();
   }
 
   function displayAggregatedResults(textFiles: FileNodeTextFile[]): void {
@@ -1107,6 +1164,8 @@ export function initValidatorApp(): void {
           (f): f is FileNodeTextFile => f.type === 'text-file'
         );
         displayAggregatedResults(textFiles);
+        // Update file tree colors based on validation results
+        updateFileTreeSeverityClasses();
       } else {
         // Single-file mode: display results for just this file
         displayResults(result);
