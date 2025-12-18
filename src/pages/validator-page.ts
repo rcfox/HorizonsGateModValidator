@@ -316,8 +316,10 @@ export function initValidatorApp(): void {
   const downloadZipBtn = getElementByIdAs('downloadZipBtn', HTMLButtonElement);
   const mainContainer = getElementByIdAs('main', HTMLElement);
 
+  // Hide validate button (auto-validation handles this)
+  validateBtn.style.display = 'none';
+
   // Event listeners
-  validateBtn.addEventListener('click', handleValidate);
   clearBtn.addEventListener('click', handleClear);
   loadSampleBtn.addEventListener('click', handleLoadSample);
   uploadFilesBtn.addEventListener('click', () => fileInput.click());
@@ -1289,10 +1291,6 @@ export function initValidatorApp(): void {
       return;
     }
 
-    // Add loading state
-    validateBtn.classList.add('loading');
-    validateBtn.textContent = 'Validating...';
-
     // Run validation
     setTimeout(() => {
       const filePath = fileManager?.currentFilePath || 'untitled.txt';
@@ -1315,10 +1313,6 @@ export function initValidatorApp(): void {
         // Single-file mode: display results for just this file
         displayResults(result);
       }
-
-      // Remove loading state
-      validateBtn.classList.remove('loading');
-      validateBtn.textContent = 'Validate';
     }, 100);
   }
 
