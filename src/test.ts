@@ -19,7 +19,7 @@ sprite = 0;
 moveCost = 1.0;
 `;
 
-const result1 = validator.validate(validMod);
+const result1 = validator.validate(validMod, 'test1.txt');
 console.log('Valid:', result1.valid);
 console.log('Errors:', result1.errors.length);
 console.log('Warnings:', result1.warnings.length);
@@ -37,7 +37,7 @@ name = Test Item
 damage = 10;
 `;
 
-const result2 = validator.validate(missingSemicolon);
+const result2 = validator.validate(missingSemicolon, 'test2.txt');
 console.log('Valid:', result2.valid);
 console.log('Warnings:', result2.warnings);
 console.log('');
@@ -50,7 +50,7 @@ ID = test;
 value = 123;
 `;
 
-const result3 = validator.validate(unknownType);
+const result3 = validator.validate(unknownType, 'test3.txt');
 console.log('Valid:', result3.valid);
 console.log('Warnings:', result3.warnings);
 console.log('');
@@ -65,7 +65,7 @@ G = 100;
 B = 100;
 `;
 
-const result4 = validator.validate(invalidType);
+const result4 = validator.validate(invalidType, 'test4.txt');
 console.log('Valid:', result4.valid);
 console.log('Errors:', result4.errors);
 console.log('');
@@ -80,7 +80,7 @@ fReq = moreThan:5:partySize;
 damage = max:10:w:damage*2;
 `;
 
-const result5 = validator.validate(formulaMod);
+const result5 = validator.validate(formulaMod, 'test5.txt');
 console.log('Valid:', result5.valid);
 console.log('Errors:', result5.errors.length);
 console.log('Warnings:', result5.warnings.length);
@@ -97,7 +97,7 @@ name = TestActor;
 HP = 100;
 `;
 
-const result6 = validator.validate(missingID);
+const result6 = validator.validate(missingID, 'test6.txt');
 console.log('Valid:', result6.valid);
 console.log('Errors:', result6.errors);
 console.log('');
@@ -119,7 +119,7 @@ G = 150;
 B = 255;
 `;
 
-const result7 = validator.validate(nested);
+const result7 = validator.validate(nested, 'test7.txt');
 console.log('Valid:', result7.valid);
 console.log('Errors:', result7.errors.length);
 console.log('Warnings:', result7.warnings.length);

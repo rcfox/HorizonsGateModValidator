@@ -40,7 +40,7 @@ class ModValidatorCLI {
 
     try {
       const content = fs.readFileSync(filePath, 'utf-8');
-      const result = this.validator.validate(content);
+      const result = this.validator.validate(content, filePath);
 
       if (result.errors.length > 0) {
         this.filesWithErrors++;

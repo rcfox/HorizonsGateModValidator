@@ -80,6 +80,7 @@ export interface SchemaData {
  */
 export interface PropertyInfo {
   value: string;
+  filePath: string;
 
   // Property name position (always single line)
   nameStartLine: number;
@@ -98,6 +99,7 @@ export interface PropertyInfo {
  */
 export interface ParsedObject {
   type: string;
+  filePath: string;
   properties: Map<string, PropertyInfo>;
   startLine: number;
   endLine: number;
@@ -130,6 +132,7 @@ export type ValidationSeverity = (typeof VALIDATION_SEVERITIES)[number];
  * Multi-line: Only property values can span multiple lines
  */
 export interface Correction {
+  filePath: string;
   startLine: number;
   startColumn: number;
   endLine: number;
@@ -140,6 +143,7 @@ export interface Correction {
 export interface ValidationMessage {
   severity: ValidationSeverity;
   message: string;
+  filePath: string;
   line: number;
   context?: string | undefined;
   suggestion?: string | undefined; // Override text for corrections (e.g., "Add a semicolon" instead of "Did you mean:")

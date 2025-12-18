@@ -19,7 +19,7 @@ declare global {
   interface Window {
     ModValidator: {
       ModValidator: new () => {
-        validate: (content: string) => ValidationResult;
+        validate: (content: string, filePath: string) => ValidationResult;
         getKnownObjectTypes: () => string[];
       };
     };
@@ -265,6 +265,11 @@ export function initValidatorApp(): void {
   let correctionIdCounter = 0;
   const generateCorrectionId = (): string => `correction-${correctionIdCounter++}`;
 
+  // Message data storage (for XSS safety - avoid putting file paths in HTML attributes)
+  const messagesMap = new Map<string, ValidationMessage>();
+  let messageIdCounter = 0;
+  const generateMessageId = (): string => `message-${messageIdCounter++}`;
+
   // DOM elements
   const modInput = getElementByIdAs('modInput', HTMLTextAreaElement);
   const validateBtn = getElementByIdAs('validateBtn', HTMLButtonElement);
@@ -486,7 +491,10 @@ export function initValidatorApp(): void {
         const editorOfRemaining = editorWidth / remainingWidth;
 
         // Clamp between 0.3 and 0.7
-        const clampedEditorOfRemaining = Math.max(RESIZE_CONSTANTS.MIN_SPLIT_PERCENT, Math.min(RESIZE_CONSTANTS.MAX_SPLIT_PERCENT, editorOfRemaining));
+        const clampedEditorOfRemaining = Math.max(
+          RESIZE_CONSTANTS.MIN_SPLIT_PERCENT,
+          Math.min(RESIZE_CONSTANTS.MAX_SPLIT_PERCENT, editorOfRemaining)
+        );
 
         // Calculate pixel widths
         const newEditorWidth = clampedEditorOfRemaining * remainingWidth;
@@ -774,14 +782,14 @@ export function initValidatorApp(): void {
     // Create resize handles
     createResizeHandles();
 
-    // Select first file by depth
+    // Validate all text files on upload (before selecting a file to show aggregated results)
+    validateAllFiles();
+
+    // Select first file by depth (doesn't overwrite aggregated results)
     const firstFilePath = findFirstFileByDepth(fileTree);
     if (firstFilePath) {
-      await selectFile(firstFilePath);
+      selectFile(firstFilePath);
     }
-
-    // Validate all text files on upload
-    await validateAllFiles();
   }
 
   function renderFileTree(): void {
@@ -863,7 +871,7 @@ export function initValidatorApp(): void {
     }
   }
 
-  async function selectFile(path: string): Promise<void> {
+  function selectFile(path: string): void {
     if (!fileManager) return;
 
     // Save current file content if there's a current file
@@ -922,28 +930,86 @@ export function initValidatorApp(): void {
         item.classList.remove('active');
       }
     });
-
-    // Display cached validation results if available
-    if (fileNode.validationResult) {
-      displayResults(fileNode.validationResult);
-    } else {
-      // Validate this file
-      handleValidate();
-    }
   }
 
-  async function validateAllFiles(): Promise<void> {
+  function validateAllFiles(): void {
     if (!fileManager) return;
 
     const textFiles = Array.from(fileManager.files.values()).filter(
       (f): f is FileNodeTextFile => f.type === 'text-file'
     );
 
+    // Validate all files and cache results
     for (const fileNode of textFiles) {
       if (fileNode.content) {
-        fileNode.validationResult = validator.validate(fileNode.content);
+        fileNode.validationResult = validator.validate(fileNode.content, fileNode.path);
       }
     }
+
+    // Display aggregated results
+    displayAggregatedResults(textFiles);
+  }
+
+  function displayAggregatedResults(textFiles: FileNodeTextFile[]): void {
+    // Clear old data to prevent memory leaks
+    correctionsMap.clear();
+    messagesMap.clear();
+
+    // Aggregate all messages from all files
+    let totalErrors = 0;
+    let totalWarnings = 0;
+    let totalInfo = 0;
+    const allMessages: ValidationMessage[] = [];
+
+    for (const fileNode of textFiles) {
+      if (fileNode.validationResult) {
+        const result = fileNode.validationResult;
+        totalErrors += result.errors.length;
+        totalWarnings += result.warnings.length;
+        totalInfo += result.info.length;
+        allMessages.push(...result.errors, ...result.warnings, ...result.info);
+      }
+    }
+
+    // Update status
+    const filesWithErrors = textFiles.filter(f => f.validationResult && f.validationResult.errors.length > 0).length;
+    if (totalErrors === 0) {
+      validationStatus.textContent = `✓ All ${textFiles.length} file(s) valid`;
+      validationStatus.className = 'status success';
+    } else {
+      validationStatus.textContent = `✗ ${totalErrors} Error${totalErrors !== 1 ? 's' : ''} across ${filesWithErrors} file${filesWithErrors !== 1 ? 's' : ''}`;
+      validationStatus.className = 'status error';
+    }
+
+    // Display messages
+    if (allMessages.length === 0) {
+      resultsContainer.innerHTML = `
+            <div class="message success">
+                <div class="message-header">
+                    <span class="message-icon">✓</span>
+                    <span>No issues found!</span>
+                </div>
+                <div class="message-text">All ${textFiles.length} file(s) appear to be valid.</div>
+            </div>
+        `;
+      return;
+    }
+
+    // Sort messages: errors first, then warnings, then info; within each, sort by file path then line
+    allMessages.sort((a, b) => {
+      const severityOrder = { error: 0, warning: 1, info: 2 };
+      const severityDiff = severityOrder[a.severity] - severityOrder[b.severity];
+      if (severityDiff !== 0) return severityDiff;
+      const fileDiff = a.filePath.localeCompare(b.filePath);
+      if (fileDiff !== 0) return fileDiff;
+      return (a.line || 0) - (b.line || 0);
+    });
+
+    const html = allMessages.map(msg => createMessageHTML(msg)).join('');
+    resultsContainer.innerHTML = html;
+
+    // Populate file paths using textContent for XSS safety
+    populateMessageFilePaths();
   }
 
   async function handleDownloadZip(): Promise<void> {
@@ -1024,8 +1090,8 @@ export function initValidatorApp(): void {
 
     // Run validation
     setTimeout(() => {
-      const result = validator.validate(content);
-      displayResults(result);
+      const filePath = fileManager?.currentFilePath || 'untitled.txt';
+      const result = validator.validate(content, filePath);
 
       // Cache result if in multi-file mode
       if (fileManager?.currentFilePath) {
@@ -1033,6 +1099,17 @@ export function initValidatorApp(): void {
         if (currentFile?.type === 'text-file') {
           currentFile.validationResult = result;
         }
+      }
+
+      // In multi-file mode, display aggregated results from all files
+      if (fileManager) {
+        const textFiles = Array.from(fileManager.files.values()).filter(
+          (f): f is FileNodeTextFile => f.type === 'text-file'
+        );
+        displayAggregatedResults(textFiles);
+      } else {
+        // Single-file mode: display results for just this file
+        displayResults(result);
       }
 
       // Remove loading state
@@ -1089,8 +1166,9 @@ export function initValidatorApp(): void {
   }
 
   function displayResults(result: ValidationResult): void {
-    // Clear old corrections to prevent memory leaks
+    // Clear old data to prevent memory leaks
     correctionsMap.clear();
+    messagesMap.clear();
 
     // Update status
     if (result.valid) {
@@ -1119,26 +1197,23 @@ export function initValidatorApp(): void {
 
     const html = messages.map(msg => createMessageHTML(msg)).join('');
     resultsContainer.innerHTML = html;
+
+    // Populate file paths using textContent for XSS safety
+    populateMessageFilePaths();
   }
 
   function createMessageHTML(msg: ValidationMessage): string {
     const icon = getIcon(msg.severity);
-    const lineAttr = msg.line ? `data-line="${msg.line}"` : '';
     const cursorClass = msg.line ? 'clickable' : '';
 
-    // Add position data attributes if corrections are available
-    let positionAttrs = '';
-    if (msg.corrections && msg.corrections?.[0]?.startLine === msg.line) {
-      const firstCorrection = msg.corrections[0];
-      if (firstCorrection) {
-        positionAttrs = `data-start-line="${firstCorrection.startLine}" data-start-column="${firstCorrection.startColumn}" data-end-line="${firstCorrection.endLine}" data-end-column="${firstCorrection.endColumn}"`;
-      }
-    }
+    // Store message in map and generate ID for XSS-safe retrieval
+    const messageId = generateMessageId();
+    messagesMap.set(messageId, msg);
 
     // Create corrections HTML if available
     let correctionsHTML = '';
     if (msg.corrections && msg.corrections.length > 0) {
-      const icon = msg.correctionIcon || '💡';
+      const corrIcon = msg.correctionIcon || '💡';
 
       // If there's a custom suggestion text, make the entire suggestion clickable
       // Otherwise, show "Did you mean:" with each correction's replacementText as links
@@ -1148,7 +1223,7 @@ export function initValidatorApp(): void {
         const correctionId = generateCorrectionId();
         correctionsMap.set(correctionId, correction);
         const suggestionLink = `<span class="correction-link" data-correction-id="${correctionId}">${escapeHtml(msg.suggestion)}</span>`;
-        correctionsHTML = `<div class="message-corrections">${icon} ${suggestionLink}</div>`;
+        correctionsHTML = `<div class="message-corrections">${corrIcon} ${suggestionLink}</div>`;
       } else {
         // Show each correction's replacement text as separate links (for typos)
         const correctionLinks = msg.corrections
@@ -1158,7 +1233,7 @@ export function initValidatorApp(): void {
             return `<span class="correction-link" data-correction-id="${correctionId}">${escapeHtml(correction.replacementText)}</span>`;
           })
           .join(', ');
-        correctionsHTML = `<div class="message-corrections">${icon} Did you mean: ${correctionLinks}?</div>`;
+        correctionsHTML = `<div class="message-corrections">${corrIcon} Did you mean: ${correctionLinks}?</div>`;
       }
     }
 
@@ -1175,13 +1250,18 @@ export function initValidatorApp(): void {
       documentationHTML = `<div class="message-corrections">📚 <a href="${escapeHtml(msg.documentationUrl)}" target="_blank" rel="noopener noreferrer" class="documentation-link">${escapeHtml(label)}</a></div>`;
     }
 
+    // Show file path in multi-file mode
+    const showFilePath = fileManager !== null;
+    const filePathHTML = showFilePath ? `<span class="message-file-path"></span>:` : '';
+    const line = showFilePath ? msg.line : `Line ${msg.line}`;
+
     return `
-        <div class="message ${msg.severity} ${cursorClass}" ${lineAttr} ${positionAttrs}>
+        <div class="message ${msg.severity} ${cursorClass}" data-message-id="${messageId}">
             <div class="message-header">
                 <span class="message-icon">${icon}</span>
                 <span>${msg.message}</span>
             </div>
-            ${msg.line ? `<div class="message-line-info">Line ${msg.line}</div>` : ''}
+            ${msg.line ? `<div class="message-line-info">${filePathHTML}<span class="message-line-number">${line}</span></div>` : ''}
             ${msg.context ? `<div class="message-context">${escapeHtml(msg.context)}</div>` : ''}
             ${correctionsHTML}
             ${formulaReferenceHTML}
@@ -1193,6 +1273,25 @@ export function initValidatorApp(): void {
             }
         </div>
     `;
+  }
+
+  /**
+   * After creating message HTML, populate file paths using textContent for XSS safety
+   */
+  function populateMessageFilePaths(): void {
+    const messageElements = resultsContainer.querySelectorAll('.message[data-message-id]');
+    messageElements.forEach(el => {
+      const messageId = el.getAttribute('data-message-id');
+      if (messageId) {
+        const msg = messagesMap.get(messageId);
+        if (msg) {
+          const filePathSpan = el.querySelector('.message-file-path');
+          if (filePathSpan) {
+            filePathSpan.textContent = msg.filePath;
+          }
+        }
+      }
+    });
   }
 
   function getIcon(severity: string): string {
@@ -1319,8 +1418,14 @@ export function initValidatorApp(): void {
   }
 
   function applyCorrection(correction: Correction): void {
+    const { startLine, startColumn, endLine, endColumn, replacementText, filePath } = correction;
+
+    // Switch to correct file if in multi-file mode and different file
+    if (fileManager && filePath && filePath !== fileManager.currentFilePath) {
+      selectFile(filePath);
+    }
+
     const lines = modInput.value.split('\n');
-    const { startLine, startColumn, endLine, endColumn, replacementText } = correction;
 
     // Validate correction bounds
     if (startLine < 1 || startLine > lines.length || endLine < 1 || endLine > lines.length) {
@@ -1398,23 +1503,15 @@ export function initValidatorApp(): void {
     // Otherwise handle message click to jump to line
     const messageElement = target.closest('.message.clickable');
     if (messageElement) {
-      const lineNumber = parseInt(messageElement.getAttribute('data-line') || '', 10);
-      if (lineNumber) {
-        // Check if we have position information for more precise selection
-        const startLineStr = messageElement.getAttribute('data-start-line');
-        const startColumnStr = messageElement.getAttribute('data-start-column');
-        const endLineStr = messageElement.getAttribute('data-end-line');
-        const endColumnStr = messageElement.getAttribute('data-end-column');
-
-        if (startLineStr && startColumnStr && endLineStr && endColumnStr) {
-          scrollToLine(lineNumber, {
-            startLine: parseInt(startLineStr, 10),
-            startColumn: parseInt(startColumnStr, 10),
-            endLine: parseInt(endLineStr, 10),
-            endColumn: parseInt(endColumnStr, 10),
-          });
-        } else {
-          scrollToLine(lineNumber);
+      const messageId = messageElement.getAttribute('data-message-id');
+      if (messageId) {
+        const msg = messagesMap.get(messageId);
+        if (msg && msg.line) {
+          // Switch to correct file if in multi-file mode and different file
+          if (fileManager && msg.filePath && msg.filePath !== fileManager.currentFilePath) {
+            selectFile(msg.filePath);
+          }
+          scrollToLine(msg.line);
         }
       }
     }

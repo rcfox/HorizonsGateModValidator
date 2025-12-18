@@ -44,6 +44,7 @@ export class PropertyValidator {
         if (!this.isValidBoolean(cleanValue)) {
           const similar = findSimilar(value, ['true', 'false'], MAX_EDIT_DISTANCE);
           const corrections = similar.map(s => ({
+            filePath: propInfo.filePath,
             startLine: propInfo.valueStartLine,
             startColumn: propInfo.valueStartColumn,
             endLine: propInfo.valueEndLine,
@@ -53,6 +54,7 @@ export class PropertyValidator {
           messages.push({
             severity: 'error',
             message: `Invalid boolean value for ${propertyName}`,
+            filePath: propInfo.filePath,
             line,
             context: `Expected 'true' or 'false', got '${cleanValue}'`,
             corrections,
@@ -65,6 +67,7 @@ export class PropertyValidator {
           messages.push({
             severity: 'error',
             message: `Invalid integer value for ${propertyName}`,
+            filePath: propInfo.filePath,
             line,
             context: `Expected whole number, got '${cleanValue}'`,
           });
@@ -76,6 +79,7 @@ export class PropertyValidator {
           messages.push({
             severity: 'error',
             message: `Invalid float value for ${propertyName}`,
+            filePath: propInfo.filePath,
             line,
             context: `Expected number, got '${cleanValue}'`,
           });
@@ -87,6 +91,7 @@ export class PropertyValidator {
           messages.push({
             severity: 'error',
             message: `Invalid byte value for ${propertyName}`,
+            filePath: propInfo.filePath,
             line,
             context: `Expected number 0-255, got '${cleanValue}'`,
           });
@@ -98,19 +103,19 @@ export class PropertyValidator {
         break;
 
       case 'Vector2':
-        messages.push(...this.validateVector2(propertyName, cleanValue, line));
+        messages.push(...this.validateVector2(propertyName, cleanValue, propInfo.filePath, line));
         break;
 
       case 'Vector3':
-        messages.push(...this.validateVector3(propertyName, cleanValue, line));
+        messages.push(...this.validateVector3(propertyName, cleanValue, propInfo.filePath, line));
         break;
 
       case 'Rectangle':
-        messages.push(...this.validateRectangle(propertyName, cleanValue, line));
+        messages.push(...this.validateRectangle(propertyName, cleanValue, propInfo.filePath, line));
         break;
 
       case 'TileCoord':
-        messages.push(...this.validateTileCoord(propertyName, cleanValue, line));
+        messages.push(...this.validateTileCoord(propertyName, cleanValue, propInfo.filePath, line));
         break;
 
       case 'Color':
@@ -122,23 +127,23 @@ export class PropertyValidator {
         break;
 
       case 'List<string>':
-        messages.push(...this.validateListString(propertyName, cleanValue, hasOverwritePrefix, line));
+        messages.push(...this.validateListString(propertyName, cleanValue, hasOverwritePrefix, propInfo.filePath, line));
         break;
 
       case 'List<integer>':
-        messages.push(...this.validateListInteger(propertyName, cleanValue, hasOverwritePrefix, line));
+        messages.push(...this.validateListInteger(propertyName, cleanValue, hasOverwritePrefix, propInfo.filePath, line));
         break;
 
       case 'List<float>':
-        messages.push(...this.validateListFloat(propertyName, cleanValue, hasOverwritePrefix, line));
+        messages.push(...this.validateListFloat(propertyName, cleanValue, hasOverwritePrefix, propInfo.filePath, line));
         break;
 
       case 'List<Vector2>':
-        messages.push(...this.validateVector2(propertyName, cleanValue, line));
+        messages.push(...this.validateVector2(propertyName, cleanValue, propInfo.filePath, line));
         break;
 
       case 'List<TileCoord>':
-        messages.push(...this.validateTileCoord(propertyName, cleanValue, line));
+        messages.push(...this.validateTileCoord(propertyName, cleanValue, propInfo.filePath, line));
         break;
 
       case 'List<Formula>':
@@ -188,6 +193,7 @@ export class PropertyValidator {
         messages.push({
           severity: 'info',
           message: `Cannot validate type ${expectedType} for ${propertyName}`,
+          filePath: propInfo.filePath,
           line,
           context: 'Type validation not implemented for this type',
         });
@@ -251,6 +257,7 @@ export class PropertyValidator {
         messages.push({
           severity: 'warning',
           message: `Invalid ${enumName} value '${value}' for ${propertyName}`,
+          filePath: propInfo.filePath,
           line,
         });
       }
@@ -265,6 +272,7 @@ export class PropertyValidator {
         messages.push({
           severity: 'info',
           message: `Custom Element value detected: ${value}`,
+          filePath: propInfo.filePath,
           line,
           context: `Custom element values (> 2000) are reserved for modders`,
           suggestion: `Check the modder community document to ensure this value hasn't been taken and to reserve a section`,
@@ -282,6 +290,7 @@ export class PropertyValidator {
 
       if (matchingNames.length > 0) {
         const corrections = matchingNames.map(name => ({
+          filePath: propInfo.filePath,
           startLine: propInfo.valueStartLine,
           startColumn: propInfo.valueStartColumn,
           endLine: propInfo.valueEndLine,
@@ -291,6 +300,7 @@ export class PropertyValidator {
         messages.push({
           severity: 'warning',
           message: `Numeric enum value used for ${propertyName}`,
+          filePath: propInfo.filePath,
           line,
           context: `Use the enum name instead of the numeric value '${value}'`,
           corrections,
@@ -299,6 +309,7 @@ export class PropertyValidator {
         messages.push({
           severity: 'error',
           message: `Invalid ${enumName} numeric value for ${propertyName}`,
+          filePath: propInfo.filePath,
           line,
           context: `'${value}' is not a valid ${enumName} value`,
           suggestion: `Use enum names instead of numbers`,
@@ -313,6 +324,7 @@ export class PropertyValidator {
       // Find similar enum values
       const similar = findSimilar(value, enumNames, MAX_EDIT_DISTANCE);
       const corrections = similar.map(s => ({
+        filePath: propInfo.filePath,
         startLine: propInfo.valueStartLine,
         startColumn: propInfo.valueStartColumn,
         endLine: propInfo.valueEndLine,
@@ -323,6 +335,7 @@ export class PropertyValidator {
       messages.push({
         severity: 'error',
         message: `Invalid ${enumName} value '${value}' for ${propertyName}`,
+        filePath: propInfo.filePath,
         line,
         corrections,
       });
@@ -331,7 +344,7 @@ export class PropertyValidator {
     return messages;
   }
 
-  private validateVector2(name: string, value: string, line: number): ValidationMessage[] {
+  private validateVector2(name: string, value: string, filePath: string, line: number): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
     const parts = value.split(',').map(p => p.trim());
 
@@ -339,6 +352,7 @@ export class PropertyValidator {
       messages.push({
         severity: 'error',
         message: `Invalid Vector2 for ${name}`,
+        filePath,
         line,
         context: `Expected format: x,y (got ${parts.length} values)`,
       });
@@ -350,6 +364,7 @@ export class PropertyValidator {
       messages.push({
         severity: 'error',
         message: `Missing X component for Vector2 in ${name}`,
+        filePath,
         line,
         context: `Expected format: x,y`,
       });
@@ -357,6 +372,7 @@ export class PropertyValidator {
       messages.push({
         severity: 'error',
         message: `Invalid Vector2 X value for ${name}`,
+        filePath,
         line,
         context: `Expected number, got '${x}'`,
       });
@@ -367,6 +383,7 @@ export class PropertyValidator {
       messages.push({
         severity: 'error',
         message: `Missing Y component for Vector2 in ${name}`,
+        filePath,
         line,
         context: `Expected format: x,y`,
       });
@@ -374,6 +391,7 @@ export class PropertyValidator {
       messages.push({
         severity: 'error',
         message: `Invalid Vector2 Y value for ${name}`,
+        filePath,
         line,
         context: `Expected number, got '${y}'`,
       });
@@ -382,7 +400,7 @@ export class PropertyValidator {
     return messages;
   }
 
-  private validateVector3(name: string, value: string, line: number): ValidationMessage[] {
+  private validateVector3(name: string, value: string, filePath: string, line: number): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
     const parts = value.split(',').map(p => p.trim());
 
@@ -390,6 +408,7 @@ export class PropertyValidator {
       messages.push({
         severity: 'error',
         message: `Invalid Vector3 for ${name}`,
+        filePath,
         line,
         context: `Expected format: x,y,z (got ${parts.length} values)`,
       });
@@ -403,6 +422,7 @@ export class PropertyValidator {
         messages.push({
           severity: 'error',
           message: `Missing ${componentNames[i]} component for Vector3 in ${name}`,
+          filePath,
           line,
           context: `Expected format: x,y,z`,
         });
@@ -410,6 +430,7 @@ export class PropertyValidator {
         messages.push({
           severity: 'error',
           message: `Invalid Vector3 ${componentNames[i]} value for ${name}`,
+          filePath,
           line,
           context: `Expected number, got '${component}'`,
         });
@@ -419,7 +440,7 @@ export class PropertyValidator {
     return messages;
   }
 
-  private validateRectangle(name: string, value: string, line: number): ValidationMessage[] {
+  private validateRectangle(name: string, value: string, filePath: string, line: number): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
     const parts = value.split(',').map(p => p.trim());
 
@@ -427,6 +448,7 @@ export class PropertyValidator {
       messages.push({
         severity: 'error',
         message: `Invalid Rectangle for ${name}`,
+        filePath,
         line,
         context: `Expected format: x,y,width,height (got ${parts.length} values)`,
       });
@@ -440,6 +462,7 @@ export class PropertyValidator {
         messages.push({
           severity: 'error',
           message: `Missing ${componentNames[i]} component for Rectangle in ${name}`,
+          filePath,
           line,
           context: `Expected format: x,y,width,height`,
         });
@@ -447,6 +470,7 @@ export class PropertyValidator {
         messages.push({
           severity: 'error',
           message: `Invalid Rectangle ${componentNames[i]} value for ${name}`,
+          filePath,
           line,
           context: `Expected integer, got '${component}'`,
         });
@@ -456,19 +480,31 @@ export class PropertyValidator {
     return messages;
   }
 
-  private validateTileCoord(name: string, value: string, line: number): ValidationMessage[] {
+  private validateTileCoord(name: string, value: string, filePath: string, line: number): ValidationMessage[] {
     // TileCoord is same as Vector2
-    return this.validateVector2(name, value, line);
+    return this.validateVector2(name, value, filePath, line);
   }
 
-  private validateListString(_name: string, _value: string, _isOverwrite: boolean, _line: number): ValidationMessage[] {
+  private validateListString(
+    _name: string,
+    _value: string,
+    _isOverwrite: boolean,
+    _filePath: string,
+    _line: number
+  ): ValidationMessage[] {
     // Strings in lists are comma-separated
     // With ! prefix, it overwrites the list, otherwise appends
     // Empty strings are allowed if it's a single append
     return [];
   }
 
-  private validateListInteger(name: string, value: string, isOverwrite: boolean, line: number): ValidationMessage[] {
+  private validateListInteger(
+    name: string,
+    value: string,
+    isOverwrite: boolean,
+    filePath: string,
+    line: number
+  ): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
 
     if (isOverwrite) {
@@ -482,6 +518,7 @@ export class PropertyValidator {
           messages.push({
             severity: 'error',
             message: `Invalid integer in list for ${name}`,
+            filePath,
             line,
             context: `Expected integer, got '${part}'`,
           });
@@ -493,6 +530,7 @@ export class PropertyValidator {
         messages.push({
           severity: 'error',
           message: `Invalid integer for ${name}`,
+          filePath,
           line,
           context: `Expected integer, got '${value}'`,
         });
@@ -502,7 +540,13 @@ export class PropertyValidator {
     return messages;
   }
 
-  private validateListFloat(name: string, value: string, isOverwrite: boolean, line: number): ValidationMessage[] {
+  private validateListFloat(
+    name: string,
+    value: string,
+    isOverwrite: boolean,
+    filePath: string,
+    line: number
+  ): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
 
     if (isOverwrite) {
@@ -516,6 +560,7 @@ export class PropertyValidator {
           messages.push({
             severity: 'error',
             message: `Invalid float in list for ${name}`,
+            filePath,
             line,
             context: `Expected number, got '${part}'`,
           });
@@ -527,6 +572,7 @@ export class PropertyValidator {
         messages.push({
           severity: 'error',
           message: `Invalid float for ${name}`,
+          filePath,
           line,
           context: `Expected number, got '${value}'`,
         });
