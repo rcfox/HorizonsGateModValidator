@@ -260,6 +260,10 @@ export function initValidatorApp(): void {
   let fileManager: FileManager | null = null;
   let fileTree: FileNodeDirectory | null = null;
 
+  // View mode for multi-file validation results
+  type ResultsViewMode = 'all' | 'current';
+  let resultsViewMode: ResultsViewMode = 'all';
+
   // Correction data storage (for XSS safety - avoid putting user data in HTML attributes)
   const correctionsMap = new Map<string, Correction>();
   let correctionIdCounter = 0;
@@ -278,6 +282,29 @@ export function initValidatorApp(): void {
   const resultsContainer = getElementByIdAs('results', HTMLDivElement);
   const validationStatus = getElementByIdAs('validationStatus', HTMLDivElement);
   const lineNumbers = getElementByIdAs('lineNumbers', HTMLDivElement);
+
+  // Create status buttons for multi-file mode (replace single status when in multi-file mode)
+  const statusButtonsContainer = document.createElement('div');
+  statusButtonsContainer.className = 'status-buttons-container';
+  statusButtonsContainer.style.display = 'none'; // Hidden until multi-file mode
+
+  const allFilesStatus = document.createElement('div');
+  allFilesStatus.className = 'status status-button active';
+  allFilesStatus.title = 'Show validation messages from all files';
+
+  const currentFileStatus = document.createElement('div');
+  currentFileStatus.className = 'status status-button';
+  currentFileStatus.title = 'Show validation messages from current file only';
+
+  // Add buttons to container
+  statusButtonsContainer.appendChild(allFilesStatus);
+  statusButtonsContainer.appendChild(currentFileStatus);
+
+  // Insert container next to the original status
+  const resultsHeader = validationStatus.parentElement;
+  if (resultsHeader) {
+    validationStatus.after(statusButtonsContainer);
+  }
 
   // New elements for file tree
   const fileTreeContainer = getElementByIdAs('fileTree', HTMLDivElement);
@@ -298,6 +325,8 @@ export function initValidatorApp(): void {
   fileInput.addEventListener('change', handleFileInputChange);
   dirInput.addEventListener('change', handleFileInputChange);
   downloadZipBtn.addEventListener('click', handleDownloadZip);
+  allFilesStatus.addEventListener('click', () => switchViewMode('all'));
+  currentFileStatus.addEventListener('click', () => switchViewMode('current'));
 
   // Handle upload dropdown with delay
   const uploadDropdown = querySelectorAs('.upload-dropdown', HTMLElement);
@@ -776,6 +805,10 @@ export function initValidatorApp(): void {
     clearBtn.textContent = 'Close All';
     loadSampleBtn.style.display = 'none';
 
+    // Show status buttons in multi-file mode, hide single status
+    validationStatus.style.display = 'none';
+    statusButtonsContainer.style.display = 'flex';
+
     // Render file tree
     renderFileTree();
 
@@ -981,8 +1014,16 @@ export function initValidatorApp(): void {
       // Smooth scroll the file tree content
       fileTreeContent.scrollBy({
         top: scrollOffset,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
+    }
+
+    // Update status buttons when switching files
+    updateStatusButtons();
+
+    // If in "current file" view mode, refresh to show the newly selected file's messages
+    if (resultsViewMode === 'current') {
+      refreshResultsDisplay();
     }
   }
 
@@ -1013,29 +1054,13 @@ export function initValidatorApp(): void {
     messagesMap.clear();
 
     // Aggregate all messages from all files
-    let totalErrors = 0;
-    let totalWarnings = 0;
-    let totalInfo = 0;
     const allMessages: ValidationMessage[] = [];
 
     for (const fileNode of textFiles) {
       if (fileNode.validationResult) {
         const result = fileNode.validationResult;
-        totalErrors += result.errors.length;
-        totalWarnings += result.warnings.length;
-        totalInfo += result.info.length;
         allMessages.push(...result.errors, ...result.warnings, ...result.info);
       }
-    }
-
-    // Update status
-    const filesWithErrors = textFiles.filter(f => f.validationResult && f.validationResult.errors.length > 0).length;
-    if (totalErrors === 0) {
-      validationStatus.textContent = `✓ All ${textFiles.length} file(s) valid`;
-      validationStatus.className = 'status success';
-    } else {
-      validationStatus.textContent = `✗ ${totalErrors} Error${totalErrors !== 1 ? 's' : ''} across ${filesWithErrors} file${filesWithErrors !== 1 ? 's' : ''}`;
-      validationStatus.className = 'status error';
     }
 
     // Display messages
@@ -1131,6 +1156,129 @@ export function initValidatorApp(): void {
     }
   }
 
+  /**
+   * Update status buttons based on validation results
+   */
+  function updateStatusButtons(): void {
+    if (!fileManager) return;
+
+    const textFiles = Array.from(fileManager.files.values()).filter(
+      (f): f is FileNodeTextFile => f.type === 'text-file'
+    );
+
+    // Aggregate totals for all files
+    let totalErrors = 0;
+    let totalWarnings = 0;
+    let totalInfo = 0;
+
+    for (const fileNode of textFiles) {
+      if (fileNode.validationResult) {
+        totalErrors += fileNode.validationResult.errors.length;
+        totalWarnings += fileNode.validationResult.warnings.length;
+        totalInfo += fileNode.validationResult.info.length;
+      }
+    }
+
+    const filesWithErrors = textFiles.filter(f => f.validationResult && f.validationResult.errors.length > 0).length;
+    const filesWithWarnings = textFiles.filter(
+      f => f.validationResult && f.validationResult.warnings.length > 0
+    ).length;
+
+    const s = (count: number): string => {
+      return count !== 1 ? 's' : '';
+    };
+
+    // Update "all files" status button
+    allFilesStatus.classList.remove('success', 'error', 'warning');
+    if (totalErrors > 0) {
+      allFilesStatus.textContent = `✗ ${totalErrors} Error${s(totalErrors)} across ${filesWithErrors} file${s(filesWithErrors)}`;
+      allFilesStatus.classList.add('error');
+    } else if (totalWarnings > 0) {
+      allFilesStatus.textContent = `⚠ ${totalWarnings} Warning${s(totalWarnings)} across ${filesWithWarnings} file${s(filesWithWarnings)}`;
+      allFilesStatus.classList.add('warning');
+    } else if (totalInfo > 0) {
+      allFilesStatus.textContent = `ℹ ${totalInfo} Info message${s(totalInfo)} across ${textFiles.length} file${s(textFiles.length)}`;
+      allFilesStatus.classList.add('success');
+    } else {
+      allFilesStatus.textContent = `✓ All ${textFiles.length} file${s(textFiles.length)} valid`;
+      allFilesStatus.classList.add('success');
+    }
+
+    // Update "current file" status button
+    if (fileManager.currentFilePath) {
+      const currentFile = fileManager.files.get(fileManager.currentFilePath);
+      if (currentFile?.type === 'text-file' && currentFile.validationResult) {
+        const currentErrors = currentFile.validationResult.errors.length;
+        const currentWarnings = currentFile.validationResult.warnings.length;
+        const currentInfo = currentFile.validationResult.info.length;
+
+        currentFileStatus.classList.remove('success', 'error', 'warning');
+        if (currentErrors > 0) {
+          currentFileStatus.textContent = `✗ ${currentErrors} Error${s(currentErrors)} in this file`;
+          currentFileStatus.classList.add('error');
+        } else if (currentWarnings > 0) {
+          currentFileStatus.textContent = `⚠ ${currentWarnings} Warning${s(currentWarnings)} in this file`;
+          currentFileStatus.classList.add('warning');
+        } else if (currentInfo > 0) {
+          currentFileStatus.textContent = `ℹ ${currentInfo} Info message${s(currentInfo)} in this file`;
+          currentFileStatus.classList.add('success');
+        } else {
+          currentFileStatus.textContent = `✓ This file valid`;
+          currentFileStatus.classList.add('success');
+        }
+      }
+    }
+  }
+
+  /**
+   * Refresh the results display based on current view mode
+   */
+  function refreshResultsDisplay(): void {
+    if (!fileManager) return;
+
+    const textFiles = Array.from(fileManager.files.values()).filter(
+      (f): f is FileNodeTextFile => f.type === 'text-file'
+    );
+
+    // Always update status buttons
+    updateStatusButtons();
+
+    if (resultsViewMode === 'all') {
+      // Show all files
+      displayAggregatedResults(textFiles);
+    } else {
+      // Show current file only
+      if (fileManager.currentFilePath) {
+        const currentFile = fileManager.files.get(fileManager.currentFilePath);
+        if (currentFile?.type === 'text-file' && currentFile.validationResult) {
+          displayResults(currentFile.validationResult);
+        }
+      }
+    }
+  }
+
+  /**
+   * Switch between showing all files and current file only
+   */
+  function switchViewMode(mode: ResultsViewMode): void {
+    if (!fileManager) return;
+
+    // Update mode
+    resultsViewMode = mode;
+
+    // Update active state
+    if (mode === 'all') {
+      allFilesStatus.classList.add('active');
+      currentFileStatus.classList.remove('active');
+    } else {
+      allFilesStatus.classList.remove('active');
+      currentFileStatus.classList.add('active');
+    }
+
+    // Refresh display
+    refreshResultsDisplay();
+  }
+
   function handleValidate(): void {
     const content = modInput.value;
 
@@ -1158,12 +1306,9 @@ export function initValidatorApp(): void {
         }
       }
 
-      // In multi-file mode, display aggregated results from all files
+      // In multi-file mode, refresh display based on view mode
       if (fileManager) {
-        const textFiles = Array.from(fileManager.files.values()).filter(
-          (f): f is FileNodeTextFile => f.type === 'text-file'
-        );
-        displayAggregatedResults(textFiles);
+        refreshResultsDisplay();
         // Update file tree colors based on validation results
         updateFileTreeSeverityClasses();
       } else {
@@ -1194,6 +1339,13 @@ export function initValidatorApp(): void {
       downloadZipBtn.style.display = 'none';
       clearBtn.textContent = 'Clear';
       loadSampleBtn.style.display = 'inline-block';
+
+      // Hide status buttons and show original status, reset view mode
+      validationStatus.style.display = '';
+      statusButtonsContainer.style.display = 'none';
+      resultsViewMode = 'all';
+      allFilesStatus.classList.add('active');
+      currentFileStatus.classList.remove('active');
 
       // Remove resize handles
       resizeHandle1?.remove();

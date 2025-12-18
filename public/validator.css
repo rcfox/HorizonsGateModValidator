@@ -180,6 +180,33 @@ main.with-file-tree {
     border: 1px solid rgba(250, 173, 20, 0.3);
 }
 
+/* Status buttons container */
+.status-buttons-container {
+    display: flex;
+    gap: 10px;
+}
+
+/* Status button styling */
+.status-button {
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.status-button:not(.active) {
+    opacity: 0.5;
+    filter: grayscale(50%);
+}
+
+.status-button:not(.active):hover {
+    opacity: 0.7;
+    filter: grayscale(30%);
+}
+
+.status-button.active {
+    cursor: default;
+}
+
 /* Validation messages */
 .message {
     padding: 12px;
