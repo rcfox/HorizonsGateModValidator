@@ -127,11 +127,15 @@ export class PropertyValidator {
         break;
 
       case 'List<string>':
-        messages.push(...this.validateListString(propertyName, cleanValue, hasOverwritePrefix, propInfo.filePath, line));
+        messages.push(
+          ...this.validateListString(propertyName, cleanValue, hasOverwritePrefix, propInfo.filePath, line)
+        );
         break;
 
       case 'List<integer>':
-        messages.push(...this.validateListInteger(propertyName, cleanValue, hasOverwritePrefix, propInfo.filePath, line));
+        messages.push(
+          ...this.validateListInteger(propertyName, cleanValue, hasOverwritePrefix, propInfo.filePath, line)
+        );
         break;
 
       case 'List<float>':
