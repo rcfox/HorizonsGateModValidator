@@ -835,9 +835,10 @@ export function initValidatorApp(): void {
       return 'file-unvalidated';
     }
 
-    const { errors, warnings, info } = fileNode.validationResult;
+    const { errors, warnings, hints, info } = fileNode.validationResult;
     if (errors.length > 0) return 'file-error';
     if (warnings.length > 0) return 'file-warning';
+    if (hints.length > 0) return 'file-hint';
     if (info.length > 0) return 'file-info';
     return 'file-valid';
   }
@@ -1061,7 +1062,7 @@ export function initValidatorApp(): void {
     for (const fileNode of textFiles) {
       if (fileNode.validationResult) {
         const result = fileNode.validationResult;
-        allMessages.push(...result.errors, ...result.warnings, ...result.info);
+        allMessages.push(...result.errors, ...result.warnings, ...result.hints, ...result.info);
       }
     }
 
@@ -1079,9 +1080,9 @@ export function initValidatorApp(): void {
       return;
     }
 
-    // Sort messages: errors first, then warnings, then info; within each, sort by file path then line
+    // Sort messages: errors first, then warnings, then hints, then info; within each, sort by file path then line
     allMessages.sort((a, b) => {
-      const severityOrder = { error: 0, warning: 1, info: 2 };
+      const severityOrder = { error: 0, warning: 1, hint: 2, info: 3 };
       const severityDiff = severityOrder[a.severity] - severityOrder[b.severity];
       if (severityDiff !== 0) return severityDiff;
       const fileDiff = a.filePath.localeCompare(b.filePath);
@@ -1171,12 +1172,14 @@ export function initValidatorApp(): void {
     // Aggregate totals for all files
     let totalErrors = 0;
     let totalWarnings = 0;
+    let totalHints = 0;
     let totalInfo = 0;
 
     for (const fileNode of textFiles) {
       if (fileNode.validationResult) {
         totalErrors += fileNode.validationResult.errors.length;
         totalWarnings += fileNode.validationResult.warnings.length;
+        totalHints += fileNode.validationResult.hints.length;
         totalInfo += fileNode.validationResult.info.length;
       }
     }
@@ -1185,6 +1188,7 @@ export function initValidatorApp(): void {
     const filesWithWarnings = textFiles.filter(
       f => f.validationResult && f.validationResult.warnings.length > 0
     ).length;
+    const filesWithHints = textFiles.filter(f => f.validationResult && f.validationResult.hints.length > 0).length;
 
     const s = (count: number): string => {
       return count !== 1 ? 's' : '';
@@ -1198,6 +1202,9 @@ export function initValidatorApp(): void {
     } else if (totalWarnings > 0) {
       allFilesStatus.textContent = `⚠ ${totalWarnings} Warning${s(totalWarnings)} across ${filesWithWarnings} file${s(filesWithWarnings)}`;
       allFilesStatus.classList.add('warning');
+    } else if (totalHints > 0) {
+      allFilesStatus.textContent = `💡 ${totalHints} Hint${s(totalHints)} across ${filesWithHints} file${s(filesWithHints)}`;
+      allFilesStatus.classList.add('success');
     } else if (totalInfo > 0) {
       allFilesStatus.textContent = `ℹ ${totalInfo} Info message${s(totalInfo)} across ${textFiles.length} file${s(textFiles.length)}`;
       allFilesStatus.classList.add('success');
@@ -1212,6 +1219,7 @@ export function initValidatorApp(): void {
       if (currentFile?.type === 'text-file' && currentFile.validationResult) {
         const currentErrors = currentFile.validationResult.errors.length;
         const currentWarnings = currentFile.validationResult.warnings.length;
+        const currentHints = currentFile.validationResult.hints.length;
         const currentInfo = currentFile.validationResult.info.length;
 
         currentFileStatus.classList.remove('success', 'error', 'warning');
@@ -1221,6 +1229,9 @@ export function initValidatorApp(): void {
         } else if (currentWarnings > 0) {
           currentFileStatus.textContent = `⚠ ${currentWarnings} Warning${s(currentWarnings)} in this file`;
           currentFileStatus.classList.add('warning');
+        } else if (currentHints > 0) {
+          currentFileStatus.textContent = `💡 ${currentHints} Hint${s(currentHints)} in this file`;
+          currentFileStatus.classList.add('success');
         } else if (currentInfo > 0) {
           currentFileStatus.textContent = `ℹ ${currentInfo} Info message${s(currentInfo)} in this file`;
           currentFileStatus.classList.add('success');
@@ -1385,7 +1396,7 @@ export function initValidatorApp(): void {
     }
 
     // Display messages
-    const messages = [...result.errors, ...result.warnings, ...result.info];
+    const messages = [...result.errors, ...result.warnings, ...result.hints, ...result.info];
 
     if (messages.length === 0) {
       resultsContainer.innerHTML = `
@@ -1505,6 +1516,8 @@ export function initValidatorApp(): void {
         return '✗';
       case 'warning':
         return '⚠';
+      case 'hint':
+        return '💡';
       case 'info':
         return 'ℹ';
       default:

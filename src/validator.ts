@@ -42,12 +42,14 @@ export class ModValidator {
 
     const errors = allMessages.filter(m => m.severity === 'error');
     const warnings = allMessages.filter(m => m.severity === 'warning');
+    const hints = allMessages.filter(m => m.severity === 'hint');
     const info = allMessages.filter(m => m.severity === 'info');
 
     return {
       valid: errors.length === 0,
       errors,
       warnings,
+      hints,
       info,
     };
   }
@@ -263,7 +265,7 @@ export class ModValidator {
         }));
 
         messages.push({
-          severity: 'error',
+          severity: 'hint',
           message: `Unknown property '${cleanPropName}' for ${typeDisplay}`,
           filePath: propInfo.filePath,
           line: propInfo.nameStartLine,

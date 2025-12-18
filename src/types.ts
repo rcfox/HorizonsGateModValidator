@@ -117,7 +117,7 @@ export interface ParsedObject {
 /**
  * Validation result types
  */
-export const VALIDATION_SEVERITIES = ['error', 'warning', 'info'] as const;
+export const VALIDATION_SEVERITIES = ['error', 'warning', 'hint', 'info'] as const;
 export type ValidationSeverity = (typeof VALIDATION_SEVERITIES)[number];
 
 /**
@@ -158,6 +158,7 @@ export interface ValidationResult {
   valid: boolean;
   errors: ValidationMessage[];
   warnings: ValidationMessage[];
+  hints: ValidationMessage[];
   info: ValidationMessage[];
 }
 

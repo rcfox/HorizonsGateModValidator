@@ -236,6 +236,11 @@ main.with-file-tree {
     background-color: rgba(250, 173, 20, 0.05);
 }
 
+.message.hint {
+    border-left-color: var(--hint-color);
+    background-color: rgba(184, 115, 51, 0.05);
+}
+
 .message.info {
     border-left-color: var(--info-color);
     background-color: rgba(24, 144, 255, 0.05);
@@ -383,6 +388,11 @@ main.with-file-tree {
 
 .file-tree-item.file-warning .name {
     color: var(--warning-color);
+    font-weight: 600;
+}
+
+.file-tree-item.file-hint .name {
+    color: var(--hint-color);
     font-weight: 600;
 }
 
