@@ -30,6 +30,7 @@ export class ModParser {
     this.errors = [];
 
     let lastObject: ParsedObject | null = null;
+    let sawUnexpectedToken = false;
 
     // Parse objects
     while (!this.isAtEnd()) {
@@ -49,15 +50,19 @@ export class ModParser {
         }
         lastObject = obj;
       } else {
-        // Unexpected token outside of object definition
-        const token = this.peek();
-        this.errors.push({
-          severity: 'error',
-          message: 'Unexpected token outside object definition',
-          filePath: this.filePath,
-          line: token.line,
-          context: `Found ${token.value}, expected [ObjectType]`,
-        });
+        // Only emit this error once per file.
+        if (!sawUnexpectedToken) {
+          sawUnexpectedToken = true;
+          // Unexpected token outside of object definition
+          const token = this.peek();
+          this.errors.push({
+            severity: 'error',
+            message: 'Unexpected token outside object definition',
+            filePath: this.filePath,
+            line: token.line,
+            context: `Found "${token.value}", expected [ObjectType]`,
+          });
+        }
         this.advance(); // Skip the problematic token
       }
     }
