@@ -417,34 +417,56 @@ export class ModValidator {
         // We have another check for ID existing elsewhere.
         return false;
       }
+
+      // If we're cloning from another Action, we don't need to worry about missing subobjects
+      // because we'll be inheriting the cloned Actions's subobjects by default.
+      const hasCloneFrom = !!action.properties.get('cloneFrom')?.value;
+
       if (!action.nextObject) {
-        messages.push({
-          severity: 'error',
-          message: `Action '${actionId}' must be followed by [ActionAoE]`,
-          filePath: action.filePath,
-          line: action.endLine,
-        });
+        if (!hasCloneFrom) {
+          messages.push({
+            severity: 'error',
+            message: `Action '${actionId}' must be followed by [ActionAoE]`,
+            filePath: action.filePath,
+            line: action.endLine,
+          });
+        }
         return false;
       }
 
-      if (!validateActionAoE(action.nextObject, actionId)) {
+      if (!validateActionAoE(action.nextObject, actionId, hasCloneFrom)) {
         return false;
       }
 
-      if (!action.nextObject.nextObject) {
-        messages.push({
-          severity: 'error',
-          message: `Action '${actionId}' must have at least one [AvAffecter] following after the [ActionAoE]`,
-          filePath: action.filePath,
-          line: action.endLine,
-        });
-        return false;
-      }
+      // Check what type action.nextObject actually is
+      const nextType = this.resolveFunctionalAlias(action.nextObject.type);
 
-      let currentObj: ParsedObject | null = action.nextObject;
+      // Determine the starting point for AvAffecter validation
+      let currentObj: ParsedObject | null = null;
       let firstAvAffecter = true;
+
+      if (nextType === 'ActionAoE') {
+        // Normal case: ActionAoE exists, check for AvAffecter after it
+        if (!action.nextObject.nextObject) {
+          if (!hasCloneFrom) {
+            messages.push({
+              severity: 'error',
+              message: `Action '${actionId}' must have at least one [AvAffecter] following after the [ActionAoE]`,
+              filePath: action.filePath,
+              line: action.endLine,
+            });
+          }
+          return false;
+        }
+        currentObj = action.nextObject;
+      } else {
+        // ActionAoE was skipped (hasCloneFrom), action.nextObject is the first AvAffecter
+        // Start validation from the Action itself since we need to process action.nextObject
+        currentObj = action;
+      }
+
       while ((currentObj = currentObj.nextObject)) {
-        if (!validateAvAffecter(currentObj, actionId, firstAvAffecter)) {
+        if (!validateAvAffecter(currentObj, actionId, firstAvAffecter, hasCloneFrom)) {
           return false;
         }
 
@@ -468,9 +490,12 @@ export class ModValidator {
       return true;
     };
 
-    const validateActionAoE = (obj: ParsedObject, actionId: string): boolean => {
+    const validateActionAoE = (obj: ParsedObject, actionId: string, actionHasCloneFrom: boolean): boolean => {
       const nextType = this.resolveFunctionalAlias(obj.type);
       if (nextType !== 'ActionAoE') {
+        if (actionHasCloneFrom) {
+          return true;
+        }
         messages.push({
           severity: 'error',
           message: `Action '${actionId}' must be followed by [ActionAoE], but found [${obj.type}]`,
@@ -487,13 +512,21 @@ export class ModValidator {
       return true;
     };
 
-    const validateAvAffecter = (obj: ParsedObject, actionId: string, firstAvAffecter: boolean): boolean => {
+    const validateAvAffecter = (
+      obj: ParsedObject,
+      actionId: string,
+      firstAvAffecter: boolean,
+      actionHasCloneFrom: boolean
+    ): boolean => {
       const nextType = this.resolveFunctionalAlias(obj.type);
       if (nextType !== 'AvAffecter') {
         if (!firstAvAffecter) {
           // If this isn't the first AvAffecter, being a different type isn't an error,
           // it just marks the end of this Action definition.
           return false;
+        }
+        if (actionHasCloneFrom) {
+          return true;
         }
         messages.push({
           severity: 'error',
