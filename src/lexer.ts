@@ -95,7 +95,12 @@ export class ModLexer {
         break;
       case ' ':
       case '\t':
-        // Skip whitespace
+        // Skip whitespace unless we're in value mode
+        if (this.inValueMode) {
+          // In value mode, whitespace is part of the value
+          this.scanValue();
+        }
+        // Otherwise skip whitespace
         break;
       case '-':
         // Check for comment (--), but only when NOT inside a property value
@@ -129,6 +134,12 @@ export class ModLexer {
   }
 
   private scanIdentifierOrValue(): void {
+    // If we're in value mode, scan as a value to preserve whitespace
+    if (this.inValueMode) {
+      this.scanValue();
+      return;
+    }
+
     const start = this.current - 1;
 
     // Continue until we hit a delimiter
@@ -143,7 +154,7 @@ export class ModLexer {
   private scanValue(): void {
     const start = this.current - 1;
 
-    // Scan until semicolon or newline (values can contain spaces in formulas)
+    // Scan until semicolon or newline (values can contain spaces)
     while (!this.isAtEnd()) {
       const char = this.peek();
       if (char === ';' || char === '\n') {
@@ -152,7 +163,7 @@ export class ModLexer {
       this.advance();
     }
 
-    const value = this.source.substring(start, this.current).trim();
+    const value = this.source.substring(start, this.current);
     if (value.length > 0) {
       this.addToken(TokenType.STRING_VALUE, value);
     }

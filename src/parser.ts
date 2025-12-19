@@ -276,7 +276,7 @@ export class ModParser {
       }
     }
 
-    value = valueParts.join('').trim();
+    value = valueParts.join('');
 
     // Check for semicolon
     if (!foundSemicolon && value.length > 0) {
