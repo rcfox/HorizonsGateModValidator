@@ -81,6 +81,58 @@ export class ModValidator {
     this.parsedObjectsCache.delete(filePath);
   }
 
+  /**
+   * Check if two ParsedObjects are identical (have the same properties with the same values)
+   */
+  private areObjectsIdentical(obj1: ParsedObject, obj2: ParsedObject): boolean {
+    // Different number of properties means not identical
+    if (obj1.properties.size !== obj2.properties.size) {
+      return false;
+    }
+
+    // Check if all properties in obj1 exist in obj2 with the same value
+    for (const [propName, propInfo1] of obj1.properties) {
+      const propInfo2 = obj2.properties.get(propName);
+      if (!propInfo2) {
+        return false; // Property missing in obj2
+      }
+      // Normalize whitespace for comparison
+      if (propInfo1.value.trim() !== propInfo2.value.trim()) {
+        return false; // Different values
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Group objects by their content (identical objects are grouped together)
+   * Returns an array of groups, where each group contains objects with identical properties
+   */
+  private groupIdenticalObjects(objs: ParsedObject[]): ParsedObject[][] {
+    const groups: ParsedObject[][] = [];
+
+    for (const obj of objs) {
+      // Find a group where this object is identical to the first object in that group
+      let foundGroup = false;
+      for (const group of groups) {
+        const firstInGroup = group[0];
+        if (firstInGroup && this.areObjectsIdentical(obj, firstInGroup)) {
+          group.push(obj);
+          foundGroup = true;
+          break;
+        }
+      }
+
+      // If no matching group found, create a new group
+      if (!foundGroup) {
+        groups.push([obj]);
+      }
+    }
+
+    return groups;
+  }
+
   private checkDuplicateIds(objects: ParsedObject[]): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
     const objectIds: Map<string, Map<string, ParsedObject[]>> = new Map();
@@ -116,50 +168,120 @@ export class ModValidator {
       typeIds.set(objId, [...(objsWithSameId ?? []), obj]);
     }
 
-    // For each ID used more than once, create a single message with all locations
+    // For each ID used more than once, group by identical content and create messages
     for (const [resolvedType, typeIds] of objectIds) {
       for (const [objId, objs] of typeIds) {
         if (objs.length <= 1) {
           continue; // Not a duplicate
         }
 
-        // Create corrections for all uses
-        const corrections = objs.map(obj => {
-          const idProp = obj.properties.get('ID');
-          if (!idProp) {
-            throw new Error(`Object missing ID property: ${obj.type}`);
+        // Group objects by their content
+        const groups = this.groupIdenticalObjects(objs);
+
+        // If there's only one group, all objects are identical
+        if (groups.length === 1) {
+          const group = groups[0];
+          if (!group) {
+            throw new Error('Group should not be empty');
           }
-          return {
-            filePath: idProp.filePath,
-            startLine: idProp.valueStartLine,
-            startColumn: idProp.valueStartColumn,
-            endLine: idProp.valueEndLine,
-            endColumn: idProp.valueEndColumn,
-            replacementText: idProp.value, // Same as original (for navigation only)
-            displayText: `${idProp.filePath}:${idProp.valueStartLine}`,
-          };
-        });
 
-        // Use the first occurrence's location for the message
-        const firstObj = objs[0];
-        if (!firstObj) {
-          throw new Error('Objects array should not be empty');
-        }
-        const firstIdProp = firstObj.properties.get('ID');
-        if (!firstIdProp) {
-          throw new Error(`First object missing ID property: ${firstObj.type}`);
-        }
+          // Create corrections for all uses
+          const corrections = group.map(obj => {
+            const idProp = obj.properties.get('ID');
+            if (!idProp) {
+              throw new Error(`Object missing ID property: ${obj.type}`);
+            }
+            return {
+              filePath: idProp.filePath,
+              startLine: idProp.valueStartLine,
+              startColumn: idProp.valueStartColumn,
+              endLine: idProp.valueEndLine,
+              endColumn: idProp.valueEndColumn,
+              replacementText: idProp.value, // Same as original (for navigation only)
+              displayText: `${idProp.filePath}:${idProp.valueStartLine}`,
+            };
+          });
 
-        messages.push({
-          severity: 'warning',
-          message: `ID '${objId}' for ${resolvedType} used in ${objs.length} instances`,
-          filePath: firstIdProp.filePath,
-          line: firstIdProp.valueStartLine,
-          suggestion: 'Uses:',
-          correctionIcon: '🎯',
-          corrections,
-          isCrossFile: true,
-        });
+          // Use the first occurrence's location for the message
+          const firstObj = group[0];
+          if (!firstObj) {
+            throw new Error('Group should not be empty');
+          }
+          const firstIdProp = firstObj.properties.get('ID');
+          if (!firstIdProp) {
+            throw new Error(`First object missing ID property: ${firstObj.type}`);
+          }
+
+          messages.push({
+            severity: 'info',
+            message: `ID '${objId}' for ${resolvedType} has ${group.length} identical copies`,
+            filePath: firstIdProp.filePath,
+            line: firstIdProp.valueStartLine,
+            suggestion: 'Identical duplicates - consider removing redundant copies',
+            correctionIcon: '🎯',
+            corrections,
+            isCrossFile: true,
+          });
+        } else {
+          // Multiple groups means there are conflicting definitions
+          // Report on each group separately
+          for (const group of groups) {
+            if (!group || group.length === 0) {
+              continue;
+            }
+
+            const corrections = group.map(obj => {
+              const idProp = obj.properties.get('ID');
+              if (!idProp) {
+                throw new Error(`Object missing ID property: ${obj.type}`);
+              }
+              return {
+                filePath: idProp.filePath,
+                startLine: idProp.valueStartLine,
+                startColumn: idProp.valueStartColumn,
+                endLine: idProp.valueEndLine,
+                endColumn: idProp.valueEndColumn,
+                replacementText: idProp.value, // Same as original (for navigation only)
+                displayText: `${idProp.filePath}:${idProp.valueStartLine}`,
+              };
+            });
+
+            const firstObj = group[0];
+            if (!firstObj) {
+              throw new Error('Group should not be empty');
+            }
+            const firstIdProp = firstObj.properties.get('ID');
+            if (!firstIdProp) {
+              throw new Error(`First object missing ID property: ${firstObj.type}`);
+            }
+
+            if (group.length > 1) {
+              // Multiple identical copies in this group
+              messages.push({
+                severity: 'info',
+                message: `ID '${objId}' for ${resolvedType} has ${group.length} identical copies (part of ${objs.length} total conflicting definitions)`,
+                filePath: firstIdProp.filePath,
+                line: firstIdProp.valueStartLine,
+                suggestion: `This is one of ${groups.length} different versions`,
+                correctionIcon: '🎯',
+                corrections,
+                isCrossFile: true,
+              });
+            } else {
+              // Single object in this group (unique definition among the duplicates)
+              messages.push({
+                severity: 'warning',
+                message: `ID '${objId}' for ${resolvedType} conflicts with ${objs.length - 1} other definition(s)`,
+                filePath: firstIdProp.filePath,
+                line: firstIdProp.valueStartLine,
+                suggestion: `This is one of ${groups.length} different versions - only the last will be used`,
+                correctionIcon: '🎯',
+                corrections,
+                isCrossFile: true,
+              });
+            }
+          }
+        }
       }
     }
 
