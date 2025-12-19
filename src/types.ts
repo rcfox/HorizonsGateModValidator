@@ -116,9 +116,17 @@ export interface ParsedObject {
 
 /**
  * Validation result types
+ * Severity order for sorting and filtering (lower number = higher priority)
  */
-export const VALIDATION_SEVERITIES = ['error', 'warning', 'hint', 'info'] as const;
-export type ValidationSeverity = (typeof VALIDATION_SEVERITIES)[number];
+export const SEVERITY_ORDER = {
+  error: 0,
+  warning: 1,
+  hint: 2,
+  info: 3,
+} as const;
+
+export type ValidationSeverity = keyof typeof SEVERITY_ORDER;
+export const VALIDATION_SEVERITIES = Object.keys(SEVERITY_ORDER) as ValidationSeverity[];
 
 /**
  * Position-based correction for auto-fixing issues

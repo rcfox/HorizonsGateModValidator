@@ -6,7 +6,7 @@
 
 import { Command } from 'commander';
 import { ModValidator } from './validator.js';
-import { ValidationMessage, ValidationResult, ValidationSeverity, VALIDATION_SEVERITIES } from './types.js';
+import { ValidationMessage, ValidationResult, ValidationSeverity, VALIDATION_SEVERITIES, SEVERITY_ORDER } from './types.js';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -116,15 +116,8 @@ class ModValidatorCLI {
    * Filter messages based on minimum severity level
    */
   private filterMessages(messages: ValidationMessage[], minLevel: ValidationSeverity): ValidationMessage[] {
-    const levelOrder: Record<ValidationSeverity, number> = {
-      error: 0,
-      warning: 1,
-      hint: 2,
-      info: 3,
-    };
-
-    const minLevelValue = levelOrder[minLevel];
-    return messages.filter((msg) => levelOrder[msg.severity] <= minLevelValue);
+    const minLevelValue = SEVERITY_ORDER[minLevel];
+    return messages.filter((msg) => SEVERITY_ORDER[msg.severity] <= minLevelValue);
   }
 
   /**

@@ -12,6 +12,7 @@ import {
   assertDefined,
 } from './shared-utils.js';
 import type { ValidationResult, ValidationMessage, Correction } from '../types.js';
+import { SEVERITY_ORDER } from '../types.js';
 import JSZip from 'jszip';
 
 // Global ModValidator from bundle
@@ -1154,10 +1155,113 @@ export function initValidatorApp(): void {
       return;
     }
 
-    // Sort messages: errors first, then warnings, then hints, then info; within each, sort by file path then line
-    allMessages.sort((a, b) => {
-      const severityOrder = { error: 0, warning: 1, hint: 2, info: 3 };
-      const severityDiff = severityOrder[a.severity] - severityOrder[b.severity];
+    // Helper to extract duplicate ID info from message
+    const getDuplicateIdInfo = (msg: ValidationMessage): { id: string; type: string } | null => {
+      // Match pattern: ID 'foo' for ItemType
+      const match = msg.message.match(/^ID '([^']+)' for (\w+)/);
+      if (match && match[1] && match[2]) {
+        return { id: match[1], type: match[2] };
+      }
+      return null;
+    };
+
+    // Pre-scan to find duplicate ID groups and their highest severity
+    const duplicateIdGroups = new Map<string, ValidationMessage[]>();
+    const groupHighestSeverity = new Map<string, number>();
+
+    for (const msg of deduplicatedMessages) {
+      const dupInfo = getDuplicateIdInfo(msg);
+      if (dupInfo) {
+        const key = `${dupInfo.type}:${dupInfo.id}`;
+        if (!duplicateIdGroups.has(key)) {
+          duplicateIdGroups.set(key, []);
+          groupHighestSeverity.set(key, SEVERITY_ORDER[msg.severity]);
+        } else {
+          // Update highest severity for this group
+          const currentHighest = groupHighestSeverity.get(key)!;
+          const msgSeverity = SEVERITY_ORDER[msg.severity];
+          if (msgSeverity < currentHighest) {
+            groupHighestSeverity.set(key, msgSeverity);
+          }
+        }
+        duplicateIdGroups.get(key)!.push(msg);
+      }
+    }
+
+    // Find which groups have multiple messages (need grouping)
+    const groupsNeedingGrouping = new Set<string>();
+    for (const [key, messages] of duplicateIdGroups) {
+      if (messages.length > 1) {
+        groupsNeedingGrouping.add(key);
+      }
+    }
+
+    /**
+     * Compare two messages for duplicate ID grouping
+     * Returns a comparison result or null if not applicable
+     */
+    const compareDuplicateIdGroups = (a: ValidationMessage, b: ValidationMessage): number | null => {
+      const aDupInfo = getDuplicateIdInfo(a);
+      const bDupInfo = getDuplicateIdInfo(b);
+
+      const aKey = aDupInfo ? `${aDupInfo.type}:${aDupInfo.id}` : null;
+      const bKey = bDupInfo ? `${bDupInfo.type}:${bDupInfo.id}` : null;
+
+      const aInGroup = aKey && groupsNeedingGrouping.has(aKey);
+      const bInGroup = bKey && groupsNeedingGrouping.has(bKey);
+
+      // Neither are in groups - not applicable
+      if (!aInGroup && !bInGroup) {
+        return null;
+      }
+
+      // Both are in duplicate ID groups
+      if (aInGroup && bInGroup && aDupInfo && bDupInfo) {
+        // Same group - sort by severity within group
+        if (aKey === bKey) {
+          return SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity];
+        }
+        // Different groups - sort by group's highest severity
+        const aGroupSeverity = groupHighestSeverity.get(aKey!)!;
+        const bGroupSeverity = groupHighestSeverity.get(bKey!)!;
+        if (aGroupSeverity !== bGroupSeverity) {
+          return aGroupSeverity - bGroupSeverity;
+        }
+        // Same group severity - sort by type then ID
+        const typeDiff = aDupInfo.type.localeCompare(bDupInfo.type);
+        if (typeDiff !== 0) return typeDiff;
+        return aDupInfo.id.localeCompare(bDupInfo.id);
+      }
+
+      // One is in a group, one isn't - compare group's highest severity with message severity
+      if (aInGroup && !bInGroup) {
+        const aGroupSeverity = groupHighestSeverity.get(aKey!)!;
+        const severityDiff = aGroupSeverity - SEVERITY_ORDER[b.severity];
+        if (severityDiff !== 0) return severityDiff;
+        // Same severity - group comes before non-group
+        return -1;
+      }
+      if (!aInGroup && bInGroup) {
+        const bGroupSeverity = groupHighestSeverity.get(bKey!)!;
+        const severityDiff = SEVERITY_ORDER[a.severity] - bGroupSeverity;
+        if (severityDiff !== 0) return severityDiff;
+        // Same severity - group comes before non-group
+        return 1;
+      }
+
+      return null;
+    };
+
+    // Sort messages with special handling for duplicate ID message groups
+    deduplicatedMessages.sort((a, b) => {
+      // Try duplicate ID group sorting first
+      const groupCompare = compareDuplicateIdGroups(a, b);
+      if (groupCompare !== null) {
+        return groupCompare;
+      }
+
+      // Fall back to normal sorting
+      const severityDiff = SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity];
       if (severityDiff !== 0) return severityDiff;
       const fileDiff = a.filePath.localeCompare(b.filePath);
       if (fileDiff !== 0) return fileDiff;
