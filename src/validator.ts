@@ -217,7 +217,7 @@ export class ModValidator {
             message: `ID '${objId}' for ${resolvedType} has ${group.length} identical copies`,
             filePath: firstIdProp.filePath,
             line: firstIdProp.valueStartLine,
-            suggestion: 'Identical duplicates - consider removing redundant copies',
+            suggestion: 'Consider removing redundant copies:',
             correctionIcon: '🎯',
             corrections,
             isCrossFile: true,
@@ -230,21 +230,134 @@ export class ModValidator {
               continue;
             }
 
-            const corrections = group.map(obj => {
-              const idProp = obj.properties.get('ID');
-              if (!idProp) {
-                throw new Error(`Object missing ID property: ${obj.type}`);
+            // Find the largest group (most common version) to use as reference
+            const largestGroup = groups.reduce((largest, current) =>
+              current.length > largest.length ? current : largest
+            );
+
+            // Find properties that differ from the largest group
+            const conflictingProperties = new Set<string>();
+            const firstInGroup = group[0];
+            if (!firstInGroup) {
+              throw new Error('Group should not be empty');
+            }
+
+            // Only compare against the largest group (unless this IS the largest group)
+            if (largestGroup.length > 1 && group !== largestGroup) {
+              const firstInLargest = largestGroup[0];
+              if (firstInLargest) {
+                // Check each property for differences from the largest group
+                for (const [propName, propInfo] of firstInGroup.properties) {
+                  if (propName === 'ID') continue; // Skip ID since it's the same
+
+                  const largestPropInfo = firstInLargest.properties.get(propName);
+                  if (!largestPropInfo) {
+                    // Property exists in this group but not in largest group
+                    conflictingProperties.add(propName);
+                  } else if (propInfo.value.trim() !== largestPropInfo.value.trim()) {
+                    // Property has different value
+                    conflictingProperties.add(propName);
+                  }
+                }
+
+                // Check for properties in largest group that don't exist in this group
+                for (const propName of firstInLargest.properties.keys()) {
+                  if (propName === 'ID') continue;
+                  if (!firstInGroup.properties.has(propName)) {
+                    conflictingProperties.add(propName);
+                  }
+                }
               }
-              return {
-                filePath: idProp.filePath,
-                startLine: idProp.valueStartLine,
-                startColumn: idProp.valueStartColumn,
-                endLine: idProp.valueEndLine,
-                endColumn: idProp.valueEndColumn,
-                replacementText: idProp.value, // Same as original (for navigation only)
-                displayText: `${idProp.filePath}:${idProp.valueStartLine}`,
-              };
-            });
+            } else {
+              // This is the largest group, or all groups are size 1
+              // Compare against all other groups to find what's different
+              for (const otherGroup of groups) {
+                if (otherGroup === group) continue;
+                const firstInOther = otherGroup[0];
+                if (!firstInOther) continue;
+
+                // Check each property for differences
+                for (const [propName, propInfo] of firstInGroup.properties) {
+                  if (propName === 'ID') continue;
+
+                  const otherPropInfo = firstInOther.properties.get(propName);
+                  if (!otherPropInfo) {
+                    conflictingProperties.add(propName);
+                  } else if (propInfo.value.trim() !== otherPropInfo.value.trim()) {
+                    conflictingProperties.add(propName);
+                  }
+                }
+
+                // Check for properties in other group that don't exist in this group
+                for (const propName of firstInOther.properties.keys()) {
+                  if (propName === 'ID') continue;
+                  if (!firstInGroup.properties.has(propName)) {
+                    conflictingProperties.add(propName);
+                  }
+                }
+              }
+            }
+
+            // Create corrections based on message type
+            let corrections;
+
+            if (group.length > 1) {
+              // Multiple identical copies - jump to ID locations
+              corrections = group.map(obj => {
+                const idProp = obj.properties.get('ID');
+                if (!idProp) {
+                  throw new Error(`Object missing ID property: ${obj.type}`);
+                }
+                return {
+                  filePath: idProp.filePath,
+                  startLine: idProp.valueStartLine,
+                  startColumn: idProp.valueStartColumn,
+                  endLine: idProp.valueEndLine,
+                  endColumn: idProp.valueEndColumn,
+                  replacementText: idProp.value,
+                  displayText: `${idProp.filePath}:${idProp.valueStartLine}`,
+                };
+              });
+            } else {
+              // Single conflicting object - jump to conflicting properties
+              corrections = group.flatMap(obj => {
+                const propCorrections = [];
+
+                if (conflictingProperties.size > 0) {
+                  // Jump to each conflicting property value
+                  for (const propName of conflictingProperties) {
+                    const propInfo = obj.properties.get(propName);
+                    if (propInfo) {
+                      propCorrections.push({
+                        filePath: propInfo.filePath,
+                        startLine: propInfo.valueStartLine,
+                        startColumn: propInfo.valueStartColumn,
+                        endLine: propInfo.valueEndLine,
+                        endColumn: propInfo.valueEndColumn,
+                        replacementText: propInfo.value, // Same as original value (for navigation)
+                        displayText: propName,
+                      });
+                    }
+                  }
+                } else {
+                  // Fallback to ID if we can't identify specific conflicts
+                  const idProp = obj.properties.get('ID');
+                  if (idProp) {
+                    propCorrections.push({
+                      filePath: idProp.filePath,
+                      startLine: idProp.valueStartLine,
+                      startColumn: idProp.valueStartColumn,
+                      endLine: idProp.valueEndLine,
+                      endColumn: idProp.valueEndColumn,
+                      replacementText: idProp.value,
+                      displayText: `${idProp.filePath}:${idProp.valueStartLine}`,
+                    });
+                  }
+                }
+
+                return propCorrections;
+              });
+            }
 
             const firstObj = group[0];
             if (!firstObj) {
@@ -262,7 +375,8 @@ export class ModValidator {
                 message: `ID '${objId}' for ${resolvedType} has ${group.length} identical copies (part of ${objs.length} total conflicting definitions)`,
                 filePath: firstIdProp.filePath,
                 line: firstIdProp.valueStartLine,
-                suggestion: `This is one of ${groups.length} different versions`,
+                context: `This is one of ${groups.length} different versions.`,
+                suggestion: 'Identical instances:',
                 correctionIcon: '🎯',
                 corrections,
                 isCrossFile: true,
@@ -274,7 +388,7 @@ export class ModValidator {
                 message: `ID '${objId}' for ${resolvedType} conflicts with ${objs.length - 1} other definition(s)`,
                 filePath: firstIdProp.filePath,
                 line: firstIdProp.valueStartLine,
-                suggestion: `This is one of ${groups.length} different versions - only the last will be used`,
+                suggestion: `Conflicting properties:`,
                 correctionIcon: '🎯',
                 corrections,
                 isCrossFile: true,
@@ -496,6 +610,7 @@ export class ModValidator {
           filePath: obj.filePath,
           line: obj.startLine,
           suggestion: `Add: ID=${actionId};`,
+          suggestionIsAction: true,
           correctionIcon: '🔧',
           corrections: [
             {

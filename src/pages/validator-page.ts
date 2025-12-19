@@ -1056,11 +1056,14 @@ export function initValidatorApp(): void {
   /**
    * Merge cross-file messages into a file's ValidationResult (returns new object)
    */
-  function mergeCrossFileMessages(result: ValidationResult, filePath: string, allCrossFileMessages: ValidationMessage[]): ValidationResult {
+  function mergeCrossFileMessages(
+    result: ValidationResult,
+    filePath: string,
+    allCrossFileMessages: ValidationMessage[]
+  ): ValidationResult {
     // Filter cross-file messages relevant to this file
-    const relevantMessages = allCrossFileMessages.filter(msg =>
-      msg.filePath === filePath ||
-      msg.corrections?.some(c => c.filePath === filePath)
+    const relevantMessages = allCrossFileMessages.filter(
+      msg => msg.filePath === filePath || msg.corrections?.some(c => c.filePath === filePath)
     );
 
     // Separate by severity
@@ -1508,7 +1511,11 @@ export function initValidatorApp(): void {
         // Merge new cross-file messages into all files
         for (const fileNode of textFiles) {
           if (fileNode.validationResult) {
-            fileNode.validationResult = mergeCrossFileMessages(fileNode.validationResult, fileNode.path, crossFileMessages);
+            fileNode.validationResult = mergeCrossFileMessages(
+              fileNode.validationResult,
+              fileNode.path,
+              crossFileMessages
+            );
           }
         }
 
@@ -1585,10 +1592,7 @@ export function initValidatorApp(): void {
 
     // Update status (cross-file messages already included in result)
     const hasMessages =
-      result.errors.length > 0 ||
-      result.warnings.length > 0 ||
-      result.hints.length > 0 ||
-      result.info.length > 0;
+      result.errors.length > 0 || result.warnings.length > 0 || result.hints.length > 0 || result.info.length > 0;
 
     if (!hasMessages) {
       validationStatus.textContent = '✓ Valid';
@@ -1644,7 +1648,7 @@ export function initValidatorApp(): void {
       const corrIcon = msg.correctionIcon || '💡';
 
       if (msg.suggestion && msg.suggestion.trim().length > 0) {
-        if (msg.corrections.length === 1) {
+        if (msg.suggestionIsAction) {
           // Single correction with suggestion: make the suggestion text itself clickable
           const correction = assertDefined(msg.corrections[0], 'First correction should exist');
           const correctionId = generateCorrectionId();

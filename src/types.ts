@@ -156,6 +156,7 @@ export interface ValidationMessage {
   line: number;
   context?: string | undefined;
   suggestion?: string | undefined; // Override text for corrections (e.g., "Add a semicolon" instead of "Did you mean:")
+  suggestionIsAction?: boolean | undefined; // If true, then a list of corrections is not shown, only the suggestion, and it applies the first correction.
   correctionIcon?: string | undefined; // Override icon for corrections (e.g., "🔧" for fixes, default "💡" for typos)
   corrections?: Correction[] | undefined; // Suggested corrections for typos
   isCrossFile?: boolean | undefined; // True if this message came from cross-file validation (e.g., duplicate IDs)

@@ -292,6 +292,7 @@ export class ModParser {
           line: propertyLine,
           context: 'Add ; at the end of the line',
           suggestion: 'Add a semicolon',
+          suggestionIsAction: true,
           correctionIcon: '🔧',
           corrections: [
             {
