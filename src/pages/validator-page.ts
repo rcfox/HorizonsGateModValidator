@@ -1122,8 +1122,26 @@ export function initValidatorApp(): void {
       }
     }
 
+    // Deduplicate cross-file messages (they appear once per affected file)
+    const seenCrossFileMessages = new Set<string>();
+    const deduplicatedMessages = allMessages.filter(msg => {
+      if (!msg.isCrossFile) {
+        return true; // Keep all non-cross-file messages
+      }
+
+      // Use JSON.stringify for a unique key
+      const key = JSON.stringify(msg);
+
+      if (seenCrossFileMessages.has(key)) {
+        return false; // Duplicate, filter it out
+      }
+
+      seenCrossFileMessages.add(key);
+      return true; // First occurrence, keep it
+    });
+
     // Display messages
-    if (allMessages.length === 0) {
+    if (deduplicatedMessages.length === 0) {
       resultsContainer.innerHTML = `
             <div class="message success">
                 <div class="message-header">
@@ -1146,7 +1164,7 @@ export function initValidatorApp(): void {
       return (a.line || 0) - (b.line || 0);
     });
 
-    const html = allMessages.map(msg => createMessageHTML(msg)).join('');
+    const html = deduplicatedMessages.map(msg => createMessageHTML(msg)).join('');
     resultsContainer.innerHTML = html;
 
     // Populate file paths using textContent for XSS safety
