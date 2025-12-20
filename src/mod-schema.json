@@ -3692,6 +3692,143 @@
           "pattern": true
         },
         {
+          "name": "IDnum",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "quantity",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "movement",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "offset",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "rot",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "buried",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "broken",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "specialInfoTC",
+          "type": "TileCoord",
+          "csType": "TileCoord"
+        },
+        {
+          "name": "container",
+          "type": "Container",
+          "csType": "Container"
+        },
+        {
+          "name": "cantReactAgainTimer",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "highlight",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "index_temp",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "q",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "r",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "bu",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "br",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "timer",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "specialX",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "specialY",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "oX",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "oY",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "containedIn",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "cSlot",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "containerID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
           "name": "maxWeight",
           "type": "float",
           "csType": "float"
@@ -3730,13 +3867,6 @@
           "name": "canContainAnything",
           "type": "boolean",
           "csType": "bool"
-        },
-        {
-          "name": "ID",
-          "type": "string",
-          "csType": "string",
-          "virtual": true,
-          "source": "DataManager (common)"
         },
         {
           "name": "cloneFrom",
@@ -6958,6 +7088,41 @@
           "csType": "string",
           "virtual": true,
           "pattern": true
+        },
+        {
+          "name": "position",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "color",
+          "type": "Color",
+          "csType": "Color"
+        },
+        {
+          "name": "rotation",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "origin",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "scale",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "sprEffect",
+          "type": "SpriteEffects",
+          "csType": "SpriteEffects"
+        },
+        {
+          "name": "depth",
+          "type": "float",
+          "csType": "float"
         },
         {
           "name": "ID",

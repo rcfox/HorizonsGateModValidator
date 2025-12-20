@@ -44,9 +44,42 @@ const schemaToCsTypeMap = {
   'Formula': 'Formula'
 };
 
-function extractFieldsFromClass(filePath, className) {
+/**
+ * Extract the base class name from a class declaration
+ * @param {string} content - The C# file content
+ * @param {string} className - The class name to find inheritance for
+ * @returns {string|null} - The base class name, or null if none
+ */
+function extractBaseClass(content, className) {
+  // Match: public class ClassName : BaseClass
+  const inheritanceRegex = new RegExp(`public\\s+class\\s+${className}\\s*:\\s*(\\w+)`);
+  const match = content.match(inheritanceRegex);
+  return match ? match[1] : null;
+}
+
+function extractFieldsFromClass(filePath, className, baseDir) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const fields = [];
+
+  // Check for inheritance and recursively extract base class fields
+  const baseClassName = extractBaseClass(content, className);
+  if (baseClassName) {
+    // Find the base class file
+    const { execSync } = require('child_process');
+    const result = execSync(`find "${baseDir}" -name "${baseClassName}.cs" 2>/dev/null`, { encoding: 'utf-8' });
+    const files = result.trim().split('\n').filter(f => f);
+
+    if (files.length === 0) {
+      throw new Error(`Base class file not found: ${baseClassName}.cs (required by ${className})`);
+    }
+
+    const baseClassPath = files[0];
+    console.log(`  ${className} inherits from ${baseClassName}, extracting base class fields...`);
+    // Recursively extract base class fields
+    const baseFields = extractFieldsFromClass(baseClassPath, baseClassName, baseDir);
+    // Add base fields first (they can be overridden by derived class)
+    fields.push(...baseFields);
+  }
 
   // Match public field declarations
   const fieldRegex = /^\s*public\s+([\w<>,\s]+?)\s+(\w+)\s*(?:=|;)/gm;
@@ -76,11 +109,22 @@ function extractFieldsFromClass(filePath, className) {
       }
     }
 
-    fields.push({
-      name: fieldName,
-      type: mappedType,
-      csType: rawType
-    });
+    // Check if this field overrides a base class field
+    const existingFieldIndex = fields.findIndex(f => f.name === fieldName);
+    if (existingFieldIndex >= 0) {
+      // Override the base class field
+      fields[existingFieldIndex] = {
+        name: fieldName,
+        type: mappedType,
+        csType: rawType
+      };
+    } else {
+      fields.push({
+        name: fieldName,
+        type: mappedType,
+        csType: rawType
+      });
+    }
   }
 
   // Also match public properties with getters/setters
@@ -91,11 +135,6 @@ function extractFieldsFromClass(filePath, className) {
   while ((match = propertyRegex.exec(content)) !== null) {
     const rawType = match[1].trim();
     const fieldName = match[2].trim();
-
-    // Skip if already added as a field
-    if (fields.find(f => f.name === fieldName)) {
-      continue;
-    }
 
     // Skip static properties (rawType will be like "static Light")
     if (rawType.startsWith('static ')) {
@@ -117,11 +156,22 @@ function extractFieldsFromClass(filePath, className) {
       }
     }
 
-    fields.push({
-      name: fieldName,
-      type: mappedType,
-      csType: rawType
-    });
+    // Check if this property overrides a base class field or if it already exists
+    const existingFieldIndex = fields.findIndex(f => f.name === fieldName);
+    if (existingFieldIndex >= 0) {
+      // Override the base class field
+      fields[existingFieldIndex] = {
+        name: fieldName,
+        type: mappedType,
+        csType: rawType
+      };
+    } else {
+      fields.push({
+        name: fieldName,
+        type: mappedType,
+        csType: rawType
+      });
+    }
   }
 
   // Extract private fields that are serialized (appear in stringBuilder output)
@@ -822,7 +872,7 @@ function extractSchema(tacticsDir) {
     console.log(`Extracting ${className}...`);
     // Extract virtual properties from constructor first (they have better type info)
     const virtualProps = extractVirtualProperties(filePath, className);
-    const fields = extractFieldsFromClass(filePath, className);
+    const fields = extractFieldsFromClass(filePath, className, baseDir);
 
     // Filter out fields that duplicate virtual properties (constructor takes precedence)
     const virtualPropNames = new Set(virtualProps.map(vp => vp.name));
@@ -927,7 +977,7 @@ function extractSchema(tacticsDir) {
   // Zone: Uses setupZone(valuesDict) instead of constructor
   const zoneFilePath = path.join(baseDir, 'Tactics', 'Zone.cs');
   if (fs.existsSync(zoneFilePath)) {
-    const zoneFields = extractFieldsFromClass(zoneFilePath, 'Zone');
+    const zoneFields = extractFieldsFromClass(zoneFilePath, 'Zone', baseDir);
     const zoneVirtualProps = extractVirtualProperties(zoneFilePath, 'Zone');
     const realFieldNames = new Set(zoneFields.map(f => f.name));
     const uniqueVirtualProps = zoneVirtualProps.filter(vp => !realFieldNames.has(vp.name));
