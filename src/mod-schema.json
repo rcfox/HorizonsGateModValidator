@@ -2352,7 +2352,7 @@
       "supportsCloneFrom": true
     },
     "Keyframe": {
-      "category": "definition",
+      "category": "nested",
       "fields": [
         {
           "name": "frame",
@@ -6970,7 +6970,7 @@
       "supportsCloneFrom": true
     },
     "Screenshake": {
-      "category": "definition",
+      "category": "nested",
       "fields": [
         {
           "name": "magnitude",

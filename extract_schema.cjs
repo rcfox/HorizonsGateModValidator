@@ -782,7 +782,9 @@ function categorizeClass(className, dataManagerContent) {
   // Pattern: Data.actorTypes[value] = new ActorType(...)
   // Pattern: Data.dialogNodes[value] = mostRecentDialogNode (where DialogNode was created)
   // Pattern: Game1.currentGameState.locations[zone].Add(value, new Location(...))
-  const definitionPattern = new RegExp(`Data\\.\\w+\\[\\w+\\]\\s*=\\s*(?:new\\s+${className}\\(|\\w+)`);
+  // IMPORTANT: Should NOT match nested assignments like Data.animations[value].keyframes[...] =
+  // Use negative lookahead to ensure no property access after the bracket
+  const definitionPattern = new RegExp(`Data\\.\\w+\\[\\w+\\](?!\\.)\\s*=\\s*(?:new\\s+${className}\\(|\\w+)`);
   const gameStateCollectionPattern = new RegExp(`(?:Game1\\.currentGameState|currentGameState)\\.\\w+\\[.+?\\]\\.(?:Add|\\[\\w+\\]\\s*=)\\([^)]*(?:value|${className})`);
 
   if (definitionPattern.test(firstMatch.code) || gameStateCollectionPattern.test(firstMatch.code)) {
@@ -826,8 +828,14 @@ function categorizeClass(className, dataManagerContent) {
   }
 
   // If the case name matches the class name and we couldn't categorize it, likely a definition
-  // But only if it's actually stored in a Data collection
+  // But only if it's actually stored in a top-level Data collection (not nested)
   if (firstMatch.caseType === className && isStoredInData) {
+    // Check if it's stored in a nested collection (e.g., Data.animations[value].keyframes)
+    // vs top-level (e.g., Data.keyframes[value])
+    const nestedDataStorage = /Data\.\w+\[\w+\]\.\w+/;
+    if (nestedDataStorage.test(firstMatch.code)) {
+      return 'nested';
+    }
     return 'definition';
   }
 
