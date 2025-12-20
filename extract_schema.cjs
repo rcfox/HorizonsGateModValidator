@@ -972,7 +972,7 @@ function extractSchema(tacticsDir) {
   console.log(`  Checked ${filesChecked} files, found ${aliasCount} property aliases`);
 
   // Add special types that don't follow standard instantiation patterns
-  console.log('  Adding special types (Zone, HeightMap, LevelDataZone, FormulaGlobal)');
+  console.log('  Adding special types (Zone, HeightMap, LevelDataZone, FormulaGlobal, Palette, ZoneMerge)');
 
   // Zone: Uses setupZone(valuesDict) instead of constructor
   const zoneFilePath = path.join(baseDir, 'Tactics', 'Zone.cs');
@@ -1012,6 +1012,35 @@ function extractSchema(tacticsDir) {
     supportsCloneFrom: false
   };
   schema['GlobalFormula'] = schema['FormulaGlobal'];
+
+  // Palette: Stores palette data in Data.palettes
+  schema['Palette'] = {
+    category: 'special',
+    fields: [
+      { name: 'num', type: 'integer', csType: 'int' },
+      { name: 'animated', type: 'boolean', csType: 'bool' },
+      { name: 'animatedSlow', type: 'boolean', csType: 'bool' },
+      { name: 'animatedFast', type: 'boolean', csType: 'bool' }
+    ],
+    supportsCloneFrom: false
+  };
+
+  // ZoneMerge: Inherits Zone properties plus mergeWith handling
+  // Properties handled in readInTextFileData before createDataFromDict
+  if (!schema['Zone']) {
+    throw new Error('Zone schema must exist before creating ZoneMerge schema');
+  }
+  schema['ZoneMerge'] = {
+    category: 'special',
+    fields: [
+      ...schema['Zone'].fields,  // Inherit all Zone properties
+      { name: 'X', type: 'float', csType: 'float' },
+      { name: 'Y', type: 'float', csType: 'float' },
+      { name: 'mergeWith', type: 'string', csType: 'string' },
+      { name: 'fReq', type: 'Formula', csType: 'string' }
+    ],
+    supportsCloneFrom: false
+  };
 
   // Extract enums
   const enums = extractEnums(baseDir);

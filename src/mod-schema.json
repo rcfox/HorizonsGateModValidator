@@ -8218,6 +8218,438 @@
         }
       ],
       "supportsCloneFrom": false
+    },
+    "Palette": {
+      "category": "special",
+      "fields": [
+        {
+          "name": "num",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "animated",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "animatedSlow",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "animatedFast",
+          "type": "boolean",
+          "csType": "bool"
+        }
+      ],
+      "supportsCloneFrom": false
+    },
+    "ZoneMerge": {
+      "category": "special",
+      "fields": [
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "locID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "sizeX",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "sizeY",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "showFogOfWar",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "fogOfWar",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "minimapEnabled",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "dark",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "darknessColor",
+          "type": "Color",
+          "csType": "Color"
+        },
+        {
+          "name": "allowCameraPastZoneEdges",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "rollingPinStyle",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "drawSky",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "drawSky_overrideYpos",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "peaceful",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "overseerMode",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "boatZone",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "wind",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "overworld",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "cantAct",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canDropItems",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "cantGameOver",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "alwaysKeepWeaponsUnsheathed",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "zoneDirtPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneDirtDarkPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneGrassPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneGrassDarkPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneStonePalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneStoneLightPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneStoneDarkPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneWaterPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneWoodPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneWoodDarkPalette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc1Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc2Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc3Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc4Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc5Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc6Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc7Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "zoneMisc8Palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "paletteOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "darkenedTileTexture",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "bgTerrainTypeID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "bgFXID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "bgFX_sineWave",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "bgScale",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "bgParallaxRatio",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "bgMoveSpeedX",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "bgMoveSpeedY",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "travelSong",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "travelSongVolume",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "travelSongPitch",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "combatSong",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "combatSongVolume",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "combatSongPitch",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "combatSongDelay",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenWaveFreq",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenDarkWaveFreq",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenWaveAmp",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenDarkWaveAmp",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenWaveSpeed",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenWaveAmp_reflect",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "zoneFX",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "zoneFXTime",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "zoneFX_x",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "zoneFX_y",
+          "type": "List<float>",
+          "csType": "List<float>"
+        },
+        {
+          "name": "timeUntilNewDay",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "actors",
+          "type": "Dictionary<string, Actor>",
+          "csType": "Dictionary<string, Actor>"
+        },
+        {
+          "name": "triggers",
+          "type": "List<Trigger>",
+          "csType": "List<Trigger>"
+        },
+        {
+          "name": "actTimers",
+          "type": "List<ActTimer>",
+          "csType": "List<ActTimer>"
+        },
+        {
+          "name": "darkR",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "darkG",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "darkB",
+          "type": "byte",
+          "csType": "byte",
+          "virtual": true
+        },
+        {
+          "name": "combatMode",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
+          "name": "X",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "Y",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "mergeWith",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "fReq",
+          "type": "Formula",
+          "csType": "string"
+        }
+      ],
+      "supportsCloneFrom": false
     }
   },
   "typeAliases": {
