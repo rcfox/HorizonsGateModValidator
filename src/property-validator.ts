@@ -123,7 +123,7 @@ export class PropertyValidator {
         break;
 
       case 'Formula':
-        messages.push(...validateFormula(cleanValue, propInfo));
+        messages.push(...validateFormula(cleanValue, propInfo, propertyName, className));
         break;
 
       case 'List<string>':
@@ -151,7 +151,7 @@ export class PropertyValidator {
         break;
 
       case 'List<Formula>':
-        messages.push(...validateFormula(cleanValue, propInfo));
+        messages.push(...validateFormula(cleanValue, propInfo, propertyName, className));
         break;
 
       default:

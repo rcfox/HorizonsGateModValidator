@@ -9,7 +9,12 @@ import { parseFormula, validateAST, type ValidationError, type ASTNode, type Fun
 /**
  * Validate a formula string using the AST parser and validator
  */
-export function validateFormula(formula: string, propInfo: PropertyInfo): ValidationMessage[] {
+export function validateFormula(
+  formula: string,
+  propInfo: PropertyInfo,
+  propertyName: string,
+  objectType: string
+): ValidationMessage[] {
   const messages: ValidationMessage[] = [];
 
   if (!formula || formula.trim().length === 0) {
@@ -22,15 +27,17 @@ export function validateFormula(formula: string, propInfo: PropertyInfo): Valida
     const ast = parseFormula(formula);
 
     // Step 2: Validate the AST against formula.json metadata
-    const validationErrors = validateAST(ast);
+    // Pass context to allow 'x' parameter in FormulaGlobal.formula
+    const allowXParameter = objectType === 'FormulaGlobal' && propertyName === 'formula';
+    const validationErrors = validateAST(ast, undefined, allowXParameter);
 
     // Convert AST validation errors to ValidationMessages
     for (const error of validationErrors) {
       const corrections = createCorrections(formula, error, propInfo);
 
       messages.push({
+        ...error, // FIXME: Look into unifying ValidationError and ValidationMessage
         severity: 'error',
-        message: error.message,
         filePath: propInfo.filePath,
         line: propInfo.valueStartLine,
         formulaReference: error.operatorName ?? undefined,

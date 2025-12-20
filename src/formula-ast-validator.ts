@@ -30,6 +30,7 @@ for (const op of data.operators) {
 
 export interface ValidationError {
   message: string;
+  context?: string | undefined;
   node: ASTNode | FunctionArg;
   path: string; // Path to the node in the tree for context
   operatorName: string | null; // Operator name for linking to formula reference
@@ -40,7 +41,7 @@ export interface ValidationError {
  * Validates an AST against formula.json metadata
  * Returns array of validation errors (empty if valid)
  */
-export function validateAST(ast: ASTNode, path: string = 'root'): ValidationError[] {
+export function validateAST(ast: ASTNode, path: string = 'root', allowXParameter: boolean = false): ValidationError[] {
   const errors: ValidationError[] = [];
 
   switch (ast.type) {
@@ -50,28 +51,28 @@ export function validateAST(ast: ASTNode, path: string = 'root'): ValidationErro
       break;
 
     case 'function':
-      errors.push(...validateFunctionCall(ast, path));
+      errors.push(...validateFunctionCall(ast, path, allowXParameter));
       break;
 
     case 'global':
       // Global formula references - could validate against known globals
       // but we don't have that data in formula.json
       if (ast.argument) {
-        errors.push(...validateAST(ast.argument, `${path}.argument`));
+        errors.push(...validateAST(ast.argument, `${path}.argument`, allowXParameter));
       }
       break;
 
     case 'mathFunction':
       // Math functions use function-style syntax
-      errors.push(...validateMathFunction(ast, path));
+      errors.push(...validateMathFunction(ast, path, allowXParameter));
       break;
 
     case 'binaryOp':
-      errors.push(...validateBinaryOp(ast, path));
+      errors.push(...validateBinaryOp(ast, path, allowXParameter));
       break;
 
     case 'unaryOp':
-      errors.push(...validateUnaryOp(ast, path));
+      errors.push(...validateUnaryOp(ast, path, allowXParameter));
       break;
   }
 
@@ -81,7 +82,7 @@ export function validateAST(ast: ASTNode, path: string = 'root'): ValidationErro
 /**
  * Validates a function call node
  */
-function validateFunctionCall(node: FunctionCallNode, path: string): ValidationError[] {
+function validateFunctionCall(node: FunctionCallNode, path: string, allowXParameter: boolean): ValidationError[] {
   const errors: ValidationError[] = [];
 
   // Resolve alias to canonical name
@@ -155,7 +156,7 @@ function validateFunctionCall(node: FunctionCallNode, path: string): ValidationE
 
     // Skip argument validation since no use case matches
     if (node.body) {
-      errors.push(...validateAST(node.body, `${path}.body`));
+      errors.push(...validateAST(node.body, `${path}.body`, allowXParameter));
     }
     return errors;
   }
@@ -169,7 +170,7 @@ function validateFunctionCall(node: FunctionCallNode, path: string): ValidationE
     const expectedArg = expectedArgs[i];
     if (!expectedArg) return;
 
-    errors.push(...validateFunctionArg(arg, expectedArg, node.name, `${path}.args[${i}]`));
+    errors.push(...validateFunctionArg(arg, expectedArg, node.name, `${path}.args[${i}]`, allowXParameter));
   });
 
   // Validate body if present
@@ -185,7 +186,7 @@ function validateFunctionCall(node: FunctionCallNode, path: string): ValidationE
       });
     } else {
       // Recursively validate the body
-      errors.push(...validateAST(node.body, `${path}.body`));
+      errors.push(...validateAST(node.body, `${path}.body`, allowXParameter));
     }
   }
 
@@ -200,31 +201,34 @@ function validateParameterType(
   param: ASTNode,
   expectedArg: FormulaArgument,
   operatorName: string,
-  path: string
+  path: string,
+  allowXParameter: boolean = false
 ): ValidationError[] {
   const errors: ValidationError[] = [];
 
   switch (expectedArg.type) {
     case 'integer':
     case 'float':
-    case 'byte':
-      // Parameter should be a literal number, not a complex formula
-      if (param.type !== 'literal') {
-        errors.push({
-          message: `Parameter '${expectedArg.name}' of operator '${operatorName}' expects a ${expectedArg.type}, but got a formula expression`,
-          node: param,
-          path,
-          operatorName,
-          suggestions: [],
-        });
+    case 'byte': // Parameter should be a literal number, not a complex formula
+    case 'boolean': // Should be a literal 0/1 or true/false
+      // Exception: In FormulaGlobal.formula for d-operators, 'x' variable is allowed
+      if (param.type === 'variable' && param.name === 'x' && allowXParameter) {
+        // 'x' is allowed in this context
+        break;
       }
-      break;
-
-    case 'boolean':
-      // Should be a literal 0/1 or true/false
       if (param.type !== 'literal') {
+        // Provide specific error message for variables
+        const expected = allowXParameter ? `a ${expectedArg.type} or 'x'` : expectedArg.type;
+        const name = 'name' in param ? `'${param.name}'` : 'a formula expression';
+        const message = `Parameter '${expectedArg.name}' of operator '${operatorName}' expects ${expected}, but got ${name}`;
+        const context =
+          !allowXParameter && 'name' in param && param.name === 'x'
+            ? `This is only allowed when defining a [FormulaGlobal] 'formula' property.`
+            : undefined;
+
         errors.push({
-          message: `Parameter '${expectedArg.name}' of operator '${operatorName}' expects a boolean, but got a formula expression`,
+          message,
+          context,
           node: param,
           path,
           operatorName,
@@ -256,7 +260,8 @@ function validateFunctionArg(
   arg: FunctionArg,
   expectedArg: FormulaArgument,
   operatorName: string,
-  path: string
+  path: string,
+  allowXParameter: boolean
 ): ValidationError[] {
   const errors: ValidationError[] = [];
 
@@ -419,16 +424,25 @@ function validateFunctionArg(
 
       if (paramArguments.length > 0) {
         // Validate each parameter against its expected type
+        // Check if this operator is 'd' or delegates to 'd' for 'x' parameter support
+        const isDOperator = canonicalBaseOperatorName === 'd' || argDelegatesTo === 'd';
+
         arg.params.forEach((param, i) => {
           const expectedParamArg = paramArguments[i];
           if (expectedParamArg) {
             // Check if the parameter is a literal that matches the expected type
             errors.push(
-              ...validateParameterType(param, expectedParamArg, specificOperatorName, `${path}.params[${i}]`)
+              ...validateParameterType(
+                param,
+                expectedParamArg,
+                specificOperatorName,
+                `${path}.params[${i}]`,
+                allowXParameter && isDOperator
+              )
             );
           }
           // Also recursively validate the parameter's structure
-          errors.push(...validateAST(param, `${path}.params[${i}]`));
+          errors.push(...validateAST(param, `${path}.params[${i}]`, allowXParameter));
         });
       } else {
         // No parameters expected, but some were provided
@@ -445,7 +459,7 @@ function validateFunctionArg(
     } else {
       // Just validate the parameters recursively
       arg.params.forEach((param, i) => {
-        errors.push(...validateAST(param, `${path}.params[${i}]`));
+        errors.push(...validateAST(param, `${path}.params[${i}]`, allowXParameter));
       });
     }
   }
@@ -456,7 +470,7 @@ function validateFunctionArg(
 /**
  * Validates a math function (function-style operator)
  */
-function validateMathFunction(node: MathFunctionNode, path: string): ValidationError[] {
+function validateMathFunction(node: MathFunctionNode, path: string, allowXParameter: boolean): ValidationError[] {
   const errors: ValidationError[] = [];
   const operator = operatorMap.get(node.name);
 
@@ -484,7 +498,7 @@ function validateMathFunction(node: MathFunctionNode, path: string): ValidationE
 
   // Validate the argument if present
   if (node.argument) {
-    errors.push(...validateAST(node.argument, `${path}.argument`));
+    errors.push(...validateAST(node.argument, `${path}.argument`, allowXParameter));
   }
 
   return errors;
@@ -493,12 +507,12 @@ function validateMathFunction(node: MathFunctionNode, path: string): ValidationE
 /**
  * Validates a binary operation
  */
-function validateBinaryOp(node: BinaryOperationNode, path: string): ValidationError[] {
+function validateBinaryOp(node: BinaryOperationNode, path: string, allowXParameter: boolean): ValidationError[] {
   const errors: ValidationError[] = [];
 
   // Validate both operands
-  errors.push(...validateAST(node.left, `${path}.left`));
-  errors.push(...validateAST(node.right, `${path}.right`));
+  errors.push(...validateAST(node.left, `${path}.left`, allowXParameter));
+  errors.push(...validateAST(node.right, `${path}.right`, allowXParameter));
 
   return errors;
 }
@@ -506,11 +520,11 @@ function validateBinaryOp(node: BinaryOperationNode, path: string): ValidationEr
 /**
  * Validates a unary operation
  */
-function validateUnaryOp(node: UnaryOperationNode, path: string): ValidationError[] {
+function validateUnaryOp(node: UnaryOperationNode, path: string, allowXParameter: boolean): ValidationError[] {
   const errors: ValidationError[] = [];
 
   // Validate the operand
-  errors.push(...validateAST(node.operand, `${path}.operand`));
+  errors.push(...validateAST(node.operand, `${path}.operand`, allowXParameter));
 
   return errors;
 }
