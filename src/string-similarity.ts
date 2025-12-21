@@ -26,7 +26,7 @@ export function levenshteinDistance(str1: string, str2: string): number {
   // Fill matrix
   for (let i = 1; i <= len1; i++) {
     for (let j = 1; j <= len2; j++) {
-      const cost = str1[i - 1]!.toLowerCase() === str2[j - 1]!.toLowerCase() ? 0 : 1;
+      const cost = str1[i - 1] === str2[j - 1]! ? 0 : 1;
       matrix[i]![j] = Math.min(
         matrix[i - 1]![j]! + 1, // deletion
         matrix[i]![j - 1]! + 1, // insertion
@@ -49,7 +49,7 @@ export function findSimilar(
   const similarities = candidates
     .map(candidate => ({
       value: candidate,
-      distance: levenshteinDistance(target, candidate),
+      distance: levenshteinDistance(target.toLowerCase(), candidate.toLowerCase()),
     }))
     .filter(item => item.distance >= 0 && item.distance <= maxDistance)
     .sort((a, b) => a.distance - b.distance);

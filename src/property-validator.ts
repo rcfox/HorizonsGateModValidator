@@ -223,7 +223,7 @@ export class PropertyValidator {
 
   private isValidByte(value: string): boolean {
     const num = parseInt(value, 10);
-    return !isNaN(num) && num >= 0 && num <= 255;
+    return !isNaN(num) && num >= 0 && num <= 255 && this.isValidInteger(value);
   }
 
   /**

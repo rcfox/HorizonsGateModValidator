@@ -12,7 +12,10 @@
     "build:bundle": "tsc && node build-bundle.js",
     "build:cli": "tsc",
     "watch": "tsc --watch",
-    "test": "node dist/test.js"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "mod",
@@ -23,8 +26,11 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^24.10.1",
+    "@vitest/coverage-v8": "^4.0.16",
+    "@vitest/ui": "^4.0.16",
     "esbuild": "^0.27.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
   },
   "dependencies": {
     "commander": "^14.0.2",
