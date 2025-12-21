@@ -259,7 +259,7 @@ class ModValidatorCLI {
         }
 
         // Validate error-level option
-        if (options.errorLevel && !VALIDATION_SEVERITIES.includes(options.errorLevel as any)) {
+        if (options.errorLevel && !VALIDATION_SEVERITIES.includes(options.errorLevel)) {
           console.error(`Error: Invalid error level '${options.errorLevel}'. Must be one of: ${VALIDATION_SEVERITIES.join(', ')}.`);
           process.exit(1);
         }
