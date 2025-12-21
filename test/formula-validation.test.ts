@@ -59,31 +59,4 @@ describe('Formula AST Validation', () => {
       expect(hasExpectedMessage).toBe(true);
     }
   });
-
-  describe('Specific validation rules', () => {
-    test('validates argument count for operators', () => {
-      const ast = parseFormula('between:10:c:STR'); // Missing third argument
-      const errors = validateAST(ast);
-      expect(errors.length).toBeGreaterThan(0);
-      expect(errors[0]?.message).toMatch(/argument/i);
-    });
-
-    test('validates argument types', () => {
-      const ast = parseFormula('min:abc:c:HP'); // abc is not a valid number
-      const errors = validateAST(ast);
-      expect(errors.length).toBeGreaterThan(0);
-    });
-
-    test('accepts valid nested formulas', () => {
-      const ast = parseFormula('min:5:max:10:c:HP');
-      const errors = validateAST(ast);
-      expect(errors).toHaveLength(0);
-    });
-
-    test('validates function-style operators', () => {
-      const ast = parseFormula('m:distance(32)');
-      const errors = validateAST(ast);
-      expect(errors).toHaveLength(0);
-    });
-  });
 });

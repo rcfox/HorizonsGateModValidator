@@ -198,27 +198,22 @@ describe('Mod Validator Integration', () => {
   describe('Vector validation', () => {
     test('validates Vector2 format', () => {
       const modContent = `[Item] ID=test;
-\tposition=10,20;`;
+\toffset=10,20;`;
 
       const validator = new ModValidator();
       const result = validator.validate(modContent, 'test.txt');
 
-      // Check if position is a valid field and is validated as Vector2
-      const vectorErrors = result.errors.filter(e => e.message.includes('Vector2'));
-      // If position is not a valid field, we won't get Vector2 errors, which is fine
+      expectValid(result);
     });
 
     test('detects invalid Vector2 format', () => {
-      const modContent = `[Trigger] ID=test;
-\tsize=10;`; // size is Vector2, needs two values
+      const modContent = `[Item] ID=test;
+\toffset=10;`; // offset is Vector2, needs two values
 
       const validator = new ModValidator();
       const result = validator.validate(modContent, 'test.txt');
 
-      const vectorErrors = result.errors.filter(e => e.message.includes('Vector2'));
-      if (vectorErrors.length > 0) {
-        expect(vectorErrors[0]?.message).toContain('Vector2');
-      }
+      expectMessage(result, { text: 'Invalid Vector2', severity: 'error' });
     });
   });
 
@@ -266,14 +261,13 @@ describe('Mod Validator Integration', () => {
     });
 
     test('allows empty property values', () => {
-      const modContent = `[Action] ID=test;
+      const modContent = `[ItemType] ID=test;
 \tdescription=;`;
 
       const validator = new ModValidator();
       const result = validator.validate(modContent, 'test.txt');
 
-      // Empty string values are generally allowed
-      // Might get unknown property error if description doesn't exist on Action
+      expectValid(result);
     });
   });
 });

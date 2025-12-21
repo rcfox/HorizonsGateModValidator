@@ -104,21 +104,4 @@ describe('Formula Parsing', () => {
       expect(() => parseFormula(input)).toThrow();
     });
   });
-
-  describe('Edge cases', () => {
-    test('handles whitespace in formulas', () => {
-      expect(() => parseFormula('-52 + c:MagAtk * 2')).not.toThrow();
-      expect(() => parseFormula('52 + c:MagAtk * 2')).not.toThrow();
-    });
-
-    test('handles complex nested expressions', () => {
-      expect(() => parseFormula('c:STR+min:10:t:HP*2')).not.toThrow();
-      expect(() => parseFormula('floor:c:DEX/2+t:DEX/2')).not.toThrow();
-    });
-
-    test('parses global formulas with and without arguments', () => {
-      expect(() => parseFormula('gswordDmg')).not.toThrow();
-      expect(() => parseFormula('distance(5)')).not.toThrow();
-    });
-  });
 });

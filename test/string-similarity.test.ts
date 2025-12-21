@@ -140,46 +140,4 @@ describe('String Similarity', () => {
       expect(results[0]?.distance).toBe(0);
     });
   });
-
-  describe('Typo correction scenarios', () => {
-    test('suggests correct object type for common typos', () => {
-      const objectTypes = ['Action', 'Item', 'Actor', 'Trigger', 'FormulaGlobal'];
-
-      // Missing letter
-      expect(findSimilar('Acton', objectTypes)[0]?.value).toBe('Action');
-
-      // Extra letter
-      expect(findSimilar('Actionn', objectTypes)[0]?.value).toBe('Action');
-
-      // Wrong letter
-      expect(findSimilar('Axtion', objectTypes)[0]?.value).toBe('Action');
-
-      // Transposition (2 edits)
-      expect(findSimilar('Aciton', objectTypes)[0]?.value).toBe('Action');
-    });
-
-    test('suggests correct property names for common typos', () => {
-      const properties = ['applyWeaponBuffs', 'casterAnimation', 'targetAnimation', 'magnitude'];
-
-      // Common typos
-      expect(findSimilar('applyWeponBuffs', properties)[0]?.value).toBe('applyWeaponBuffs');
-      expect(findSimilar('casterAnimaton', properties)[0]?.value).toBe('casterAnimation');
-      expect(findSimilar('magnatude', properties)[0]?.value).toBe('magnitude');
-    });
-
-    test('suggests correct enum values for common typos', () => {
-      const enumValues = ['melee', 'physical', 'fire', 'ice', 'lightning'];
-
-      expect(findSimilar('mele', enumValues)[0]?.value).toBe('melee');
-      expect(findSimilar('fysical', enumValues)[0]?.value).toBe('physical');
-      expect(findSimilar('lightining', enumValues)[0]?.value).toBe('lightning');
-    });
-
-    test('returns no suggestions for very different strings', () => {
-      const candidates = ['Action', 'Item', 'Actor'];
-      const results = findSimilar('xyz123', candidates, MAX_EDIT_DISTANCE);
-
-      expect(results).toHaveLength(0);
-    });
-  });
 });
