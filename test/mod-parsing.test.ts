@@ -5,7 +5,7 @@
 
 import { describe, test, expect } from 'vitest';
 import { ModParser } from '../src/parser.js';
-import { expectValid } from './test-utils.js';
+import { expectMessage, expectValid } from './test-utils.js';
 
 describe('Mod File Parsing', () => {
   describe('Simple object parsing', () => {
@@ -91,10 +91,7 @@ describe('Mod File Parsing', () => {
       expectValid(errors);
       expect(objects).toHaveLength(1);
       const formula = objects[0]?.properties.get('formula')?.value;
-      expect(formula).toBeDefined();
-      expect(formula).toContain('c:HP+');
-      expect(formula).toContain('c:STR*2+');
-      expect(formula).toContain('5');
+      expect(formula).toBe('c:HP+\t\tc:STR*2+\t\t5');
     });
   });
 
@@ -164,8 +161,7 @@ describe('Mod File Parsing', () => {
       const parser = new ModParser(input, 'test.txt');
       const { errors } = parser.parse();
 
-      expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some(e => e.message.includes(']'))).toBe(true);
+      expectMessage(errors, { text: 'Expected ]', severity: 'error' });
     });
 
     test('reports unexpected tokens outside object definition', () => {
@@ -173,8 +169,7 @@ describe('Mod File Parsing', () => {
       const parser = new ModParser(input, 'test.txt');
       const { errors } = parser.parse();
 
-      expect(errors.length).toBeGreaterThan(0);
-      expect(errors[0]?.message).toContain('Unexpected token');
+      expectMessage(errors, { text: 'Unexpected token', severity: 'error' });
     });
   });
 

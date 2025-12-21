@@ -9,6 +9,10 @@ function assertExhaustive(_param: never): never {
   throw new Error('this should never run');
 }
 
+export function expectToBeDefined<T>(value: T | undefined): asserts value is T {
+  expect(value).toBeDefined();
+}
+
 /**
  * Assert that a validation result has no messages
  * Includes actual messages in assertion failure for better debugging

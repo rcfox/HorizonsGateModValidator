@@ -5,7 +5,7 @@
 
 import { describe, test, expect } from 'vitest';
 import { ModValidator } from '../src/validator.js';
-import { expectValid, expectMessage } from './test-utils.js';
+import { expectValid, expectMessage, expectToBeDefined } from './test-utils.js';
 
 describe('Mod Validator Integration', () => {
   describe('Valid mod files', () => {
@@ -124,7 +124,15 @@ describe('Mod Validator Integration', () => {
 
       expectMessage(result, { text: 'Unknown object type', severity: 'error' });
       const error = result.errors.find(e => e.message.includes('Unknown object type'));
-      expect(error?.corrections?.length).toBeGreaterThan(0);
+      expectToBeDefined(error?.corrections);
+      expect(error.corrections.length).toBeGreaterThan(0);
+
+      const correction = error.corrections[0]!;
+      expect(correction.replacementText).toBe('Actor');
+      expect(correction.startLine).toBe(1);
+      expect(correction.startColumn).toBe(1);
+      expect(correction.endLine).toBe(1);
+      expect(correction.endColumn).toBe(6);
     });
 
     test('suggests corrections for misspelled property names', () => {
@@ -136,7 +144,15 @@ describe('Mod Validator Integration', () => {
 
       expectMessage(result, { text: 'Unknown property', severity: 'hint' });
       const hint = result.hints.find(h => h.message.includes('Unknown property'));
-      expect(hint?.corrections?.length).toBeGreaterThan(0);
+      expectToBeDefined(hint?.corrections);
+      expect(hint.corrections.length).toBeGreaterThan(0);
+
+      const correction = hint.corrections[0]!;
+      expect(correction.replacementText).toBe('applyWeaponBuffs');
+      expect(correction.startLine).toBe(2);
+      expect(correction.startColumn).toBe(1);
+      expect(correction.endLine).toBe(2);
+      expect(correction.endColumn).toBe(16);
     });
   });
 

@@ -3,7 +3,7 @@
  * Tests that property values are validated correctly against their expected types
  */
 
-import { describe, test, expect } from 'vitest';
+import { describe, test } from 'vitest';
 import { PropertyValidator } from '../src/property-validator.js';
 import type { FieldType, PropertyInfo } from '../src/types.js';
 import { expectValid, expectMessage } from './test-utils.js';
