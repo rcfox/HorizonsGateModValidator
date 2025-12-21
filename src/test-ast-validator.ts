@@ -17,6 +17,7 @@ const testCases = [
   { formula: 'abs:c:HP-10', expectValid: true },
   { formula: 'm:distance(32)', expectValid: true },
   { formula: 'd:gswordDmg', expectValid: true },
+  { formula: 'd:gswordDmg(3)', expectValid: true },
 
   // Invalid: wrong number of arguments
   { formula: 'between:10:c:STR', expectValid: false, reason: 'between needs 3 args (min, max, formula)' },
@@ -27,7 +28,7 @@ const testCases = [
 
   // Invalid: using colon syntax for function-style operators
   { formula: 'd:foo:bar', expectValid: false, reason: 'd should use parentheses' },
-  { formula: 'd:foo(bar)', expectValid: true },
+  { formula: 'd:foo(bar)', expectValid: false, reason: "operator 'd' expects float" },
 
   // Valid complex formulas
   { formula: 'c:STR*2+5', expectValid: true },
