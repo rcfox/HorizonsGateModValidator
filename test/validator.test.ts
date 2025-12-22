@@ -54,6 +54,16 @@ describe('Mod Validator Integration', () => {
       expectValid(result);
     });
 
+    test('validates FormulaGlobal with x parameter in formula', () => {
+      const modContent = `[FormulaGlobal] ID=customDamage;
+\tformula=d:fireDmg(x)+10;`;
+
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      expectValid(result);
+    });
+
     test('validates enum properties', () => {
       const modContent = `[ItemType] ID=testItem;
 \titemCategory=weapon;`;
@@ -103,6 +113,17 @@ describe('Mod Validator Integration', () => {
       const result = validator.validate(modContent, 'test.txt');
 
       expectMessage(result, { text: 'argument', severity: 'error' });
+    });
+
+    test('detects x parameter outside FormulaGlobal context', () => {
+      const modContent = `[AvAffecter] ID=testAffecter;
+\tactorValue=HP;
+\tmagnitude=d:fireDmg(x);`;
+
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      expectMessage(result, { text: "operator 'd' expects float, but got 'x'", severity: 'error' });
     });
 
     test('detects missing required ID property', () => {

@@ -1,18 +1,35 @@
 /**
- * Formula Parser - Recreates the C# Formula parsing algorithm to generate an AST
+ * Formula Parser - SYNTAX VALIDATION ONLY
  *
- * Based on Tactics/Formula.cs parsing logic:
+ * Recreates the C# Formula parsing algorithm to generate an AST.
+ * This parser handles SYNTAX validation - whether the formula text is structurally valid.
+ *
+ * RESPONSIBILITIES (what this file validates):
+ * - Formula structure: operators, parentheses placement, colons
+ * - Bare words with parentheses must be function-style operators (from formula.json)
+ * - Invalid characters after colons: abs:& , min: foo (space), abs:(, abs:-
+ * - Unary operator validation: unary + is invalid
+ * - Creates appropriate AST nodes: literal, variable, global, function, etc.
+ *
+ * NOT RESPONSIBILITIES (delegated to formula-ast-validator.ts):
+ * - Unknown operator names (e.g., m:unknownFunc)
+ * - Wrong parameter types (e.g., m:distance(foo) where literal expected)
+ * - Wrong argument counts (e.g., min:5 missing formula body)
+ * - Calling convention mismatches (using : vs () incorrectly)
+ * - 'x' parameter validity in context (validator checks allowXParameter flag)
+ *
+ * Parsing algorithm (based on Tactics/Formula.cs):
  * 1. Split formula by operators (+-*\/%) to get operands
  * 2. Process each operand from right to left
  * 3. Each operand can be:
  *    - A literal number or 'x' variable
  *    - A function call with colon-separated arguments (e.g., "c:HP", "min:5:c:STR")
- *    - A global formula reference with optional parenthesized argument
- *    - A math function with parenthesized argument
- * 4. Replace operands with their values and evaluate the math expression
+ *    - A global formula reference (bare identifier)
+ *    - A function-style operator with parenthesized argument (e.g., distance(32))
+ * 4. Build operation tree respecting precedence
  *
  * After parsing, use validateAST() from formula-ast-validator.ts to check
- * the AST against formula.json metadata.
+ * the AST against formula.json metadata for semantic correctness.
  */
 
 import {
@@ -94,24 +111,28 @@ export interface UnaryOperationNode {
 /**
  * Tokenizes a formula into operands and operators
  * Handles unary operators (only - is supported, + crashes the game)
+ * Respects parentheses - operators inside parentheses are part of operands, not top-level operators
  */
 function tokenizeFormula(formula: string): {
   operands: string[];
   operators: string[];
   positions: number[];
+  unaryOperandIndices: Map<number, number>;
 } {
   // Remove all whitespace (matches C# behavior)
   const cleanFormula = formula.replace(/\s+/g, '');
 
-  // Parse character by character to properly handle unary operators
+  // Parse character by character to properly handle unary operators and parentheses
   const operands: string[] = [];
   const operators: string[] = [];
   const positions: number[] = [];
+  const unaryOperandIndices = new Map<number, number>();
 
   let i = 0;
   let currentOperand = '';
   let currentOperandStart = 0;
   let justPushedOperand = false;
+  let parenDepth = 0;
 
   while (i < cleanFormula.length) {
     const char = cleanFormula[i];
@@ -119,8 +140,24 @@ function tokenizeFormula(formula: string): {
       throw new Error(`Invalid char in formula ${cleanFormula} at ${i}`);
     }
 
-    // Check if this is an operator
-    if ('+-*/%'.includes(char)) {
+    // Track parenthesis depth
+    if (char === '(') {
+      parenDepth++;
+      currentOperand += char;
+      i++;
+      continue;
+    } else if (char === ')') {
+      parenDepth--;
+      if (parenDepth < 0) {
+        throw new Error(`Invalid syntax: unmatched closing parenthesis at position ${i}`);
+      }
+      currentOperand += char;
+      i++;
+      continue;
+    }
+
+    // Check if this is an operator at depth 0 (top-level operator)
+    if ('+-*/%'.includes(char) && parenDepth === 0) {
       // Save current operand if we have one
       if (currentOperand) {
         operands.push(currentOperand);
@@ -135,8 +172,11 @@ function tokenizeFormula(formula: string): {
       // If we just pushed an operand, this must be a binary operator
       const prevIsOperator = !justPushedOperand;
       if (char === '-' && prevIsOperator) {
-        // Unary minus
+        // Unary minus - record which operand this will apply to
+        const operatorIndex = operators.length;
+        const targetOperandIndex = operands.length; // Next operand to be added
         operators.push('unary-');
+        unaryOperandIndices.set(operatorIndex, targetOperandIndex);
       } else if (char === '+' && prevIsOperator) {
         // Unary plus - this crashes the game!
         throw new Error(
@@ -162,12 +202,39 @@ function tokenizeFormula(formula: string): {
     positions.push(currentOperandStart);
   }
 
-  return { operands, operators, positions };
+  // Validate invariants
+  // Check parentheses are balanced
+  if (parenDepth !== 0) {
+    throw new Error(
+      `Invalid syntax: unmatched opening parenthesis. Expected ${parenDepth} more closing parenthesis(es).`
+    );
+  }
+
+  const unaryCount = Array.from(operators).filter(op => op.startsWith('unary')).length;
+  if (unaryOperandIndices.size !== unaryCount) {
+    throw new Error(
+      `Invariant violation: unaryOperandIndices.size (${unaryOperandIndices.size}) !== unary operator count (${unaryCount})`
+    );
+  }
+
+  for (const [opIndex, operandIndex] of unaryOperandIndices.entries()) {
+    if (operandIndex >= operands.length) {
+      throw new Error(
+        `Invariant violation: unary operator at ${opIndex} references non-existent operand ${operandIndex} (max: ${operands.length - 1})`
+      );
+    }
+  }
+
+  const usedOperandIndices = new Set(unaryOperandIndices.values());
+  if (usedOperandIndices.size !== unaryOperandIndices.size) {
+    throw new Error('Invariant violation: multiple unary operators apply to the same operand');
+  }
+
+  return { operands, operators, positions, unaryOperandIndices };
 }
 
 /**
- * Parses a single operand into an AST node
- * Operands are processed right-to-left in the original C# code
+ * Parses a single operand string into an AST node
  */
 function parseOperand(operand: string): ASTNode {
   // Check if it's a literal number
@@ -188,23 +255,30 @@ function parseOperand(operand: string): ASTNode {
     return parseFunctionCall(operand);
   }
 
-  // Check if it contains a left parenthesis (global formula or math function)
+  // Check if it contains a left parenthesis (function-style operator only)
   if (operand.includes('(')) {
     return parseParenthesizedOperand(operand);
   }
 
-  // If no special syntax, treat as a global formula reference or math function name
+  // If no special syntax, treat as a global formula reference
   return { type: 'global', name: operand };
 }
 
 /**
  * Parses an operand with parentheses: name(arg)
- * Used for function-style operators (determined by isFunctionStyle in formula.json)
+ * Only valid for function-style operators (determined by isFunctionStyle in formula.json)
  */
-function parseParenthesizedOperand(operand: string): GlobalFormulaNode | MathFunctionNode {
+function parseParenthesizedOperand(operand: string): MathFunctionNode {
   const parenIndex = operand.indexOf('(');
   const name = operand.substring(0, parenIndex);
   const argString = operand.substring(parenIndex + 1, operand.length - 1); // Remove '(' and ')'
+
+  // Parentheses are only valid with function-style operators
+  if (!isFunctionStyle(name)) {
+    throw new Error(
+      `Invalid syntax: '${name}(...)' - parentheses can only be used with function-style operators. '${name}' is not a valid function-style operator.`
+    );
+  }
 
   // Try to parse argument as a number or formula
   let argument: ASTNode | undefined;
@@ -218,19 +292,13 @@ function parseParenthesizedOperand(operand: string): GlobalFormulaNode | MathFun
     argument = parseFormula(argString);
   }
 
-  // Check if this operator is marked as function-style in formula.json
-  // Function-style operators use parentheses: m:distance(5), d(gswordDmg)
-  // Otherwise, it's a global formula reference
-  if (isFunctionStyle(name)) {
-    return { type: 'mathFunction', name, argument };
-  } else {
-    return { type: 'global', name, argument };
-  }
+  return { type: 'mathFunction', name, argument };
 }
 
 /**
  * Parses a function-style argument like "distance(32)" or "rand(100)"
- * Returns the function name and parsed parameters
+ * Used only for m: and d: operators (and operators that delegate to them)
+ * Returns the function name and parsed parameters as AST nodes
  */
 function parseFunctionStyleArg(arg: string): { name: string; params: ASTNode[] } | null {
   const parenIndex = arg.indexOf('(');
@@ -246,6 +314,7 @@ function parseFunctionStyleArg(arg: string): { name: string; params: ASTNode[] }
     .split(',')
     .map(s => s.trim())
     .filter(s => s);
+
   const params: ASTNode[] = paramStrings.map(param => {
     // Try to parse as number
     const numValue = parseFloat(param);
@@ -253,13 +322,23 @@ function parseFunctionStyleArg(arg: string): { name: string; params: ASTNode[] }
       return { type: 'literal', value: numValue };
     }
 
-    // Try to parse as variable
+    // 'x' and 'X' are always parsed as variables
     if (param === 'x' || param === 'X') {
       return { type: 'variable', name: param };
     }
 
-    // Otherwise parse as formula
-    return parseFormula(param);
+    // Check if parameter contains operators (which would make it a formula expression, not an identifier)
+    // Function-style arguments can only be: numeric literals, 'x' variable, or simple identifiers
+    // Formulas like (1+1), (5*2), etc. are not allowed
+    if (/[+\-*\/%()]/.test(param)) {
+      throw new Error(
+        `Invalid syntax: '${arg}' - function-style argument contains formula operators. Parameters must be simple literals or identifiers, not expressions like '${param}'.`
+      );
+    }
+
+    // Other identifiers are parsed as global formula references
+    // The validator will check if they're allowed in this context
+    return { type: 'global', name: param };
   });
 
   return { name, params };
@@ -360,11 +439,137 @@ function parseFunctionCall(operand: string): FunctionCallNode {
 }
 
 /**
- * Builds a binary operation tree from operands and operators
- * Respects standard math operator precedence (*, /, % before +, -)
- * Handles unary operators (-, +)
+ * Applies unary operators to operands, creating a new array with UnaryOp nodes
+ * Returns modified operands and binary-only operators (immutable)
  */
-function buildOperationTree(operands: ASTNode[], operators: string[]): ASTNode {
+function applyUnaryOperators(
+  operands: ASTNode[],
+  operators: string[],
+  unaryOperandIndices: Map<number, number>
+): { modifiedOperands: ASTNode[]; binaryOperators: string[] } {
+  // Create a copy of operands that we'll modify
+  const modifiedOperands = [...operands];
+  const binaryOperators: string[] = [];
+
+  // Process operators, applying unary ones and collecting binary ones
+  for (let i = 0; i < operators.length; i++) {
+    const op = operators[i];
+    if (!op) {
+      throw new Error(`Missing operator at index ${i}`);
+    }
+
+    if (op.startsWith('unary')) {
+      const unaryOp = op.substring('unary'.length) as '-' | '+';
+      const operandIndex = unaryOperandIndices.get(i);
+
+      if (operandIndex === undefined) {
+        throw new Error(`Unary operator at index ${i} has no operand mapping`);
+      }
+
+      const operand = modifiedOperands[operandIndex];
+      if (!operand) {
+        throw new Error(`Missing operand at index ${operandIndex} for unary operator at ${i}`);
+      }
+
+      // Wrap the operand in a UnaryOp node
+      modifiedOperands[operandIndex] = {
+        type: 'unaryOp',
+        operator: unaryOp,
+        operand: operand,
+      };
+    } else {
+      // Binary operator - keep it
+      binaryOperators.push(op);
+    }
+  }
+
+  // Validate binary operator count
+  if (binaryOperators.length !== modifiedOperands.length - 1) {
+    throw new Error(
+      `Invariant violation: binary operator count (${binaryOperators.length}) must equal operand count - 1 (${modifiedOperands.length - 1})`
+    );
+  }
+
+  return { modifiedOperands, binaryOperators };
+}
+
+/**
+ * Builds a binary operation tree from operands and operators (immutable)
+ * Respects standard math operator precedence (*, /, % before +, -)
+ */
+function buildBinaryTree(operands: ASTNode[], operators: string[]): ASTNode {
+  if (operands.length === 1) {
+    const result = operands[0];
+    if (!result) {
+      throw new Error('Single operand is undefined');
+    }
+    return result;
+  }
+
+  if (operators.length === 0) {
+    throw new Error(`No operators but ${operands.length} operands`);
+  }
+
+  // Find first high-precedence operator (*, /, %)
+  const highPrecedenceOps = ['*', '/', '%'];
+  const highPrecIndex = operators.findIndex(op => highPrecedenceOps.includes(op));
+
+  if (highPrecIndex !== -1) {
+    // Found a high-precedence operator - build node for it
+    const op = operators[highPrecIndex];
+    const left = operands[highPrecIndex];
+    const right = operands[highPrecIndex + 1];
+
+    if (!op || !left || !right) {
+      throw new Error(`Missing operator or operands at index ${highPrecIndex}`);
+    }
+
+    const binaryNode: BinaryOperationNode = {
+      type: 'binaryOp',
+      operator: op as '*' | '/' | '%',
+      left: left,
+      right: right,
+    };
+
+    // Create new arrays with the binary node replacing its operands
+    const newOperands = [...operands.slice(0, highPrecIndex), binaryNode, ...operands.slice(highPrecIndex + 2)];
+    const newOperators = [...operators.slice(0, highPrecIndex), ...operators.slice(highPrecIndex + 1)];
+
+    // Recursively build the rest of the tree
+    return buildBinaryTree(newOperands, newOperators);
+  }
+
+  // No high-precedence operators left, process low-precedence (+, -) left-to-right
+  const op = operators[0];
+  const left = operands[0];
+  const right = operands[1];
+
+  if (!op || !left || !right) {
+    throw new Error('Missing operator or operands in low-precedence pass');
+  }
+
+  const binaryNode: BinaryOperationNode = {
+    type: 'binaryOp',
+    operator: op as '+' | '-',
+    left: left,
+    right: right,
+  };
+
+  const newOperands = [binaryNode, ...operands.slice(2)];
+  const newOperators = operators.slice(1);
+
+  return buildBinaryTree(newOperands, newOperators);
+}
+
+/**
+ * Builds a complete operation tree from operands and operators
+ * Handles both unary and binary operators with proper precedence
+ */
+function buildOperationTree(
+  operands: ASTNode[],
+  operators: string[],
+  unaryOperandIndices: Map<number, number>
+): ASTNode {
   if (operands.length === 1 && operators.length === 0) {
     const result = operands[0];
     if (!result) {
@@ -373,109 +578,16 @@ function buildOperationTree(operands: ASTNode[], operators: string[]): ASTNode {
     return result;
   }
 
-  // First, handle unary operators (highest precedence, right-to-left)
-  // Unary operators are marked as "unary-"
-  // When we have "unary-" at index i, it applies to operands[i]
-  for (let i = operators.length - 1; i >= 0; i--) {
-    const op = operators[i];
-    if (!op) {
-      throw new Error(`Missing operator at index ${i}`);
-    }
+  // First apply unary operators (immutable)
+  const { modifiedOperands, binaryOperators } = applyUnaryOperators(operands, operators, unaryOperandIndices);
 
-    if (op.startsWith('unary')) {
-      const unaryOp = op.substring('unary'.length) as '-' | '+'; // Remove "unary" prefix
-      const operand = operands[i];
-      if (!operand) {
-        throw new Error(`Missing operand for unary operator at index ${i}`);
-      }
-
-      const unaryNode: UnaryOperationNode = {
-        type: 'unaryOp',
-        operator: unaryOp,
-        operand: operand,
-      };
-      // Replace the operand with the unary node
-      operands[i] = unaryNode;
-      // Remove the operator
-      operators.splice(i, 1);
-    }
-  }
-
-  if (operands.length === 1) {
-    const result = operands[0];
-    if (!result) {
-      throw new Error('Formula parsing resulted in undefined operand');
-    }
-    return result;
-  }
-
-  // Second pass: handle *, /, % (higher precedence)
-  const highPrecedenceOps = ['*', '/', '%'];
-  while (operators.some(op => highPrecedenceOps.includes(op))) {
-    const index = operators.findIndex(op => highPrecedenceOps.includes(op));
-    if (index === -1) break;
-
-    const op = operators[index];
-    const left = operands[index];
-    const right = operands[index + 1];
-
-    if (!op) {
-      throw new Error(`Missing operator at index ${index}`);
-    }
-    if (!left) {
-      throw new Error(`Missing left operand for operator '${op}' at index ${index}`);
-    }
-    if (!right) {
-      throw new Error(`Missing right operand for operator '${op}' at index ${index}`);
-    }
-
-    const newNode: BinaryOperationNode = {
-      type: 'binaryOp',
-      operator: op as '*' | '/' | '%',
-      left: left,
-      right: right,
-    };
-
-    operands.splice(index, 2, newNode);
-    operators.splice(index, 1);
-  }
-
-  // Third pass: handle +, - (lower precedence)
-  while (operators.length > 0) {
-    const op = operators[0];
-    const left = operands[0];
-    const right = operands[1];
-
-    if (!op) {
-      throw new Error('Missing operator in final pass');
-    }
-    if (!left) {
-      throw new Error(`Missing left operand for operator '${op}'`);
-    }
-    if (!right) {
-      throw new Error(`Missing right operand for operator '${op}'`);
-    }
-
-    const newNode: BinaryOperationNode = {
-      type: 'binaryOp',
-      operator: op as '+' | '-',
-      left: left,
-      right: right,
-    };
-
-    operands.splice(0, 2, newNode);
-    operators.splice(0, 1);
-  }
-
-  const finalResult = operands[0];
-  if (!finalResult) {
-    throw new Error('Formula parsing completed with no result');
-  }
-  return finalResult;
+  // Then build binary tree (immutable)
+  return buildBinaryTree(modifiedOperands, binaryOperators);
 }
 
 /**
  * Main entry point: parses a formula string into an AST
+ * @param formula The formula string to parse
  */
 export function parseFormula(formula: string): ASTNode {
   // Check for invalid characters immediately after colon
@@ -502,13 +614,13 @@ export function parseFormula(formula: string): ASTNode {
     throw new Error(errorMsg);
   }
 
-  const { operands, operators } = tokenizeFormula(formula);
+  const { operands, operators, unaryOperandIndices } = tokenizeFormula(formula);
 
   // Parse each operand into an AST node
-  const operandNodes = operands.map(parseOperand);
+  const operandNodes = operands.map(op => parseOperand(op));
 
   // Build the operation tree respecting precedence
-  return buildOperationTree(operandNodes, operators);
+  return buildOperationTree(operandNodes, operators, unaryOperandIndices);
 }
 
 /**

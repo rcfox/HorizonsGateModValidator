@@ -1,6 +1,25 @@
 /**
- * Formula AST Validation Tests
- * Tests that parsed formulas are validated correctly against formula metadata
+ * Formula AST Validation Tests - SEMANTICS ONLY
+ *
+ * Tests that parsed formulas are validated correctly against formula.json metadata.
+ * This file tests SEMANTIC validation - whether the parsed AST makes sense according to the schema.
+ *
+ * BELONGS HERE (validator/semantic errors):
+ * - Unknown operators: m:unknownFunc, d:invalidGlobal
+ * - Wrong parameter types: m:distance(foo) where literal expected
+ * - Wrong argument counts: min:5 (missing formula body)
+ * - Invalid 'x' usage: d:fireDmg(x) without allowXParameter flag
+ * - Wrong calling convention: using colon syntax for function-style operator
+ * - Typos in operator names (suggestions provided)
+ *
+ * DOES NOT BELONG HERE (parser/syntax errors - use formula-parsing.test.ts instead):
+ * - Invalid formula structure: abs:(1-2), abs:-2
+ * - Bare words with parentheses: distance(5) where distance is not function-style
+ * - Invalid characters: abs:&
+ * - Unary + operator: 5*+2
+ *
+ * Rule of thumb: If parseFormula() succeeds and produces an AST, but validateAST() finds issues,
+ *                test it here. If parseFormula() throws an error, test it in formula-parsing.test.ts.
  */
 
 import { describe, test, expect } from 'vitest';
@@ -58,5 +77,35 @@ describe('Formula AST Validation', () => {
 
       expect(hasExpectedMessage).toBe(true);
     }
+  });
+
+  describe('allowXParameter flag', () => {
+    test('d:fireDmg(x) should fail without allowXParameter', () => {
+      const ast = parseFormula('d:fireDmg(x)');
+      const errors = validateAST(ast, 'root', false);
+      expect(errors.length).toBeGreaterThan(0);
+      const hasExpectedMessage = errors.some(e => e.message.toLowerCase().includes('expect'));
+      expect(hasExpectedMessage).toBe(true);
+    });
+
+    test('d:fireDmg(x) should succeed with allowXParameter', () => {
+      const ast = parseFormula('d:fireDmg(x)');
+      const errors = validateAST(ast, 'root', true);
+      expect(errors).toHaveLength(0);
+    });
+
+    test('m:distance(x) should fail without allowXParameter', () => {
+      const ast = parseFormula('m:distance(x)');
+      const errors = validateAST(ast, 'root', false);
+      expect(errors.length).toBeGreaterThan(0);
+    });
+
+    test('d:fireDmg(foo) should fail even with allowXParameter (only x is allowed)', () => {
+      const ast = parseFormula('d:fireDmg(foo)');
+      const errors = validateAST(ast, 'root', true);
+      expect(errors.length).toBeGreaterThan(0);
+      const hasExpectedMessage = errors.some(e => e.message.toLowerCase().includes('expect'));
+      expect(hasExpectedMessage).toBe(true);
+    });
   });
 });

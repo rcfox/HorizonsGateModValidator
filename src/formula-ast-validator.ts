@@ -1,6 +1,24 @@
 /**
- * AST Validator - Validates parsed formula ASTs against formula.json metadata
- * Checks argument counts, types, and calling conventions
+ * AST Validator - SEMANTIC VALIDATION ONLY
+ *
+ * Validates parsed formula ASTs against formula.json metadata.
+ * This validator handles SEMANTIC validation - whether the parsed AST makes sense according to the schema.
+ *
+ * RESPONSIBILITIES (what this file validates):
+ * - Unknown operator names: validates against formula.json, provides suggestions for typos
+ * - Parameter type checking: ensures literals where literals expected, allows 'x' with allowXParameter
+ * - Argument count validation: checks against operator use cases in formula.json
+ * - Calling convention: validates function-style vs colon syntax matches operator definition
+ * - Operator delegation: handles mMin0 -> m, dMin0 -> d, etc.
+ * - Context-specific validation: allowXParameter for FormulaGlobal.formula property
+ *
+ * NOT RESPONSIBILITIES (handled by formula-parser.ts):
+ * - Syntax errors: abs:(1-2), abs:-2, min:+5
+ * - Structural validation: parentheses placement, operator parsing
+ * - AST creation: deciding if something is literal vs variable vs global
+ *
+ * The validator receives an already-parsed AST and checks if it's semantically valid
+ * according to the operator definitions in formula.json. It does NOT re-parse the formula.
  */
 
 import {

@@ -3,7 +3,7 @@
  * This module loads and processes the formula operator definitions
  */
 
-import formulaData from "./formula.json" with { type: "json" };
+import formulaData from './formula.json' with { type: 'json' };
 
 export interface FormulaArgument {
   name: string;
@@ -45,9 +45,7 @@ export const operatorAliasMap = new Map<string, string>();
  * Set of operators that use function-style syntax with parentheses: name(arg)
  * Examples: distance(5), d(gswordDmg)
  */
-export const functionStyleOperators = new Set(
-  data.operators.filter((op) => op.isFunctionStyle).map((op) => op.name),
-);
+export const functionStyleOperators = new Set(data.operators.filter(op => op.isFunctionStyle).map(op => op.name));
 
 /**
  * Map of operators to their non-formula argument count
@@ -82,11 +80,11 @@ for (const op of data.operators) {
   }
 
   // Count non-formula arguments
-  const nonFormulaArgs = args.filter((a) => a.type !== "formula");
+  const nonFormulaArgs = args.filter(a => a.type !== 'formula');
   operatorArgCounts.set(op.name, nonFormulaArgs.length);
 
   // Track operators with formula bodies
-  if (args.some((a) => a.type === "formula")) {
+  if (args.some(a => a.type === 'formula')) {
     operatorsWithFormulaBodies.add(op.name);
   }
 
@@ -136,7 +134,7 @@ export function hasFormulaBody(operatorName: string): boolean {
  * Get all operator names (for validation/autocomplete)
  */
 export function getAllOperatorNames(): string[] {
-  return data.operators.map((op) => op.name);
+  return data.operators.map(op => op.name);
 }
 
 /**
