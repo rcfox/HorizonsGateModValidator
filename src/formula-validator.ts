@@ -22,13 +22,10 @@ export function validateFormula(
     return messages;
   }
 
-  try {
-    // Step 1: Parse the formula into an AST
-    const ast = parseFormula(formula);
+  const allowXParameter = objectType === 'FormulaGlobal' && propertyName === 'formula';
 
-    // Step 2: Validate the AST against formula.json metadata
-    // Pass context to allow 'x' parameter in FormulaGlobal.formula
-    const allowXParameter = objectType === 'FormulaGlobal' && propertyName === 'formula';
+  try {
+    const ast = parseFormula(formula);
     const validationErrors = validateAST(ast, undefined, allowXParameter);
 
     // Convert AST validation errors to ValidationMessages
@@ -71,45 +68,28 @@ function createCorrections(_formula: string, error: ValidationError, propInfo: P
   }
 
   // Use position information from the AST node (now includes line and column)
-  if (
-    'startLine' in error.node &&
-    'startColumn' in error.node &&
-    'endLine' in error.node &&
-    'endColumn' in error.node
-  ) {
-    const nodeStartLine = error.node.startLine;
-    const nodeStartColumn = error.node.startColumn;
-    const nodeEndLine = error.node.endLine;
-    const nodeEndColumn = error.node.endColumn;
+  const nodeStartLine = error.node.startLine;
+  const nodeStartColumn = error.node.startColumn;
+  const nodeEndLine = error.node.endLine;
+  const nodeEndColumn = error.node.endColumn;
 
-    if (
-      nodeStartLine !== undefined &&
-      nodeStartColumn !== undefined &&
-      nodeEndLine !== undefined &&
-      nodeEndColumn !== undefined
-    ) {
-      // Calculate absolute position by combining node position with property value position
-      // Node positions are relative to the start of the formula value
-      const startLine = propInfo.valueStartLine + nodeStartLine;
-      const endLine = propInfo.valueStartLine + nodeEndLine;
+  // Calculate absolute position by combining node position with property value position
+  // Node positions are relative to the start of the formula value
+  const startLine = propInfo.valueStartLine + nodeStartLine;
+  const endLine = propInfo.valueStartLine + nodeEndLine;
 
-      // For the first line of the node, add the property value's start column
-      // For subsequent lines, use the column as-is (relative to start of line)
-      const startColumn = nodeStartLine === 0 ? propInfo.valueStartColumn + nodeStartColumn : nodeStartColumn;
-      const endColumn = nodeEndLine === 0 ? propInfo.valueStartColumn + nodeEndColumn : nodeEndColumn;
+  // For the first line of the node, add the property value's start column
+  // For subsequent lines, use the column as-is (relative to start of line)
+  const startColumn = nodeStartLine === 0 ? propInfo.valueStartColumn + nodeStartColumn : nodeStartColumn;
+  const endColumn = nodeEndLine === 0 ? propInfo.valueStartColumn + nodeEndColumn : nodeEndColumn;
 
-      // Create a correction for each suggestion
-      return error.suggestions.map(suggestion => ({
-        filePath: propInfo.filePath,
-        startLine,
-        startColumn,
-        endLine,
-        endColumn,
-        replacementText: suggestion,
-      }));
-    }
-  }
-
-  // This shouldn't happen with the new position tracking, but keep as fallback
-  return [];
+  // Create a correction for each suggestion
+  return error.suggestions.map(suggestion => ({
+    filePath: propInfo.filePath,
+    startLine,
+    startColumn,
+    endLine,
+    endColumn,
+    replacementText: suggestion,
+  }));
 }
