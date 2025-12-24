@@ -2,11 +2,11 @@
   "tags": [
     {
       "name": "font",
-      "description": "Changes the font for subsequent text. If no valid font is specified or array3[1] is missing, reverts to default font.",
+      "description": "Changes the font for subsequent text. If no valid font is specified or Argument 1 is missing, reverts to default font.",
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Font name to switch to (must exist in Game1.fonts dictionary)"
         }
       ],
@@ -17,7 +17,7 @@
       "description": "Creates a subtitle line with specified font, displaying dialog string elements. Only works if text doesn't start with '('. Adjusts string to fit within maxWidth.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Font name for the subtitle (uses default font if not in Game1.fonts)"
         }
       ],
@@ -37,7 +37,7 @@
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Speed multiplier value (float). If empty or missing, resets to 1.0"
         }
       ],
@@ -49,7 +49,7 @@
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Pause duration in seconds (float). Defaults to 0.7 if empty or missing"
         }
       ],
@@ -57,10 +57,10 @@
     },
     {
       "name": "title",
-      "description": "Centers text horizontally and adds a newline. The text content is taken from array3[1].",
+      "description": "Centers text horizontally and adds a newline. The text content is taken from Argument 1.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Text to display centered"
         }
       ],
@@ -69,10 +69,10 @@
     },
     {
       "name": "indent",
-      "description": "Indents text by 25% of remaining width and adds newline. The text content is taken from array3[1].",
+      "description": "Indents text by 25% of remaining width and adds newline. The text content is taken from Argument 1.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Text to display indented"
         }
       ],
@@ -84,7 +84,7 @@
       "description": "Displays an image at normal size, centered horizontally on a new line. Validates texture exists before displaying.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Texture key name (must exist in Game1.textures)"
         }
       ],
@@ -96,7 +96,7 @@
       "description": "Displays an image at 2x size (width and height doubled), centered horizontally on a new line. Validates texture exists.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Texture key name (must exist in Game1.textures)"
         }
       ],
@@ -108,7 +108,7 @@
       "description": "Displays an image at 3x size (width and height tripled), centered horizontally on a new line. Validates texture exists.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Texture key name (must exist in Game1.textures)"
         }
       ],
@@ -120,7 +120,7 @@
       "description": "Displays an image where the texture name is retrieved from a global variable. Skips display if variable is empty or '0'. Centered on new line.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Global variable name containing the texture key"
         }
       ],
@@ -132,11 +132,11 @@
       "description": "Conditionally displays an image based on formula evaluation. Shows image only if formula result is > 0 and texture name is not empty or '0'. Centered on new line.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Texture key name (must exist in Game1.textures)"
         },
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Formula condition - image displays only if result > 0 and not empty string"
         }
       ],
@@ -148,7 +148,7 @@
       "description": "Displays an icon texture inline at normal size. Wraps to next line if doesn't fit. Validates texture exists.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Texture key name (must exist in Game1.textures). Skips if empty"
         }
       ],
@@ -160,7 +160,7 @@
       "description": "Displays an icon with width reduced by 3 pixels and shifted left. Wraps to next line if doesn't fit.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Texture key name (must exist in Game1.textures). Skips if empty"
         }
       ],
@@ -172,7 +172,7 @@
       "description": "Displays an icon with width reduced by 5 pixels and shifted further left. Wraps to next line if doesn't fit.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Texture key name (must exist in Game1.textures). Skips if empty"
         }
       ],
@@ -184,7 +184,7 @@
       "description": "Displays an icon positioned 2 pixels lower than normal. Wraps to next line if doesn't fit.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Texture key name (must exist in Game1.textures). Skips if empty"
         }
       ],
@@ -196,7 +196,7 @@
       "description": "Displays an icon at 2x size (width and height doubled). Takes up more horizontal space. Wraps to next line if doesn't fit.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Texture key name (must exist in Game1.textures). Skips if empty"
         }
       ],
@@ -208,7 +208,7 @@
       "description": "Displays an icon at 2x size positioned 2 pixels lower. Wraps to next line if doesn't fit.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Texture key name (must exist in Game1.textures). Skips if empty"
         }
       ],
@@ -220,7 +220,7 @@
       "description": "Displays an action's icon with its associated color palettes. Retrieves icon from Data.actions dictionary. Width increased by 2 pixels.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Action ID in Data.actions dictionary"
         }
       ],
@@ -232,7 +232,7 @@
       "description": "Displays a support ability's icon. Retrieves icon from Data.supportAbilities dictionary. Width increased by 2 pixels.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Support ability ID in Data.supportAbilities dictionary"
         }
       ],
@@ -244,7 +244,7 @@
       "description": "Displays an icon at half size (0.5x), shifted left by 4 pixels and down by 4 pixels, with width reduced by 8 pixels.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Texture key name (must exist in Game1.textures). Skips if empty"
         }
       ],
@@ -256,7 +256,7 @@
       "description": "Displays an icon inline without wrapping to a new line if it doesn't fit. Uses addIcon helper function.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Texture key name to display"
         }
       ],
@@ -265,11 +265,11 @@
     },
     {
       "name": "background",
-      "description": "Displays a background texture at 2x size, centered horizontally, inserted at the beginning of texture list (drawn behind other elements). Skips if array3.Length <= 1 or texture name is empty.",
+      "description": "Displays a background texture at 2x size, centered horizontally, inserted at the beginning of texture list (drawn behind other elements). Skips if no argument is given.",
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Texture key name (must exist in Game1.textures). Required but checked as optional due to length check"
         }
       ],
@@ -280,11 +280,11 @@
       "description": "Conditionally displays a background texture based on formula evaluation. Shows only if formula > 0. Background is 2x size, centered horizontally.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Texture key name (must exist in Game1.textures). Skips if empty"
         },
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Formula condition - background displays only if result > 0 and not empty string"
         }
       ],
@@ -297,7 +297,7 @@
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Texture key name (must exist in Game1.textures)"
         }
       ],
@@ -309,7 +309,7 @@
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Global variable name containing texture key"
         }
       ],
@@ -321,7 +321,7 @@
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Global variable name containing texture key"
         }
       ],
@@ -332,7 +332,7 @@
       "description": "Displays an item icon inline from Data.itemTypes. Shows sprite with item's color palettes. Wraps to next line if doesn't fit. Skips if item doesn't exist.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Item type ID in Data.itemTypes dictionary"
         }
       ],
@@ -344,7 +344,7 @@
       "description": "Displays an item icon positioned 3 pixels lower than normal. Wraps to next line if doesn't fit.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Item type ID in Data.itemTypes dictionary"
         }
       ],
@@ -356,7 +356,7 @@
       "description": "Displays an item icon where item type ID is retrieved from a global variable. Wraps to next line if doesn't fit.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Global variable name containing item type ID"
         }
       ],
@@ -368,7 +368,7 @@
       "description": "Displays an item icon from global variable, positioned 3 pixels lower. Wraps to next line if doesn't fit.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Global variable name containing item type ID"
         }
       ],
@@ -380,7 +380,7 @@
       "description": "Displays an item icon at 2x size. Handles special item sprite properties (2x width/height). Wraps to next line if doesn't fit.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Item type ID in Data.itemTypes dictionary"
         }
       ],
@@ -392,7 +392,7 @@
       "description": "Displays an item icon at 2x size, positioned 6 pixels lower. Handles special sprite properties.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Item type ID in Data.itemTypes dictionary"
         }
       ],
@@ -404,7 +404,7 @@
       "description": "Displays an item icon at 2x size where item type ID is retrieved from global variable. Handles special sprite properties.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Global variable name containing item type ID"
         }
       ],
@@ -416,7 +416,7 @@
       "description": "Displays an item icon at 2x size from global variable, positioned 6 pixels lower. Handles special sprite properties.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Global variable name containing item type ID"
         }
       ],
@@ -428,7 +428,7 @@
       "description": "Displays an item icon at 2x size, positioned 8 pixels lower (more than _low variant). Handles special sprite properties.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Item type ID in Data.itemTypes dictionary"
         }
       ],
@@ -440,7 +440,7 @@
       "description": "Displays an item icon at 2x size from global variable, positioned 8 pixels lower. Handles special sprite properties.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Global variable name containing item type ID"
         }
       ],
@@ -452,7 +452,7 @@
       "description": "Displays the name of an item from Data.itemTypes dictionary.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Item type ID in Data.itemTypes dictionary"
         }
       ],
@@ -464,7 +464,7 @@
       "description": "Displays the name of an item where item type ID is retrieved from a global variable.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Global variable name containing item type ID"
         }
       ],
@@ -476,7 +476,7 @@
       "description": "Displays the base value (price) of an item as a number string.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Item type ID in Data.itemTypes dictionary"
         }
       ],
@@ -488,7 +488,7 @@
       "description": "Displays the base value of an item where item type ID is retrieved from a global variable.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Global variable name containing item type ID"
         }
       ],
@@ -500,7 +500,7 @@
       "description": "Displays the buy price of an item (may differ from base value). Uses getBuyPrice() method.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Item type ID in Data.itemTypes dictionary"
         }
       ],
@@ -512,13 +512,13 @@
       "description": "Displays an actor sprite at normal size. Supports party index or actor ID. Uses default sprite with palettes. Wraps to next line if doesn't fit.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Actor ID or party index (integer). If integer, retrieves from partyActors"
         }
       ],
       "optional": [
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Facing direction row index for sprite animation (integer). Only used if actor type doesn't have noFacingRotRows"
         }
       ],
@@ -529,13 +529,13 @@
       "description": "Displays an actor sprite at normal size, positioned 6 pixels lower. Supports party index or actor ID.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Actor ID or party index (integer)"
         }
       ],
       "optional": [
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Facing direction row index for sprite animation"
         }
       ],
@@ -546,13 +546,13 @@
       "description": "Displays an actor sprite at 2x size. Supports party index or actor ID. Uses default sprite with palettes.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Actor ID or party index (integer)"
         }
       ],
       "optional": [
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Facing direction row index for sprite animation"
         }
       ],
@@ -563,13 +563,13 @@
       "description": "Displays an actor sprite at 2x size, positioned 6 pixels lower. Supports party index or actor ID.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Actor ID or party index (integer)"
         }
       ],
       "optional": [
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Facing direction row index for sprite animation"
         }
       ],
@@ -580,13 +580,13 @@
       "description": "Displays an actor's portrait (head sprite and optional face sprite) at normal size. Checks living actors and dead actors. Uses pDead palette if actor is dead.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Actor ID or party index (integer)"
         }
       ],
       "optional": [
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Facing direction row index for sprite animation"
         }
       ],
@@ -597,13 +597,13 @@
       "description": "Displays an actor's portrait (head and face sprites) at 2x size. Checks living and dead actors.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Actor ID or party index (integer)"
         }
       ],
       "optional": [
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Facing direction row index for sprite animation"
         }
       ],
@@ -614,13 +614,13 @@
       "description": "Displays the portrait of the fleet's commodore at normal size. Automatically retrieves commodore from actor's fleet.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Actor ID (gets overwritten with commodore's ID internally)"
         }
       ],
       "optional": [
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Facing direction row index for sprite animation"
         }
       ],
@@ -631,13 +631,13 @@
       "description": "Displays the portrait of the fleet's commodore at 2x size. Automatically retrieves commodore from actor's fleet.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Actor ID (gets overwritten with commodore's ID internally)"
         }
       ],
       "optional": [
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Facing direction row index for sprite animation"
         }
       ],
@@ -648,13 +648,13 @@
       "description": "Displays an actor sprite from player fleet's boats at normal size. Uses boat index to retrieve actor.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Boat index in player fleet (integer, gets converted to boat's actorTypeID)"
         }
       ],
       "optional": [
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Facing direction row index for sprite animation"
         }
       ],
@@ -665,13 +665,13 @@
       "description": "Displays an actor sprite from player fleet's boats at normal size, positioned 6 pixels lower.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Boat index in player fleet (integer)"
         }
       ],
       "optional": [
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Facing direction row index for sprite animation"
         }
       ],
@@ -682,13 +682,13 @@
       "description": "Displays an actor sprite from player fleet's boats at 2x size.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Boat index in player fleet (integer)"
         }
       ],
       "optional": [
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Facing direction row index for sprite animation"
         }
       ],
@@ -699,13 +699,13 @@
       "description": "Displays an actor sprite from player fleet's boats at 2x size, positioned 6 pixels lower.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Boat index in player fleet (integer)"
         }
       ],
       "optional": [
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Facing direction row index for sprite animation"
         }
       ],
@@ -717,7 +717,7 @@
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Line width in pixels (float). Defaults to maxWidth * 0.6 if empty or missing"
         }
       ],
@@ -729,7 +729,7 @@
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Line width in pixels (float). Defaults to maxWidth * 0.6 if empty or missing"
         }
       ],
@@ -754,7 +754,7 @@
       "description": "Inserts a horizontal line separator centered at 25% from left. Advances Y by 5 pixels. Default width is 60% of maxWidth.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Line width in pixels (float). Uses this value directly (no default if empty, will cause parse error)"
         }
       ],
@@ -767,7 +767,7 @@
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Formula string to evaluate. If missing, displays empty string"
         }
       ],
@@ -779,7 +779,7 @@
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Formula string to evaluate. If missing, displays empty string"
         }
       ],
@@ -791,7 +791,7 @@
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Formula string to evaluate. If missing, displays empty string"
         }
       ],
@@ -802,7 +802,7 @@
       "description": "Evaluates a formula and displays the result with decimal precision (not floored). Uses actor context.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Formula string to evaluate"
         }
       ],
@@ -814,7 +814,7 @@
       "description": "Adjusts the X position by a specified amount (adds to current X).",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "X offset value in pixels (float, can be negative)"
         }
       ],
@@ -826,7 +826,7 @@
       "description": "Adjusts the Y position by a specified amount (adds to current Y).",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Y offset value in pixels (float, can be negative)"
         }
       ],
@@ -838,7 +838,7 @@
       "description": "Adjusts the X position offset for all subsequent images/textures (adds to zero2.X).",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "X offset value in pixels (float, can be negative)"
         }
       ],
@@ -850,7 +850,7 @@
       "description": "Adjusts the Y position offset for all subsequent images/textures (adds to zero2.Y).",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Y offset value in pixels (float, can be negative)"
         }
       ],
@@ -862,7 +862,7 @@
       "description": "Sets the X position to an absolute value.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Absolute X position in pixels (float)"
         }
       ],
@@ -874,7 +874,7 @@
       "description": "Sets the Y position to an absolute value.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Absolute Y position in pixels (float)"
         }
       ],
@@ -886,7 +886,7 @@
       "description": "Sets both the current X position and the base X position (used for line wrapping) to an absolute value.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Absolute X position in pixels (float)"
         }
       ],
@@ -898,7 +898,7 @@
       "description": "Centers the specified text horizontally within the available width. Adjusts X position to center the text.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Text string to center"
         }
       ],
@@ -911,11 +911,11 @@
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Grid snap value in pixels (float). Centers are rounded to nearest multiple of this value"
         },
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Total width to center within (float). Defaults to getWidth() if not specified"
         }
       ],
@@ -954,7 +954,7 @@
       "description": "Adjusts the maximum width by adding a specified value scaled by tooltip scale factor.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Width adjustment value (float, multiplied by Globals.tooltipScale)"
         }
       ],
@@ -966,11 +966,11 @@
       "description": "Conditionally displays text based on formula evaluation. Shows text only if formula result > 0.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Text to display if condition is true"
         },
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Formula condition - text displays only if result > 0"
         }
       ],
@@ -979,18 +979,18 @@
     },
     {
       "name": "textIfElse",
-      "description": "Displays one of two text strings based on formula evaluation (if-else). Shows array3[1] if formula > 0, otherwise shows array3[2].",
+      "description": "Displays one of two text strings based on formula evaluation (if-else). Shows Argument 1 if formula > 0, otherwise shows Argument 2.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Text to display if condition is true"
         },
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Text to display if condition is false"
         },
         {
-          "name": "array3[3]",
+          "name": "Argument 3",
           "description": "Formula condition - determines which text to show"
         }
       ],
@@ -1002,11 +1002,11 @@
       "description": "Conditionally displays text and stops all further tag processing if condition is true. Sets flag2=true to end processing. Shows text only if formula > 0.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Text to display if condition is true (also terminates processing)"
         },
         {
-          "name": "array3[2]",
+          "name": "Argument 2",
           "description": "Formula condition - text displays and processing stops only if result > 0"
         }
       ],
@@ -1018,7 +1018,7 @@
       "description": "Randomly selects and displays one option from a slash-separated list. Uses current Game1.random state (not seeded).",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Slash-separated string options (e.g., 'option1/option2/option3')"
         }
       ],
@@ -1030,7 +1030,7 @@
       "description": "Randomly selects one option from slash-separated list using seeded random generator. Seed is based on actorID hash and world time (changes every 6 days). Consistent for same actor and time period.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Slash-separated string options (e.g., 'option1/option2/option3')"
         }
       ],
@@ -1042,7 +1042,7 @@
       "description": "Randomly selects one option from slash-separated list using seeded random generator. Seed is based only on actorID hash (consistent for same actor regardless of time).",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Slash-separated string options (e.g., 'option1/option2/option3')"
         }
       ],
@@ -1055,7 +1055,7 @@
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Color name (resolved via Data.getColor). If empty or missing, uses upColor_text"
         }
       ],
@@ -1066,7 +1066,7 @@
       "description": "Displays the keyboard/gamepad key binding for a specific command. Shows as uppercase, first keybind only, prettified format.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Command name to look up keybind for"
         }
       ],
@@ -1085,7 +1085,7 @@
       "description": "Displays different text based on the actor's gender. Shows first option if male, second if female. Uses slash-separated values.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Slash-separated gender options (e.g., 'male_text/female_text'). First for male, second for female"
         }
       ],
@@ -1097,7 +1097,7 @@
       "description": "Displays different text based on the player's gender. Shows first option if player is male, second if female. Uses slash-separated values.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Slash-separated gender options (e.g., 'male_text/female_text'). First for male, second for female"
         }
       ],
@@ -1106,10 +1106,10 @@
     },
     {
       "name": "actorName",
-      "description": "Displays an actor's name. If array3[1] actor exists, shows that actor's name, otherwise shows the context actor's name.",
+      "description": "Displays an actor's name. If Argument 1 actor exists, shows that actor's name, otherwise shows the context actor's name.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Actor ID to get name from. Falls back to context actor if not found"
         }
       ],
@@ -1121,7 +1121,7 @@
       "description": "Displays the name of the fleet's commodore. Retrieves commodore from the context actor's fleet.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Actor ID (used to find fleet, then gets commodore from that fleet)"
         }
       ],
@@ -1133,7 +1133,7 @@
       "description": "Displays the name of a party member by index. Skips if index is out of bounds.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Party member index (integer, 0-based)"
         }
       ],
@@ -1145,7 +1145,7 @@
       "description": "Displays the name of a boat in the player's fleet by index. Skips if index is out of bounds.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Boat index in player fleet (integer, 0-based)"
         }
       ],
@@ -1157,7 +1157,7 @@
       "description": "Displays the type name (actor type) of a boat in the player's fleet by index. Skips if index is out of bounds.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Boat index in player fleet (integer, 0-based)"
         }
       ],
@@ -1191,12 +1191,12 @@
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
-          "description": "X position offset in pixels (integer, requires array3[2] also)"
+          "name": "Argument 1",
+          "description": "X position offset in pixels (integer, requires Argument 2 also)"
         },
         {
-          "name": "array3[2]",
-          "description": "Y position offset in pixels (integer, requires array3[1] also)"
+          "name": "Argument 2",
+          "description": "Y position offset in pixels (integer, requires Argument 1 also)"
         }
       ],
       "aliases": []
@@ -1256,7 +1256,7 @@
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Location ID to display name for. If not specified, uses current/nearest location"
         }
       ],
@@ -1268,7 +1268,7 @@
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Location ID to display name for. If not specified, uses current/nearest location"
         }
       ],
@@ -1377,7 +1377,7 @@
       "description": "Displays detailed food effects for a specified food item. Shows morale bonus and all actor value effects with durations. Multi-line formatted list with icons at 1x scale.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Item type ID of food item to show effects for"
         }
       ],
@@ -1389,7 +1389,7 @@
       "description": "Displays trivia text about an actor. Uses actor's getTrivia() method. Skips if actor doesn't exist.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Actor ID to get trivia for"
         }
       ],
@@ -1401,7 +1401,7 @@
       "description": "Displays icons of an actor's 5 most frequently used abilities. Shows action icons with class-specific color palettes. Clears all text/textures if actor not found.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Actor ID to show favorite abilities for"
         }
       ],
@@ -1438,11 +1438,11 @@
     },
     {
       "name": "g",
-      "description": "Gets and displays a global variable value as string. Empty string if array3.Length <= 1.",
+      "description": "Gets and displays a global variable value as string. Empty string if no argument is given.",
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Global variable name to retrieve"
         }
       ],
@@ -1454,7 +1454,7 @@
       "required": [],
       "optional": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Global variable name to retrieve"
         }
       ],
@@ -1542,7 +1542,7 @@
       "description": "Sets the reveal effect for text animation. Stores effect name in revealFX variable.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Reveal effect name/identifier"
         }
       ],
@@ -1554,7 +1554,7 @@
       "description": "Displays a palette swatch at 1x scale. Shows both a colored bar (pixel texture) and the actual palette colors. Positioned at specific offsets (-316,22 for bar, -50,10 for palette).",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Palette name in Data.palettes dictionary"
         }
       ],
@@ -1566,7 +1566,7 @@
       "description": "Displays a palette swatch at 2x scale. Shows colored bar and palette colors at larger size. Positioned at specific offsets (-316,22 for bar, -252,60 for palette). Advances X position by 32 pixels.",
       "required": [
         {
-          "name": "array3[1]",
+          "name": "Argument 1",
           "description": "Palette name in Data.palettes dictionary"
         }
       ],
@@ -1585,11 +1585,11 @@
           "description": "Modifies a global variable by adding an integer value to it. Uses Game1.currentGameState.modGlobalVar().",
           "required": [
             {
-              "name": "array[2]",
+              "name": "Argument 1",
               "description": "Global variable name to modify"
             },
             {
-              "name": "array[3]",
+              "name": "Argument 2",
               "description": "Integer value to add to the global variable"
             }
           ],
@@ -1601,7 +1601,7 @@
           "description": "Adds money to the player's current money total. Can be negative to subtract money.",
           "required": [
             {
-              "name": "array[2]",
+              "name": "Argument 1",
               "description": "Integer amount of money to add (can be negative)"
             }
           ],
@@ -1613,11 +1613,11 @@
           "description": "Modifies the player's fame with a specific faction. Uses Game1.currentGameState.modFame().",
           "required": [
             {
-              "name": "array[2]",
+              "name": "Argument 1",
               "description": "Faction ID"
             },
             {
-              "name": "array[3]",
+              "name": "Argument 2",
               "description": "Integer fame value to add (can be negative)"
             }
           ],
@@ -1629,11 +1629,11 @@
           "description": "Modifies the player's favor with a specific faction. Uses Game1.currentGameState.modFavor().",
           "required": [
             {
-              "name": "array[2]",
+              "name": "Argument 1",
               "description": "Faction ID"
             },
             {
-              "name": "array[3]",
+              "name": "Argument 2",
               "description": "Integer favor value to add (can be negative)"
             }
           ],
@@ -1645,7 +1645,7 @@
           "description": "Displays a damage number (floating text) at the current position on screen. Uses UIManager.I.addDamageNumber().",
           "required": [
             {
-              "name": "array[2]",
+              "name": "Argument 1",
               "description": "Text to display as damage number"
             }
           ],
@@ -1657,7 +1657,7 @@
           "description": "Creates and executes a task immediately. Creates a new Task object and calls executeTask() with zero coordinates.",
           "required": [
             {
-              "name": "array[2]",
+              "name": "Argument 1",
               "description": "Comma-separated task string to execute"
             }
           ],
@@ -1666,10 +1666,10 @@
         },
         {
           "name": "pause",
-          "description": "Pauses execution by adjusting the timer. Subtracts (array[2] * 5) from the timer value.",
+          "description": "Pauses execution by adjusting the timer. Subtracts (Argument 1 * 5) from the timer value.",
           "required": [
             {
-              "name": "array[2]",
+              "name": "Argument 1",
               "description": "Pause duration (float). Multiplied by 5 before subtracting from timer"
             }
           ],
@@ -1681,7 +1681,7 @@
           "description": "Adds a visual effect to the render queue at the current text position. Uses Camera.addFXtoQueue() with 'White' color.",
           "required": [
             {
-              "name": "array[2]",
+              "name": "Argument 1",
               "description": "Effect ID/name to add to queue"
             }
           ],
@@ -1693,7 +1693,7 @@
           "description": "Plays a sound effect.",
           "required": [
             {
-              "name": "array[2]",
+              "name": "Argument 1",
               "description": "Sound effect ID to play"
             }
           ],
@@ -1705,7 +1705,7 @@
           "description": "Advances dialog automatically after a specified delay.",
           "required": [
             {
-              "name": "array[2]",
+              "name": "Argument 1",
               "description": "Delay in seconds (float) before advancing dialog"
             }
           ],
@@ -1717,7 +1717,7 @@
           "description": "Opens the journal to a specific entry. Centers window, disables interaction, plays page flip sound, and optionally shows page turn effect.",
           "required": [
             {
-              "name": "array[2]",
+              "name": "Argument 1",
               "description": "Journal entry ID to open to"
             }
           ],
