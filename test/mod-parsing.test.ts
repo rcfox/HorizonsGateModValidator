@@ -91,7 +91,7 @@ describe('Mod File Parsing', () => {
       expectValid(errors);
       expect(objects).toHaveLength(1);
       const formula = objects[0]?.properties.get('formula')?.value;
-      expect(formula).toBe('c:HP+\t\tc:STR*2+\t\t5');
+      expect(formula).toBe('c:HP+\n\t\tc:STR*2+\n\t\t5');
     });
   });
 

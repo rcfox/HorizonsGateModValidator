@@ -206,7 +206,7 @@ export class ModParser {
     let firstValueToken = true;
 
     // Collect all tokens until semicolon, handling multi-line values
-    const valueParts: string[] = [];
+    const valueParts: { text: string; line: number }[] = [];
     let foundSemicolon = false;
 
     while (!this.isAtEnd() && !this.check(TokenType.LEFT_BRACKET)) {
@@ -249,7 +249,7 @@ export class ModParser {
 
       const token = this.advance();
       if (token.type === TokenType.IDENTIFIER || token.type === TokenType.STRING_VALUE) {
-        valueParts.push(token.value);
+        valueParts.push({ text: token.value, line: token.line });
 
         // Track position of first value token
         if (firstValueToken) {
@@ -263,7 +263,7 @@ export class ModParser {
         valueEndColumn = token.column + token.value.length;
       } else if (token.type === TokenType.EQUALS) {
         // This might be part of a formula like "is:1:value"
-        valueParts.push('=');
+        valueParts.push({ text: '=', line: token.line });
 
         if (firstValueToken) {
           valueStartLine = token.line;
@@ -276,7 +276,14 @@ export class ModParser {
       }
     }
 
-    value = valueParts.join('');
+    // Join value parts, adding newlines between tokens on different lines
+    value = valueParts.reduce((acc, part, idx) => {
+      if (idx === 0) return part.text;
+      const prevLine = valueParts[idx - 1]!.line;
+      const currentLine = part.line;
+      const newlines = '\n'.repeat(currentLine - prevLine);
+      return acc + newlines + part.text;
+    }, '');
 
     // Check for semicolon
     if (!foundSemicolon && value.length > 0) {

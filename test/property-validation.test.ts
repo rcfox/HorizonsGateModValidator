@@ -79,6 +79,19 @@ describe('Property Validation', () => {
       { value: 'abc', error: 'Invalid float' },
       { value: '' },
     ]);
+
+    // BUG: Invalid float regex allows malformed values
+    // ISSUE: property-validator.ts:219 regex /^-?\d*\.?\d*([eE][+-]?\d+)?$/
+    //        allows zero digits before AND after decimal point
+    // GAME BEHAVIOR: float.Parse() throws FormatException for these values
+    describe('Invalid formats (CURRENTLY FAILING - should error)', () => {
+      checkTestCases('float', [
+        { value: '.', error: 'Invalid float' }, // Just a decimal point
+        { value: '-', error: 'Invalid float' }, // Just a minus sign
+        { value: 'e5', error: 'Invalid float' }, // Missing mantissa
+        { value: '-.', error: 'Invalid float' }, // Minus and decimal only
+      ]);
+    });
   });
 
   describe('Byte validation', () => {
