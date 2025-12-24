@@ -165,6 +165,11 @@ export function initDynamicTextApp(): void {
     const hasAliases = tag.aliases && tag.aliases.length > 0;
     const hasCommands = tag.commands && tag.commands.length > 0;
     const tagUrl = `${window.location.origin}${window.location.pathname}?tag=${encodeURIComponent(tag.name)}`;
+    const issueTitle = encodeURIComponent(`[Dynamic Text Documentation] Issue with "${tag.name}" tag`);
+    const issueBody = encodeURIComponent(
+      `**Tag Name:** \`${tag.name}\`\n\n**Issue Description:**\n<!-- Describe what's wrong or unclear about this tag's documentation -->\n\n\n**Expected:**\n<!-- What should the documentation say? -->\n\n\n<!-- Please provide as much detail as possible -->`
+    );
+    const issueUrl = `https://github.com/rcfox/HorizonsGateModValidator/issues/new?title=${issueTitle}&body=${issueBody}`;
 
     return `
       <details class="tag-item" data-tag-name="${tag.name}">
@@ -245,6 +250,10 @@ export function initDynamicTextApp(): void {
           </div>`
               : ''
           }
+
+          <div class="tag-disclaimer">
+            Due to the number of tags, these descriptions were initially generated using AI. Report any mistakes here: <a href="${issueUrl}" target="_blank" class="disclaimer-report-link">Report Issue</a>
+          </div>
         </div>
       </details>`;
   }
