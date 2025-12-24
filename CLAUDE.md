@@ -18,7 +18,7 @@ npm run build:cli
 
 **Basic usage:**
 ```bash
-./dist/cli.js <paths...> [options]
+./dist/src/cli.js <paths...> [options]
 ```
 
 **Options:**
@@ -103,6 +103,10 @@ file.txt:71: warning: Numeric enum value used for itemCategory
 - **mod-schema.json** - Generated schema with class definitions, type aliases, and enums
 - **mod-schema.d.ts** - TypeScript definitions for schema
 
+### Tests (`/test`)
+- **test-utils.ts** - Contains several helper functions for writing tests.
+- Several test files, named by functionality.
+
 ### Web UI (`/public`)
 - **index.html** - Main validator page
 - **app.js** - UI logic, theme management, validation triggers, auto-correction
@@ -150,13 +154,6 @@ file.txt:71: warning: Numeric enum value used for itemCategory
 - Filters out:
   - Static properties
   - Duplicate virtual properties (real fields take precedence)
-
-### UI Features
-- **Line numbers** with synchronized scrolling
-- **Click error to jump to line** - Highlights and scrolls to error location
-- **Auto-validation** - Debounced (1s delay) on input
-- **Light/Dark mode** - Defaults to system preference, persisted in localStorage
-- **Sample code** - Intentionally includes errors to demonstrate validation
 
 ## Important Implementation Details
 
@@ -231,7 +228,7 @@ interface Correction {
 ## Development Notes
 
 ### Line Endings
-All files use Unix line endings (`\n`)
+All source files in this project must use Unix line endings (`\n`)
 
 ### C# Source Location
 Schema extraction expects decompiled C# files in the parent directory of the root of this project.
@@ -254,10 +251,53 @@ Schema extraction expects decompiled C# files in the parent directory of the roo
 	element=physical;
 ```
 
-## Future TODOs
-- [X] Add a section of "known issues" to the top of the page.
-- [X] Namespace colliding enum names (e.g., `Action.specialProperty` vs `ItemType.specialProperty`)
-- [X] Handle missing virtual properties on Trigger: topX, topY, btmX, btmY
-- [ ] Better formula parsing: handle arguments for operators, no dangling expressions, @ expressions (@F, @G, etc.)
-- [ ] Task handling: required arguments, task enum check
-- [ ] Dialog handling: Text formatting tags (ie: <foo=bar>)
+## Useful Tools
+
+### Formula AST visualizer
+Displays the AST for a formula, useful for debugging.
+
+**Usage**: ./dist/src/tools/formula-visualizer.js 1+2
+
+**Result**:
+
+```
+{
+  "type": "binaryOp",
+  "operator": "+",
+  "left": {
+    "type": "literal",
+    "value": 1,
+    "startLine": 0,
+    "startColumn": 0,
+    "endLine": 0,
+    "endColumn": 1
+  },
+  "right": {
+    "type": "literal",
+    "value": 2,
+    "startLine": 0,
+    "startColumn": 2,
+    "endLine": 0,
+    "endColumn": 3
+  },
+  "startLine": 0,
+  "startColumn": 0,
+  "endLine": 0,
+  "endColumn": 3
+}
+```
+
+**Usage**: ./dist/src/tools/formula-visualizer.js --format dot 1+2
+
+**Result**: 
+
+```
+digraph AST {
+  node [shape=box];
+  n0 [label="binaryOp\n+"];
+  n1 [label="literal\n1"];
+  n2 [label="literal\n2"];
+  n0 -> n1 [label="left"];
+  n0 -> n2 [label="right"];
+}
+```
