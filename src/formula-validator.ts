@@ -4,7 +4,7 @@
  */
 
 import { ValidationMessage, Correction, PropertyInfo } from './types.js';
-import { parseFormula, validateAST, type ValidationError, type ASTNode, type FunctionArg } from './formula-parser.js';
+import { parseFormula, validateAST, type ValidationError } from './formula-parser.js';
 
 /**
  * Validate a formula string using the AST parser and validator
@@ -61,80 +61,51 @@ export function validateFormula(
 /**
  * Create position-based corrections from formula validation error
  */
-function createCorrections(formula: string, error: ValidationError, propInfo: PropertyInfo): Correction[] {
+function createCorrections(_formula: string, error: ValidationError, propInfo: PropertyInfo): Correction[] {
   if (error.suggestions.length === 0) {
     return [];
   }
 
-  // Get the incorrect text from the node
-  const incorrectText = getNodeText(error.node);
-  if (!incorrectText) {
-    return [];
-  }
+  // Use position information from the AST node (now includes line and column)
+  if (
+    'startLine' in error.node &&
+    'startColumn' in error.node &&
+    'endLine' in error.node &&
+    'endColumn' in error.node
+  ) {
+    const nodeStartLine = error.node.startLine;
+    const nodeStartColumn = error.node.startColumn;
+    const nodeEndLine = error.node.endLine;
+    const nodeEndColumn = error.node.endColumn;
 
-  // Check if any suggestion includes an operator prefix (e.g., "m:distance")
-  // This handles cases where suggestions have prefixes that need to be included in the search
-  let textToFind = incorrectText;
-  const colonSuggestions = error.suggestions.filter(s => s.includes(':'));
-  if (colonSuggestions.length > 0) {
-    const first = colonSuggestions[0];
-    if (!first) {
-      throw new Error('Invalid suggestion');
-    }
+    if (
+      nodeStartLine !== undefined &&
+      nodeStartColumn !== undefined &&
+      nodeEndLine !== undefined &&
+      nodeEndColumn !== undefined
+    ) {
+      // Calculate absolute position by combining node position with property value position
+      // Node positions are relative to the start of the formula value
+      const startLine = propInfo.valueStartLine + nodeStartLine;
+      const endLine = propInfo.valueStartLine + nodeEndLine;
 
-    // Extract the prefix from the first colonsuggestion (they should all have the same prefix)
-    const colonIndex = first.indexOf(':');
-    if (colonIndex > 0) {
-      const prefix = first.substring(0, colonIndex + 1);
-      // Check if the formula contains "prefix:incorrectText"
-      const prefixedText = prefix + incorrectText;
-      if (formula.includes(prefixedText)) {
-        textToFind = prefixedText;
-      }
-    }
-  }
+      // For the first line of the node, add the property value's start column
+      // For subsequent lines, use the column as-is (relative to start of line)
+      const startColumn = nodeStartLine === 0 ? propInfo.valueStartColumn + nodeStartColumn : nodeStartColumn;
+      const endColumn = nodeEndLine === 0 ? propInfo.valueStartColumn + nodeEndColumn : nodeEndColumn;
 
-  // Find the position of the incorrect text in the formula
-  const relativePosition = formula.indexOf(textToFind);
-  if (relativePosition === -1) {
-    return [];
-  }
-
-  // Calculate absolute position within the value
-  // For now, assume single-line formulas (multi-line support would need line tracking)
-  const startColumn = propInfo.valueStartColumn + relativePosition;
-  const endColumn = startColumn + textToFind.length;
-
-  // Create a correction for each suggestion
-  return error.suggestions.map(suggestion => ({
-    filePath: propInfo.filePath,
-    startLine: propInfo.valueStartLine,
-    startColumn,
-    endLine: propInfo.valueEndLine,
-    endColumn,
-    replacementText: suggestion,
-  }));
-}
-
-/**
- * Extract the text to be replaced from an AST node
- */
-function getNodeText(node: ASTNode | FunctionArg): string | null {
-  if ('type' in node) {
-    switch (node.type) {
-      case 'function':
-        return node.name;
-      case 'global':
-        return node.name;
-      case 'mathFunction':
-        return node.name;
-      case 'string':
-        return node.value;
-      case 'functionStyle':
-        return node.name;
-      default:
-        return null;
+      // Create a correction for each suggestion
+      return error.suggestions.map(suggestion => ({
+        filePath: propInfo.filePath,
+        startLine,
+        startColumn,
+        endLine,
+        endColumn,
+        replacementText: suggestion,
+      }));
     }
   }
-  return null;
+
+  // This shouldn't happen with the new position tracking, but keep as fallback
+  return [];
 }

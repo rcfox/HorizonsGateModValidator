@@ -12,7 +12,7 @@
  *   node dist/formula-visualizer.js --format dot "c:HP*2+5" | dot -Tpng -o ast.png
  */
 
-import { parseFormula, type ASTNode } from './formula-parser.js';
+import { parseFormula, type ASTNode } from '../formula-parser.js';
 
 /**
  * Escapes special characters for DOT label strings

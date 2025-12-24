@@ -242,6 +242,27 @@ describe('Formula Parsing', () => {
           body: undefined,
         },
       },
+      // Underscores are allowed WITHIN identifiers (verified against Tactics/Data.cs)
+      // Game examples: c:skill_Aim, c:skill_Sword, d:d_vicious, sa:cannon_longShot
+      // Note: Leading underscores (c:_foo) are correctly rejected and not used by the game
+      {
+        formula: 'c:skill_Sword',
+        expectedAST: {
+          type: 'function',
+          name: 'c',
+          args: [{ type: 'string', value: 'skill_Sword' }],
+          body: undefined,
+        },
+      },
+      {
+        formula: 'd:d_vicious',
+        expectedAST: {
+          type: 'function',
+          name: 'd',
+          args: [{ type: 'string', value: 'd_vicious' }],
+          body: undefined,
+        },
+      },
       {
         formula: 't:STR',
         expectedAST: {
@@ -430,6 +451,7 @@ describe('Formula Parsing', () => {
       { formula: 'min:+5', error: 'math operator cannot appear' },
       { formula: 'min: d:foo', error: 'space cannot appear after colon' },
       { formula: 'abs:&', error: 'colon must be followed by a letter or digit' },
+      { formula: 'd:_test', error: 'colon must be followed by a letter or digit' },
     ]);
   });
 
