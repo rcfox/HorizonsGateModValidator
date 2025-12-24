@@ -3,7 +3,15 @@
  * Uses shared utilities for common functionality
  */
 
-import { initTheme, setupSearch, setupExpandCollapse, setupCopyButtons, getElementById, querySelectorAs, querySelectorAllAs } from './shared-utils.js';
+import {
+  initTheme,
+  setupSearch,
+  setupExpandCollapse,
+  setupCopyButtons,
+  getElementById,
+  querySelectorAs,
+  querySelectorAllAs,
+} from './shared-utils.js';
 import rawTasksData from '../tasks.json';
 
 interface TaskArgument {
@@ -27,54 +35,56 @@ const tasksData = rawTasksData as TasksData;
 
 // Convert array notation to user-friendly variable names
 function convertToFriendlyNames(text: string): string {
-  return text
-    // tileCoords with property access (must come first, most specific)
-    .replace(/tileCoords\[(\d+)\]\.X/g, (_match, num) => {
-      const n = parseInt(num);
-      return n === 0 ? 'xValue' : `xValue${n + 1}`;
-    })
-    .replace(/tileCoords\[(\d+)\]\.Y/g, (_match, num) => {
-      const n = parseInt(num);
-      return n === 0 ? 'yValue' : `yValue${n + 1}`;
-    })
+  return (
+    text
+      // tileCoords with property access (must come first, most specific)
+      .replace(/tileCoords\[(\d+)\]\.X/g, (_match, num) => {
+        const n = parseInt(num);
+        return n === 0 ? 'xValue' : `xValue${n + 1}`;
+      })
+      .replace(/tileCoords\[(\d+)\]\.Y/g, (_match, num) => {
+        const n = parseInt(num);
+        return n === 0 ? 'yValue' : `yValue${n + 1}`;
+      })
 
-    // tileCoords general (any index or no index)
-    .replace(/tileCoords\[\d+\]/g, '(xValue, yValue)')
-    .replace(/tileCoords/g, '(xValue, yValue)')
+      // tileCoords general (any index or no index)
+      .replace(/tileCoords\[\d+\]/g, '(xValue, yValue)')
+      .replace(/tileCoords/g, '(xValue, yValue)')
 
-    // strings (specific indexes first, then general)
-    .replace(/strings\[0\]/g, 'sValue')
-    .replace(/strings\[1\]/g, 'sValue2')
-    .replace(/strings\[(\d+)\]/g, (_match, num) => {
-      const n = parseInt(num);
-      return n === 0 ? 'sValue' : `sValue${n + 1}`;
-    })
+      // strings (specific indexes first, then general)
+      .replace(/strings\[0\]/g, 'sValue')
+      .replace(/strings\[1\]/g, 'sValue2')
+      .replace(/strings\[(\d+)\]/g, (_match, num) => {
+        const n = parseInt(num);
+        return n === 0 ? 'sValue' : `sValue${n + 1}`;
+      })
 
-    // floats
-    .replace(/floats\[0\]/g, 'fValue')
-    .replace(/floats\[1\]/g, 'fValue2')
-    .replace(/floats\[(\d+)\]/g, (_match, num) => {
-      const n = parseInt(num);
-      return n === 0 ? 'fValue' : `fValue${n + 1}`;
-    })
+      // floats
+      .replace(/floats\[0\]/g, 'fValue')
+      .replace(/floats\[1\]/g, 'fValue2')
+      .replace(/floats\[(\d+)\]/g, (_match, num) => {
+        const n = parseInt(num);
+        return n === 0 ? 'fValue' : `fValue${n + 1}`;
+      })
 
-    // bools
-    .replace(/bools\[0\]/g, 'bValue1')
-    .replace(/bools\[1\]/g, 'bValue2')
-    .replace(/bools\[(\d+)\]/g, (_match, num) => `bValue${parseInt(num) + 1}`);
+      // bools
+      .replace(/bools\[0\]/g, 'bValue1')
+      .replace(/bools\[1\]/g, 'bValue2')
+      .replace(/bools\[(\d+)\]/g, (_match, num) => `bValue${parseInt(num) + 1}`)
+  );
 }
 
 // Convert task data to use friendly names
 function convertTaskData(tasks: Task[]): Task[] {
-  return tasks.map((task) => ({
+  return tasks.map(task => ({
     ...task,
     name: convertToFriendlyNames(task.name),
     description: convertToFriendlyNames(task.description),
-    required: task.required.map((arg) => ({
+    required: task.required.map(arg => ({
       name: convertToFriendlyNames(arg.name),
       description: convertToFriendlyNames(arg.description),
     })),
-    optional: task.optional.map((arg) => ({
+    optional: task.optional.map(arg => ({
       name: convertToFriendlyNames(arg.name),
       description: convertToFriendlyNames(arg.description),
     })),
@@ -97,10 +107,8 @@ export function initTasksApp(): void {
     searchInputId: 'searchInput',
     clearButtonId: 'clearSearch',
     highlightToggleId: 'highlightToggle',
-    onSearch: (searchTerm) => {
-      filteredTasks = searchTerm
-        ? convertedTasks.filter((task) => searchTask(task, searchTerm))
-        : convertedTasks;
+    onSearch: searchTerm => {
+      filteredTasks = searchTerm ? convertedTasks.filter(task => searchTask(task, searchTerm)) : convertedTasks;
       renderTasks(filteredTasks, search.highlightMatch);
       updateCount(filteredTasks.length, convertedTasks.length);
     },
@@ -124,13 +132,10 @@ export function initTasksApp(): void {
   const urlParams = new URLSearchParams(window.location.search);
   const taskParam = urlParams.get('task');
   if (taskParam) {
-    const matchingTask = convertedTasks.find((task) => task.name.toLowerCase() === taskParam.toLowerCase());
+    const matchingTask = convertedTasks.find(task => task.name.toLowerCase() === taskParam.toLowerCase());
 
     if (matchingTask) {
-      const taskElement = querySelectorAs(
-        `.task-item[data-task-name="${matchingTask.name}"]`,
-        HTMLDetailsElement
-      );
+      const taskElement = querySelectorAs(`.task-item[data-task-name="${matchingTask.name}"]`, HTMLDetailsElement);
 
       if (taskElement) {
         taskElement.open = true;
@@ -149,11 +154,15 @@ export function initTasksApp(): void {
     if (task.name.toLowerCase().includes(term)) return true;
     if (task.description.toLowerCase().includes(term)) return true;
 
-    if (task.required.some((arg) => arg.name.toLowerCase().includes(term) || arg.description.toLowerCase().includes(term))) {
+    if (
+      task.required.some(arg => arg.name.toLowerCase().includes(term) || arg.description.toLowerCase().includes(term))
+    ) {
       return true;
     }
 
-    if (task.optional.some((arg) => arg.name.toLowerCase().includes(term) || arg.description.toLowerCase().includes(term))) {
+    if (
+      task.optional.some(arg => arg.name.toLowerCase().includes(term) || arg.description.toLowerCase().includes(term))
+    ) {
       return true;
     }
 
@@ -170,17 +179,17 @@ export function initTasksApp(): void {
 
     // Save current open state of all tasks
     const openStates = new Map<string, boolean>();
-    querySelectorAllAs('.task-item', HTMLDetailsElement, tasksList).forEach((item) => {
+    querySelectorAllAs('.task-item', HTMLDetailsElement, tasksList).forEach(item => {
       const taskName = item.getAttribute('data-task-name');
       if (taskName) {
         openStates.set(taskName, item.open);
       }
     });
 
-    tasksList.innerHTML = tasks.map((task) => renderTask(task, highlightMatch)).join('');
+    tasksList.innerHTML = tasks.map(task => renderTask(task, highlightMatch)).join('');
 
     // Restore open state
-    querySelectorAllAs('.task-item', HTMLDetailsElement, tasksList).forEach((item) => {
+    querySelectorAllAs('.task-item', HTMLDetailsElement, tasksList).forEach(item => {
       const taskName = item.getAttribute('data-task-name');
       if (taskName && openStates.has(taskName)) {
         item.open = openStates.get(taskName)!;
@@ -218,7 +227,7 @@ export function initTasksApp(): void {
               <ul class="arguments-list">
                 ${task.required
                   .map(
-                    (arg) => `
+                    arg => `
                   <li class="argument-item">
                     <code class="argument-name">${highlight(arg.name)}</code>
                     <span class="argument-description">${highlight(arg.description)}</span>
@@ -238,7 +247,7 @@ export function initTasksApp(): void {
               <ul class="arguments-list">
                 ${task.optional
                   .map(
-                    (arg) => `
+                    arg => `
                   <li class="argument-item">
                     <code class="argument-name">${highlight(arg.name)}</code>
                     <span class="argument-description">${highlight(arg.description)}</span>

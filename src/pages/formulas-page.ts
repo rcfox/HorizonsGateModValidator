@@ -3,7 +3,14 @@
  * Uses shared utilities for common functionality
  */
 
-import { initTheme, setupSearch, setupExpandCollapse, setupCopyButtons, getElementById, querySelectorAllAs } from './shared-utils.js';
+import {
+  initTheme,
+  setupSearch,
+  setupExpandCollapse,
+  setupCopyButtons,
+  getElementById,
+  querySelectorAllAs,
+} from './shared-utils.js';
 import rawFormulasData from '../formula.json';
 
 interface FormulaArgument {
@@ -51,10 +58,8 @@ export function initFormulasApp(): void {
     searchInputId: 'searchInput',
     clearButtonId: 'clearSearch',
     highlightToggleId: 'highlightToggle',
-    onSearch: (searchTerm) => {
-      filteredOperators = searchTerm
-        ? sortedOperators.filter((op) => searchOperator(op, searchTerm))
-        : sortedOperators;
+    onSearch: searchTerm => {
+      filteredOperators = searchTerm ? sortedOperators.filter(op => searchOperator(op, searchTerm)) : sortedOperators;
       renderOperators(filteredOperators, search.highlightMatch);
       updateCount(filteredOperators.length, formulasData.operators.length);
     },
@@ -79,7 +84,7 @@ export function initFormulasApp(): void {
   const operatorParam = urlParams.get('operator');
   if (operatorParam) {
     const matchingOperator = formulasData.operators.find(
-      (op) => op.name === operatorParam || (op.aliases && op.aliases.includes(operatorParam))
+      op => op.name === operatorParam || (op.aliases && op.aliases.includes(operatorParam))
     );
 
     if (matchingOperator) {
@@ -89,13 +94,13 @@ export function initFormulasApp(): void {
       );
 
       if (operatorElements.length > 0) {
-        operatorElements.forEach((element) => {
+        operatorElements.forEach(element => {
           element.open = true;
         });
 
         setTimeout(() => {
           operatorElements[0]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          operatorElements.forEach((element) => {
+          operatorElements.forEach(element => {
             element.classList.add('operator-highlight');
             setTimeout(() => element.classList.remove('operator-highlight'), 2000);
           });
@@ -107,19 +112,23 @@ export function initFormulasApp(): void {
   function searchOperator(operator: FormulaOperator, searchTerm: string): boolean {
     const term = searchTerm.toLowerCase();
     if (operator.name.toLowerCase().includes(term)) return true;
-    if (operator.aliases && operator.aliases.some((a) => a.toLowerCase().includes(term))) return true;
+    if (operator.aliases && operator.aliases.some(a => a.toLowerCase().includes(term))) return true;
     if (operator.category.toLowerCase().includes(term)) return true;
 
-    return operator.uses.some((use) => {
+    return operator.uses.some(use => {
       if (use.description.toLowerCase().includes(term)) return true;
       if (use.example.toLowerCase().includes(term)) return true;
       if (use.returns.toLowerCase().includes(term)) return true;
-      if (use.arguments?.some((arg) =>
-        arg.name.toLowerCase().includes(term) ||
-        arg.type.toLowerCase().includes(term) ||
-        arg.description.toLowerCase().includes(term)
-      )) return true;
-      if (use.requires?.some((req) => req.toLowerCase().includes(term))) return true;
+      if (
+        use.arguments?.some(
+          arg =>
+            arg.name.toLowerCase().includes(term) ||
+            arg.type.toLowerCase().includes(term) ||
+            arg.description.toLowerCase().includes(term)
+        )
+      )
+        return true;
+      if (use.requires?.some(req => req.toLowerCase().includes(term))) return true;
       return false;
     });
   }
@@ -132,7 +141,7 @@ export function initFormulasApp(): void {
       return;
     }
 
-    operatorsList.innerHTML = operators.map((op) => renderOperator(op, highlightMatch)).join('');
+    operatorsList.innerHTML = operators.map(op => renderOperator(op, highlightMatch)).join('');
   }
 
   function renderOperator(operator: FormulaOperator, highlight: (text: string) => string): string {
@@ -155,7 +164,7 @@ export function initFormulasApp(): void {
           if (!use.arguments || use.arguments.length === 0) {
             signature = operator.name;
           } else if (operator.name.startsWith('m:')) {
-            const allArgs = use.arguments.map((arg) => arg.name).join(':');
+            const allArgs = use.arguments.map(arg => arg.name).join(':');
             signature = `${operator.name}(${allArgs})`;
           } else if (use.arguments.length === 1) {
             signature = `${operator.name}:${use.arguments[0]?.name}`;
@@ -163,12 +172,12 @@ export function initFormulasApp(): void {
             const firstArg = use.arguments[0]?.name;
             const restArgs = use.arguments
               .slice(1)
-              .map((arg) => arg.name)
+              .map(arg => arg.name)
               .join(':');
             signature = `${operator.name}:${firstArg}(${restArgs})`;
           }
         } else {
-          const argNames = use.arguments ? use.arguments.map((arg) => arg.name).join(':') : '';
+          const argNames = use.arguments ? use.arguments.map(arg => arg.name).join(':') : '';
           signature = argNames ? `${operator.name}:${argNames}` : operator.name;
         }
 
@@ -198,7 +207,7 @@ export function initFormulasApp(): void {
             <div class="info-section">
               <h4 class="info-header">Aliases</h4>
               <div class="info-content">
-                <code class="info-code">${operator.aliases!.map((a) => highlight(a)).join(', ')}</code>
+                <code class="info-code">${operator.aliases!.map(a => highlight(a)).join(', ')}</code>
               </div>
             </div>`
                 : ''
@@ -213,7 +222,7 @@ export function initFormulasApp(): void {
               <ul class="arguments-list">
                 ${use
                   .arguments!.map(
-                    (arg) => `
+                    arg => `
                   <li class="argument-item">
                     <div class="argument-header">
                       <code class="argument-name">${highlight(arg.name)}</code>
