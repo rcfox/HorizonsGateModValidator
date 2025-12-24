@@ -110,6 +110,81 @@ h1 {
     background-color: var(--code-bg);
 }
 
+/* Navigation dropdown menu */
+.nav-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.nav-menu-button {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: 1px solid var(--border-color);
+    background: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nav-menu-button:hover {
+    background-color: var(--code-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.nav-menu-button::after {
+    content: '▼';
+    font-size: 0.7rem;
+    transition: transform 0.2s;
+}
+
+.nav-menu.open .nav-menu-button::after {
+    transform: rotate(180deg);
+}
+
+.nav-menu-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    min-width: 200px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    padding: 6px 0;
+}
+
+.nav-menu.open .nav-menu-dropdown {
+    display: block;
+}
+
+.nav-menu-dropdown .nav-link {
+    display: block;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 0;
+    font-size: 0.9rem;
+}
+
+.nav-menu-dropdown .nav-link:hover {
+    background-color: var(--code-bg);
+    border: none;
+}
+
+.nav-menu-separator {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 6px 0;
+}
+
 /* Known issues - ALL PAGES */
 .known-issues {
     background: var(--surface-color);

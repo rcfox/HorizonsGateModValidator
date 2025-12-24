@@ -1,0 +1,190 @@
+/* Dynamic text page specific styles (dynamic-text.html only) */
+
+.tag-name {
+  min-width: 150px;
+}
+
+/* Required/Optional argument styling */
+.arguments-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.arguments-header.required {
+  color: var(--error-color);
+}
+
+.arguments-header.required::before {
+  content: '●';
+  font-size: 10px;
+}
+
+.arguments-header.optional {
+  color: var(--info-color);
+}
+
+.arguments-header.optional::before {
+  content: '○';
+  font-size: 10px;
+}
+
+.arguments-header.required ~ .arguments-list .argument-item {
+  border-left-color: var(--error-color);
+  background: rgba(245, 34, 45, 0.03);
+}
+
+.arguments-header.optional ~ .arguments-list .argument-item {
+  border-left-color: var(--info-color);
+  background: rgba(24, 144, 255, 0.03);
+}
+
+.argument-name {
+  background: var(--code-bg);
+  display: inline-block;
+  align-self: flex-start;
+}
+
+/* Aliases section (similar to formulas) */
+.tag-info-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-header {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.info-content {
+  padding: 10px 12px;
+  background: var(--code-bg);
+  border-left: 3px solid var(--primary-color);
+  border-radius: 4px;
+}
+
+.info-code {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  color: var(--text-color);
+  word-break: break-all;
+}
+
+/* Subcommands styling - nested collapsible items */
+.subcommands-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.subcommands-header {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text-color);
+}
+
+.subcommands-list {
+  margin-left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Nested tag items (subcommands) */
+.subcommand-item {
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-color);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.subcommand-item:hover {
+  border-color: var(--primary-color);
+}
+
+.subcommand-item[open] {
+  border-color: var(--primary-color);
+  background: var(--code-bg);
+}
+
+.subcommand-summary {
+  cursor: pointer;
+  padding: 12px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  list-style: none;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.subcommand-summary::before {
+  content: '▶';
+  color: var(--text-muted);
+  font-size: 10px;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.subcommand-item[open] .subcommand-summary::before {
+  transform: rotate(90deg);
+}
+
+.subcommand-summary:hover {
+  background: var(--surface-color);
+}
+
+.subcommand-summary::-webkit-details-marker {
+  display: none;
+}
+
+.subcommand-name {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.subcommand-brief {
+  color: var(--text-muted);
+  font-size: 13px;
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subcommand-details {
+  padding: 0 16px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.subcommand-description {
+  color: var(--text-color);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* No subcommands placeholder */
+.no-subcommands {
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 8px 0;
+}

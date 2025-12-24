@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Horizon's Gate Dynamic Text Reference</title>
+    <link rel="stylesheet" href="shared-base.css" />
+    <link rel="stylesheet" href="shared-reference.css" />
+    <link rel="stylesheet" href="dynamic-text.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Horizon's Gate Dynamic Text Reference</h1>
+        <div class="header-actions">
+          <div class="nav-menu">
+            <button class="nav-menu-button">Menu</button>
+            <div class="nav-menu-dropdown">
+              <a href="index.html" class="nav-link">Mod Validator</a>
+              <hr class="nav-menu-separator" />
+              <a href="tasks.html" class="nav-link">Task Reference</a>
+              <a href="formulas.html" class="nav-link">Formula Reference</a>
+              <a href="dynamic-text.html" class="nav-link">Dynamic Text Reference</a>
+            </div>
+          </div>
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+            🌙
+          </button>
+        </div>
+      </header>
+
+      <main class="dynamic-text-main">
+        <div class="dynamic-text-section">
+          <div class="section-header">
+            <h2>Dynamic Text Tags</h2>
+            <div id="gameVersion" class="game-version"></div>
+            <div id="tagCount" class="tag-count"></div>
+          </div>
+
+          <div class="search-wrapper">
+            <input
+              type="text"
+              id="searchInput"
+              class="search-input"
+              placeholder="Search tags, descriptions, arguments, or commands..."
+              autocomplete="off"
+            />
+            <button id="clearSearch" class="clear-search" aria-label="Clear search">×</button>
+          </div>
+
+          <div class="dynamic-text-controls">
+            <button id="expandAll" class="btn btn-secondary">Expand All</button>
+            <button id="collapseAll" class="btn btn-secondary">Collapse All</button>
+            <label class="highlight-checkbox">
+              <input type="checkbox" id="highlightToggle" checked />
+              Highlight matches
+            </label>
+          </div>
+
+          <div id="tagsList" class="tags-list">
+            <p class="placeholder">Loading tags...</p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="app.bundle.js"></script>
+  </body>
+</html>

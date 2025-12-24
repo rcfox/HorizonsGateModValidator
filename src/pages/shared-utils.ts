@@ -121,6 +121,9 @@ export function initTheme(storageKey: string = 'theme'): void {
     });
     updateThemeIcon(theme);
   }
+
+  // Initialize navigation dropdown
+  setupNavDropdown();
 }
 
 function updateThemeIcon(theme: string): void {
@@ -332,4 +335,36 @@ export function handleDeepLink<T>(config: DeepLinkConfig<T>): void {
       element.classList.remove(config.highlightClass);
     }, 2000);
   }, 100);
+}
+
+// ============================================================================
+// Navigation Dropdown Menu
+// ============================================================================
+
+export function setupNavDropdown(): void {
+  const navMenu = document.querySelector('.nav-menu');
+  const navMenuButton = document.querySelector('.nav-menu-button');
+
+  if (!navMenu || !navMenuButton) return;
+
+  // Toggle dropdown on button click
+  navMenuButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    navMenu.classList.toggle('open');
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!navMenu.contains(e.target as Node)) {
+      navMenu.classList.remove('open');
+    }
+  });
+
+  // Close dropdown when clicking a link
+  const navLinks = navMenu.querySelectorAll('.nav-link');
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      navMenu.classList.remove('open');
+    });
+  });
 }
