@@ -35,11 +35,15 @@ export function validateFormula(
     for (const error of validationErrors) {
       const corrections = createCorrections(formula, error, propInfo);
 
+      // Calculate actual line number for multi-line formulas
+      // Node positions are relative to formula start, so add to property value start line
+      const errorLine = propInfo.valueStartLine + error.node.startLine;
+
       messages.push({
         ...error, // FIXME: Look into unifying ValidationError and ValidationMessage
         severity: 'error',
         filePath: propInfo.filePath,
-        line: propInfo.valueStartLine,
+        line: errorLine,
         formulaReference: error.operatorName ?? undefined,
         corrections: corrections.length > 0 ? corrections : undefined,
       });

@@ -104,7 +104,7 @@ function validateFunctionCall(node: FunctionCallNode, path: string, allowXParame
   const errors: ValidationError[] = [];
 
   // Resolve alias to canonical name
-  const canonicalName = resolveOperatorAlias(node.name);
+  const canonicalName = resolveOperatorAlias(node.name.value);
   const operator = canonicalName ? operatorMap.get(canonicalName) : undefined;
 
   if (!operator) {
@@ -117,12 +117,12 @@ function validateFunctionCall(node: FunctionCallNode, path: string, allowXParame
       }
     }
     const allNames = [...allOperatorNames, ...allAliases];
-    const similar = findSimilar(node.name, allNames);
+    const similar = findSimilar(node.name.value, allNames);
     const suggestions = similar.map(s => s.value);
 
     errors.push({
-      message: `Unknown operator: '${node.name}'`,
-      node,
+      message: `Unknown operator: '${node.name.value}'`,
+      node: node.name, // Use the name node for corrections
       path,
       operatorName: null,
       suggestions,
@@ -138,10 +138,10 @@ function validateFunctionCall(node: FunctionCallNode, path: string, allowXParame
     canonicalName === 'm' || canonicalName === 'd' || operator.delegatesTo === 'm' || operator.delegatesTo === 'd';
   if (operator.isFunctionStyle && !isMathOperator) {
     errors.push({
-      message: `Operator '${node.name}' requires function-style syntax with parentheses, not colon-separated. Example: ${operator.uses[0]?.example || node.name + '(...)'}`,
-      node,
+      message: `Operator '${node.name.value}' requires function-style syntax with parentheses, not colon-separated. Example: ${operator.uses[0]?.example || node.name.value + '(...)'}`,
+      node: node.name, // Use the name node for corrections
       path,
-      operatorName: node.name,
+      operatorName: node.name.value,
       suggestions: [],
     });
   }
@@ -159,16 +159,16 @@ function validateFunctionCall(node: FunctionCallNode, path: string, allowXParame
     const possiblePatterns = operator.uses.map(use => {
       const args = use.arguments || [];
       if (args.length === 0) {
-        return `${node.name} (no arguments)`;
+        return `${node.name.value} (no arguments)`;
       }
-      return `${node.name}:${args.map(a => a.name).join(':')}`;
+      return `${node.name.value}:${args.map(a => a.name).join(':')}`;
     });
 
     errors.push({
-      message: `Operator '${node.name}' does not have a use case with ${providedArgs} argument(s). Possible patterns: ${possiblePatterns.join(' OR ')}`,
-      node,
+      message: `Operator '${node.name.value}' does not have a use case with ${providedArgs} argument(s). Possible patterns: ${possiblePatterns.join(' OR ')}`,
+      node: node.name, // Use the name node for corrections
       path,
-      operatorName: node.name,
+      operatorName: node.name.value,
       suggestions: [],
     });
 
@@ -188,7 +188,7 @@ function validateFunctionCall(node: FunctionCallNode, path: string, allowXParame
     const expectedArg = expectedArgs[i];
     if (!expectedArg) return;
 
-    errors.push(...validateFunctionArg(arg, expectedArg, node.name, `${path}.args[${i}]`, allowXParameter));
+    errors.push(...validateFunctionArg(arg, expectedArg, node.name.value, `${path}.args[${i}]`, allowXParameter));
   });
 
   // Validate body if present
@@ -196,10 +196,10 @@ function validateFunctionCall(node: FunctionCallNode, path: string, allowXParame
     const formulaArgIndex = expectedArgs.findIndex(a => a.type === 'formula');
     if (formulaArgIndex === -1) {
       errors.push({
-        message: `Operator '${node.name}' does not expect a formula body`,
-        node,
+        message: `Operator '${node.name.value}' does not expect a formula body`,
+        node: node.name, // Use the name node for corrections
         path: `${path}.body`,
-        operatorName: node.name,
+        operatorName: node.name.value,
         suggestions: [],
       });
     } else {
@@ -341,9 +341,9 @@ function validateFunctionArg(
             }
             const allMOperators = [...allMOperatorNames, ...allMAliases];
             const similar = findSimilar(fullOperatorName, allMOperators);
-            // Preserve user's chosen alias prefix (e.g., "math:" or "mIs0:")
-            const userPrefix = operatorName + ':';
-            const suggestions = similar.map(s => s.value.replace(/^m:/, userPrefix));
+            // Strip the m: prefix since we're only replacing the argument part, not the full operator call
+            // The user's chosen prefix (m:, math:, etc.) is already in the source code before the argument
+            const suggestions = similar.map(s => s.value.replace(/^m:/, ''));
 
             errors.push({
               message: `Unknown operator: '${operatorName}:${value}'`,
@@ -400,9 +400,9 @@ function validateFunctionArg(
         }
         const allMOperators = [...allMOperatorNames, ...allMAliases];
         const similar = findSimilar(fullOperatorName, allMOperators);
-        // Preserve user's chosen alias prefix (e.g., "math:" or "mIs0:")
-        const userPrefix = operatorName + ':';
-        const suggestions = similar.map(s => s.value.replace(/^m:/, userPrefix));
+        // Strip the m: prefix since we're only replacing the function name part, not the full operator call
+        // The user's chosen prefix (m:, math:, etc.) is already in the source code before the function name
+        const suggestions = similar.map(s => s.value.replace(/^m:/, ''));
 
         errors.push({
           message: `Unknown operator: '${operatorName}:${arg.name}'`,
@@ -490,12 +490,12 @@ function validateFunctionArg(
  */
 function validateMathFunction(node: MathFunctionNode, path: string, allowXParameter: boolean): ValidationError[] {
   const errors: ValidationError[] = [];
-  const operator = operatorMap.get(node.name);
+  const operator = operatorMap.get(node.name.value);
 
   if (!operator) {
     errors.push({
-      message: `Unknown function-style operator: '${node.name}'`,
-      node,
+      message: `Unknown function-style operator: '${node.name.value}'`,
+      node: node.name, // Use the name node for corrections
       path,
       operatorName: null,
       suggestions: [],
@@ -506,10 +506,10 @@ function validateMathFunction(node: MathFunctionNode, path: string, allowXParame
   // Check if this operator should NOT use function-style syntax
   if (!operator.isFunctionStyle) {
     errors.push({
-      message: `Operator '${node.name}' should use colon-separated syntax, not parentheses. Example: ${operator.uses[0]?.example || node.name + ':...'}`,
-      node,
+      message: `Operator '${node.name.value}' should use colon-separated syntax, not parentheses. Example: ${operator.uses[0]?.example || node.name.value + ':...'}`,
+      node: node.name, // Use the name node for corrections
       path,
-      operatorName: node.name,
+      operatorName: node.name.value,
       suggestions: [],
     });
   }

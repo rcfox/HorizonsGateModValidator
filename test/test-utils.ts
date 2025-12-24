@@ -4,13 +4,52 @@
 
 import { expect } from 'vitest';
 import type { ValidationMessage, ValidationResult, ValidationSeverity } from '../src/types.js';
+import type { ASTNode, PositionInfo } from '../src/formula-parser.js';
+import { AssertionError } from 'chai';
+
+/**
+ * Recursively remove position information from a type.
+ */
+export type WithoutPosition<T> = T extends readonly (infer E)[]
+  ? readonly WithoutPosition<E>[]
+  : T extends object
+    ? Omit<
+        {
+          [K in keyof T]: WithoutPosition<T[K]>;
+        },
+        keyof PositionInfo
+      >
+    : T;
+
+/**
+ * Strip position information from an AST node for test comparisons.
+ * Position tracking is tested separately; structure tests only care about the AST shape.
+ * THIS IS ONLY ALLOWED TO BE USED IN TESTS
+ */
+export function stripPositions<T extends ASTNode>(node: T): WithoutPosition<T>;
+export function stripPositions<T extends ASTNode>(node: readonly T[]): WithoutPosition<T>[];
+export function stripPositions(node: ASTNode | readonly ASTNode[]): unknown {
+  if (Array.isArray(node)) {
+    return node.map(x => stripPositions(x));
+  }
+
+  const positionKeys: readonly (keyof PositionInfo)[] = ['startLine', 'startColumn', 'endLine', 'endColumn'];
+
+  const entries = Object.entries(node)
+    .filter(([key]) => !positionKeys.includes(key as keyof PositionInfo))
+    .map(([key, value]) => [key, value !== null && typeof value === 'object' ? stripPositions(value) : value]);
+
+  return Object.fromEntries(entries);
+}
 
 function assertExhaustive(_param: never): never {
   throw new Error('this should never run');
 }
 
-export function expectToBeDefined<T>(value: T | undefined): asserts value is T {
-  expect(value).toBeDefined();
+export function expectToBeDefined<T>(value: T | undefined | null): asserts value is NonNullable<T> {
+  if (value === null || value === undefined) {
+    throw new AssertionError('expected value to be defined', undefined, expectToBeDefined);
+  }
 }
 
 /**

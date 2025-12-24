@@ -1,23 +1,10 @@
 /**
  * Numeric Literal Parsing Tests
- *
- * Tests for BUG: formula-parser.ts incorrectly rejects valid numeric formats
- *
- * ISSUE: The condition `operand === numValue.toString()` is too strict.
- * It rejects valid numbers like "5.0", ".5", "5.", and scientific notation.
- *
- * GAME BEHAVIOR (verified in Tactics/Formula.cs):
- * - The game's Evaluate() uses XPath's number() function which is very lenient
- * - Accepts: "5", "5.0", ".5", "5.", "1e5", "1.5e-3", etc.
- * - For function-style arguments, int.TryParse fails on decimals, then falls through
- *   to recursive Formula evaluation which uses number()
- *
- * EXPECTED: These should all parse as literal nodes with correct numeric values
- * CURRENT: Many are incorrectly treated as global formula references
  */
 
 import { describe, test, expect } from 'vitest';
-import { parseFormula, type ASTNode, type LiteralNode } from '../src/formula-parser.js';
+import { parseFormula } from '../src/formula-parser.js';
+import { stripPositions } from './test-utils.js';
 
 type LiteralTestCase = {
   formula: string;
@@ -40,7 +27,7 @@ function checkLiterals(testCases: LiteralTestCase[]) {
       }).toThrow(); // Mark as expected to fail for now
     } else {
       const ast = parseFormula(formula);
-      expect(ast).toEqual({ type: 'literal', value: expectedValue } satisfies LiteralNode);
+      expect(stripPositions(ast)).toEqual({ type: 'literal', value: expectedValue });
     }
   });
 }
@@ -54,12 +41,12 @@ describe('Numeric Literal Parsing - Bug: Too Strict Validation', () => {
     ]);
   });
 
-  describe('Decimal formats (CURRENTLY FAILING)', () => {
+  describe('Decimal formats', () => {
     checkLiterals([
-      { formula: '5.0', expectedValue: 5, currentlyFailing: true },
+      { formula: '5.0', expectedValue: 5 },
       { formula: '3.14', expectedValue: 3.14 },
-      { formula: '5.', expectedValue: 5, currentlyFailing: true },
-      { formula: '.5', expectedValue: 0.5, currentlyFailing: true },
+      { formula: '5.', expectedValue: 5 },
+      { formula: '.5', expectedValue: 0.5 },
       { formula: '0.5', expectedValue: 0.5 },
     ]);
 
@@ -69,18 +56,18 @@ describe('Numeric Literal Parsing - Bug: Too Strict Validation', () => {
       expect(ast).toMatchObject({
         type: 'unaryOp',
         operator: '-',
-        operand: { type: 'literal', value: 0.1 }
+        operand: { type: 'literal', value: 0.1 },
       });
     });
   });
 
-  describe('Scientific notation (CURRENTLY FAILING)', () => {
+  describe('Scientific notation', () => {
     checkLiterals([
-      { formula: '1e5', expectedValue: 100000, currentlyFailing: true },
-      { formula: '2E3', expectedValue: 2000, currentlyFailing: true },
-      { formula: '1.5e10', expectedValue: 1.5e10, currentlyFailing: true },
-      { formula: '2.5E-3', expectedValue: 0.0025, currentlyFailing: true },
-      { formula: '1e+3', expectedValue: 1000, currentlyFailing: true },
+      { formula: '1e5', expectedValue: 100000 },
+      { formula: '2E3', expectedValue: 2000 },
+      { formula: '1.5e10', expectedValue: 1.5e10 },
+      { formula: '2.5E-3', expectedValue: 0.0025 },
+      { formula: '1e+3', expectedValue: 1000 },
     ]);
   });
 
@@ -91,7 +78,7 @@ describe('Numeric Literal Parsing - Bug: Too Strict Validation', () => {
         type: 'binaryOp',
         operator: '+',
         left: { type: 'literal', value: 5 },
-        right: { type: 'literal', value: 3 }
+        right: { type: 'literal', value: 3 },
       });
     });
 
@@ -101,7 +88,7 @@ describe('Numeric Literal Parsing - Bug: Too Strict Validation', () => {
         type: 'binaryOp',
         operator: '*',
         left: { type: 'literal', value: 0.5 },
-        right: { type: 'literal', value: 2 }
+        right: { type: 'literal', value: 2 },
       });
     });
   });
@@ -111,12 +98,14 @@ describe('Numeric Literal Parsing - Bug: Too Strict Validation', () => {
       const ast = parseFormula('m:distance(32.5)');
       expect(ast).toMatchObject({
         type: 'function',
-        name: 'm',
-        args: [{
-          type: 'functionStyle',
-          name: 'distance',
-          params: [{ type: 'literal', value: 32.5 }]
-        }]
+        name: { type: 'functionName', value: 'm' },
+        args: [
+          {
+            type: 'functionStyle',
+            name: 'distance',
+            params: [{ type: 'literal', value: 32.5 }],
+          },
+        ],
       });
     });
 
@@ -124,12 +113,14 @@ describe('Numeric Literal Parsing - Bug: Too Strict Validation', () => {
       const ast = parseFormula('d:foo(5.0)');
       expect(ast).toMatchObject({
         type: 'function',
-        name: 'd',
-        args: [{
-          type: 'functionStyle',
-          name: 'foo',
-          params: [{ type: 'literal', value: 5 }]
-        }]
+        name: { type: 'functionName', value: 'd' },
+        args: [
+          {
+            type: 'functionStyle',
+            name: 'foo',
+            params: [{ type: 'literal', value: 5 }],
+          },
+        ],
       });
     });
   });
@@ -137,28 +128,12 @@ describe('Numeric Literal Parsing - Bug: Too Strict Validation', () => {
   describe('Invalid formats (should not be literals)', () => {
     test('non-numeric identifier becomes global formula', () => {
       const ast = parseFormula('abc');
-      expect(ast).toEqual({ type: 'global', name: 'abc', argument: undefined });
+      expect(stripPositions(ast)).toEqual({ type: 'global', name: 'abc' });
     });
 
     test('mixed alphanumeric becomes global formula', () => {
       const ast = parseFormula('5abc');
-      expect(ast).toEqual({ type: 'global', name: '5abc', argument: undefined });
+      expect(stripPositions(ast)).toEqual({ type: 'global', name: '5abc' });
     });
   });
 });
-
-/**
- * NOTES FOR FIX (affects 3 locations):
- *
- * Replace:
- *   if (!isNaN(numValue) && operand === numValue.toString())
- *
- * With:
- *   const num = Number(operand);
- *   if (!isNaN(num) && isFinite(num))
- *
- * Locations:
- * 1. formula-parser.ts:242 - parseOperand()
- * 2. formula-parser.ts:286 - parseParenthesizedOperand()
- * 3. formula-parser.ts:321 - parseFunctionStyleArg()
- */

@@ -46,11 +46,13 @@ export { validateAST, formatValidationErrors, type ValidationError } from './for
 
 /** Position information for AST nodes (relative to start of formula, preserving line breaks) */
 export interface PositionInfo {
-  startLine: number;   // Line offset from start of formula (0 for first line)
+  startLine: number; // Line offset from start of formula (0 for first line)
   startColumn: number; // Column on that line (0-indexed)
-  endLine: number;     // Line offset from start of formula
-  endColumn: number;   // Column on that line (0-indexed, exclusive)
+  endLine: number; // Line offset from start of formula
+  endColumn: number; // Column on that line (0-indexed, exclusive)
 }
+
+export type WithPosition<T> = T & PositionInfo;
 
 // Base node interfaces (internal - without positions)
 interface LiteralNodeBase {
@@ -65,7 +67,7 @@ interface VariableNodeBase {
 
 interface FunctionCallNodeBase {
   type: 'function';
-  name: string; // e.g., 'c', 't', 'min', 'max', 'lessThan', etc.
+  name: FunctionNameNode; // Function name with position tracking
   args: FunctionArg[]; // Colon-separated arguments
   body?: ASTNode | undefined; // For functions that take formula expressions (min, max, lessThan, etc.)
 }
@@ -87,9 +89,14 @@ interface GlobalFormulaNodeBase {
   argument?: ASTNode | undefined; // Optional parenthesized argument
 }
 
+interface FunctionNameNodeBase {
+  type: 'functionName';
+  value: string; // The function name (e.g., 'distance', 'floor', 'm', 'd')
+}
+
 interface MathFunctionNodeBase {
   type: 'mathFunction';
-  name: string; // e.g., 'distance', 'evasionFacing', etc.
+  name: FunctionNameNode; // The function name with position tracking
   argument?: ASTNode | undefined; // Optional parenthesized argument
 }
 
@@ -106,22 +113,23 @@ interface UnaryOperationNodeBase {
   operand: ASTNode;
 }
 
-// Exported node types (with positions)
-export type LiteralNode = LiteralNodeBase & PositionInfo;
-export type VariableNode = VariableNodeBase & PositionInfo;
-export type FunctionCallNode = FunctionCallNodeBase & PositionInfo;
-export type StringArg = StringArgBase & PositionInfo;
-export type FunctionStyleArg = FunctionStyleArgBase & PositionInfo;
-export type GlobalFormulaNode = GlobalFormulaNodeBase & PositionInfo;
-export type MathFunctionNode = MathFunctionNodeBase & PositionInfo;
-export type BinaryOperationNode = BinaryOperationNodeBase & PositionInfo;
-export type UnaryOperationNode = UnaryOperationNodeBase & PositionInfo;
+export type LiteralNode = WithPosition<LiteralNodeBase>;
+export type VariableNode = WithPosition<VariableNodeBase>;
+export type FunctionCallNode = WithPosition<FunctionCallNodeBase>;
+export type StringArg = WithPosition<StringArgBase>;
+export type FunctionStyleArg = WithPosition<FunctionStyleArgBase>;
+export type GlobalFormulaNode = WithPosition<GlobalFormulaNodeBase>;
+export type FunctionNameNode = WithPosition<FunctionNameNodeBase>;
+export type MathFunctionNode = WithPosition<MathFunctionNodeBase>;
+export type BinaryOperationNode = WithPosition<BinaryOperationNodeBase>;
+export type UnaryOperationNode = WithPosition<UnaryOperationNodeBase>;
 
 export type ASTNode =
   | LiteralNode
   | VariableNode
   | FunctionCallNode
   | GlobalFormulaNode
+  | FunctionNameNode
   | MathFunctionNode
   | BinaryOperationNode
   | UnaryOperationNode;
@@ -132,7 +140,7 @@ export type FunctionArg = StringArg | FunctionStyleArg;
  * Position in formula with line and column tracking
  */
 export interface FormulaPosition {
-  line: number;   // Line offset from start (0-indexed)
+  line: number; // Line offset from start (0-indexed)
   column: number; // Column on that line (0-indexed)
   offset: number; // Absolute character offset
 }
@@ -184,13 +192,12 @@ function tokenizeFormula(formula: string): {
       continue;
     }
 
-    // Track start of operand
-    if (!currentOperandStart) {
-      currentOperandStart = { line, column, offset: i };
-    }
-
     // Track parenthesis depth
     if (char === '(') {
+      // Track start of operand if not already tracking
+      if (!currentOperandStart) {
+        currentOperandStart = { line, column, offset: i };
+      }
       parenDepth++;
       currentOperand += char;
       column++;
@@ -208,7 +215,14 @@ function tokenizeFormula(formula: string): {
     }
 
     // Check if this is an operator at depth 0 (top-level operator)
-    if ('+-*/%'.includes(char) && parenDepth === 0) {
+    // Special case: + or - after e/E is part of scientific notation, not an operator
+    // Only matches if: currentOperand is a numeric literal ending with e/E AND next char after +/- is a digit
+    // Examples: "1e+5" (scientific), "1e-10" (scientific), "distance+1" (not scientific)
+    const endsWithScientificE = currentOperand && /^-?(\d+\.?\d*|\d*\.\d+)[eE]$/.test(currentOperand);
+    const nextCharIsDigit = i + 1 < formula.length && /\d/.test(formula[i + 1] ?? '');
+    const isScientificSign = endsWithScientificE && (char === '+' || char === '-') && nextCharIsDigit;
+
+    if ('+-*/%'.includes(char) && parenDepth === 0 && !isScientificSign) {
       // Save current operand if we have one
       if (currentOperand && currentOperandStart) {
         operands.push(currentOperand);
@@ -241,7 +255,10 @@ function tokenizeFormula(formula: string): {
       column++;
       i++;
     } else {
-      // Part of an operand
+      // Part of an operand - track start if not already tracking
+      if (!currentOperandStart) {
+        currentOperandStart = { line, column, offset: i };
+      }
       currentOperand += char;
       column++;
       i++;
@@ -338,9 +355,14 @@ function parseOperand(operand: string, startPos: FormulaPosition): ASTNode {
   const posInfo = createPositionInfo(startPos, operand);
 
   // Check if it's a literal number
-  const numValue = parseFloat(operand);
-  if (!isNaN(numValue) && isFinite(numValue)) {
-    return { type: 'literal', value: numValue, ...posInfo };
+  // Use a regex to ensure the entire operand is numeric (not just a numeric prefix like "5" in "5:10")
+  // This regex allows: integers, decimals, leading/trailing decimal point, scientific notation
+  const numericRegex = /^-?(\d+\.?\d*|\d*\.\d+)([eE][+-]?\d+)?$/;
+  if (numericRegex.test(operand)) {
+    const numValue = parseFloat(operand);
+    if (!isNaN(numValue) && isFinite(numValue)) {
+      return { type: 'literal', value: numValue, ...posInfo };
+    }
   }
 
   // Check if it's the 'x' or 'X' variable
@@ -388,9 +410,12 @@ function parseParenthesizedOperand(operand: string, startPos: FormulaPosition): 
 
   // Try to parse argument as a number or formula
   let argument: ASTNode | undefined;
-  const numValue = parseFloat(argString);
-  if (!isNaN(numValue) && isFinite(numValue)) {
-    argument = { type: 'literal', value: numValue, ...createPositionInfo(argStartPos, argString) };
+  const numericRegex = /^-?(\d+\.?\d*|\d*\.\d+)([eE][+-]?\d+)?$/;
+  if (numericRegex.test(argString)) {
+    const numValue = parseFloat(argString);
+    if (!isNaN(numValue) && isFinite(numValue)) {
+      argument = { type: 'literal', value: numValue, ...createPositionInfo(argStartPos, argString) };
+    }
   } else if (argString === 'x' || argString === 'X') {
     argument = { type: 'variable', name: argString, ...createPositionInfo(argStartPos, argString) };
   } else if (argString) {
@@ -398,7 +423,14 @@ function parseParenthesizedOperand(operand: string, startPos: FormulaPosition): 
     argument = parseFormula(argString, argStartPos);
   }
 
-  return { type: 'mathFunction', name, argument, ...createPositionInfo(startPos, operand) };
+  // Create a FunctionNameNode with position tracking for just the function name
+  const nameNode: FunctionNameNode = {
+    type: 'functionName',
+    value: name,
+    ...createPositionInfo(startPos, name),
+  };
+
+  return { type: 'mathFunction', name: nameNode, argument, ...createPositionInfo(startPos, operand) };
 }
 
 /**
@@ -431,11 +463,14 @@ function parseFunctionStyleArg(arg: string, startPos: FormulaPosition): { name: 
     const paramStart = currentPos;
 
     // Try to parse as number
-    const numValue = parseFloat(param);
-    if (!isNaN(numValue) && isFinite(numValue)) {
-      const result = { type: 'literal' as const, value: numValue, ...createPositionInfo(paramStart, param) };
-      currentPos = advancePosition(currentPos, param + (idx < paramStrings.length - 1 ? ',' : ''));
-      return result;
+    const numericRegex = /^-?(\d+\.?\d*|\d*\.\d+)([eE][+-]?\d+)?$/;
+    if (numericRegex.test(param)) {
+      const numValue = parseFloat(param);
+      if (!isNaN(numValue) && isFinite(numValue)) {
+        const result = { type: 'literal' as const, value: numValue, ...createPositionInfo(paramStart, param) };
+        currentPos = advancePosition(currentPos, param + (idx < paramStrings.length - 1 ? ',' : ''));
+        return result;
+      }
     }
 
     // 'x' and 'X' are always parsed as variables
@@ -563,9 +598,16 @@ function parseFunctionCall(operand: string, startPos: FormulaPosition): Function
     return result;
   });
 
+  // Create a FunctionNameNode with position tracking for just the function name
+  const nameNode: FunctionNameNode = {
+    type: 'functionName',
+    value: functionName,
+    ...createPositionInfo(startPos, functionName),
+  };
+
   return {
     type: 'function',
-    name: functionName,
+    name: nameNode,
     args,
     body,
     ...createPositionInfo(startPos, operand),
@@ -834,8 +876,11 @@ export function printAST(node: ASTNode, indent: string = ''): string {
       }
       return globalStr;
 
+    case 'functionName':
+      return `${indent}FunctionName(${node.value})`;
+
     case 'mathFunction':
-      let mathStr = `${indent}MathFunction(${node.name})`;
+      let mathStr = `${indent}MathFunction(${node.name.value})`;
       if (node.argument) {
         mathStr += '\n' + printAST(node.argument, indent + '  ');
       }

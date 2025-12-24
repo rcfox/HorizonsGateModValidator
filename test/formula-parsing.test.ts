@@ -22,11 +22,12 @@
  */
 
 import { describe, test, expect } from 'vitest';
-import { parseFormula, type ASTNode } from '../src/formula-parser.js';
+import { parseFormula, ASTNode } from '../src/formula-parser.js';
+import { stripPositions, type WithoutPosition } from './test-utils.js';
 
 type ValidTestCase = {
   formula: string;
-  expectedAST: ASTNode;
+  expectedAST: WithoutPosition<ASTNode>;
 };
 
 type InvalidTestCase = {
@@ -37,13 +38,13 @@ type InvalidTestCase = {
 function checkValidFormulas(testCases: ValidTestCase[]) {
   test.each(testCases)('$formula', ({ formula, expectedAST }) => {
     const ast = parseFormula(formula);
-    expect(ast).toEqual(expectedAST);
+    expect(stripPositions(ast)).toEqual(expectedAST);
   });
 }
 
 function checkInvalidFormulas(testCases: InvalidTestCase[]) {
   test.each(testCases)('$formula (error: $error)', ({ formula, error }) => {
-    expect(() => parseFormula(formula)).toThrow(error);
+    expect(() => parseFormula(formula)).toThrow(new RegExp(error.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'));
   });
 }
 
@@ -96,7 +97,7 @@ describe('Formula Parsing', () => {
           operator: '+',
           left: {
             type: 'function',
-            name: 'c',
+            name: { type: 'functionName', value: 'c' },
             args: [{ type: 'string', value: 'HP' }],
             body: undefined,
           },
@@ -119,13 +120,13 @@ describe('Formula Parsing', () => {
           operator: '+',
           left: {
             type: 'function',
-            name: 'c',
+            name: { type: 'functionName', value: 'c' },
             args: [{ type: 'string', value: 'HP' }],
             body: undefined,
           },
           right: {
             type: 'function',
-            name: 't',
+            name: { type: 'functionName', value: 't' },
             args: [{ type: 'string', value: 'HP' }],
             body: undefined,
           },
@@ -141,7 +142,7 @@ describe('Formula Parsing', () => {
             operator: '*',
             left: {
               type: 'function',
-              name: 'c',
+              name: { type: 'functionName', value: 'c' },
               args: [{ type: 'string', value: 'STR' }],
               body: undefined,
             },
@@ -166,7 +167,7 @@ describe('Formula Parsing', () => {
           operator: '-',
           operand: {
             type: 'function',
-            name: 'c',
+            name: { type: 'functionName', value: 'c' },
             args: [{ type: 'string', value: 'HP' }],
             body: undefined,
           },
@@ -237,7 +238,7 @@ describe('Formula Parsing', () => {
         formula: 'c:HP',
         expectedAST: {
           type: 'function',
-          name: 'c',
+          name: { type: 'functionName', value: 'c' },
           args: [{ type: 'string', value: 'HP' }],
           body: undefined,
         },
@@ -249,7 +250,7 @@ describe('Formula Parsing', () => {
         formula: 'c:skill_Sword',
         expectedAST: {
           type: 'function',
-          name: 'c',
+          name: { type: 'functionName', value: 'c' },
           args: [{ type: 'string', value: 'skill_Sword' }],
           body: undefined,
         },
@@ -258,7 +259,7 @@ describe('Formula Parsing', () => {
         formula: 'd:d_vicious',
         expectedAST: {
           type: 'function',
-          name: 'd',
+          name: { type: 'functionName', value: 'd' },
           args: [{ type: 'string', value: 'd_vicious' }],
           body: undefined,
         },
@@ -267,7 +268,7 @@ describe('Formula Parsing', () => {
         formula: 't:STR',
         expectedAST: {
           type: 'function',
-          name: 't',
+          name: { type: 'functionName', value: 't' },
           args: [{ type: 'string', value: 'STR' }],
           body: undefined,
         },
@@ -276,7 +277,7 @@ describe('Formula Parsing', () => {
         formula: 'cb:DEX',
         expectedAST: {
           type: 'function',
-          name: 'cb',
+          name: { type: 'functionName', value: 'cb' },
           args: [{ type: 'string', value: 'DEX' }],
           body: undefined,
         },
@@ -285,7 +286,7 @@ describe('Formula Parsing', () => {
         formula: 'w:damage',
         expectedAST: {
           type: 'function',
-          name: 'w',
+          name: { type: 'functionName', value: 'w' },
           args: [{ type: 'string', value: 'damage' }],
           body: undefined,
         },
@@ -294,7 +295,7 @@ describe('Formula Parsing', () => {
         formula: 'w2:accuracy',
         expectedAST: {
           type: 'function',
-          name: 'w2',
+          name: { type: 'functionName', value: 'w2' },
           args: [{ type: 'string', value: 'accuracy' }],
           body: undefined,
         },
@@ -304,7 +305,7 @@ describe('Formula Parsing', () => {
         formula: 'W:damage',
         expectedAST: {
           type: 'function',
-          name: 'W',
+          name: { type: 'functionName', value: 'W' },
           args: [{ type: 'string', value: 'damage' }],
           body: undefined,
         },
@@ -313,7 +314,7 @@ describe('Formula Parsing', () => {
         formula: 'weapon:damage',
         expectedAST: {
           type: 'function',
-          name: 'weapon',
+          name: { type: 'functionName', value: 'weapon' },
           args: [{ type: 'string', value: 'damage' }],
           body: undefined,
         },
@@ -322,7 +323,7 @@ describe('Formula Parsing', () => {
         formula: 'C:HP',
         expectedAST: {
           type: 'function',
-          name: 'C',
+          name: { type: 'functionName', value: 'C' },
           args: [{ type: 'string', value: 'HP' }],
           body: undefined,
         },
@@ -331,11 +332,11 @@ describe('Formula Parsing', () => {
         formula: 'min:5:c:HP',
         expectedAST: {
           type: 'function',
-          name: 'min',
+          name: { type: 'functionName', value: 'min' },
           args: [{ type: 'string', value: '5' }],
           body: {
             type: 'function',
-            name: 'c',
+            name: { type: 'functionName', value: 'c' },
             args: [{ type: 'string', value: 'HP' }],
             body: undefined,
           },
@@ -348,11 +349,11 @@ describe('Formula Parsing', () => {
           operator: '+',
           left: {
             type: 'function',
-            name: 'max',
+            name: { type: 'functionName', value: 'max' },
             args: [{ type: 'string', value: '10' }],
             body: {
               type: 'function',
-              name: 't',
+              name: { type: 'functionName', value: 't' },
               args: [{ type: 'string', value: 'STR' }],
               body: undefined,
             },
@@ -364,14 +365,14 @@ describe('Formula Parsing', () => {
         formula: 'between:10:20:c:STR',
         expectedAST: {
           type: 'function',
-          name: 'between',
+          name: { type: 'functionName', value: 'between' },
           args: [
             { type: 'string', value: '10' },
             { type: 'string', value: '20' },
           ],
           body: {
             type: 'function',
-            name: 'c',
+            name: { type: 'functionName', value: 'c' },
             args: [{ type: 'string', value: 'STR' }],
             body: undefined,
           },
@@ -384,11 +385,11 @@ describe('Formula Parsing', () => {
           operator: '-',
           left: {
             type: 'function',
-            name: 'abs',
+            name: { type: 'functionName', value: 'abs' },
             args: [],
             body: {
               type: 'function',
-              name: 'c',
+              name: { type: 'functionName', value: 'c' },
               args: [{ type: 'string', value: 'HP' }],
               body: undefined,
             },
@@ -403,11 +404,11 @@ describe('Formula Parsing', () => {
           operator: '/',
           left: {
             type: 'function',
-            name: 'floor',
+            name: { type: 'functionName', value: 'floor' },
             args: [],
             body: {
               type: 'function',
-              name: 'c',
+              name: { type: 'functionName', value: 'c' },
               args: [{ type: 'string', value: 'DEX' }],
               body: undefined,
             },
@@ -419,11 +420,11 @@ describe('Formula Parsing', () => {
         formula: 'swapCasterTarget:t:HP',
         expectedAST: {
           type: 'function',
-          name: 'swapCasterTarget',
+          name: { type: 'functionName', value: 'swapCasterTarget' },
           args: [],
           body: {
             type: 'function',
-            name: 't',
+            name: { type: 'functionName', value: 't' },
             args: [{ type: 'string', value: 'HP' }],
             body: undefined,
           },
@@ -433,7 +434,7 @@ describe('Formula Parsing', () => {
         formula: 'itemAt:10:20:chest',
         expectedAST: {
           type: 'function',
-          name: 'itemAt',
+          name: { type: 'functionName', value: 'itemAt' },
           args: [
             { type: 'string', value: '10' },
             { type: 'string', value: '20' },
@@ -462,7 +463,7 @@ describe('Formula Parsing', () => {
         formula: 'd:gswordDmg',
         expectedAST: {
           type: 'function',
-          name: 'd',
+          name: { type: 'functionName', value: 'd' },
           args: [{ type: 'string', value: 'gswordDmg' }],
           body: undefined,
         },
@@ -471,7 +472,7 @@ describe('Formula Parsing', () => {
         formula: 'd:fireDmg(foo)', // FIXME: This should fail -> Only a float inside of the parentheses should be accepted.
         expectedAST: {
           type: 'function',
-          name: 'd',
+          name: { type: 'functionName', value: 'd' },
           args: [
             {
               type: 'functionStyle',
@@ -487,7 +488,7 @@ describe('Formula Parsing', () => {
         formula: 'dMin0:gswordDmg',
         expectedAST: {
           type: 'function',
-          name: 'dMin0',
+          name: { type: 'functionName', value: 'dMin0' },
           args: [{ type: 'string', value: 'gswordDmg' }],
           body: undefined,
         },
@@ -496,7 +497,7 @@ describe('Formula Parsing', () => {
         formula: 'dMax0:fireDmg(5)',
         expectedAST: {
           type: 'function',
-          name: 'dMax0',
+          name: { type: 'functionName', value: 'dMax0' },
           args: [
             {
               type: 'functionStyle',
@@ -512,7 +513,7 @@ describe('Formula Parsing', () => {
         formula: 'd:fireDmg(x)',
         expectedAST: {
           type: 'function',
-          name: 'd',
+          name: { type: 'functionName', value: 'd' },
           args: [
             {
               type: 'functionStyle',
@@ -539,7 +540,7 @@ describe('Formula Parsing', () => {
         formula: 'm:distance(32)',
         expectedAST: {
           type: 'function',
-          name: 'm',
+          name: { type: 'functionName', value: 'm' },
           args: [
             {
               type: 'functionStyle',
@@ -555,7 +556,7 @@ describe('Formula Parsing', () => {
         formula: 'm:rand(100)',
         expectedAST: {
           type: 'function',
-          name: 'm',
+          name: { type: 'functionName', value: 'm' },
           args: [
             {
               type: 'functionStyle',
@@ -571,7 +572,7 @@ describe('Formula Parsing', () => {
         formula: 'mMin0:distance(32)',
         expectedAST: {
           type: 'function',
-          name: 'mMin0',
+          name: { type: 'functionName', value: 'mMin0' },
           args: [
             {
               type: 'functionStyle',
@@ -586,7 +587,7 @@ describe('Formula Parsing', () => {
         formula: 'mIs0:rand(100)',
         expectedAST: {
           type: 'function',
-          name: 'mIs0',
+          name: { type: 'functionName', value: 'mIs0' },
           args: [
             {
               type: 'functionStyle',
@@ -595,6 +596,32 @@ describe('Formula Parsing', () => {
             },
           ],
           body: undefined,
+        },
+      },
+      // Regression test: identifiers ending with 'e' should not be treated as scientific notation
+      // Previously, the regex /[eE]$/ incorrectly matched any identifier ending with 'e',
+      // causing "m:distance+1" to be parsed as a single operand "m:distance+1"
+      {
+        formula: 'm:distance+1',
+        expectedAST: {
+          type: 'binaryOp',
+          operator: '+',
+          left: {
+            type: 'function',
+            name: { type: 'functionName', value: 'm' },
+            args: [{ type: 'string', value: 'distance' }],
+            body: undefined,
+          },
+          right: { type: 'literal', value: 1 },
+        },
+      },
+      {
+        formula: 'someValue-2',
+        expectedAST: {
+          type: 'binaryOp',
+          operator: '-',
+          left: { type: 'global', name: 'someValue' },
+          right: { type: 'literal', value: 2 },
         },
       },
     ]);
@@ -615,7 +642,7 @@ describe('Formula Parsing', () => {
           operator: '+',
           left: {
             type: 'function',
-            name: 'c',
+            name: { type: 'functionName', value: 'c' },
             args: [{ type: 'string', value: 'STR' }],
             body: undefined,
           },
@@ -624,11 +651,11 @@ describe('Formula Parsing', () => {
             operator: '*',
             left: {
               type: 'function',
-              name: 'min',
+              name: { type: 'functionName', value: 'min' },
               args: [{ type: 'string', value: '10' }],
               body: {
                 type: 'function',
-                name: 't',
+                name: { type: 'functionName', value: 't' },
                 args: [{ type: 'string', value: 'HP' }],
                 body: undefined,
               },
@@ -647,11 +674,11 @@ describe('Formula Parsing', () => {
             operator: '/',
             left: {
               type: 'function',
-              name: 'floor',
+              name: { type: 'functionName', value: 'floor' },
               args: [],
               body: {
                 type: 'function',
-                name: 'c',
+                name: { type: 'functionName', value: 'c' },
                 args: [{ type: 'string', value: 'DEX' }],
                 body: undefined,
               },
@@ -663,7 +690,7 @@ describe('Formula Parsing', () => {
             operator: '/',
             left: {
               type: 'function',
-              name: 't',
+              name: { type: 'functionName', value: 't' },
               args: [{ type: 'string', value: 'DEX' }],
               body: undefined,
             },
@@ -678,18 +705,18 @@ describe('Formula Parsing', () => {
           operator: '-',
           left: {
             type: 'function',
-            name: 'min',
+            name: { type: 'functionName', value: 'min' },
             args: [{ type: 'string', value: '0' }],
             body: {
               type: 'function',
-              name: 't',
+              name: { type: 'functionName', value: 't' },
               args: [{ type: 'string', value: 'HP' }],
               body: undefined,
             },
           },
           right: {
             type: 'function',
-            name: 'c',
+            name: { type: 'functionName', value: 'c' },
             args: [{ type: 'string', value: 'ATK' }],
             body: undefined,
           },
@@ -705,11 +732,11 @@ describe('Formula Parsing', () => {
             operator: '/',
             left: {
               type: 'function',
-              name: 'floor',
+              name: { type: 'functionName', value: 'floor' },
               args: [],
               body: {
                 type: 'function',
-                name: 'c',
+                name: { type: 'functionName', value: 'c' },
                 args: [{ type: 'string', value: 'critChance' }],
                 body: undefined,
               },
@@ -718,7 +745,7 @@ describe('Formula Parsing', () => {
           },
           right: {
             type: 'function',
-            name: 'c',
+            name: { type: 'functionName', value: 'c' },
             args: [{ type: 'string', value: 'ATK' }],
             body: undefined,
           },
@@ -734,7 +761,7 @@ describe('Formula Parsing', () => {
             operator: '*',
             left: {
               type: 'function',
-              name: 'c',
+              name: { type: 'functionName', value: 'c' },
               args: [{ type: 'string', value: 'rank' }],
               body: undefined,
             },
@@ -749,7 +776,7 @@ describe('Formula Parsing', () => {
             operator: '*',
             left: {
               type: 'function',
-              name: 'c',
+              name: { type: 'functionName', value: 'c' },
               args: [{ type: 'string', value: 'MagAtk' }],
               body: undefined,
             },

@@ -77,7 +77,7 @@ function astToDot(ast: ASTNode): string {
             }
           })
           .join(', ');
-        const funcName = escapeDotLabel(node.name);
+        const funcName = escapeDotLabel(node.name.value);
         lines.push(`  n${id} [label="function\\n${funcName}: ${argsStr}"];`);
         if (node.body) {
           const bodyId = addNode(node.body);
@@ -87,12 +87,19 @@ function astToDot(ast: ASTNode): string {
       }
 
       case 'mathFunction': {
-        const name = escapeDotLabel(node.name);
-        lines.push(`  n${id} [label="mathFunction\\n${name}"];`);
+        lines.push(`  n${id} [label="mathFunction"];`);
+        const nameId = addNode(node.name);
+        lines.push(`  n${id} -> n${nameId} [label="name"];`);
         if (node.argument) {
           const argId = addNode(node.argument);
           lines.push(`  n${id} -> n${argId} [label="arg"];`);
         }
+        break;
+      }
+
+      case 'functionName': {
+        const name = escapeDotLabel(node.value);
+        lines.push(`  n${id} [label="functionName\\n${name}"];`);
         break;
       }
 

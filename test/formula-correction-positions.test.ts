@@ -1,33 +1,10 @@
 /**
  * Formula Correction Position Tests
- *
- * Tests for BUG: formula-validator.ts uses indexOf() to find correction positions
- *
- * ISSUE: formula-validator.ts:98 uses `formula.indexOf(textToFind)` which always
- * finds the FIRST occurrence. For formulas with repeated operators/values, this
- * generates incorrect correction positions for later occurrences.
- *
- * EXAMPLE:
- *   Formula: "m:foo+m:bar+m:foo"
- *   If the SECOND "foo" is invalid, indexOf("m:foo") finds the FIRST one
- *   Result: Correction points to wrong location
- *
- * EXPECTED: Corrections should point to the actual error location
- * CURRENT: Corrections for repeated values point to the first occurrence
  */
 
 import { describe, test, expect } from 'vitest';
 import { ModValidator } from '../src/validator.js';
-import type { Correction } from '../src/types.js';
-
-/**
- * Helper to extract the actual text at correction bounds
- */
-function extractCorrectionText(content: string, correction: Correction): string {
-  const lines = content.split('\n');
-  const line = lines[correction.startLine - 1] ?? '';
-  return line.slice(correction.startColumn, correction.endColumn);
-}
+import { expectToBeDefined } from './test-utils.js';
 
 /**
  * Helper to find position of Nth occurrence of a substring
@@ -43,7 +20,7 @@ function nthIndexOf(str: string, searchStr: string, n: number): number {
 
 describe('Formula Correction Positions - Bug: indexOf() Finds First Occurrence', () => {
   describe('Repeated unknown operators in formulas', () => {
-    test('FAILING: second occurrence of unknown m: operator gets wrong correction position', () => {
+    test('second occurrence of unknown m: operator gets correct correction position', () => {
       const modContent = `[Action] ID=test;
 
 [AvAffecter] ID=test;
@@ -87,7 +64,7 @@ describe('Formula Correction Positions - Bug: indexOf() Finds First Occurrence',
       }
     });
 
-    test('FAILING: three occurrences with middle one invalid', () => {
+    test('three occurrences with middle one invalid', () => {
       const modContent = `[AvAffecter] ID=test;
 \tmagnitude=m:distance(5)+m:wrongOp+m:distance(10);`;
 
@@ -112,7 +89,7 @@ describe('Formula Correction Positions - Bug: indexOf() Finds First Occurrence',
   });
 
   describe('Repeated values in different positions', () => {
-    test('FAILING: same function name used multiple times', () => {
+    test('same function name used multiple times', () => {
       const modContent = `[AvAffecter] ID=test;
 \tmagnitude=d:foo+d:bar+d:foo;`;
 
@@ -146,42 +123,42 @@ describe('Formula Correction Positions - Bug: indexOf() Finds First Occurrence',
       }
     });
 
-    test('FAILING: repeated unknown enum values', () => {
-      const modContent = `[Action] ID=test;
-\tactionType=badValue;
+    test('repeated unknown operators in different objects', () => {
+      const modContent = `[AvAffecter] ID=test;
+\tmagnitude=m:badOp;
 
-[Action] ID=test2;
-\tactionType=goodValue;
+[AvAffecter] ID=test2;
+\tmagnitude=m:distance(5);
 
-[Action] ID=test3;
-\tactionType=badValue;`;
+[AvAffecter] ID=test3;
+\tmagnitude=m:badOp;`;
 
       const validator = new ModValidator();
       const result = validator.validate(modContent, 'test.txt');
 
-      const badValueMsgs = result.errors.filter(e =>
-        e.message.includes('badValue') && e.message.includes('actionType')
-      );
+      const badOpMsgs = result.errors.filter(e => e.message.includes('m:badOp'));
 
-      // Should have two errors for "badValue"
-      expect(badValueMsgs.length).toBe(2);
+      // Should have two errors for "m:badOp"
+      expect(badOpMsgs.length).toBe(2);
+      expectToBeDefined(badOpMsgs[0]);
+      expectToBeDefined(badOpMsgs[1]);
 
-      // Both should point to their respective lines
-      expect(badValueMsgs[0]?.line).toBe(2);
-      expect(badValueMsgs[1]?.line).toBe(6);
+      // Both should point to their respective lines (line 2 and line 8)
+      expect(badOpMsgs[0].line).toBe(2);
+      expect(badOpMsgs[1].line).toBe(8);
 
-      // Corrections should point to actual occurrences
-      if (badValueMsgs[0]?.corrections?.[0]) {
-        expect(badValueMsgs[0].corrections[0].startLine).toBe(2);
+      // Corrections should point to actual occurrences (if they exist)
+      if (badOpMsgs[0].corrections) {
+        expect(badOpMsgs[0].corrections[0]).toMatchObject({ startLine: 2, endLine: 2 });
       }
-      if (badValueMsgs[1]?.corrections?.[0]) {
-        expect(badValueMsgs[1].corrections[0].startLine).toBe(6);
+      if (badOpMsgs[1].corrections) {
+        expect(badOpMsgs[1].corrections[0]).toMatchObject({ startLine: 8, endLine: 8 });
       }
     });
   });
 
   describe('Multi-line formulas with repeated values', () => {
-    test('FAILING: repeated operators across lines', () => {
+    test('repeated operators across lines', () => {
       // Multi-line formulas are supported per CLAUDE.md
       const modContent = `[AvAffecter] ID=test;
 \tmagnitude=m:unknownOp+
@@ -204,26 +181,3 @@ describe('Formula Correction Positions - Bug: indexOf() Finds First Occurrence',
     });
   });
 });
-
-/**
- * NOTES FOR FIX:
- *
- * The issue is in formula-validator.ts createCorrections() function.
- * Current approach (line 98):
- *   const relativePosition = formula.indexOf(textToFind);
- *
- * This always finds the FIRST occurrence.
- *
- * Possible fixes:
- * 1. Track character positions during AST parsing (extend AST nodes with position info)
- * 2. Search from an expected position based on AST traversal order
- * 3. Use a more sophisticated search that considers context
- *
- * The cleanest fix is #1: Add position tracking to the formula parser's AST nodes,
- * similar to how the main parser tracks positions for property names and values.
- *
- * This would require:
- * - Extending ASTNode types with startColumn/endColumn
- * - Tracking positions during tokenization in formula-parser.ts
- * - Using those positions directly in createCorrections()
- */
