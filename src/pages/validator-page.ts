@@ -759,10 +759,7 @@ export function initValidatorApp(): void {
     }
 
     // Clear validator cache when loading new files
-    validator.clearCache();
-
-    // Refresh object viewer to clear old data
-    refreshObjectViewer();
+    clearValidatorCache();
 
     // Warn if too many files
     if (fileMap.size > 100) {
@@ -800,7 +797,7 @@ export function initValidatorApp(): void {
       // Reset state
       fileManager = null;
       fileTree = null;
-      validator.clearCache();
+      clearValidatorCache();
       return;
     }
 
@@ -1585,9 +1582,6 @@ export function initValidatorApp(): void {
       clearBtn.textContent = 'Clear';
       loadSampleBtn.style.display = 'inline-block';
 
-      // Clear validator cache
-      validator.clearCache();
-
       // Hide status buttons and show original status, reset view mode
       validationStatus.style.display = '';
       statusButtonsContainer.style.display = 'none';
@@ -1598,7 +1592,9 @@ export function initValidatorApp(): void {
       // Reset tab state
       currentTab = 'messages';
       objectSearchTerm = '';
-      refreshObjectViewer();
+
+      // Clear validator cache and refresh object viewer
+      clearValidatorCache();
 
       // Switch to messages tab in UI
       document.querySelectorAll('.tab-button').forEach(btn => {
@@ -1622,7 +1618,7 @@ export function initValidatorApp(): void {
       validationStatus.className = 'status';
     } else {
       // Single file mode - just clear
-      validator.clearCache();
+      clearValidatorCache();
 
       modInput.value = '';
       updateLineNumbers();
@@ -1630,9 +1626,6 @@ export function initValidatorApp(): void {
         '<p class="placeholder">No validation results yet. Paste your mod code and click "Validate".</p>';
       validationStatus.textContent = '';
       validationStatus.className = 'status';
-
-      // Refresh object viewer to clear it
-      refreshObjectViewer();
     }
   }
 
@@ -1924,6 +1917,16 @@ export function initValidatorApp(): void {
     if (currentTab === 'objects') {
       renderObjectsTab();
     }
+  }
+
+  /**
+   * Clear the validator cache and refresh the object viewer.
+   * INVARIANT: This function must be called whenever validator.clearCache() is called
+   * to keep the object viewer UI synchronized with the validator's internal state.
+   */
+  function clearValidatorCache(): void {
+    validator.clearCache();
+    refreshObjectViewer();
   }
 
   /**
