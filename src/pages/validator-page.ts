@@ -11,7 +11,14 @@ import {
   querySelectorAs,
   assertDefined,
 } from './shared-utils.js';
-import type { ValidationResult, ValidationMessage, Correction } from '../types.js';
+import type {
+  ValidationResult,
+  ValidationMessage,
+  Correction,
+  ObjectDisplayInfo,
+  ObjectGroup,
+  ParsedObject,
+} from '../types.js';
 import { SEVERITY_ORDER } from '../types.js';
 import JSZip from 'jszip';
 
@@ -25,6 +32,8 @@ declare global {
         getCrossFileValidationMessages: () => ValidationMessage[];
         clearCache: () => void;
         removeFromCache: (filePath: string) => void;
+        getParsedObjectsCache: () => Map<string, ParsedObject[]>;
+        resolveFunctionalAlias: (typeName: string) => string;
       };
     };
   }
@@ -278,6 +287,17 @@ export function initValidatorApp(): void {
   let messageIdCounter = 0;
   const generateMessageId = (): string => `message-${messageIdCounter++}`;
 
+  // Tab state for results panel
+  let currentTab: 'messages' | 'objects' = 'messages';
+  let objectsRendered = false; // Lazy rendering flag
+
+  // Object viewer data storage (for XSS safety)
+  const objectsDataMap = new Map<string, ObjectDisplayInfo>();
+  let objectGroups: ObjectGroup[] = []; // Cache of all groups
+  const visibleItemsPerGroup = new Map<string, number>(); // Track visible count per group
+  let objectSearchTerm = ''; // Current search term
+  const ITEMS_PER_PAGE = 100; // Show 100 items at a time
+
   // DOM elements
   const modInput = getElementByIdAs('modInput', HTMLTextAreaElement);
   const validateBtn = getElementByIdAs('validateBtn', HTMLButtonElement);
@@ -370,6 +390,9 @@ export function initValidatorApp(): void {
 
   // Initialize line numbers
   updateLineNumbers();
+
+  // Inject tab structure
+  injectTabStructure();
 
   // Resize handles
   let resizeHandle1: HTMLElement | null = null;
@@ -737,6 +760,9 @@ export function initValidatorApp(): void {
 
     // Clear validator cache when loading new files
     validator.clearCache();
+
+    // Refresh object viewer to clear old data
+    refreshObjectViewer();
 
     // Warn if too many files
     if (fileMap.size > 100) {
@@ -1109,6 +1135,9 @@ export function initValidatorApp(): void {
 
     // Update file tree colors based on validation results
     updateFileTreeSeverityClasses();
+
+    // Refresh object viewer
+    refreshObjectViewer();
   }
 
   function displayAggregatedResults(textFiles: FileNodeTextFile[]): void {
@@ -1476,14 +1505,7 @@ export function initValidatorApp(): void {
   function handleValidate(): void {
     const content = modInput.value;
 
-    if (!content.trim()) {
-      resultsContainer.innerHTML = '<p class="placeholder">No content to validate.</p>';
-      validationStatus.textContent = '';
-      validationStatus.className = 'status';
-      return;
-    }
-
-    // Run validation
+    // Run validation (even if empty - this clears the cache properly)
     setTimeout(() => {
       const filePath = fileManager?.currentFilePath || 'untitled.txt';
       const result = validator.validate(content, filePath);
@@ -1522,11 +1544,25 @@ export function initValidatorApp(): void {
         // Refresh display and file tree
         refreshResultsDisplay();
         updateFileTreeSeverityClasses();
+
+        // Refresh object viewer
+        refreshObjectViewer();
       } else {
         // Single-file mode: get cross-file messages and merge
-        const crossFileMessages = validator.getCrossFileValidationMessages();
-        const resultWithCrossFile = mergeCrossFileMessages(result, filePath, crossFileMessages);
-        displayResults(resultWithCrossFile);
+        if (!content.trim()) {
+          // Show placeholder for empty content
+          resultsContainer.innerHTML = '<p class="placeholder">No content to validate.</p>';
+          validationStatus.textContent = '';
+          validationStatus.className = 'status';
+        } else {
+          // Show validation results
+          const crossFileMessages = validator.getCrossFileValidationMessages();
+          const resultWithCrossFile = mergeCrossFileMessages(result, filePath, crossFileMessages);
+          displayResults(resultWithCrossFile);
+        }
+
+        // Refresh object viewer (even if empty - clears the viewer)
+        refreshObjectViewer();
       }
     }, 100);
   }
@@ -1549,12 +1585,28 @@ export function initValidatorApp(): void {
       clearBtn.textContent = 'Clear';
       loadSampleBtn.style.display = 'inline-block';
 
+      // Clear validator cache
+      validator.clearCache();
+
       // Hide status buttons and show original status, reset view mode
       validationStatus.style.display = '';
       statusButtonsContainer.style.display = 'none';
       resultsViewMode = 'all';
       allFilesStatus.classList.add('active');
       currentFileStatus.classList.remove('active');
+
+      // Reset tab state
+      currentTab = 'messages';
+      objectSearchTerm = '';
+      refreshObjectViewer();
+
+      // Switch to messages tab in UI
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-tab') === 'messages');
+      });
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.getAttribute('data-panel') === 'messages');
+      });
 
       // Remove resize handles
       resizeHandle1?.remove();
@@ -1570,12 +1622,17 @@ export function initValidatorApp(): void {
       validationStatus.className = 'status';
     } else {
       // Single file mode - just clear
+      validator.clearCache();
+
       modInput.value = '';
       updateLineNumbers();
       resultsContainer.innerHTML =
         '<p class="placeholder">No validation results yet. Paste your mod code and click "Validate".</p>';
       validationStatus.textContent = '';
       validationStatus.className = 'status';
+
+      // Refresh object viewer to clear it
+      refreshObjectViewer();
     }
   }
 
@@ -1583,6 +1640,479 @@ export function initValidatorApp(): void {
     modInput.value = SAMPLE_MOD;
     updateLineNumbers();
     handleValidate();
+  }
+
+  /**
+   * Inject tab structure into the results section
+   */
+  function injectTabStructure(): void {
+    // Only inject once
+    if (resultsContainer.parentElement?.querySelector('.results-tabs')) {
+      return;
+    }
+
+    // Create tab buttons
+    const tabsContainer = document.createElement('div');
+    tabsContainer.className = 'results-tabs';
+
+    const messagesTab = document.createElement('button');
+    messagesTab.className = 'tab-button active';
+    messagesTab.dataset['tab'] = 'messages';
+    messagesTab.textContent = 'Messages';
+
+    const objectsTab = document.createElement('button');
+    objectsTab.className = 'tab-button';
+    objectsTab.dataset['tab'] = 'objects';
+    objectsTab.textContent = 'Objects';
+
+    tabsContainer.appendChild(messagesTab);
+    tabsContainer.appendChild(objectsTab);
+
+    // Create tab content wrapper
+    const tabContent = document.createElement('div');
+    tabContent.className = 'tab-content';
+
+    // Wrap existing results container (keep original, don't clone)
+    const messagesPanel = document.createElement('div');
+    messagesPanel.className = 'tab-panel active';
+    messagesPanel.dataset['panel'] = 'messages';
+    messagesPanel.id = 'messages-panel';
+
+    // Create objects panel
+    const objectsPanel = document.createElement('div');
+    objectsPanel.className = 'tab-panel';
+    objectsPanel.dataset['panel'] = 'objects';
+    objectsPanel.innerHTML = '<p class="placeholder">No objects found.</p>';
+
+    // Get parent before moving resultsContainer
+    const parent = resultsContainer.parentElement;
+    if (parent) {
+      // Insert tabs
+      parent.insertBefore(tabsContainer, resultsContainer);
+
+      // Move resultsContainer into messages panel
+      messagesPanel.appendChild(resultsContainer);
+
+      // Add panels to tab content
+      tabContent.appendChild(messagesPanel);
+      tabContent.appendChild(objectsPanel);
+
+      // Insert tab content after tabs
+      parent.insertBefore(tabContent, tabsContainer.nextSibling);
+    }
+
+    // Set up tab click handlers
+    messagesTab.addEventListener('click', () => switchTab('messages'));
+    objectsTab.addEventListener('click', () => switchTab('objects'));
+  }
+
+  /**
+   * Switch between Messages and Objects tabs
+   */
+  function switchTab(tabId: 'messages' | 'objects'): void {
+    currentTab = tabId;
+
+    // Update tab buttons
+    document.querySelectorAll('.tab-button').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+    });
+
+    // Update tab panels
+    document.querySelectorAll('.tab-panel').forEach(panel => {
+      panel.classList.toggle('active', panel.getAttribute('data-panel') === tabId);
+    });
+
+    // Lazy render objects tab on first view
+    if (tabId === 'objects' && !objectsRendered) {
+      renderObjectsTab();
+      objectsRendered = true;
+    }
+  }
+
+  /**
+   * Group parsed objects by their normalized type
+   */
+  function groupObjectsByType(parsedObjectsCache: Map<string, ParsedObject[]>): ObjectGroup[] {
+    const groups = new Map<string, ObjectDisplayInfo[]>();
+
+    for (const [filePath, objects] of parsedObjectsCache) {
+      for (const obj of objects) {
+        const id = obj.properties.get('ID')?.value || null;
+        const normalizedType = validator.resolveFunctionalAlias(obj.type);
+        const uniqueKey = `${filePath}:${obj.typeStartLine}:${obj.typeStartColumn}`;
+
+        const displayInfo: ObjectDisplayInfo = {
+          type: obj.type,
+          normalizedType,
+          id,
+          filePath,
+          position: {
+            typeStartLine: obj.typeStartLine,
+            typeStartColumn: obj.typeStartColumn,
+            typeEndColumn: obj.typeEndColumn,
+          },
+          uniqueKey,
+        };
+
+        if (!groups.has(normalizedType)) {
+          groups.set(normalizedType, []);
+        }
+        groups.get(normalizedType)!.push(displayInfo);
+      }
+    }
+
+    // Sort groups by type name
+    const sortedGroups: ObjectGroup[] = [];
+    const sortedTypes = Array.from(groups.keys()).sort();
+
+    for (const typeName of sortedTypes) {
+      const objects = groups.get(typeName)!;
+
+      // Sort objects within group
+      objects.sort((a, b) => {
+        // Objects with IDs first
+        if (a.id && !b.id) return -1;
+        if (!a.id && b.id) return 1;
+
+        // Then by ID alphabetically
+        if (a.id && b.id) return a.id.localeCompare(b.id);
+
+        // Then by file path and line number
+        const fileDiff = a.filePath.localeCompare(b.filePath);
+        if (fileDiff !== 0) return fileDiff;
+
+        return a.position.typeStartLine - b.position.typeStartLine;
+      });
+
+      sortedGroups.push({
+        typeName,
+        count: objects.length,
+        objects,
+      });
+    }
+
+    return sortedGroups;
+  }
+
+  /**
+   * Filter objects based on search term
+   */
+  function matchesSearch(obj: ObjectDisplayInfo, parsedObj: ParsedObject, searchTerm: string): boolean {
+    if (!searchTerm) return true;
+
+    const lowerSearch = searchTerm.toLowerCase();
+
+    // Match against type
+    if (obj.type.toLowerCase().includes(lowerSearch)) return true;
+    if (obj.normalizedType.toLowerCase().includes(lowerSearch)) return true;
+
+    // Match against ID
+    if (obj.id?.toLowerCase().includes(lowerSearch)) return true;
+
+    // Match against any property name or value
+    for (const [propName, propInfo] of parsedObj.properties) {
+      if (propName.toLowerCase().includes(lowerSearch)) return true;
+      if (propInfo.value.toLowerCase().includes(lowerSearch)) return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Render items for a specific group (lazy rendering)
+   */
+  function renderGroupItems(group: ObjectGroup, itemsContainer: HTMLElement, parsedObjects: ParsedObject[]): void {
+    // Build lookup map for accessing full parsed objects (needed for display)
+    const parsedObjMap = new Map<string, ParsedObject>();
+    for (const obj of parsedObjects) {
+      const key = `${obj.filePath}:${obj.typeStartLine}`;
+      parsedObjMap.set(key, obj);
+    }
+
+    // Filter by search term (skip if no search)
+    let filteredObjects: ObjectDisplayInfo[];
+
+    if (objectSearchTerm) {
+      filteredObjects = group.objects.filter(obj => {
+        const key = `${obj.filePath}:${obj.position.typeStartLine}`;
+        const parsedObj = parsedObjMap.get(key);
+        return parsedObj ? matchesSearch(obj, parsedObj, objectSearchTerm) : false;
+      });
+
+      if (filteredObjects.length === 0) {
+        itemsContainer.innerHTML = '<p class="placeholder" style="padding: 8px;">No matching objects</p>';
+        return;
+      }
+    } else {
+      // No search - use all objects directly
+      filteredObjects = group.objects;
+    }
+
+    // Get visible count (default to ITEMS_PER_PAGE if not set)
+    const visibleCount = visibleItemsPerGroup.get(group.typeName) || ITEMS_PER_PAGE;
+    const visibleObjects = filteredObjects.slice(0, visibleCount);
+    const hasMore = filteredObjects.length > visibleCount;
+
+    // Render items
+    const objectsHtml = visibleObjects
+      .map(obj => {
+        objectsDataMap.set(obj.uniqueKey, obj);
+
+        return `
+          <div class="object-item clickable" data-object-key="${escapeHtml(obj.uniqueKey)}">
+            <span class="object-id"></span>
+            <span class="object-location"></span>
+          </div>
+        `;
+      })
+      .join('');
+
+    let showMoreHtml = '';
+    if (hasMore) {
+      const remaining = filteredObjects.length - visibleCount;
+      const nextBatch = Math.min(remaining, ITEMS_PER_PAGE);
+      showMoreHtml = `<button class="show-more-btn" data-group="${escapeHtml(group.typeName)}">Show ${nextBatch} more...</button>`;
+    }
+
+    itemsContainer.innerHTML = objectsHtml + showMoreHtml;
+
+    // Populate text content for XSS safety
+    const objectItems = itemsContainer.querySelectorAll('.object-item[data-object-key]');
+    objectItems.forEach(item => {
+      const objectKey = item.getAttribute('data-object-key');
+      if (objectKey) {
+        const obj = objectsDataMap.get(objectKey);
+        if (obj) {
+          const idSpan = item.querySelector('.object-id');
+          const locationSpan = item.querySelector('.object-location');
+
+          if (idSpan) {
+            if (obj.id) {
+              idSpan.textContent = obj.id;
+            } else {
+              // Show first 3 properties for objects without ID
+              const key = `${obj.filePath}:${obj.position.typeStartLine}`;
+              const parsedObj = parsedObjMap.get(key);
+              if (parsedObj && parsedObj.properties.size > 0) {
+                const propEntries = Array.from(parsedObj.properties.entries()).slice(0, 3);
+                const propStrings = propEntries.map(([name, info]) => `${name}=${info.value}`);
+                idSpan.textContent = propStrings.join('; ');
+              } else {
+                idSpan.textContent = '(no properties)';
+              }
+            }
+          }
+          if (locationSpan) {
+            locationSpan.textContent = `${obj.filePath}:${obj.position.typeStartLine}`;
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Refresh the object viewer (called whenever validation cache changes)
+   */
+  function refreshObjectViewer(): void {
+    // Reset state
+    objectsRendered = false;
+    objectsDataMap.clear();
+    objectGroups = [];
+    visibleItemsPerGroup.clear();
+
+    // If on Objects tab, re-render
+    if (currentTab === 'objects') {
+      renderObjectsTab();
+    }
+  }
+
+  /**
+   * Show "No objects found" placeholder
+   */
+  function showNoObjectsPlaceholder(): void {
+    const objectsPanel = document.querySelector('[data-panel="objects"]');
+    if (!objectsPanel) return;
+
+    objectsPanel.innerHTML = '<p class="placeholder">No objects found.</p>';
+  }
+
+  /**
+   * Filter and count object groups based on search term
+   */
+  function filterObjectGroups(allParsedObjects: ParsedObject[]): Array<{ group: ObjectGroup; matchCount: number }> {
+    if (objectSearchTerm) {
+      // Build lookup map for performance
+      const parsedObjMap = new Map<string, ParsedObject>();
+      for (const obj of allParsedObjects) {
+        const key = `${obj.filePath}:${obj.typeStartLine}`;
+        parsedObjMap.set(key, obj);
+      }
+
+      return objectGroups
+        .map(group => {
+          const matchingObjects = group.objects.filter(obj => {
+            const key = `${obj.filePath}:${obj.position.typeStartLine}`;
+            const parsedObj = parsedObjMap.get(key);
+            return parsedObj ? matchesSearch(obj, parsedObj, objectSearchTerm) : false;
+          });
+
+          return { group, matchCount: matchingObjects.length };
+        })
+        .filter(g => g.matchCount > 0);
+    } else {
+      // No search - show all groups
+      return objectGroups.map(group => ({ group, matchCount: group.count }));
+    }
+  }
+
+  /**
+   * Create and set up the groups container with lazy rendering
+   */
+  function createGroupsContainer(
+    groupsWithMatches: Array<{ group: ObjectGroup; matchCount: number }>,
+    allParsedObjects: ParsedObject[]
+  ): HTMLElement {
+    const groupsContainer = document.createElement('div');
+    groupsContainer.className = 'object-groups-container';
+
+    const groupsHtml = groupsWithMatches
+      .map(({ group, matchCount }) => {
+        const countDisplay = objectSearchTerm ? `(${matchCount} / ${group.count})` : `(${group.count})`;
+
+        return `
+          <details class="object-group" data-group-name="${escapeHtml(group.typeName)}">
+            <summary class="object-group-header">${escapeHtml(group.typeName)} ${countDisplay}</summary>
+            <div class="object-group-items" data-group="${escapeHtml(group.typeName)}">
+              <p class="placeholder" style="padding: 8px;">Loading...</p>
+            </div>
+          </details>
+        `;
+      })
+      .join('');
+
+    groupsContainer.innerHTML = groupsHtml;
+
+    // Set up lazy rendering for groups
+    groupsContainer.querySelectorAll('.object-group').forEach(details => {
+      let rendered = false;
+      details.addEventListener('toggle', () => {
+        const detailsElement = assertInstanceOf(details, HTMLDetailsElement, 'Details element');
+        if (detailsElement.open && !rendered) {
+          const groupName = details.getAttribute('data-group-name');
+          const group = objectGroups.find(g => g.typeName === groupName);
+          const itemsContainer = querySelectorAs('.object-group-items', HTMLElement, details);
+
+          if (group && itemsContainer) {
+            renderGroupItems(group, itemsContainer, allParsedObjects);
+            rendered = true;
+          }
+        }
+      });
+    });
+
+    // Handle "Show more" clicks
+    groupsContainer.addEventListener('click', e => {
+      const target = assertInstanceOf(e.target, HTMLElement, 'Click target');
+      if (target.classList.contains('show-more-btn')) {
+        const groupName = target.getAttribute('data-group');
+        const group = objectGroups.find(g => g.typeName === groupName);
+        const itemsContainer = target.closest('.object-group-items');
+        if (group && itemsContainer && groupName) {
+          const currentCount = visibleItemsPerGroup.get(groupName) || ITEMS_PER_PAGE;
+          visibleItemsPerGroup.set(groupName, currentCount + ITEMS_PER_PAGE);
+          renderGroupItems(group, assertInstanceOf(itemsContainer, HTMLElement, 'Items container'), allParsedObjects);
+        }
+      }
+    });
+
+    return groupsContainer;
+  }
+
+  /**
+   * Update just the object groups (called when search term changes)
+   */
+  function updateObjectsGroups(): void {
+    const objectsPanel = document.querySelector('[data-panel="objects"]');
+    if (!objectsPanel) return;
+
+    // Remove old groups container
+    objectsPanel.querySelector('.object-groups-container')?.remove();
+
+    // Get all parsed objects
+    const parsedObjectsCache = validator.getParsedObjectsCache();
+    const allParsedObjects = Array.from(parsedObjectsCache.values()).flat();
+
+    // Filter and create groups
+    const groupsWithMatches = filterObjectGroups(allParsedObjects);
+    const groupsContainer = createGroupsContainer(groupsWithMatches, allParsedObjects);
+    objectsPanel.appendChild(groupsContainer);
+  }
+
+  /**
+   * Render the objects tab
+   */
+  function renderObjectsTab(): void {
+    const objectsPanel = document.querySelector('[data-panel="objects"]');
+    if (!objectsPanel) return;
+
+    // Clear old data and panel
+    objectsDataMap.clear();
+    objectsPanel.innerHTML = '';
+
+    // Group objects from cache
+    const parsedObjectsCache = validator.getParsedObjectsCache();
+    objectGroups = groupObjectsByType(parsedObjectsCache);
+
+    if (objectGroups.length === 0) {
+      showNoObjectsPlaceholder();
+      return;
+    }
+
+    // Create search controls
+    const controlsContainer = document.createElement('div');
+    controlsContainer.className = 'object-viewer-controls';
+
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.id = 'objectSearch';
+    searchInput.className = 'object-search';
+    searchInput.placeholder = 'Search objects...';
+    searchInput.value = objectSearchTerm;
+
+    controlsContainer.appendChild(searchInput);
+    objectsPanel.appendChild(controlsContainer);
+
+    // Set up search handler
+    let searchTimeout: number | undefined;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      searchTimeout = window.setTimeout(() => {
+        objectSearchTerm = searchInput.value;
+        visibleItemsPerGroup.clear();
+        updateObjectsGroups();
+      }, 300);
+    });
+
+    // Render groups
+    updateObjectsGroups();
+  }
+
+  /**
+   * Navigate to an object's definition
+   */
+  function navigateToObject(displayInfo: ObjectDisplayInfo): void {
+    // Switch file if needed (multi-file mode only)
+    if (fileManager && displayInfo.filePath !== fileManager.currentFilePath) {
+      selectFile(displayInfo.filePath);
+    }
+
+    // Scroll to object type line and select it
+    scrollToLine(displayInfo.position.typeStartLine, {
+      startLine: displayInfo.position.typeStartLine,
+      startColumn: displayInfo.position.typeStartColumn,
+      endLine: displayInfo.position.typeStartLine,
+      endColumn: displayInfo.position.typeEndColumn,
+    });
   }
 
   function displayResults(result: ValidationResult): void {
@@ -1916,9 +2446,23 @@ export function initValidatorApp(): void {
     });
   }
 
-  // Handle clicks on messages to jump to line
-  resultsContainer.addEventListener('click', e => {
-    const target = assertInstanceOf(e.target, HTMLElement, 'Results container click event');
+  // Handle clicks on objects and messages
+  document.addEventListener('click', e => {
+    const target = e.target as HTMLElement;
+
+    // Check if clicked on an object item
+    const objectItem = target.closest('.object-item.clickable');
+    if (objectItem) {
+      e.stopPropagation();
+      const uniqueKey = objectItem.getAttribute('data-object-key');
+      if (uniqueKey) {
+        const displayInfo = objectsDataMap.get(uniqueKey);
+        if (displayInfo) {
+          navigateToObject(displayInfo);
+        }
+      }
+      return;
+    }
 
     // Check if clicked on a formula reference link
     const formulaReferenceLink = target.closest('.formula-reference-link');

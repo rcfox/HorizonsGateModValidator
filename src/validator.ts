@@ -27,10 +27,6 @@ export class ModValidator {
     return this.typeAliases[typeName] || typeName;
   }
 
-  private resolveFunctionalAlias(typeName: string): string {
-    return this.functionalAliases[typeName] || typeName;
-  }
-
   validate(content: string, filePath: string): ValidationResult {
     const parser = new ModParser(content, filePath);
 
@@ -79,6 +75,22 @@ export class ModValidator {
    */
   removeFromCache(filePath: string): void {
     this.parsedObjectsCache.delete(filePath);
+  }
+
+  /**
+   * Get the parsed objects cache for UI features (like object viewer)
+   */
+  getParsedObjectsCache(): Map<string, ParsedObject[]> {
+    return this.parsedObjectsCache;
+  }
+
+  /**
+   * Resolve a functional alias to normalize spelling variations
+   * (e.g., "ActionAOE" normalizes to "ActionAoE")
+   * This does NOT resolve type aliases (e.g., AvAffecterAoE stays as-is)
+   */
+  resolveFunctionalAlias(typeName: string): string {
+    return this.functionalAliases[typeName] || typeName;
   }
 
   /**

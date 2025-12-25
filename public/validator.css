@@ -91,6 +91,169 @@ main.with-file-tree {
     overflow: hidden;
 }
 
+/* Tab system */
+.results-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.tab-button {
+    background: none;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-secondary);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+}
+
+.tab-button:hover {
+    color: var(--text-primary);
+}
+
+.tab-button.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-content {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.tab-panel {
+    display: none;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+/* Object viewer */
+.object-viewer-controls {
+    margin-bottom: 16px;
+}
+
+.object-search {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--code-bg);
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.object-search:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.show-more-btn {
+    margin-top: 8px;
+    padding: 6px 12px;
+    background: var(--surface-hover);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.2s;
+}
+
+.show-more-btn:hover {
+    background: var(--hover-bg);
+}
+
+.object-group {
+    margin-bottom: 12px;
+}
+
+.object-group-header {
+    font-size: 16px;
+    font-weight: 600;
+    padding: 8px 12px;
+    margin: 0;
+    color: var(--text-primary);
+    cursor: pointer;
+    background: var(--surface-hover);
+    border-radius: 4px;
+    user-select: none;
+    list-style: none;
+    transition: background-color 0.2s;
+}
+
+.object-group-header::-webkit-details-marker {
+    display: none;
+}
+
+.object-group-header::before {
+    content: '▸ ';
+    display: inline-block;
+    transition: transform 0.2s;
+}
+
+.object-group[open] > .object-group-header::before {
+    transform: rotate(90deg);
+}
+
+.object-group-header:hover {
+    background: var(--hover-bg);
+}
+
+.object-group-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+    padding-left: 8px;
+}
+
+.object-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background: var(--code-bg);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    gap: 16px;
+}
+
+.object-item.clickable {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.object-item.clickable:hover {
+    background: var(--hover-bg);
+}
+
+.object-id {
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.object-location {
+    color: var(--text-secondary);
+    font-size: 12px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
 /* Editor with line numbers */
 .editor-wrapper {
     display: flex;

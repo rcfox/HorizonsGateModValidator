@@ -173,6 +173,32 @@ export interface ValidationResult {
 }
 
 /**
+ * Display information for an object in the object viewer
+ */
+export interface ObjectDisplayInfo {
+  type: string; // Object type name (original from mod file)
+  normalizedType: string; // Normalized through functional aliases (for grouping)
+  id: string | null; // ID property value, null if absent
+  filePath: string; // Source file path
+  position: {
+    // Position for navigation and display
+    typeStartLine: number;
+    typeStartColumn: number;
+    typeEndColumn: number;
+  };
+  uniqueKey: string; // "ID:value" or "file:line:column"
+}
+
+/**
+ * Group of objects of the same type
+ */
+export interface ObjectGroup {
+  typeName: string; // Object type name
+  count: number; // Number of objects in group
+  objects: ObjectDisplayInfo[]; // Objects in this group
+}
+
+/**
  * Token types for lexer
  */
 export enum TokenType {
