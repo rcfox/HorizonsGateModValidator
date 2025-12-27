@@ -581,6 +581,30 @@ export class ModValidator {
         continue;
       }
 
+      // Special case: ActorValueAffecter.magnitude should be validated as task string
+      // when actorValue property equals "task"
+      if (resolvedTypeName === 'ActorValueAffecter' && cleanPropName === 'magnitude') {
+        const actorValueProp = obj.properties.get('actorValue');
+        if (actorValueProp && actorValueProp.value.trim() === 'task') {
+          // ERROR: magnitude must not be empty when actorValue = "task"
+          if (propValue.trim() === '') {
+            messages.push({
+              severity: 'error',
+              message: 'ActorValueAffecter with actorValue="task" requires non-empty magnitude',
+              filePath: propInfo.filePath,
+              line: propInfo.valueStartLine,
+              context: 'The magnitude property should contain a task string (e.g., "action,actionID")',
+            });
+            continue;
+          }
+
+          // Validate as task string instead of Formula
+          const taskMessages = this.propertyValidator.validateTaskString(propValue, propInfo);
+          messages.push(...taskMessages);
+          continue; // Skip normal Formula validation
+        }
+      }
+
       // Validate property type
       // Use cleanPropName so corrections reference the base property name without + suffixes
       const typeMessages = this.propertyValidator.validateProperty(

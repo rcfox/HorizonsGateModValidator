@@ -40,19 +40,14 @@ import {
   getAlternateDelimiters,
   getDelegatesTo,
 } from './formula-metadata.js';
+import type { PositionInfo, WithPosition } from './types.js';
+import { isValidFloat } from './value-validators.js';
 
 // Re-export validator for convenience
 export { validateAST, formatValidationErrors, type ValidationError } from './formula-ast-validator.js';
 
-/** Position information for AST nodes (relative to start of formula, preserving line breaks) */
-export interface PositionInfo {
-  startLine: number; // Line offset from start of formula (0 for first line)
-  startColumn: number; // Column on that line (0-indexed)
-  endLine: number; // Line offset from start of formula
-  endColumn: number; // Column on that line (0-indexed, exclusive)
-}
-
-export type WithPosition<T> = T & PositionInfo;
+// Re-export position types for backward compatibility
+export type { PositionInfo, WithPosition };
 
 // Base node interfaces (internal - without positions)
 interface LiteralNodeBase {
@@ -355,10 +350,9 @@ function parseOperand(operand: string, startPos: FormulaPosition): ASTNode {
   const posInfo = createPositionInfo(startPos, operand);
 
   // Check if it's a literal number
-  // Use a regex to ensure the entire operand is numeric (not just a numeric prefix like "5" in "5:10")
-  // This regex allows: integers, decimals, leading/trailing decimal point, scientific notation
-  const numericRegex = /^-?(\d+\.?\d*|\d*\.\d+)([eE][+-]?\d+)?$/;
-  if (numericRegex.test(operand)) {
+  // Use isValidFloat to ensure the entire operand is numeric (not just a numeric prefix like "5" in "5:10")
+  // This allows: integers, decimals, leading/trailing decimal point, scientific notation
+  if (isValidFloat(operand)) {
     const numValue = parseFloat(operand);
     if (!isNaN(numValue) && isFinite(numValue)) {
       return { type: 'literal', value: numValue, ...posInfo };
@@ -410,8 +404,7 @@ function parseParenthesizedOperand(operand: string, startPos: FormulaPosition): 
 
   // Try to parse argument as a number or formula
   let argument: ASTNode | undefined;
-  const numericRegex = /^-?(\d+\.?\d*|\d*\.\d+)([eE][+-]?\d+)?$/;
-  if (numericRegex.test(argString)) {
+  if (isValidFloat(argString)) {
     const numValue = parseFloat(argString);
     if (!isNaN(numValue) && isFinite(numValue)) {
       argument = { type: 'literal', value: numValue, ...createPositionInfo(argStartPos, argString) };
@@ -463,8 +456,7 @@ function parseFunctionStyleArg(arg: string, startPos: FormulaPosition): { name: 
     const paramStart = currentPos;
 
     // Try to parse as number
-    const numericRegex = /^-?(\d+\.?\d*|\d*\.\d+)([eE][+-]?\d+)?$/;
-    if (numericRegex.test(param)) {
+    if (isValidFloat(param)) {
       const numValue = parseFloat(param);
       if (!isNaN(numValue) && isFinite(numValue)) {
         const result = { type: 'literal' as const, value: numValue, ...createPositionInfo(paramStart, param) };

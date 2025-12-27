@@ -8,13 +8,17 @@ import { validateFormula } from './formula-validator.js';
 import { findSimilar, MAX_EDIT_DISTANCE } from './string-similarity.js';
 import modSchemaData from './mod-schema.json' with { type: 'json' };
 import type { SchemaData } from './types.js';
+import { TaskValidator } from './task-validator.js';
+import { isValidBoolean, isValidInteger, isValidFloat, isValidByte } from './value-validators.js';
 
 export class PropertyValidator {
   private enums: Record<string, Record<string, number>>;
+  private taskValidator: TaskValidator;
 
   constructor() {
     const data = modSchemaData as SchemaData;
     this.enums = data.enums;
+    this.taskValidator = new TaskValidator();
   }
 
   /**
@@ -39,9 +43,17 @@ export class PropertyValidator {
       return messages;
     }
 
+    // Special case: DialogNode.specialEffect - validate as task strings
+    // TODO: Also validate trigger IDs when we have complete trigger metadata
+    if (className === 'DialogNode' && propertyName === 'specialEffect' && expectedType === 'List<string>') {
+      // Each property assignment is one element in the list, so validate the entire value as a single task string
+      messages.push(...this.taskValidator.validateTaskString(cleanValue, propInfo));
+      return messages;
+    }
+
     switch (expectedType) {
       case 'boolean':
-        if (!this.isValidBoolean(cleanValue)) {
+        if (!isValidBoolean(cleanValue)) {
           const similar = findSimilar(value, ['true', 'false'], MAX_EDIT_DISTANCE);
           const corrections = similar.map(s => ({
             filePath: propInfo.filePath,
@@ -63,7 +75,7 @@ export class PropertyValidator {
         break;
 
       case 'integer':
-        if (!this.isValidInteger(cleanValue)) {
+        if (!isValidInteger(cleanValue)) {
           messages.push({
             severity: 'error',
             message: `Invalid integer value for ${propertyName}`,
@@ -75,7 +87,7 @@ export class PropertyValidator {
         break;
 
       case 'float':
-        if (!this.isValidFloat(cleanValue)) {
+        if (!isValidFloat(cleanValue)) {
           messages.push({
             severity: 'error',
             message: `Invalid float value for ${propertyName}`,
@@ -87,7 +99,7 @@ export class PropertyValidator {
         break;
 
       case 'byte':
-        if (!this.isValidByte(cleanValue)) {
+        if (!isValidByte(cleanValue)) {
           messages.push({
             severity: 'error',
             message: `Invalid byte value for ${propertyName}`,
@@ -207,24 +219,12 @@ export class PropertyValidator {
     return messages;
   }
 
-  private isValidBoolean(value: string): boolean {
-    const lower = value.toLowerCase();
-    return lower === 'true' || lower === 'false';
-  }
-
-  private isValidInteger(value: string): boolean {
-    return /^-?\d+$/.test(value);
-  }
-
-  private isValidFloat(value: string): boolean {
-    // Support regular floats (e.g., 3.234, .5, -1.2, -.1) and scientific notation (e.g., 1.5e10, 2.5E-3)
-    // Requires at least one digit: either before decimal (\d+\.?\d*) or after decimal (\d*\.\d+)
-    return /^-?(\d+\.?\d*|\d*\.\d+)([eE][+-]?\d+)?$/.test(value);
-  }
-
-  private isValidByte(value: string): boolean {
-    const num = parseInt(value, 10);
-    return !isNaN(num) && num >= 0 && num <= 255 && this.isValidInteger(value);
+  /**
+   * Validate a value as a task string
+   * Public method for use by validator.ts for context-aware validation
+   */
+  validateTaskString(value: string, propInfo: PropertyInfo): ValidationMessage[] {
+    return this.taskValidator.validateTaskString(value, propInfo);
   }
 
   /**
@@ -373,7 +373,7 @@ export class PropertyValidator {
         line,
         context: `Expected format: x,y`,
       });
-    } else if (!this.isValidFloat(x)) {
+    } else if (!isValidFloat(x)) {
       messages.push({
         severity: 'error',
         message: `Invalid Vector2 X value for ${name}`,
@@ -392,7 +392,7 @@ export class PropertyValidator {
         line,
         context: `Expected format: x,y`,
       });
-    } else if (!this.isValidFloat(y)) {
+    } else if (!isValidFloat(y)) {
       messages.push({
         severity: 'error',
         message: `Invalid Vector2 Y value for ${name}`,
@@ -431,7 +431,7 @@ export class PropertyValidator {
           line,
           context: `Expected format: x,y,z`,
         });
-      } else if (!this.isValidFloat(component)) {
+      } else if (!isValidFloat(component)) {
         messages.push({
           severity: 'error',
           message: `Invalid Vector3 ${componentNames[i]} value for ${name}`,
@@ -471,7 +471,7 @@ export class PropertyValidator {
           line,
           context: `Expected format: x,y,width,height`,
         });
-      } else if (!this.isValidInteger(component)) {
+      } else if (!isValidInteger(component)) {
         messages.push({
           severity: 'error',
           message: `Invalid Rectangle ${componentNames[i]} value for ${name}`,
@@ -519,7 +519,7 @@ export class PropertyValidator {
         .map(p => p.trim())
         .filter(p => p.length > 0);
       for (const part of parts) {
-        if (!this.isValidInteger(part)) {
+        if (!isValidInteger(part)) {
           messages.push({
             severity: 'error',
             message: `Invalid integer in list for ${name}`,
@@ -531,7 +531,7 @@ export class PropertyValidator {
       }
     } else {
       // Single integer to append
-      if (!this.isValidInteger(value)) {
+      if (!isValidInteger(value)) {
         messages.push({
           severity: 'error',
           message: `Invalid integer for ${name}`,
@@ -561,7 +561,7 @@ export class PropertyValidator {
         .map(p => p.trim())
         .filter(p => p.length > 0);
       for (const part of parts) {
-        if (!this.isValidFloat(part)) {
+        if (!isValidFloat(part)) {
           messages.push({
             severity: 'error',
             message: `Invalid float in list for ${name}`,
@@ -573,7 +573,7 @@ export class PropertyValidator {
       }
     } else {
       // Single float to append
-      if (!this.isValidFloat(value)) {
+      if (!isValidFloat(value)) {
         messages.push({
           severity: 'error',
           message: `Invalid float for ${name}`,

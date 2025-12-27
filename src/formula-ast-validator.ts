@@ -37,6 +37,7 @@ import {
   type FormulaOperator,
   type FormulaData,
 } from './formula-metadata.js';
+import { isValidFloat, isValidInteger, isValidByte } from './value-validators.js';
 
 const data = formulaData as FormulaData;
 
@@ -289,12 +290,36 @@ function validateFunctionArg(
 
     switch (expectedArg.type) {
       case 'integer':
-      case 'float':
-      case 'byte':
-        // Should be a number
-        if (isNaN(parseFloat(value))) {
+        // Should be a valid integer
+        if (!isValidInteger(value)) {
           errors.push({
-            message: `Argument '${expectedArg.name}' of operator '${operatorName}' expects a ${expectedArg.type}, but got non-numeric value: '${value}'`,
+            message: `Argument '${expectedArg.name}' of operator '${operatorName}' expects an integer, but got: '${value}'`,
+            node: arg,
+            path,
+            operatorName,
+            suggestions: [],
+          });
+        }
+        break;
+
+      case 'float':
+        // Should be a valid float
+        if (!isValidFloat(value)) {
+          errors.push({
+            message: `Argument '${expectedArg.name}' of operator '${operatorName}' expects a float, but got: '${value}'`,
+            node: arg,
+            path,
+            operatorName,
+            suggestions: [],
+          });
+        }
+        break;
+
+      case 'byte':
+        // Should be a valid byte (0-255)
+        if (!isValidByte(value)) {
+          errors.push({
+            message: `Argument '${expectedArg.name}' of operator '${operatorName}' expects a byte (0-255), but got: '${value}'`,
             node: arg,
             path,
             operatorName,

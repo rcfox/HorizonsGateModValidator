@@ -37,6 +37,24 @@ export interface FieldSchema {
 }
 
 /**
+ * Position information for tracking locations in source text
+ * (relative to start, preserving line breaks)
+ *
+ * Used by formula parsing and task string parsing for precise error reporting
+ */
+export interface PositionInfo {
+  startLine: number; // Line offset from start (0 for first line)
+  startColumn: number; // Column on that line (0-indexed)
+  endLine: number; // Line offset from start
+  endColumn: number; // Column on that line (0-indexed, exclusive)
+}
+
+/**
+ * Utility type to add position information to any type
+ */
+export type WithPosition<T> = T & PositionInfo;
+
+/**
  * Object category determines how the object is used in the game:
  *
  * - 'definition': Template types stored in Data collections (e.g., ActorType, ItemType)
@@ -170,6 +188,54 @@ export interface ValidationResult {
   warnings: ValidationMessage[];
   hints: ValidationMessage[];
   info: ValidationMessage[];
+}
+
+/**
+ * Task parameter metadata from tasks.json
+ */
+export interface TaskParameter {
+  name: string; // e.g., "strings[0]", "floats[1]", "tileCoords[0]"
+  description: string;
+}
+
+/**
+ * Task metadata from tasks.json
+ */
+export interface TaskMetadata {
+  name: string;
+  description: string;
+  required: TaskParameter[];
+  optional: TaskParameter[];
+}
+
+/**
+ * Root structure of tasks.json
+ */
+export interface TasksData {
+  gameVersion: string;
+  tasks: TaskMetadata[];
+}
+
+/**
+ * Discriminated union for parsed task string parameters with position tracking
+ * Each variant represents how the parameter will be processed by the game
+ */
+export type ParsedParameter =
+  | WithPosition<{ type: 'string'; value: string; source: 'plain' | '@A' | '@S' }>
+  | WithPosition<{ type: 'float'; value: number; source: 'plain' }>
+  | WithPosition<{ type: 'bool'; value: boolean; source: 'plain' }>
+  | WithPosition<{ type: 'tileCoord'; source: '@T' | '@XYA' | '@X' | '@Y'; value: string }>
+  | WithPosition<{ type: 'formula'; source: '@F' | '@R'; formula: string }>
+  | WithPosition<{ type: 'delay'; source: '@'; delayValue: number }>
+  | WithPosition<{ type: 'globalVarSubstitution'; source: '@G'; varName: string; originalParam: string }>;
+
+/**
+ * Parsed task string with position information for all elements
+ */
+export interface ParsedTaskString {
+  taskName: string;
+  taskNamePosition: PositionInfo;
+  parameters: ParsedParameter[];
 }
 
 /**
