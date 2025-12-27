@@ -6,7 +6,6 @@ For each of these tasks, I want to capture:
 * What the task does.
   * Not just "executes the foo task", but actually try to describe in game terms what it does.
   * If there are multiple things it might do, make sure to list all of them. Aim for 2-4 sentences per distinct functionality, in distinct paragraphs.
-* An appropriate name for each input.
 * What each input does.
   * Be descriptive with 2-4 sentences for each input.
   * Some inputs might have multiple uses depending on other inputs, be sure to capture them all.
@@ -18,23 +17,7 @@ Valid inputs are indexes into the following arrays: `strings`, `floats`, `bools`
 
 If a task includes a dynamic number of accesses over an input array, treat this as a single input indexed the lower bound with a +. For example: `strings[2+]`. This indicates a variable number of arguments can be accepted. See the addJournalGoal as an example of this.
 
-To determine if an input is To determine if an input is required, check for unconditional array index access or array element pre-initialization. An array access is UNCONDITIONAL if the array element is accessed directly without first verifying the array's size/count.
-
-  **Examples of UNCONDITIONAL access (REQUIRED inputs):**
-  - Direct array indexing: `strings[0]`, `floats[1]`, `bools[0]`
-  - Array indexing in function arguments: `someFunction(strings[0], floats[1])`
-  - Array indexing in assignments: `var x = strings[0];`
-  - Array indexing in expressions: `if (strings[0] == "foo")` (if no prior count check)
-  - Array indexing in method calls: `actor.method(strings[1], floats[0])`
-
-  **Examples of CONDITIONAL access (OPTIONAL inputs):**
-  - Array access guarded by count check: `if (strings.Count > 0) { use(strings[0]); }`
-  - Array access guarded by bounds check: `if (floats.Count > 1) { x = floats[1]; }`
-  - Fallback patterns: `var x = (strings.Count > 0) ? strings[0] : "default";`
-
-  **The crash test:** If the array element does not exist, will the code crash at runtime? If yes, the input is REQUIRED.
-
-  **Important:** A check like `if (strings[0] > 0)` does NOT make the input optional - it still crashes if `strings[0]` doesn't exist. Only checks on the array's Count/Length before accessing make an input optional.
+To determine if an input is required, check for unconditional array index access or array element pre-initialization. An array access is UNCONDITIONAL if the array element is accessed directly without first verifying the array's size/count. A check like `if (strings[0] > 0)` does NOT make the input optional - it still crashes if `strings[0]` doesn't exist. Only checks on the array's Count/Length before accessing make an input optional.
 
 "Array element pre-initialization" refers to when elements of the input arrays (strings, floats, bools, tileCoords) are guaranteed to exist before the switch statement. If a derived variable has a fallback value but the array access is  still guarded, the input is OPTIONAL.
 
@@ -46,11 +29,15 @@ If a later-indexed input for a type is required, the earlier inputs of the same 
 
 Each description should be self-contained. Don't describe a task in terms of another task, unless they are meant to be used together, in which case, you should note that requirement.
 
+Prefer richer, more accurate descriptions over brevity.
+
 Descriptions should describe behaviour, not implementation. The audience is game modders who do not have access to the source code.
 
 Do not create a new entry for each alias. If two names execute the same code path with no conditional behaviour on the `type` variable, treat them as aliases. Similar or overlapping behavior is not sufficient. Keep the longest name as the canonical name, and add the others to the entry's "aliases" array. If there are no aliases, set `"aliases": []` for that entry.
 
-Some of the tasks' case statements are clustered together, sharing common code with small branches off depending on the contents of array3[0]. Make sure to consider each one individually. Assume these are not aliases until you verify by checking the code nested under the case statement.
+Aliases are case statements that fall through to share code with no intervening logic.
+
+Some of the tasks' case statements are clustered together, sharing common code with small branches off depending on the `type` variable. Make sure to consider each one individually. Assume these are not aliases until you verify by checking the code nested under the case statement.
 
 When different code paths with similar inputs call different functions or methods:
 
@@ -84,7 +71,8 @@ Output should be JSON with this structure:
               "name": "strings[1]",
               "description": "The value to set to the variable."
             }
-          ]
+          ],
+          "optional": []
         },
         {
           "description": "...",
@@ -97,7 +85,8 @@ Output should be JSON with this structure:
               "name": "floats[0]",
               "description": "The value to set to the variable."
             }
-          ]
+          ],
+          "optional": []
         },
         {
           "description": "...",
@@ -134,7 +123,6 @@ Do not wait to finish all tasks before writing output.
 If processing is interrupted, on the next run read ./mod-validator/src/tasks.json, identify the last task recorded, and resume with the next task in switch order. Do not reprocess completed tasks.
 
 If the last task entry appears incomplete or malformed, redo that task.
-
 
 Do not summarize, explain, or restate the extracted information in the message buffer.
 
