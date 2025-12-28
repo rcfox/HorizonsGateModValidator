@@ -227,20 +227,11 @@ export class TaskValidator {
    * @returns Parsed parameter with type and position
    */
   private parseParameter(param: string, position: PositionInfo): ParsedParameter {
-    // Check for @ prefixes in order (longest first to avoid partial matches)
-    // Based on Task.cs:682-749
+    // Check for @ prefixes in order matching Task.cs:682-749
+    // Order matters: @F and @A are checked BEFORE @G (they use 'continue' in C#)
+    // @G is a preprocessing substitution that modifies the parameter, then other @ prefixes are checked
 
-    // @XYA must be checked before @X/@Y
-    if (param.startsWith('@XYA')) {
-      return {
-        type: 'tileCoord',
-        source: '@XYA',
-        value: param.substring(4),
-        ...position,
-      };
-    }
-
-    // @F - Formula
+    // @F - Formula (processed before @G, cannot combine with @G)
     if (param.startsWith('@F')) {
       return {
         type: 'formula',
@@ -249,6 +240,118 @@ export class TaskValidator {
         ...position,
       };
     }
+
+    // @A - Actor ID (processed before @G, cannot combine with @G)
+    if (param.startsWith('@A')) {
+      return {
+        type: 'string',
+        source: '@A',
+        value: param.substring(2),
+        ...position,
+      };
+    }
+
+    // @G - Global variable substitution (preprocessing step)
+    // Can be combined with other @ prefixes: @R@Gvar, @X@Gvar, etc.
+    // Format: <prefix>@G<varname> becomes <prefix><varValue> after substitution
+    if (param.includes('@G')) {
+      const atGIndex = param.indexOf('@G');
+      const prefix = param.substring(0, atGIndex);
+      const varName = param.substring(atGIndex + 2);
+
+      // After @G substitution, the prefix determines the type
+      // Since we can't substitute at parse time, we analyze the prefix
+
+      // @R@Gvar → formula after substitution
+      if (prefix === '@R') {
+        return {
+          type: 'formula',
+          source: '@R',
+          formula: '', // Will be filled by @G substitution at runtime
+          globalVarName: varName,
+          ...position,
+        };
+      }
+
+      // @XYA@Gvar → tileCoord after substitution
+      if (prefix === '@XYA') {
+        return {
+          type: 'tileCoord',
+          source: '@XYA',
+          value: '', // Will be filled by @G substitution at runtime
+          globalVarName: varName,
+          ...position,
+        };
+      }
+
+      // @X@Gvar → tileCoord (X coordinate) after substitution
+      if (prefix === '@X') {
+        return {
+          type: 'tileCoord',
+          source: '@X',
+          value: '', // Will be filled by @G substitution at runtime
+          globalVarName: varName,
+          ...position,
+        };
+      }
+
+      // @Y@Gvar → tileCoord (Y coordinate) after substitution
+      if (prefix === '@Y') {
+        return {
+          type: 'tileCoord',
+          source: '@Y',
+          value: '', // Will be filled by @G substitution at runtime
+          globalVarName: varName,
+          ...position,
+        };
+      }
+
+      // @T@Gvar → tileCoord (travel point) after substitution
+      if (prefix === '@T') {
+        return {
+          type: 'tileCoord',
+          source: '@T',
+          value: '', // Will be filled by @G substitution at runtime
+          globalVarName: varName,
+          ...position,
+        };
+      }
+
+      // @S@Gvar → string after substitution
+      if (prefix === '@S') {
+        return {
+          type: 'string',
+          source: '@S',
+          value: '', // Will be filled by @G substitution at runtime
+          globalVarName: varName,
+          ...position,
+        };
+      }
+
+      // @@Gvar → delay after substitution
+      if (prefix === '@') {
+        return {
+          type: 'delay',
+          source: '@',
+          delayValue: 0, // Will be filled by @G substitution at runtime
+          globalVarName: varName,
+          ...position,
+        };
+      }
+
+      // prefix@Gvar or just @Gvar → type unknown until runtime substitution
+      // We can't validate the type, so return a special globalVarSubstitution type
+      return {
+        type: 'globalVarSubstitution',
+        source: '@G',
+        varName,
+        originalParam: param,
+        ...position,
+      };
+    }
+
+    // Other @ prefixes (processed after @G would have been substituted)
+    // These cannot have @G in them at this point
 
     // @R - Formula (redundant with @F)
     if (param.startsWith('@R')) {
@@ -260,22 +363,12 @@ export class TaskValidator {
       };
     }
 
-    // @A - Actor ID
-    if (param.startsWith('@A')) {
+    // @XYA must be checked before @X/@Y
+    if (param.startsWith('@XYA')) {
       return {
-        type: 'string',
-        source: '@A',
-        value: param.substring(2),
-        ...position,
-      };
-    }
-
-    // @S - Force string
-    if (param.startsWith('@S')) {
-      return {
-        type: 'string',
-        source: '@S',
-        value: param.substring(2),
+        type: 'tileCoord',
+        source: '@XYA',
+        value: param.substring(4),
         ...position,
       };
     }
@@ -312,15 +405,12 @@ export class TaskValidator {
       };
     }
 
-    // @G - Global variable substitution
-    if (param.includes('@G')) {
-      const atGIndex = param.indexOf('@G');
-      const varName = param.substring(atGIndex + 2);
+    // @S - Force string
+    if (param.startsWith('@S')) {
       return {
-        type: 'globalVarSubstitution',
-        source: '@G',
-        varName,
-        originalParam: param,
+        type: 'string',
+        source: '@S',
+        value: param.substring(2),
         ...position,
       };
     }
@@ -393,7 +483,10 @@ export class TaskValidator {
 
     switch (parsed.type) {
       case 'formula':
-        if (parsed.formula.trim() === '') {
+        // Skip validation if @G is present (value will be filled at runtime)
+        if (parsed.globalVarName) {
+          // @G substitution - value will be filled at runtime, nothing to validate
+        } else if (parsed.formula.trim() === '') {
           messages.push({
             severity: 'error',
             message: `${parsed.source} prefix requires non-empty formula`,
@@ -422,7 +515,8 @@ export class TaskValidator {
 
       case 'string':
         if (parsed.source === '@A' || parsed.source === '@S') {
-          if (parsed.value.trim() === '') {
+          // Skip empty check if @G is present (value will be filled at runtime)
+          if (!parsed.globalVarName && parsed.value.trim() === '') {
             messages.push({
               severity: 'error',
               message: `${parsed.source} prefix requires non-empty value`,
@@ -436,7 +530,8 @@ export class TaskValidator {
 
       case 'tileCoord':
         if (parsed.source === '@T' || parsed.source === '@XYA') {
-          if (parsed.value.trim() === '') {
+          // Skip empty check if @G is present (value will be filled at runtime)
+          if (!parsed.globalVarName && parsed.value.trim() === '') {
             messages.push({
               severity: 'error',
               message: `${parsed.source} prefix requires non-empty value`,
@@ -446,8 +541,8 @@ export class TaskValidator {
             });
           }
         } else if (parsed.source === '@X' || parsed.source === '@Y') {
-          // Validate that it's a valid float
-          if (!isValidFloat(parsed.value)) {
+          // Skip validation if @G is present (value will be filled at runtime)
+          if (!parsed.globalVarName && !isValidFloat(parsed.value)) {
             messages.push({
               severity: 'error',
               message: `Coordinate value must be a valid number`,
@@ -472,7 +567,8 @@ export class TaskValidator {
         break;
 
       case 'delay':
-        if (isNaN(parsed.delayValue)) {
+        // Skip validation if @G is present (value will be filled at runtime)
+        if (!parsed.globalVarName && isNaN(parsed.delayValue)) {
           messages.push({
             severity: 'error',
             message: `Delay value must be a valid number`,
@@ -492,6 +588,19 @@ export class TaskValidator {
           });
         }
         break;
+    }
+
+    // Check for @G global variable substitution in any parameter type
+    if ('globalVarName' in parsed && parsed.globalVarName !== undefined) {
+      if (parsed.globalVarName.trim() === '') {
+        messages.push({
+          severity: 'error',
+          message: `@G prefix requires non-empty variable name`,
+          filePath: propInfo.filePath,
+          line: absoluteLine,
+          context: `Global variable name cannot be empty`,
+        });
+      }
     }
 
     return messages;

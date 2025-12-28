@@ -238,9 +238,33 @@ describe('Task String Validation', () => {
       expectMessage(result, { text: '@XYA prefix requires non-empty value', severity: 'error' });
     });
 
-    test('validates @G global variable substitution', () => {
+    test('validates @G global variable substitution alone', () => {
       const modContent = `[DialogNode] ID=testNode;
         specialEffect=setupPartyFromGVars,prefix@GvarName;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+      expectValid(result);
+    });
+
+    test('validates @R@G formula with global variable', () => {
+      const modContent = `[DialogNode] ID=testNode;
+        specialEffect=test,@R@GformulaVar;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+      expectValid(result);
+    });
+
+    test('validates @X@G coordinate with global variable', () => {
+      const modContent = `[DialogNode] ID=testNode;
+        specialEffect=applyElement,fire,@X@GxCoord;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+      expectValid(result);
+    });
+
+    test('validates @S@G string with global variable', () => {
+      const modContent = `[DialogNode] ID=testNode;
+        specialEffect=setupPartyFromGVars,@S@GstringVar;`;
 
       const result = validator.validate(modContent, 'test.txt');
       expectValid(result);
@@ -249,6 +273,16 @@ describe('Task String Validation', () => {
     test('errors on empty @G variable name', () => {
       const modContent = `[DialogNode] ID=testNode;
         specialEffect=test,@G;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+
+      // Should have error for empty variable name
+      expectMessage(result, { text: '@G prefix requires non-empty variable name', severity: 'error' });
+    });
+
+    test('errors on empty @G variable name in combination', () => {
+      const modContent = `[DialogNode] ID=testNode;
+        specialEffect=test,@R@G;`;
 
       const result = validator.validate(modContent, 'test.txt');
 

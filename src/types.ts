@@ -228,14 +228,19 @@ export interface TasksData {
 /**
  * Discriminated union for parsed task string parameters with position tracking
  * Each variant represents how the parameter will be processed by the game
+ *
+ * @G (global variable substitution) is a preprocessing step that can be combined with other @ prefixes:
+ * - @R@Gvar, @X@Gvar, @Y@Gvar, @T@Gvar, @XYA@Gvar, @S@Gvar, @@Gvar are all valid
+ * - @F@Gvar and @A@Gvar are NOT valid (those prefixes are processed before @G)
+ * - The globalVarName field indicates @G substitution will occur at runtime
  */
 export type ParsedParameter =
-  | WithPosition<{ type: 'string'; value: string; source: 'plain' | '@A' | '@S' }>
+  | WithPosition<{ type: 'string'; value: string; source: 'plain' | '@A' | '@S'; globalVarName?: string }>
   | WithPosition<{ type: 'float'; value: number; source: 'plain' }>
   | WithPosition<{ type: 'bool'; value: boolean; source: 'plain' }>
-  | WithPosition<{ type: 'tileCoord'; source: '@T' | '@XYA' | '@X' | '@Y'; value: string }>
-  | WithPosition<{ type: 'formula'; source: '@F' | '@R'; formula: string }>
-  | WithPosition<{ type: 'delay'; source: '@'; delayValue: number }>
+  | WithPosition<{ type: 'tileCoord'; source: '@T' | '@XYA' | '@X' | '@Y'; value: string; globalVarName?: string }>
+  | WithPosition<{ type: 'formula'; source: '@F' | '@R'; formula: string; globalVarName?: string }>
+  | WithPosition<{ type: 'delay'; source: '@'; delayValue: number; globalVarName?: string }>
   | WithPosition<{ type: 'globalVarSubstitution'; source: '@G'; varName: string; originalParam: string }>;
 
 /**
