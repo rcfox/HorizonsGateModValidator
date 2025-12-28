@@ -199,13 +199,21 @@ export interface TaskParameter {
 }
 
 /**
+ * Task use case metadata from tasks.json
+ */
+export interface TaskUseCase {
+  description: string;
+  required: TaskParameter[];
+  optional: TaskParameter[];
+}
+
+/**
  * Task metadata from tasks.json
  */
 export interface TaskMetadata {
   name: string;
-  description: string;
-  required: TaskParameter[];
-  optional: TaskParameter[];
+  uses: TaskUseCase[];
+  aliases: string[];
 }
 
 /**

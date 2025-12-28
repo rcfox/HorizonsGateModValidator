@@ -12,24 +12,8 @@ import {
   querySelectorAs,
   querySelectorAllAs,
 } from './shared-utils.js';
+import type { TasksData, TaskMetadata } from '../types.js';
 import rawTasksData from '../tasks.json';
-
-interface TaskArgument {
-  name: string;
-  description: string;
-}
-
-interface Task {
-  name: string;
-  description: string;
-  required: TaskArgument[];
-  optional: TaskArgument[];
-}
-
-interface TasksData {
-  gameVersion: string;
-  tasks: Task[];
-}
 
 const tasksData = rawTasksData as TasksData;
 
@@ -75,7 +59,7 @@ function convertToFriendlyNames(text: string): string {
 }
 
 // Convert task data to use friendly names
-function convertTaskData(tasks: Task[]): Task[] {
+function convertTaskData(tasks: TaskMetadata[]): TaskMetadata[] {
   return tasks.map(task => ({
     ...task,
     name: convertToFriendlyNames(task.name),
@@ -149,7 +133,7 @@ export function initTasksApp(): void {
     }
   }
 
-  function searchTask(task: Task, searchTerm: string): boolean {
+  function searchTask(task: TaskMetadata, searchTerm: string): boolean {
     const term = searchTerm.toLowerCase();
     if (task.name.toLowerCase().includes(term)) return true;
     if (task.description.toLowerCase().includes(term)) return true;
@@ -169,7 +153,7 @@ export function initTasksApp(): void {
     return false;
   }
 
-  function renderTasks(tasks: Task[], highlightMatch: (text: string) => string): void {
+  function renderTasks(tasks: TaskMetadata[], highlightMatch: (text: string) => string): void {
     const tasksList = getElementById('tasksList');
 
     if (tasks.length === 0) {
@@ -197,7 +181,7 @@ export function initTasksApp(): void {
     });
   }
 
-  function renderTask(task: Task, highlight: (text: string) => string): string {
+  function renderTask(task: TaskMetadata, highlight: (text: string) => string): string {
     const hasRequired = task.required && task.required.length > 0;
     const hasOptional = task.optional && task.optional.length > 0;
     const taskUrl = `${window.location.origin}${window.location.pathname}?task=${encodeURIComponent(task.name)}`;
