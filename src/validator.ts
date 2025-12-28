@@ -599,7 +599,7 @@ export class ModValidator {
           }
 
           // Validate as task string instead of Formula
-          const taskMessages = this.propertyValidator.validateTaskString(propValue, propInfo);
+          const taskMessages = this.propertyValidator.validateTaskString(propValue, propInfo, resolvedTypeName, cleanPropName);
           messages.push(...taskMessages);
           continue; // Skip normal Formula validation
         }

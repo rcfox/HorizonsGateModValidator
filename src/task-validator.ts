@@ -21,18 +21,31 @@ import type {
 } from './types.js';
 import { findSimilar, MAX_EDIT_DISTANCE } from './string-similarity.js';
 import { isValidFloat } from './value-validators.js';
+import { validateFormula } from './formula-validator.js';
 import tasksJsonData from './tasks.json' with { type: 'json' };
 
 export class TaskValidator {
   private tasks: Map<string, TaskMetadata>;
+  private taskAliasMap: Map<string, string>;
 
   constructor() {
-    // Load tasks.json and build lookup map
+    // Load tasks.json and build lookup maps
     const data = tasksJsonData as TasksData;
     this.tasks = new Map();
+    this.taskAliasMap = new Map();
 
     for (const task of data.tasks) {
       this.tasks.set(task.name, task);
+
+      // Add canonical name to alias map
+      this.taskAliasMap.set(task.name, task.name);
+
+      // Add aliases to alias map
+      if (task.aliases) {
+        for (const alias of task.aliases) {
+          this.taskAliasMap.set(alias, task.name);
+        }
+      }
     }
 
     // Fail fast if we couldn't load any tasks
@@ -46,16 +59,24 @@ export class TaskValidator {
    *
    * @param taskString - The comma-separated task string to validate
    * @param propInfo - Property information for position tracking
+   * @param objectType - Optional object type for context-aware validation
+   * @param propertyName - Optional property name for context-aware validation
    * @returns Array of validation messages with position-based corrections
    */
-  validateTaskString(taskString: string, propInfo: PropertyInfo): ValidationMessage[] {
+  validateTaskString(
+    taskString: string,
+    propInfo: PropertyInfo,
+    objectType?: string,
+    propertyName?: string
+  ): ValidationMessage[] {
     const messages: ValidationMessage[] = [];
 
     // Parse the task string with position tracking
     const parsed = this.parseTaskString(taskString);
 
-    // Validate task name exists
-    const task = this.tasks.get(parsed.taskName);
+    // Validate task name exists (check aliases first)
+    const canonicalName = this.taskAliasMap.get(parsed.taskName);
+    const task = canonicalName ? this.tasks.get(canonicalName) : undefined;
     if (!task) {
       // Find similar task names for suggestions
       const allTaskNames = Array.from(this.tasks.keys());
@@ -106,7 +127,9 @@ export class TaskValidator {
     }
 
     // Validate parameter counts
-    messages.push(...this.validateParameterCounts(parsed.taskName, task, parsed.parameters, propInfo));
+    messages.push(
+      ...this.validateParameterCounts(parsed.taskName, task, parsed.parameters, propInfo, objectType, propertyName)
+    );
 
     return messages;
   }
@@ -378,6 +401,22 @@ export class TaskValidator {
             line: absoluteLine,
             context: `Formula string cannot be empty`,
           });
+        } else {
+          // Validate formula syntax
+          // Create a PropertyInfo representing the formula's position within the task string
+          const formulaPropInfo: PropertyInfo = {
+            filePath: propInfo.filePath,
+            nameStartLine: propInfo.valueStartLine,
+            nameStartColumn: propInfo.valueStartColumn,
+            nameEndColumn: propInfo.valueEndColumn,
+            valueStartLine: propInfo.valueStartLine + parsed.startLine,
+            valueStartColumn: parsed.startColumn + (parsed.startLine === 0 ? propInfo.valueStartColumn : 0),
+            valueEndLine: propInfo.valueStartLine + parsed.endLine,
+            valueEndColumn: parsed.endColumn + (parsed.endLine === 0 ? propInfo.valueStartColumn : 0),
+            value: parsed.formula,
+          };
+          const formulaMessages = validateFormula(parsed.formula, formulaPropInfo, 'taskParameter', 'Task');
+          messages.push(...formulaMessages);
         }
         break;
 
@@ -465,66 +504,153 @@ export class TaskValidator {
    * @param task - Task metadata
    * @param parameters - Parsed parameters
    * @param propInfo - Property information for error reporting
+   * @param objectType - Optional object type for context-aware validation
+   * @param propertyName - Optional property name for context-aware validation
    * @returns Validation messages
    */
   private validateParameterCounts(
     taskName: string,
     task: TaskMetadata,
     parameters: ParsedParameter[],
-    propInfo: PropertyInfo
+    propInfo: PropertyInfo,
+    objectType?: string,
+    propertyName?: string
   ): ValidationMessage[] {
-    const messages: ValidationMessage[] = [];
-
     // Count how many parameters go to each array/field
     const destinations = this.inferParameterDestinations(parameters);
 
-    // Extract requirements from metadata
-    const requiredCounts = this.extractParameterRequirements(task.required);
-    const optionalCounts = this.extractParameterRequirements(task.optional);
+    // Special case: DialogNode/DialogOption/DialogNodeOverride.specialEffect adds implicit float 0
+    const hasImplicitFloat =
+      (objectType === 'DialogNode' || objectType === 'DialogOption' || objectType === 'DialogNodeOverride') &&
+      propertyName === 'specialEffect';
+    const destinationsWithImplicit = hasImplicitFloat
+      ? { ...destinations, floats: destinations.floats + 1 }
+      : destinations;
 
-    // Validate required parameters
-    for (const [arrayName, requiredCount] of Object.entries(requiredCounts)) {
-      const actualCount = destinations[arrayName as keyof typeof destinations] || 0;
-      if (typeof actualCount === 'number' && actualCount < requiredCount) {
-        messages.push({
-          severity: 'error',
-          message: `Task '${taskName}' requires at least ${requiredCount} ${arrayName} parameter(s), but got ${actualCount}`,
-          filePath: propInfo.filePath,
-          line: propInfo.valueStartLine,
-          context: task.description,
-        });
+    // Try to match against each use case
+    const useCaseResults = task.uses.map(useCase => {
+      const messages: ValidationMessage[] = [];
+
+      // Extract requirements from metadata
+      const requiredCounts = this.extractParameterRequirements(useCase.required);
+      const optionalCounts = this.extractParameterRequirements(useCase.optional);
+
+      // Validate required parameters
+      for (const [arrayName, requiredCount] of Object.entries(requiredCounts)) {
+        if (arrayName.endsWith('_unlimited')) continue; // Skip marker entries
+        const actualCount = destinationsWithImplicit[arrayName as keyof typeof destinationsWithImplicit] || 0;
+        if (typeof actualCount === 'number' && actualCount < requiredCount) {
+          messages.push({
+            severity: 'error',
+            message: `Task '${taskName}' requires at least ${requiredCount} ${arrayName} parameter(s), but got ${actualCount}`,
+            filePath: propInfo.filePath,
+            line: propInfo.valueStartLine,
+            taskReference: taskName,
+          });
+        }
       }
+
+      // Warn if too many parameters of a type (unless unlimited)
+      for (const [arrayName, actualCount] of Object.entries(destinationsWithImplicit)) {
+        if (typeof actualCount !== 'number') continue;
+
+        // Check if this parameter type is unlimited (has [N+] notation)
+        const isUnlimited =
+          requiredCounts[`${arrayName}_unlimited`] === Infinity ||
+          optionalCounts[`${arrayName}_unlimited`] === Infinity;
+
+        if (isUnlimited) {
+          // Skip "too many" warning for unlimited parameters
+          continue;
+        }
+
+        const requiredCount = requiredCounts[arrayName] || 0;
+        const optionalCount = optionalCounts[arrayName] || 0;
+        const maxExpected = requiredCount + optionalCount;
+
+        // For implicit float case: don't warn about too many if the implicit float is what causes us to exceed
+        if (hasImplicitFloat && arrayName === 'floats') {
+          const actualWithoutImplicit = destinations.floats;
+          // Only skip warning if we're within range without implicit, but over with it
+          if (actualWithoutImplicit <= maxExpected && actualCount > maxExpected) {
+            // The implicit float is what put us over, don't warn
+            continue;
+          }
+        }
+
+        if (actualCount > maxExpected) {
+          messages.push({
+            severity: 'warning',
+            message: `Task '${taskName}' expects at most ${maxExpected} ${arrayName} parameter(s), but got ${actualCount}`,
+            filePath: propInfo.filePath,
+            line: propInfo.valueStartLine,
+            context: `Extra parameters may be ignored`,
+            taskReference: taskName,
+          });
+        }
+      }
+
+      return { messages, useCase, requiredCounts };
+    });
+
+    // Find use cases that match (no error messages)
+    const matchingUseCases = useCaseResults.filter(result => result.messages.every(msg => msg.severity !== 'error'));
+
+    // If at least one use case matches, return only warnings from the best match
+    if (matchingUseCases.length > 0) {
+      const bestMatch = matchingUseCases[0]!;
+      const resultMessages = [...bestMatch.messages];
+
+      // Add info message if implicit float is being used to meet requirements
+      if (hasImplicitFloat) {
+        const requiredFloats = bestMatch.requiredCounts['floats'] || 0;
+        const optionalFloats =
+          bestMatch.requiredCounts['floats'] !== undefined ||
+          bestMatch.requiredCounts['floats_unlimited'] !== undefined;
+
+        // Show info if the implicit float helps meet required or optional float parameters
+        if (requiredFloats > 0 || optionalFloats) {
+          const providedFloats = destinations.floats;
+          const neededFloats = requiredFloats - providedFloats;
+
+          if (neededFloats > 0) {
+            // Implicit float(s) are helping to meet requirements
+            resultMessages.push({
+              severity: 'info',
+              message: `Task's float parameter is implicitly filled with 0`,
+              filePath: propInfo.filePath,
+              line: propInfo.valueStartLine,
+              context: `'${propertyName}' appends a value of 0 the end of the floats array to fill in a single missing value.`,
+              suggestion: 'Add the 0 value explicitly',
+              suggestionIsAction: true,
+              correctionIcon: '🔧',
+              corrections: [
+                {
+                  filePath: propInfo.filePath,
+                  startLine: propInfo.valueEndLine,
+                  startColumn: propInfo.valueEndColumn,
+                  endLine: propInfo.valueEndLine,
+                  endColumn: propInfo.valueEndColumn,
+                  replacementText: ',0',
+                },
+              ],
+            });
+          }
+        }
+      }
+
+      return resultMessages;
     }
 
-    // Warn if too many parameters of a type (unless unlimited)
-    for (const [arrayName, actualCount] of Object.entries(destinations)) {
-      if (typeof actualCount !== 'number') continue;
-
-      // Check if this parameter type is unlimited (has [N+] notation)
-      const isUnlimited =
-        requiredCounts[`${arrayName}_unlimited`] === Infinity || optionalCounts[`${arrayName}_unlimited`] === Infinity;
-
-      if (isUnlimited) {
-        // Skip "too many" warning for unlimited parameters
-        continue;
-      }
-
-      const requiredCount = requiredCounts[arrayName] || 0;
-      const optionalCount = optionalCounts[arrayName] || 0;
-      const maxExpected = requiredCount + optionalCount;
-
-      if (maxExpected > 0 && actualCount > maxExpected) {
-        messages.push({
-          severity: 'warning',
-          message: `Task '${taskName}' expects at most ${maxExpected} ${arrayName} parameter(s), but got ${actualCount}`,
-          filePath: propInfo.filePath,
-          line: propInfo.valueStartLine,
-          context: `Extra parameters may be ignored`,
-        });
-      }
-    }
-
-    return messages;
+    return [
+      {
+        severity: 'error',
+        message: `Task '${taskName}' parameters don't match any use case.`,
+        filePath: propInfo.filePath,
+        line: propInfo.valueStartLine,
+        taskReference: taskName,
+      },
+    ];
   }
 
   /**

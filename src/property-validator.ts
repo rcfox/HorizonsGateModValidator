@@ -43,11 +43,12 @@ export class PropertyValidator {
       return messages;
     }
 
-    // Special case: DialogNode.specialEffect - validate as task strings
+    // Special case: DialogNode/DialogOption/DialogNodeOverride.specialEffect - validate as task strings
     // TODO: Also validate trigger IDs when we have complete trigger metadata
-    if (className === 'DialogNode' && propertyName === 'specialEffect' && expectedType === 'List<string>') {
+    if ((className === 'DialogNode' || className === 'DialogOption' || className === 'DialogNodeOverride') && propertyName === 'specialEffect' && expectedType === 'List<string>') {
       // Each property assignment is one element in the list, so validate the entire value as a single task string
-      messages.push(...this.taskValidator.validateTaskString(cleanValue, propInfo));
+      // Pass className and propertyName for context-aware validation (implicit float 0)
+      messages.push(...this.taskValidator.validateTaskString(cleanValue, propInfo, className, propertyName));
       return messages;
     }
 
@@ -223,8 +224,13 @@ export class PropertyValidator {
    * Validate a value as a task string
    * Public method for use by validator.ts for context-aware validation
    */
-  validateTaskString(value: string, propInfo: PropertyInfo): ValidationMessage[] {
-    return this.taskValidator.validateTaskString(value, propInfo);
+  validateTaskString(
+    value: string,
+    propInfo: PropertyInfo,
+    objectType?: string,
+    propertyName?: string
+  ): ValidationMessage[] {
+    return this.taskValidator.validateTaskString(value, propInfo, objectType, propertyName);
   }
 
   /**

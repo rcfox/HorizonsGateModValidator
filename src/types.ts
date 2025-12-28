@@ -179,6 +179,7 @@ export interface ValidationMessage {
   corrections?: Correction[] | undefined; // Suggested corrections for typos
   isCrossFile?: boolean | undefined; // True if this message came from cross-file validation (e.g., duplicate IDs)
   formulaReference?: string | undefined; // Operator name for linking to formula reference page
+  taskReference?: string | undefined; // Task name for linking to task reference page
   documentationUrl?: string | undefined; // External documentation URL
   documentationLabel?: string | undefined; // Label for the documentation link
 }

@@ -1072,9 +1072,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "appendToGlobalVar_math"
-      ]
+      "aliases": ["appendToGlobalVar_math"]
     },
     {
       "name": "appendToGlobalVar_string",
@@ -2103,9 +2101,7 @@
           ]
         }
       ],
-      "aliases": [
-        "playSong"
-      ]
+      "aliases": ["playSong"]
     },
     {
       "name": "playNearestLocationSong",
@@ -3469,10 +3465,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "changeZoneDarkColor",
-        "setZoneDarkColor"
-      ]
+      "aliases": ["changeZoneDarkColor", "setZoneDarkColor"]
     },
     {
       "name": "setZoneDarknessToWorldDarkness",
@@ -3618,9 +3611,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "resetTrigger"
-      ]
+      "aliases": ["resetTrigger"]
     },
     {
       "name": "trigger",
@@ -3738,10 +3729,7 @@
           ]
         }
       ],
-      "aliases": [
-        "spawn_actorPrefab",
-        "spawn_actorPrefab_point"
-      ]
+      "aliases": ["spawn_actorPrefab", "spawn_actorPrefab_point"]
     },
     {
       "name": "spawn_g",
@@ -3906,9 +3894,7 @@
           ]
         }
       ],
-      "aliases": [
-        "spawn_sm"
-      ]
+      "aliases": ["spawn_sm"]
     },
     {
       "name": "spawn_fleet",
@@ -3974,10 +3960,6 @@
               "description": "The ID of the actor to talk to. If empty or the actor doesn't exist in the zone, displays dialog without an associated actor."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The Y component is used for the dialog UI vertical position (unless overridden by bools[1])."
-            },
-            {
               "name": "bools[0]",
               "description": "When false, points the camera between the player and the actor being talked to. When true, skips camera positioning."
             },
@@ -3990,6 +3972,10 @@
             {
               "name": "strings[1]",
               "description": "Dialog node ID or additional parameter for the dialog system."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The Y component is used for the dialog UI vertical position (unless overridden by bools[1])."
             }
           ]
         }
@@ -4144,9 +4130,7 @@
           ]
         }
       ],
-      "aliases": [
-        "loadSpecialZone_precision"
-      ]
+      "aliases": ["loadSpecialZone_precision"]
     },
     {
       "name": "loadSpecialZone_playerFlagship",
@@ -4175,9 +4159,7 @@
           ]
         }
       ],
-      "aliases": [
-        "loadSpecialZone_playerFlagship_precision"
-      ]
+      "aliases": ["loadSpecialZone_playerFlagship_precision"]
     },
     {
       "name": "moveSpecialZone",
@@ -4206,9 +4188,7 @@
           ]
         }
       ],
-      "aliases": [
-        "moveSpecialZone_precision"
-      ]
+      "aliases": ["moveSpecialZone_precision"]
     },
     {
       "name": "scaleSpecialZone",
@@ -4381,9 +4361,7 @@
           ]
         }
       ],
-      "aliases": [
-        "enterFleetBattle_player"
-      ]
+      "aliases": ["enterFleetBattle_player"]
     },
     {
       "name": "setDialogSpeed",
@@ -4576,10 +4554,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "getResponse_peace",
-        "getResponse_bribe"
-      ]
+      "aliases": ["getResponse_peace", "getResponse_bribe"]
     },
     {
       "name": "getBribeAmount",
@@ -5297,9 +5272,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "gotoIf"
-      ]
+      "aliases": ["gotoIf"]
     },
     {
       "name": "gotoNodeDelay",
@@ -5378,11 +5351,7 @@
           ]
         }
       ],
-      "aliases": [
-        "setDefaultNode",
-        "setAsDialogNode",
-        "setAsMyNode"
-      ]
+      "aliases": ["setDefaultNode", "setAsDialogNode", "setAsMyNode"]
     },
     {
       "name": "setMyNodeIf",
@@ -5402,9 +5371,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "setDefaultNodeIf"
-      ]
+      "aliases": ["setDefaultNodeIf"]
     },
     {
       "name": "clearDialogNode",
@@ -5804,9 +5771,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "setNPCDialogWindowSizeY"
-      ]
+      "aliases": ["setNPCDialogWindowSizeY"]
     },
     {
       "name": "setOnlyNPCDialogWindowSizeY",
@@ -6991,9 +6956,7 @@
           ]
         }
       ],
-      "aliases": [
-        "h"
-      ]
+      "aliases": ["h"]
     },
     {
       "name": "csave",
@@ -7117,9 +7080,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "screenpic"
-      ]
+      "aliases": ["screenpic"]
     },
     {
       "name": "anim",
@@ -7146,9 +7107,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "rest"
-      ]
+      "aliases": ["rest"]
     },
     {
       "name": "testboatanim",
@@ -7289,9 +7248,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "w"
-      ]
+      "aliases": ["w"]
     },
     {
       "name": "loads",
@@ -7547,9 +7504,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "math"
-      ]
+      "aliases": ["math"]
     },
     {
       "name": "resetfog",
@@ -7560,9 +7515,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "fog"
-      ]
+      "aliases": ["fog"]
     },
     {
       "name": "cfog",
@@ -7573,9 +7526,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "clearfog"
-      ]
+      "aliases": ["clearfog"]
     },
     {
       "name": "hidemapicon",
@@ -7586,9 +7537,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "hidemapicons"
-      ]
+      "aliases": ["hidemapicons"]
     },
     {
       "name": "clearitems",
@@ -7604,9 +7553,7 @@
           ]
         }
       ],
-      "aliases": [
-        "removeitems"
-      ]
+      "aliases": ["removeitems"]
     },
     {
       "name": "clearroofs",
@@ -7617,9 +7564,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "clearroof"
-      ]
+      "aliases": ["clearroof"]
     },
     {
       "name": "deleteZone",
@@ -7667,9 +7612,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "resetlocation"
-      ]
+      "aliases": ["resetlocation"]
     },
     {
       "name": "resetlocations",
@@ -7713,10 +7656,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "resetwaypoint",
-        "resetwaypoints"
-      ]
+      "aliases": ["resetwaypoint", "resetwaypoints"]
     },
     {
       "name": "build",
@@ -7727,9 +7667,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "b"
-      ]
+      "aliases": ["b"]
     },
     {
       "name": "overseer",
@@ -7751,9 +7689,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "godmode"
-      ]
+      "aliases": ["godmode"]
     },
     {
       "name": "abil",
@@ -7817,9 +7753,7 @@
           ]
         }
       ],
-      "aliases": [
-        "xpall"
-      ]
+      "aliases": ["xpall"]
     },
     {
       "name": "xpcosts",
@@ -7830,9 +7764,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "xpcost"
-      ]
+      "aliases": ["xpcost"]
     },
     {
       "name": "testskillcost",
@@ -7867,9 +7799,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "allc"
-      ]
+      "aliases": ["allc"]
     },
     {
       "name": "gp",
@@ -7896,9 +7826,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "tfl"
-      ]
+      "aliases": ["tfl"]
     },
     {
       "name": "tm",
@@ -7997,9 +7925,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "hidep"
-      ]
+      "aliases": ["hidep"]
     },
     {
       "name": "mpos",
@@ -8032,9 +7958,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "clearj"
-      ]
+      "aliases": ["clearj"]
     },
     {
       "name": "filljournal",
@@ -8045,9 +7969,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "fillj"
-      ]
+      "aliases": ["fillj"]
     },
     {
       "name": "dm",
@@ -8058,9 +7980,7 @@
           "optional": []
         }
       ],
-      "aliases": [
-        "debug"
-      ]
+      "aliases": ["debug"]
     },
     {
       "name": "debugMessage",
