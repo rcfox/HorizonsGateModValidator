@@ -1,3 +1,5 @@
+# Job Description
+
 In ./Tactics/Task.cs, in the executeTask function, there is a switch statement over the TaskType enum. Each enum name is the name of a task.
 
 For each of these tasks, I want to capture:
@@ -19,11 +21,20 @@ If a task includes a dynamic number of accesses over an input array, treat this 
 
 To determine if an input is required, check for unconditional array index access or array element pre-initialization. An array access is UNCONDITIONAL if the array element is accessed directly without first verifying the array's size/count. A check like `if (strings[0] > 0)` does NOT make the input optional - it still crashes if `strings[0]` doesn't exist. Only checks on the array's Count/Length before accessing make an input optional.
 
-"Array element pre-initialization" refers to when elements of the input arrays (strings, floats, bools, tileCoords) are guaranteed to exist before the switch statement. If a derived variable has a fallback value but the array access is  still guarded, the input is OPTIONAL.
+"Array element pre-initialization" refers to when elements of the input arrays (strings, floats, bools, tileCoords) are guaranteed to exist before the switch statement. If a derived variable has a fallback value and the array access is guarded by a length/count check, the input is OPTIONAL.
 
 If there are cases of mutually exclusive use of inputs, treat these as different use cases. For example: setGlobalVar has two use cases: one has a required `string[1]` and the other has a required `floats[0]`. In the first case, `floats[0]` should not be listed as an input. In the second case, the `strings[1]` should not be listed as an input. In both cases, `strings[0]` is required.
 
-Create separate uses when inputs are mutually exclusive OR when the behavior differs significantly. Branching on input presence alone doesn't necessarily mean separate uses.
+Create separate uses when inputs are mutually exclusive OR when the behavior differs in any observable way. Branching on input presence alone doesn't necessarily mean separate uses. When uncertain whether two behaviors are distinct, assume they are distinct and create separate uses.
+
+When different code paths with similar inputs call different functions or methods:
+
+ * Briefly investigate the called functions to understand behavioral differences (e.g., read function signatures, comments, or nearby code
+ * If the behavioral difference is clear or evident from names (e.g., "castAction" suggests actor-initiated vs "executeAction" suggests direct execution), reflect this in the use case descriptions
+ * If the difference requires deep investigation (>2-3 function calls deep), record the uncertainty in ./uncertainty.md with details about which functions differ and what the suspected difference might be
+ * Make descriptions distinct enough that modders can understand when each code path applies, even if the exact implementation difference is unclear
+
+When in doubt, prefer splitting behavior into separate uses rather than combining them. It is acceptable to create redundant or overlapping uses; it is not acceptable to merge distinct behaviors into one.
 
 If a later-indexed input for a type is required, the earlier inputs of the same type are also required. For example: if `strings[1]` is required, then `strings[0]` is also required.
 
@@ -39,20 +50,15 @@ Aliases are case statements that fall through to share code with no intervening 
 
 Some of the tasks' case statements are clustered together, sharing common code with small branches off depending on the `type` variable. Make sure to consider each one individually. Assume these are not aliases until you verify by checking the code nested under the case statement.
 
-When different code paths with similar inputs call different functions or methods:
-
- * Briefly investigate the called functions to understand behavioral differences (e.g., read function signatures, comments, or nearby code
- * If the behavioral difference is clear or evident from names (e.g., "castAction" suggests actor-initiated vs "executeAction" suggests direct execution), reflect this in the use case descriptions
- * If the difference requires deep investigation (>2-3 function calls deep), record the uncertainty in ./uncertainty.md with details about which functions differ and what the suspected difference might be
- * Make descriptions distinct enough that modders can understand when each code path applies, even if the exact implementation difference is unclear
-
 Tasks must be recorded in the same order which they appear in the switch statement. Inputs must be ordered in the following order: `strings`, `floats`, `bools` then `tileCoords`. Uses must be ordered by number of required inputs, falling back to input order as a tie-breaker.
 
-If more information is needed about how code is executed, look under one of the Tactics subdirectories of this directory. If information cannot be determined conclusively from the inspected code, record the uncertainty explicitly in ./uncertainty.md instead of continuing to search.
+This is a documentation extraction task, not a formal static analysis. Apply the rules consistently, but do not attempt to prove completeness or soundness.
+
+# Ouputs
 
 Record any errors to ./errors.md and continue with the rest of the tasks.
 
-Output should be JSON with this structure:
+The task extraction output must go into ./mod-validator/src/tasks.json as JSON with this structure:
 
 ```
 {
@@ -65,7 +71,7 @@ Output should be JSON with this structure:
           "required": [
             {
               "name": "strings[0]",
-              "description": "The of the global variable."
+              "description": "The name of the global variable."
             },
             {
               "name": "strings[1]",
@@ -79,7 +85,7 @@ Output should be JSON with this structure:
           "required": [
             {
               "name": "strings[0]",
-              "description": "The of the global variable."
+              "description": "The name of the global variable."
             },
             {
               "name": "floats[0]",
@@ -93,7 +99,7 @@ Output should be JSON with this structure:
           "required": [
             {
               "name": "strings[0]",
-              "description": "The of the global variable."
+              "description": "The name of the global variable."
             }
           ],
           "optional": [
@@ -112,18 +118,33 @@ Output should be JSON with this structure:
 }
 ```
 
+Never overwrite or recreate ./mod-validator/src/tasks.json. Always read it before writing. Only append or modify existing content.
 
-This is a documentation extraction task, not a formal static analysis. Apply the rules consistently, but do not attempt to prove completeness or soundness. Do not attempt to estimate total effort or validate global correctness. Begin extraction immediately and proceed task-by-task.
 
-Begin processing tasks immediately, in switch order.
-After completing each task, append its entry to ./mod-validator/src/tasks.json.
+# Execution Methodology
+
+This is a long-running, unattended extraction process. Do not request user input, confirmations or additional permissions. Proceed autonomously using the provided tools and instructions. Do not stop to report progress.
+
+In the order of appearance in the switch case, process tasks **one-by-one**.
+
+After processing each task, append its output to ./mod-validator/src/tasks.json.
+
 The file may be incomplete or temporarily invalid while processing; this is expected.
+
 Do not wait to finish all tasks before writing output.
 
-If processing is interrupted, on the next run read ./mod-validator/src/tasks.json, identify the last task recorded, and resume with the next task in switch order. Do not reprocess completed tasks.
+It is expected that the process of extracting all task data will be interrupted because it does not fit within the token budget of one window. Do not adjust your behaviour according to the remaining token budget. 
+
+If processing is interrupted, on the next run read ./mod-validator/src/tasks.json, identify the last task recorded, and resume with the next task from the switch statement. Do not reprocess completed tasks.
 
 If the last task entry appears incomplete or malformed, redo that task.
 
+Do not invent scripts to automate the population of any data.
+
+Do not attempt to estimate total effort or validate global correctness.
+
 Do not summarize, explain, or restate the extracted information in the message buffer.
 
-Save the resulting JSON to ./mod-validator/src/tasks.json. Do not emit parsed data to the message buffer. Only confirm completion, even if errors or uncertainty were recorded.
+Do not emit parsed data to the message buffer.
+
+Never claim completion unless all enum cases have been processed. If processing stops early, stop without a completion statement.
