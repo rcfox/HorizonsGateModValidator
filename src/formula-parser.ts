@@ -377,6 +377,12 @@ function parseOperand(operand: string, startPos: FormulaPosition): ASTNode {
   }
 
   // If no special syntax, treat as a global formula reference
+  // Validate that the name only contains word characters (letters, digits, underscore)
+  if (!/^\w+$/.test(operand)) {
+    throw new Error(
+      `Invalid identifier '${operand}': global formula names must only contain letters, digits, and underscores. Did you mean to use a function call with ':' (e.g., 'c:${operand}')?`
+    );
+  }
   return { type: 'global', name: operand, ...posInfo };
 }
 

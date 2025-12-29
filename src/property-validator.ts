@@ -234,6 +234,14 @@ export class PropertyValidator {
   }
 
   /**
+   * Validate that a task name exists (without validating parameters)
+   * Public method for use by validator.ts
+   */
+  validateTaskName(taskName: string, propInfo: PropertyInfo): ValidationMessage[] {
+    return this.taskValidator.validateTaskName(taskName, propInfo);
+  }
+
+  /**
    * Resolve an enum name to its actual key in the enums registry
    * Tries className.enumName first, then just enumName
    */

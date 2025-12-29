@@ -94,7 +94,7 @@ describe('Task String Validation', () => {
   describe('@-prefix parameter validation', () => {
     test('validates @F formula prefix', () => {
       const modContent = `[DialogNode] ID=testNode;
-        specialEffect=test,@Fhp>10;`;
+        specialEffect=test,@Fc:HP>10;`;
 
       const result = validator.validate(modContent, 'test.txt');
       expectValid(result);
@@ -158,7 +158,7 @@ describe('Task String Validation', () => {
 
     test('validates @R formula prefix (redundant with @F)', () => {
       const modContent = `[DialogNode] ID=testNode;
-        specialEffect=test,@Rhp>10;`;
+        specialEffect=test,@Rc:HP>10;`;
 
       const result = validator.validate(modContent, 'test.txt');
       expectValid(result);
@@ -451,6 +451,158 @@ describe('Task String Validation', () => {
 
       const result = validator.validate(modContent, 'test.txt');
       expectValid(result);
+    });
+  });
+
+  describe('TriggerEffect property validation', () => {
+    test('validates taskString property as task string', () => {
+      const modContent = `[Trigger] ID=testTrigger;
+        [TriggerEffect]
+          taskString=abil;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+      expectValid(result);
+    });
+
+    test('validates effectID as task name', () => {
+      const modContent = `[Trigger] ID=testTrigger;
+        [TriggerEffect]
+          effectID=abil;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+      expectValid(result);
+    });
+
+    test('warns when both effectID and taskString are specified', () => {
+      const modContent = `[Trigger] ID=testTrigger;
+        [TriggerEffect]
+          effectID=abil;
+          taskString=travel;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+
+      // Should warn that taskString takes precedence and effectID will be ignored
+      expectMessage(result, { text: 'taskString and effectID are specified', severity: 'warning' });
+    });
+
+    test('hints on unknown effectID task name', () => {
+      const modContent = `[Trigger] ID=testTrigger;
+        [TriggerEffect]
+          effectID=actoin;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+
+      // Should have hint for unknown task (with corrections)
+      expectMessage(result, { text: 'Unknown task', severity: 'error' });
+    });
+
+    test('warns when TriggerEffect has neither effectID nor taskString', () => {
+      const modContent = `[Trigger] ID=testTrigger;
+        [TriggerEffect]
+          sValue=test;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+
+      // Should warn about missing effectID and taskString
+      expectMessage(result, { text: 'has neither effectID nor taskString', severity: 'error' });
+    });
+
+    test('validates TriggerEffect with any properties', () => {
+      // All TriggerEffect properties have defaults, so any combination is valid
+      const modContent = `[Trigger] ID=testTrigger;
+        [TriggerEffect]
+          effectID=setGlobalVar;
+          sValue=varName;
+          sValue2=varValue;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+      expectValid(result);
+    });
+
+    test('validates TriggerEffect with minimal properties', () => {
+      // Only effectID is required, other properties use defaults
+      const modContent = `[Trigger] ID=testTrigger;
+        [TriggerEffect]
+          effectID=abil;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+      expectValid(result);
+    });
+
+    test('validates TriggerEffect with mixed properties', () => {
+      // Any combination of properties is valid (all have defaults)
+      const modContent = `[Trigger] ID=testTrigger;
+        [TriggerEffect]
+          effectID=setGlobalVar;
+          sValue=varName;
+          fValue=42;
+          bValue1=true;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+      expectValid(result);
+    });
+
+    test('validates fReq as formula', () => {
+      // fReq should be validated as a formula (standard property validation)
+      const modContent = `[Trigger] ID=testTrigger;
+        [TriggerEffect]
+          effectID=abil;
+          fReq=c:HP>50;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+      expectValid(result);
+    });
+
+    test('errors on invalid formula syntax in fReq', () => {
+      // Formulas with bare comparisons (no prefix) should error
+      const modContent = `[Trigger] ID=testTrigger;
+        [TriggerEffect]
+          effectID=abil;
+          fReq=hp>50;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+      expectMessage(result, { text: 'Formula parse error', severity: 'error' });
+    });
+
+    test('validates delay as any number', () => {
+      // delay should accept any number
+      const modContent = `[Trigger] ID=testTrigger;
+        [TriggerEffect]
+          effectID=abil;
+          delay=2.5;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+      expectValid(result);
+    });
+
+    test('does not warn about parameter counts', () => {
+      // All properties have defaults, so any combination is valid
+      const modContent = `[Trigger] ID=testTrigger;
+        [TriggerEffect]
+          effectID=abil;
+          sValue=anyValue;
+          fValue=1.5;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+
+      // Should not warn about parameter counts (all properties have defaults)
+      expectValid(result);
+    });
+
+    test('skips property validation when taskString is set', () => {
+      // When taskString is set, effectID and other properties should be ignored for task validation
+      const modContent = `[Trigger] ID=testTrigger;
+        [TriggerEffect]
+          taskString=abil;
+          effectID=invalidTask;
+          sValue=ignored;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+
+      // Should only validate taskString, not effectID
+      // The effectID won't be validated as a task name because taskString takes precedence
+      // But should warn that both are specified
+      expectMessage(result, { text: 'taskString and effectID are specified', severity: 'warning' });
     });
   });
 });

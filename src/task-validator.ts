@@ -55,6 +55,55 @@ export class TaskValidator {
   }
 
   /**
+   * Validate that a task name exists (without validating parameters)
+   *
+   * @param taskName - The task name to validate
+   * @param propInfo - Property information for position tracking
+   * @returns Validation messages (hints for unknown tasks with suggestions)
+   */
+  validateTaskName(taskName: string, propInfo: PropertyInfo): ValidationMessage[] {
+    const messages: ValidationMessage[] = [];
+
+    // Check if task exists (check aliases first)
+    const canonicalName = this.taskAliasMap.get(taskName);
+    if (!canonicalName) {
+      // Find similar task names for suggestions
+      const allTaskNames = Array.from(this.tasks.keys());
+      const similar = findSimilar(taskName, allTaskNames, MAX_EDIT_DISTANCE);
+
+      if (similar.length > 0) {
+        // Found similar task names - likely a typo
+        const corrections = similar.map(s => ({
+          filePath: propInfo.filePath,
+          startLine: propInfo.valueStartLine,
+          startColumn: propInfo.valueStartColumn,
+          endLine: propInfo.valueEndLine,
+          endColumn: propInfo.valueEndColumn,
+          replacementText: s.value,
+        }));
+
+        messages.push({
+          severity: 'error',
+          message: `Unknown task: '${taskName}'`,
+          filePath: propInfo.filePath,
+          line: propInfo.valueStartLine,
+          corrections,
+        });
+      } else {
+        // No similar task names
+        messages.push({
+          severity: 'error',
+          message: `Unknown task: '${taskName}'`,
+          filePath: propInfo.filePath,
+          line: propInfo.valueStartLine,
+        });
+      }
+    }
+
+    return messages;
+  }
+
+  /**
    * Main entry point: Validate a task string
    *
    * @param taskString - The comma-separated task string to validate
@@ -99,6 +148,7 @@ export class TaskValidator {
           replacementText: s.value,
         }));
 
+        // These are hint messages because taskName might also refer to a trigger ID, which we don't validate yet.
         messages.push({
           severity: 'hint',
           message: `Unknown task: '${parsed.taskName}'`,
@@ -688,9 +738,14 @@ export class TaskValidator {
         }
 
         if (actualCount > maxExpected) {
+          // For error messages, report the actual user-provided count, not including implicit float
+          const reportedCount = (hasImplicitFloat && arrayName === 'floats')
+            ? destinations.floats
+            : actualCount;
+
           messages.push({
             severity: 'warning',
-            message: `Task '${taskName}' expects at most ${maxExpected} ${arrayName} parameter(s), but got ${actualCount}`,
+            message: `Task '${taskName}' expects at most ${maxExpected} ${arrayName} parameter(s), but got ${reportedCount}`,
             filePath: propInfo.filePath,
             line: propInfo.valueStartLine,
             context: `Extra parameters may be ignored`,
@@ -707,7 +762,23 @@ export class TaskValidator {
 
     // If at least one use case matches, return only warnings from the best match
     if (matchingUseCases.length > 0) {
-      const bestMatch = matchingUseCases[0]!;
+      // Pick the best match by preferring use cases that:
+      // 1. Use more of the provided parameters (fewer "too many" warnings)
+      // 2. Have all required parameters satisfied
+      const bestMatch = matchingUseCases.reduce((best, current) => {
+        const bestWarnings = best.messages.filter(m => m.severity === 'warning').length;
+        const currentWarnings = current.messages.filter(m => m.severity === 'warning').length;
+
+        // Prefer use case with fewer warnings
+        if (currentWarnings < bestWarnings) return current;
+        if (currentWarnings > bestWarnings) return best;
+
+        // If tied on warnings, prefer the one with more required parameters (more specific match)
+        const bestRequired = Object.values(best.requiredCounts).filter(v => typeof v === 'number' && v > 0).length;
+        const currentRequired = Object.values(current.requiredCounts).filter(v => typeof v === 'number' && v > 0).length;
+
+        return currentRequired > bestRequired ? current : best;
+      });
       const resultMessages = [...bestMatch.messages];
 
       // Add info message if implicit float is being used to meet requirements
