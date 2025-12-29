@@ -3637,7 +3637,7 @@
             {
               "name": "strings[0]",
               "description": "The string ID of the trigger to execute. Searches zone triggers first, then global triggers."
-            },
+            }
           ],
           "optional": [
             {
