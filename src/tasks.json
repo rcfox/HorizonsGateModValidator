@@ -3632,11 +3632,34 @@
       "name": "trigger",
       "uses": [
         {
-          "description": "Executes a trigger from the zone or global trigger list. Can identify triggers by string ID or numeric ID. Optionally evaluates a formula condition before executing and can check trigger requirements before execution. The trigger is looked up first by string ID from zone or global triggers, then by numeric ID if no string ID is provided.",
+          "description": "Executes a trigger from the zone or global trigger list. Identifies triggers by string ID. Optionally evaluates a formula condition before executing and can check trigger requirements before execution.",
           "required": [
             {
               "name": "strings[0]",
-              "description": "The string ID of the trigger to execute. Searches zone triggers first, then global triggers. If empty, uses floats[0] to look up by numeric ID instead."
+              "description": "The string ID of the trigger to execute. Searches zone triggers first, then global triggers."
+            },
+          ],
+          "optional": [
+            {
+              "name": "strings[1]",
+              "description": "A formula string to evaluate as a condition. If provided and non-empty, the trigger only executes if the formula evaluates to a value greater than 0."
+            },
+            {
+              "name": "bools[0]",
+              "description": "When true, skips the trigger's requirement checks and executes it unconditionally (except for the optional formula condition in strings[1]). When false or when bools is empty, checks the trigger's normal requirements before executing."
+            },
+            {
+              "name": "bools[1]",
+              "description": "Parameter passed to the trigger's checkIfCanTrigger method when bools[0] is false. The meaning depends on the trigger implementation. Only used when checking trigger requirements."
+            }
+          ]
+        },
+        {
+          "description": "Executes a trigger from the zone. Identifies triggers by numeric ID. Optionally evaluates a formula condition before executing and can check trigger requirements before execution. The trigger is looked up first by string ID from zone or global triggers, then by numeric ID if no string ID is provided.",
+          "required": [
+            {
+              "name": "strings[0]",
+              "description": "When empty, uses floats[0] to look up by numeric ID instead."
             },
             {
               "name": "floats[0]",
