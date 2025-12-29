@@ -9,27 +9,10 @@ import {
   setupExpandCollapse,
   setupCopyButtons,
   getElementById,
-  querySelectorAs,
   querySelectorAllAs,
 } from './shared-utils.js';
+import type { TasksData, TaskMetadata } from '../types.js';
 import rawTasksData from '../tasks.json';
-
-interface TaskArgument {
-  name: string;
-  description: string;
-}
-
-interface Task {
-  name: string;
-  description: string;
-  required: TaskArgument[];
-  optional: TaskArgument[];
-}
-
-interface TasksData {
-  gameVersion: string;
-  tasks: Task[];
-}
 
 const tasksData = rawTasksData as TasksData;
 
@@ -75,18 +58,20 @@ function convertToFriendlyNames(text: string): string {
 }
 
 // Convert task data to use friendly names
-function convertTaskData(tasks: Task[]): Task[] {
+function convertTaskData(tasks: TaskMetadata[]): TaskMetadata[] {
   return tasks.map(task => ({
     ...task,
     name: convertToFriendlyNames(task.name),
-    description: convertToFriendlyNames(task.description),
-    required: task.required.map(arg => ({
-      name: convertToFriendlyNames(arg.name),
-      description: convertToFriendlyNames(arg.description),
-    })),
-    optional: task.optional.map(arg => ({
-      name: convertToFriendlyNames(arg.name),
-      description: convertToFriendlyNames(arg.description),
+    uses: task.uses.map(useCase => ({
+      description: convertToFriendlyNames(useCase.description),
+      required: useCase.required.map(arg => ({
+        name: convertToFriendlyNames(arg.name),
+        description: convertToFriendlyNames(arg.description),
+      })),
+      optional: useCase.optional.map(arg => ({
+        name: convertToFriendlyNames(arg.name),
+        description: convertToFriendlyNames(arg.description),
+      })),
     })),
   }));
 }
@@ -132,44 +117,64 @@ export function initTasksApp(): void {
   const urlParams = new URLSearchParams(window.location.search);
   const taskParam = urlParams.get('task');
   if (taskParam) {
-    const matchingTask = convertedTasks.find(task => task.name.toLowerCase() === taskParam.toLowerCase());
+    // Try to find by name first, then check aliases
+    let matchingTask = convertedTasks.find(task => task.name.toLowerCase() === taskParam.toLowerCase());
+
+    // If not found by name, check if taskParam is an alias
+    if (!matchingTask) {
+      matchingTask = convertedTasks.find(task =>
+        task.aliases && task.aliases.some(alias => alias.toLowerCase() === taskParam.toLowerCase())
+      );
+    }
 
     if (matchingTask) {
-      const taskElement = querySelectorAs(`.task-item[data-task-name="${matchingTask.name}"]`, HTMLDetailsElement);
+      // Open all use cases for this task
+      const taskElements = querySelectorAllAs(`.task-item[data-task-name="${matchingTask.name}"]`, HTMLDetailsElement);
 
-      if (taskElement) {
-        taskElement.open = true;
+      if (taskElements.length > 0) {
+        taskElements.forEach(el => {
+          el.open = true;
+        });
 
         setTimeout(() => {
-          taskElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          taskElement.classList.add('task-highlight');
-          setTimeout(() => taskElement.classList.remove('task-highlight'), 2000);
+          taskElements[0]!.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          taskElements.forEach(el => {
+            el.classList.add('task-highlight');
+            setTimeout(() => el.classList.remove('task-highlight'), 2000);
+          });
         }, 100);
       }
     }
   }
 
-  function searchTask(task: Task, searchTerm: string): boolean {
+  function searchTask(task: TaskMetadata, searchTerm: string): boolean {
     const term = searchTerm.toLowerCase();
     if (task.name.toLowerCase().includes(term)) return true;
-    if (task.description.toLowerCase().includes(term)) return true;
 
-    if (
-      task.required.some(arg => arg.name.toLowerCase().includes(term) || arg.description.toLowerCase().includes(term))
-    ) {
-      return true;
-    }
+    // Search aliases
+    if (task.aliases && task.aliases.some(a => a.toLowerCase().includes(term))) return true;
 
-    if (
-      task.optional.some(arg => arg.name.toLowerCase().includes(term) || arg.description.toLowerCase().includes(term))
-    ) {
-      return true;
-    }
+    // Search within use cases
+    return task.uses.some(useCase => {
+      if (useCase.description.toLowerCase().includes(term)) return true;
 
-    return false;
+      if (
+        useCase.required.some(arg => arg.name.toLowerCase().includes(term) || arg.description.toLowerCase().includes(term))
+      ) {
+        return true;
+      }
+
+      if (
+        useCase.optional.some(arg => arg.name.toLowerCase().includes(term) || arg.description.toLowerCase().includes(term))
+      ) {
+        return true;
+      }
+
+      return false;
+    });
   }
 
-  function renderTasks(tasks: Task[], highlightMatch: (text: string) => string): void {
+  function renderTasks(tasks: TaskMetadata[], highlightMatch: (text: string) => string): void {
     const tasksList = getElementById('tasksList');
 
     if (tasks.length === 0) {
@@ -177,12 +182,12 @@ export function initTasksApp(): void {
       return;
     }
 
-    // Save current open state of all tasks
+    // Save current open state of all task use cases
     const openStates = new Map<string, boolean>();
     querySelectorAllAs('.task-item', HTMLDetailsElement, tasksList).forEach(item => {
-      const taskName = item.getAttribute('data-task-name');
-      if (taskName) {
-        openStates.set(taskName, item.open);
+      const taskKey = item.getAttribute('data-task-key');
+      if (taskKey) {
+        openStates.set(taskKey, item.open);
       }
     });
 
@@ -190,34 +195,53 @@ export function initTasksApp(): void {
 
     // Restore open state
     querySelectorAllAs('.task-item', HTMLDetailsElement, tasksList).forEach(item => {
-      const taskName = item.getAttribute('data-task-name');
-      if (taskName && openStates.has(taskName)) {
-        item.open = openStates.get(taskName)!;
+      const taskKey = item.getAttribute('data-task-key');
+      if (taskKey && openStates.has(taskKey)) {
+        item.open = openStates.get(taskKey)!;
       }
     });
   }
 
-  function renderTask(task: Task, highlight: (text: string) => string): string {
-    const hasRequired = task.required && task.required.length > 0;
-    const hasOptional = task.optional && task.optional.length > 0;
+  function renderTask(task: TaskMetadata, highlight: (text: string) => string): string {
     const taskUrl = `${window.location.origin}${window.location.pathname}?task=${encodeURIComponent(task.name)}`;
     const issueTitle = encodeURIComponent(`[Task Documentation] Issue with "${task.name}" task`);
     const issueBody = encodeURIComponent(
       `**Task Name:** \`${task.name}\`\n\n**Issue Description:**\n<!-- Describe what's wrong or unclear about this task's documentation -->\n\n\n**Expected:**\n<!-- What should the documentation say? -->\n\n\n<!-- Please provide as much detail as possible -->`
     );
     const issueUrl = `https://github.com/rcfox/HorizonsGateModValidator/issues/new?title=${issueTitle}&body=${issueBody}`;
+    const hasAliases = task.aliases && task.aliases.length > 0;
 
-    return `
-      <details class="task-item" data-task-name="${task.name}">
+    return task.uses
+      .map((useCase, useIndex) => {
+        const taskKey = `${task.name}-use-${useIndex}`;
+        const hasRequired = useCase.required && useCase.required.length > 0;
+        const hasOptional = useCase.optional && useCase.optional.length > 0;
+
+        return `
+      <details class="task-item" data-task-name="${task.name}" data-task-key="${taskKey}">
         <summary class="task-summary">
           <span class="task-name">${highlight(task.name)}</span>
-          <span class="task-brief">${highlight(task.description)}</span>
+          <span class="task-brief">${highlight(useCase.description)}</span>
         </summary>
         <div class="task-details">
           <div class="task-header-row">
-            <div class="task-description">${highlight(task.description)}</div>
+            <div class="task-description">${highlight(useCase.description)}</div>
             <button class="copy-link-btn" data-url="${taskUrl}" title="Copy link to this task">🔗</button>
           </div>
+
+          ${
+            hasAliases
+              ? `
+          <div class="task-info-sections">
+            <div class="info-section">
+              <h4 class="info-header">Aliases</h4>
+              <div class="info-content">
+                <code class="info-code">${task.aliases.map(a => highlight(a)).join(', ')}</code>
+              </div>
+            </div>
+          </div>`
+              : ''
+          }
 
           ${
             hasRequired
@@ -225,7 +249,7 @@ export function initTasksApp(): void {
             <div class="task-arguments">
               <h4 class="arguments-header required">Required Arguments</h4>
               <ul class="arguments-list">
-                ${task.required
+                ${useCase.required
                   .map(
                     arg => `
                   <li class="argument-item">
@@ -245,7 +269,7 @@ export function initTasksApp(): void {
             <div class="task-arguments">
               <h4 class="arguments-header optional">Optional Arguments</h4>
               <ul class="arguments-list">
-                ${task.optional
+                ${useCase.optional
                   .map(
                     arg => `
                   <li class="argument-item">
@@ -266,6 +290,8 @@ export function initTasksApp(): void {
           </div>
         </div>
       </details>`;
+      })
+      .join('');
   }
 
   function updateCount(showing: number, total: number): void {

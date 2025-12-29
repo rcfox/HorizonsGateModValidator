@@ -465,6 +465,11 @@ export class ModValidator {
 
     messages.push(...this.validateProperties(obj, classSchema, resolvedType));
 
+    // Special validation for TriggerEffect objects
+    if (resolvedType === 'TriggerEffect') {
+      messages.push(...this.validateTriggerEffect(obj));
+    }
+
     return messages;
   }
 
@@ -581,6 +586,35 @@ export class ModValidator {
         continue;
       }
 
+      // Special case: ActorValueAffecter.magnitude should be validated as task string
+      // when actorValue property equals "task"
+      if (resolvedTypeName === 'ActorValueAffecter' && cleanPropName === 'magnitude') {
+        const actorValueProp = obj.properties.get('actorValue');
+        if (actorValueProp && actorValueProp.value.trim() === 'task') {
+          // ERROR: magnitude must not be empty when actorValue = "task"
+          if (propValue.trim() === '') {
+            messages.push({
+              severity: 'error',
+              message: 'ActorValueAffecter with actorValue="task" requires non-empty magnitude',
+              filePath: propInfo.filePath,
+              line: propInfo.valueStartLine,
+              context: 'The magnitude property should contain a task string (e.g., "action,actionID")',
+            });
+            continue;
+          }
+
+          // Validate as task string instead of Formula
+          const taskMessages = this.propertyValidator.validateTaskString(
+            propValue,
+            propInfo,
+            resolvedTypeName,
+            cleanPropName
+          );
+          messages.push(...taskMessages);
+          continue; // Skip normal Formula validation
+        }
+      }
+
       // Validate property type
       // Use cleanPropName so corrections reference the base property name without + suffixes
       const typeMessages = this.propertyValidator.validateProperty(
@@ -593,6 +627,70 @@ export class ModValidator {
 
       messages.push(...typeMessages);
     }
+
+    return messages;
+  }
+
+  /**
+   * Validate TriggerEffect object properties
+   *
+   * TriggerEffect can be specified in two ways:
+   * 1. Using taskString property (validated as a task string)
+   * 2. Using individual properties: effectID, sValue, sValue2, fValue, xValue, yValue, bValue1, bValue2, delay, fReq
+   *
+   * All TriggerEffect properties have default values, so parameter counting validation doesn't apply:
+   * - sValue = "" (default)
+   * - sValue2 = "" (default)
+   * - fValue = 0f (default)
+   * - xValue = -1 (default)
+   * - yValue = -1 (default)
+   * - bValue1 = false (default)
+   * - bValue2 = false (default)
+   * - delay = 0f (default)
+   * - fReq = "1" (default)
+   *
+   * The validation only checks that effectID is a valid task name.
+   *
+   * Note: @-parameters do NOT work in TriggerEffect (no @ prefix handling in TriggerEffect.cs)
+   */
+  private validateTriggerEffect(obj: ParsedObject): ValidationMessage[] {
+    const messages: ValidationMessage[] = [];
+
+    // If taskString is set, it takes precedence (already validated by property validator)
+    const taskString = obj.properties.get('taskString');
+    const effectID = obj.properties.get('effectID');
+
+    if (taskString && taskString.value.trim() !== '' && effectID && effectID.value.trim() !== '') {
+      // Both are specified - warn that effectID will be ignored
+      messages.push({
+        severity: 'warning',
+        message: 'Both taskString and effectID are specified on TriggerEffect',
+        context: 'taskString takes precedence and effectID will be ignored',
+        filePath: effectID.filePath,
+        line: effectID.nameStartLine,
+      });
+    }
+
+    if (taskString && taskString.value.trim() !== '') {
+      return messages;
+    }
+
+    // Get effectID - this is the task name
+    if (!effectID || effectID.value.trim() === '') {
+      // No effectID and no taskString - this TriggerEffect is incomplete
+      messages.push({
+        severity: 'error',
+        message: 'TriggerEffect has neither effectID nor taskString',
+        filePath: obj.filePath,
+        line: obj.startLine,
+      });
+      return messages;
+    }
+
+    // Validate effectID as a task name (with typo suggestions)
+    // Note: We don't validate parameter counts because all TriggerEffect properties have defaults
+    const effectIDMessages = this.propertyValidator.validateTaskName(effectID.value, effectID);
+    messages.push(...effectIDMessages);
 
     return messages;
   }

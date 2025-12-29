@@ -3,15 +3,21 @@ In ./Tactics.UI/UIDynamicText.cs, in the assignText function, there is a switch 
 For each of these tags, I want to capture:
 
 * The name of the tag.
-* What the tag does. If there are multiple things it might do, make sure to list all of them. Aim for 1-4 sentences unless it's more complicated.
+* What the tag does.
+  * Not just "executes the foo task", but actually try to describe in game terms what it does.
+  * The audience is game modders who do not have access to the source code.
+  * If there are multiple things it might do, make sure to list all of them. Aim for 1-4 sentences per distinct functionality, in distinct paragraphs.
+* What each input does.
+  * For example, item_global takes the name of a global variable.
+  * Be descriptive with 1-4 sentences for each input.
+  * Some inputs might have multiple uses depending on other inputs, be sure to capture them all.
 * Which inputs are required.
 * Which inputs are optional.
-* What each input does. For example, item_global takes the name of a global variable. Be descriptive with 1-4 sentences for each input. Some inputs might have multiple uses depending on other inputs, be sure to capture them all.
 * Any aliases found.
 
 To determine if an input is required, check to see if an array access comes before checking the length of the array. If there is no length check to ensure the given index is in bounds, or one comes after, it is required. This is because the code will crash if it attempts to access an index that is out of bounds. A check like `array3[0] > 0` does NOT count.
 
-Each description should be self-contained. Don't describe a tag in terms of another tag, unless they are meant to be used together, in which case, you should not that requirement.
+Each description should be self-contained. Don't describe a tag in terms of another tag, unless they are meant to be used together, in which case, you should note that requirement.
 
 Descriptions should describe behaviour, not implementation.
 

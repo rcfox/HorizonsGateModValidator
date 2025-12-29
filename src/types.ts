@@ -37,6 +37,24 @@ export interface FieldSchema {
 }
 
 /**
+ * Position information for tracking locations in source text
+ * (relative to start, preserving line breaks)
+ *
+ * Used by formula parsing and task string parsing for precise error reporting
+ */
+export interface PositionInfo {
+  startLine: number; // Line offset from start (0 for first line)
+  startColumn: number; // Column on that line (0-indexed)
+  endLine: number; // Line offset from start
+  endColumn: number; // Column on that line (0-indexed, exclusive)
+}
+
+/**
+ * Utility type to add position information to any type
+ */
+export type WithPosition<T> = T & PositionInfo;
+
+/**
  * Object category determines how the object is used in the game:
  *
  * - 'definition': Template types stored in Data collections (e.g., ActorType, ItemType)
@@ -161,6 +179,7 @@ export interface ValidationMessage {
   corrections?: Correction[] | undefined; // Suggested corrections for typos
   isCrossFile?: boolean | undefined; // True if this message came from cross-file validation (e.g., duplicate IDs)
   formulaReference?: string | undefined; // Operator name for linking to formula reference page
+  taskReference?: string | undefined; // Task name for linking to task reference page
   documentationUrl?: string | undefined; // External documentation URL
   documentationLabel?: string | undefined; // Label for the documentation link
 }
@@ -170,6 +189,67 @@ export interface ValidationResult {
   warnings: ValidationMessage[];
   hints: ValidationMessage[];
   info: ValidationMessage[];
+}
+
+/**
+ * Task parameter metadata from tasks.json
+ */
+export interface TaskParameter {
+  name: string; // e.g., "strings[0]", "floats[1]", "tileCoords[0]"
+  description: string;
+}
+
+/**
+ * Task use case metadata from tasks.json
+ */
+export interface TaskUseCase {
+  description: string;
+  required: TaskParameter[];
+  optional: TaskParameter[];
+}
+
+/**
+ * Task metadata from tasks.json
+ */
+export interface TaskMetadata {
+  name: string;
+  uses: TaskUseCase[];
+  aliases: string[];
+}
+
+/**
+ * Root structure of tasks.json
+ */
+export interface TasksData {
+  gameVersion: string;
+  tasks: TaskMetadata[];
+}
+
+/**
+ * Discriminated union for parsed task string parameters with position tracking
+ * Each variant represents how the parameter will be processed by the game
+ *
+ * @G (global variable substitution) is a preprocessing step that can be combined with other @ prefixes:
+ * - @R@Gvar, @X@Gvar, @Y@Gvar, @T@Gvar, @XYA@Gvar, @S@Gvar, @@Gvar are all valid
+ * - @F@Gvar and @A@Gvar are NOT valid (those prefixes are processed before @G)
+ * - The globalVarName field indicates @G substitution will occur at runtime
+ */
+export type ParsedParameter =
+  | WithPosition<{ type: 'string'; value: string; source: 'plain' | '@A' | '@S'; globalVarName?: string }>
+  | WithPosition<{ type: 'float'; value: number; source: 'plain' }>
+  | WithPosition<{ type: 'bool'; value: boolean; source: 'plain' }>
+  | WithPosition<{ type: 'tileCoord'; source: '@T' | '@XYA' | '@X' | '@Y'; value: string; globalVarName?: string }>
+  | WithPosition<{ type: 'formula'; source: '@F' | '@R'; formula: string; globalVarName?: string }>
+  | WithPosition<{ type: 'delay'; source: '@'; delayValue: number; globalVarName?: string }>
+  | WithPosition<{ type: 'globalVarSubstitution'; source: '@G'; varName: string; originalParam: string }>;
+
+/**
+ * Parsed task string with position information for all elements
+ */
+export interface ParsedTaskString {
+  taskName: string;
+  taskNamePosition: PositionInfo;
+  parameters: ParsedParameter[];
 }
 
 /**

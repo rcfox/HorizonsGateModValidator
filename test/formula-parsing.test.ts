@@ -531,6 +531,13 @@ describe('Formula Parsing', () => {
       { formula: 'd:foo(1+1)', error: 'function-style argument contains formula operators' },
       { formula: 'd:bar(10-5)', error: 'function-style argument contains formula operators' },
     ]);
+
+    // Invalid global formulas - identifiers with non-word characters
+    checkInvalidFormulas([
+      { formula: 'hp>50', error: 'global formula names must only contain letters, digits, and underscores' },
+      { formula: 'foo<bar', error: 'global formula names must only contain letters, digits, and underscores' },
+      { formula: 'test=value', error: 'global formula names must only contain letters, digits, and underscores' },
+    ]);
   });
 
   describe('Math functions', () => {

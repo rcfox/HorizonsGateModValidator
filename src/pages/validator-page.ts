@@ -2220,6 +2220,11 @@ export function initValidatorApp(): void {
       formulaReferenceHTML = `<div class="message-corrections">📖 See formula reference: <span class="correction-link formula-reference-link" data-operator="${escapeHtml(msg.formulaReference)}">${escapeHtml(msg.formulaReference)}</span></div>`;
     }
 
+    let taskReferenceHTML = '';
+    if (msg.taskReference) {
+      taskReferenceHTML = `<div class="message-corrections">📖 See task reference: <span class="correction-link task-reference-link" data-task="${escapeHtml(msg.taskReference)}">${escapeHtml(msg.taskReference)}</span></div>`;
+    }
+
     // Create documentation URL link if available
     let documentationHTML = '';
     if (msg.documentationUrl) {
@@ -2242,6 +2247,7 @@ export function initValidatorApp(): void {
             ${msg.context ? `<div class="message-context">${escapeHtml(msg.context)}</div>` : ''}
             ${correctionsHTML}
             ${formulaReferenceHTML}
+            ${taskReferenceHTML}
             ${documentationHTML}
             ${
               !correctionsHTML && !formulaReferenceHTML && !documentationHTML && msg.suggestion
@@ -2478,8 +2484,19 @@ export function initValidatorApp(): void {
       return;
     }
 
+    // Check if clicked on a task reference link
+    const taskReferenceLink = target.closest('.task-reference-link');
+    if (taskReferenceLink) {
+      e.stopPropagation();
+      const task = taskReferenceLink.getAttribute('data-task');
+      if (task) {
+        window.open(`tasks.html?task=${task}`, '_blank');
+      }
+      return;
+    }
+
     // Check if clicked on a correction link
-    const correctionLink = target.closest('.correction-link:not(.formula-reference-link)');
+    const correctionLink = target.closest('.correction-link:not(.formula-reference-link):not(.task-reference-link)');
     if (correctionLink) {
       e.stopPropagation();
       const correctionId = correctionLink.getAttribute('data-correction-id');
