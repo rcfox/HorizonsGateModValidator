@@ -153,10 +153,6 @@
           "description": "Changes the terrain type of a specific tile to a new terrain. This modifies the tile's fundamental terrain properties, affecting movement, visuals, and interactions. The change respects terrain change rules unless forced.",
           "required": [
             {
-              "name": "tileCoords[0]",
-              "description": "The tile coordinate of the tile whose terrain type should be changed."
-            },
-            {
               "name": "strings[0]",
               "description": "The ID of the new terrain type to apply to the tile. This should match a valid terrain type defined in the game data."
             },
@@ -165,7 +161,12 @@
               "description": "A boolean flag parameter that affects how the terrain change is applied. The exact behavior depends on the terrain change implementation."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The tile coordinate of the tile whose terrain type should be changed."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -1555,15 +1556,16 @@
               "description": "Must be an empty string to allow tile-based positioning."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The tile coordinate where the effect should appear."
-            },
-            {
               "name": "bools[0]",
               "description": "Must be true to enable the white color effect."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The tile coordinate where the effect should appear."
+            }
+          ]
         },
         {
           "description": "Adds a visual effect at a tile coordinate. The effect is displayed at the specified tile position without color modification. This form requires a tile coordinate but no color flag.",
@@ -1577,15 +1579,16 @@
               "description": "Must be an empty string to allow tile-based positioning."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The tile coordinate where the effect should appear."
-            },
-            {
               "name": "bools[0]",
               "description": "Must be false or not provided for standard effect display without color modification."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The tile coordinate where the effect should appear."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -1796,10 +1799,6 @@
           "description": "Points the camera at a specific tile coordinate with a fixed camera mode. The camera focuses on the specified location, discovers fog of war at that position, and optionally adjusts tracking speed. Flags can lock the camera for the duration of a preventInteraction delay and enable special roof rendering.",
           "required": [
             {
-              "name": "tileCoords[0]",
-              "description": "The tile coordinate where the camera should point. Must be provided (not (-1, -1)) to use this mode."
-            },
-            {
               "name": "bools[0]",
               "description": "When true, locks the camera for the duration of the current preventInteraction delay timer. When false, the camera can be changed immediately."
             },
@@ -1812,6 +1811,10 @@
             {
               "name": "floats[0]",
               "description": "The camera tracking speed. If non-zero, overrides the default tracking speed. If zero or not provided, uses default speed."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The tile coordinate where the camera should point. Must be provided (not (-1, -1)) to use this mode."
             }
           ]
         },
@@ -1857,10 +1860,6 @@
           "description": "Locks the camera at a specific tile coordinate with a fixed camera mode. The camera is permanently locked at the specified location until explicitly unlocked, discovers fog of war at that position, and optionally adjusts tracking speed. A roof rendering flag can be enabled.",
           "required": [
             {
-              "name": "tileCoords[0]",
-              "description": "The tile coordinate where the camera should be locked. Must be provided (not (-1, -1)) to use this mode."
-            },
-            {
               "name": "bools[0]",
               "description": "When true, fixes the camera to render as if under a roof. This affects visual rendering of the scene."
             }
@@ -1869,6 +1868,10 @@
             {
               "name": "floats[0]",
               "description": "The camera tracking speed. If non-zero, overrides the default tracking speed. If zero or not provided, uses default speed."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The tile coordinate where the camera should be locked. Must be provided (not (-1, -1)) to use this mode."
             }
           ]
         },
@@ -2162,10 +2165,6 @@
               "description": "The ID of the item to remove from the tile or travel point."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The tile coordinate (or travel point coordinates if bools[1] is true) where items should be removed. Must be provided (not (-1, -1)) to use tile/point removal mode."
-            },
-            {
               "name": "floats[0]",
               "description": "The number of items to remove. If 0, automatically becomes 1. Only used in inventory removal mode."
             },
@@ -2178,6 +2177,10 @@
             {
               "name": "strings[1]",
               "description": "The name of a global variable containing the item ID. If provided and non-empty, retrieves the item ID from this global variable instead of using strings[0]."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The tile coordinate (or travel point coordinates if bools[1] is true) where items should be removed. Must be provided (not (-1, -1)) to use tile/point removal mode."
             }
           ]
         },
@@ -2230,15 +2233,16 @@
           "description": "Removes items of a specific value or higher from a tile coordinate. This removes items based on their monetary value rather than their ID, useful for removing valuable items regardless of type.",
           "required": [
             {
-              "name": "tileCoords[0]",
-              "description": "The tile coordinate from which to remove valuable items."
-            },
-            {
               "name": "floats[0]",
               "description": "The minimum value threshold. Items with this value or higher will be removed from the tile."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The tile coordinate from which to remove valuable items."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -2289,13 +2293,13 @@
       "uses": [
         {
           "description": "Removes all items from a specific tile coordinate. All items on that tile are removed at once.",
-          "required": [
+          "required": [],
+          "optional": [
             {
               "name": "tileCoords[0]",
               "description": "The tile coordinate from which all items should be removed. Must be provided and not (-1, -1)."
             }
-          ],
-          "optional": []
+          ]
         },
         {
           "description": "Removes all instances of a specific item from every tile in the entire zone. The item ID can be provided directly or retrieved from a global variable. This performs a zone-wide cleanup of the specified item type.",
@@ -2353,10 +2357,6 @@
               "description": "The ID of the item to add. Must be a valid item type defined in the game data."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The tile coordinate where the item should be placed. Must be provided (not (-1, -1))."
-            },
-            {
               "name": "bools[0]",
               "description": "Force-fit flag. When true, forces the item to be placed even if the tile is full."
             }
@@ -2365,6 +2365,10 @@
             {
               "name": "floats[0]",
               "description": "The quantity of items to add. If not provided or 0, defaults to 1."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The tile coordinate where the item should be placed. Must be provided (not (-1, -1))."
             }
           ]
         },
@@ -2414,10 +2418,6 @@
             {
               "name": "strings[0]",
               "description": "The ID of the item to add to the container. Must be a valid item type defined in the game data."
-            },
-            {
-              "name": "tileCoords[0]",
-              "description": "The tile coordinate where the container is located. The task searches this tile for suitable containers."
             }
           ],
           "optional": [
@@ -2428,6 +2428,10 @@
             {
               "name": "floats[0]",
               "description": "The quantity of items to add to the container. If not provided or 0, defaults to 1."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The tile coordinate where the container is located. The task searches this tile for suitable containers."
             }
           ]
         }
@@ -2443,10 +2447,6 @@
             {
               "name": "strings[0]",
               "description": "The ID of the item to spawn, or the name of a global variable containing the item ID. Must be a valid item type (either directly or after global variable lookup)."
-            },
-            {
-              "name": "tileCoords[0]",
-              "description": "The tile coordinate (or travel point coordinates if bools[1] is true) where the item should spawn. Must be provided (not (-1, -1))."
             },
             {
               "name": "bools[0]",
@@ -2465,6 +2465,10 @@
             {
               "name": "strings[1]",
               "description": "The ID of a visual effect to play at the spawn location. If provided and non-empty, displays this effect when the item spawns."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The tile coordinate (or travel point coordinates if bools[1] is true) where the item should spawn. Must be provided (not (-1, -1))."
             }
           ]
         },
@@ -2499,13 +2503,13 @@
       "uses": [
         {
           "description": "Moves all items from the task's top-left area coordinate to a destination tile. All items are removed from the source tile and added to the destination, with force-fit enabled to ensure they are placed even if the destination is full.",
-          "required": [
+          "required": [],
+          "optional": [
             {
               "name": "tileCoords[0]",
               "description": "The destination tile coordinate where items should be moved to."
             }
-          ],
-          "optional": []
+          ]
         }
       ],
       "aliases": []
@@ -2519,13 +2523,14 @@
             {
               "name": "strings[0]",
               "description": "The ID of the actor who should receive the items. The actor must exist in the current zone."
-            },
+            }
+          ],
+          "optional": [
             {
               "name": "tileCoords[0]",
               "description": "The tile coordinate from which items should be taken and moved to the actor."
             }
-          ],
-          "optional": []
+          ]
         }
       ],
       "aliases": []
@@ -2687,10 +2692,6 @@
           "description": "Removes an actor at a specific tile coordinate from the zone. Optionally plays a visual effect when removing the actor and can transfer the actor's inventory to the player's stash before removal.",
           "required": [
             {
-              "name": "tileCoords[0]",
-              "description": "The tile coordinate where the actor to remove is located. Must not be (-1, -1)."
-            },
-            {
               "name": "bools[0]",
               "description": "Whether to play a visual effect when removing the actor. When true, plays an FX at the actor's position."
             },
@@ -2703,6 +2704,10 @@
             {
               "name": "strings[1]",
               "description": "The ID of the visual effect to play when removing the actor. Only used if bools[0] is true. Defaults to 'actor_flee' if not provided."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The tile coordinate where the actor to remove is located. Must not be (-1, -1)."
             }
           ]
         }
@@ -2979,15 +2984,16 @@
               "description": "The ID of the actor to move."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The tile coordinate to move the actor to."
-            },
-            {
               "name": "floats[0]",
               "description": "The facing rotation to set for the actor after moving them, in degrees."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The tile coordinate to move the actor to."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -3003,15 +3009,16 @@
               "description": "The ID of the actor to move."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The coordinates used to identify which travel point to find. The X and Y values are used to construct the travel point identifier."
-            },
-            {
               "name": "floats[0]",
               "description": "The facing rotation to set for the actor after moving them to the travel point, in degrees."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The coordinates used to identify which travel point to find. The X and Y values are used to construct the travel point identifier."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -3023,15 +3030,16 @@
           "description": "Moves all party members to a specific tile coordinate and points the camera at that location. Optionally sets the facing rotation for all party members. Also adds a brief interaction delay if in travel mode to prevent accidental interactions after teleporting.",
           "required": [
             {
-              "name": "tileCoords[0]",
-              "description": "The tile coordinate to move the party to. The camera will also target this position."
-            },
-            {
               "name": "floats[0]",
               "description": "The facing rotation to set for all party members after moving them, in degrees. If 0, party members retain their current facing."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The tile coordinate to move the party to. The camera will also target this position."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -3043,10 +3051,6 @@
           "description": "Moves all party members to the nearest travel point matching the specified coordinates. Optionally repositions party members onto specific travel points and spawns player boats in boat zones. This is commonly used for zone transitions and positioning the party at predefined locations.",
           "required": [
             {
-              "name": "tileCoords[0]",
-              "description": "The coordinates used to identify which travel point to move the party to. The X and Y values are used to construct the travel point identifier."
-            },
-            {
               "name": "bools[0]",
               "description": "Whether to put party actors onto travel points after moving. When true, repositions party members onto travel point items matching the Y coordinate from tileCoords[0]."
             },
@@ -3055,7 +3059,12 @@
               "description": "Whether to spawn player boats in boat zones. When true and the current zone is a boat zone, adds all boats from the player fleet to the zone and party if they aren't already present."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The coordinates used to identify which travel point to move the party to. The X and Y values are used to construct the travel point identifier."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -3067,15 +3076,16 @@
           "description": "Moves all party members by a relative offset vector and shifts the camera by the same amount. Optionally sets the facing rotation for all party members. The offset is added to each party member's current position, with bounds checking to keep actors within the zone.",
           "required": [
             {
-              "name": "tileCoords[0]",
-              "description": "The X and Y offset to move each party member by, relative to their current positions."
-            },
-            {
               "name": "floats[0]",
               "description": "The facing rotation to set for all party members after moving them, in degrees. If 0, party members retain their current facing."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The X and Y offset to move each party member by, relative to their current positions."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -3087,15 +3097,16 @@
           "description": "Moves all actors in the zone by a relative offset vector and shifts the camera by the same amount. Optionally sets the facing rotation for all actors. The offset is added to each actor's current position, with bounds checking to keep actors within the zone. This affects all actors, not just party members.",
           "required": [
             {
-              "name": "tileCoords[0]",
-              "description": "The X and Y offset to move each actor by, relative to their current positions."
-            },
-            {
               "name": "floats[0]",
               "description": "The facing rotation to set for all actors after moving them, in degrees. If 0, actors retain their current facing."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The X and Y offset to move each actor by, relative to their current positions."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -3202,10 +3213,6 @@
               "description": "The ID of the actor to path. If the actor is not found in the zone, falls back to the task's assigned actor."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The destination tile coordinate for the actor to path to."
-            },
-            {
               "name": "bools[0]",
               "description": "Whether to use waypoint-based pathfinding. When true, finds a path using waypoints and reverses it. When false, uses standard A* pathfinding with the actor's movement area of effect and terrain considerations."
             },
@@ -3214,7 +3221,12 @@
               "description": "The movement speed to set for the actor during pathing. If greater than 0, overrides the actor's default movement speed. If 0 or less, the actor uses their default speed."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The destination tile coordinate for the actor to path to."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -3224,13 +3236,13 @@
       "uses": [
         {
           "description": "Sets pathfinding routes for all party members to the same destination. Each party member pathfinds individually from their current position to the target coordinate using standard A* pathfinding. Party members' AI targets are set to themselves during pathing.",
-          "required": [
+          "required": [],
+          "optional": [
             {
               "name": "tileCoords[0]",
               "description": "The destination tile coordinate for all party members to path to."
             }
-          ],
-          "optional": []
+          ]
         }
       ],
       "aliases": []
@@ -3246,15 +3258,16 @@
               "description": "The ID of the actor to set a destination for. If the actor is not found in the zone, falls back to the task's assigned actor."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The destination tile coordinate for the actor to move toward."
-            },
-            {
               "name": "floats[0]",
               "description": "The movement speed to set for the actor. If greater than 0, overrides the actor's default movement speed. If 0 or less, the actor uses their default speed."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The destination tile coordinate for the actor to move toward."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -3270,10 +3283,6 @@
               "description": "The ID of the actor to apply movement to. If the actor is not found or the string is empty, falls back to the task's assigned actor."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The target tile coordinate. For each axis, -1 preserves the actor's current position on that axis; otherwise, the actor moves toward the specified coordinate."
-            },
-            {
               "name": "bools[0]",
               "description": "Whether to play a pain animation on the actor during movement. When true, animates the actor with their pain animation at normal speed."
             },
@@ -3282,7 +3291,12 @@
               "description": "The movement speed to set for the actor. If greater than 0, overrides the actor's default movement speed. If 0 or less, the actor uses their default speed."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The target tile coordinate. For each axis, -1 preserves the actor's current position on that axis; otherwise, the actor moves toward the specified coordinate."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -3298,10 +3312,6 @@
               "description": "The ID of the visual effect to add to the zone. This should be a valid FX identifier."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The world position coordinates (X, Y) where the visual effect should be placed in the zone."
-            },
-            {
               "name": "bools[0]",
               "description": "Whether to check for duplicates before adding. When true, only adds the effect if it doesn't already exist in the zone. When false, adds the effect regardless of existing instances."
             },
@@ -3310,7 +3320,12 @@
               "description": "Duration or timing parameter for the zone effect. The exact meaning depends on the effect type."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The world position coordinates (X, Y) where the visual effect should be placed in the zone."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -3326,10 +3341,6 @@
               "description": "The generation mode or parameter for creating the special FX textures. Affects how the textures are generated from the zone terrain."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "Velocity offset for the FX tiles. When not (-1, -1), sets a velocity offset of (X * 0.1, Y * 0.1) for each tile, enables looping around zone edges, and makes effects only draw when roofs are drawn."
-            },
-            {
               "name": "bools[0]",
               "description": "Whether to create underwater/background effects. When true, effects render behind everything with a large negative depth and use water FX alpha modulation. When false, effects render in front with a large positive depth."
             },
@@ -3342,6 +3353,10 @@
             {
               "name": "bools[1]",
               "description": "Whether to save the generated textures to the desktop. When true, saves each generated tile texture as an image file for debugging or inspection."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "Velocity offset for the FX tiles. When not (-1, -1), sets a velocity offset of (X * 0.1, Y * 0.1) for each tile, enables looping around zone edges, and makes effects only draw when roofs are drawn."
             }
           ]
         }
@@ -3705,10 +3720,6 @@
               "description": "Either an actor prefab ID or spawn data ID. If it exists in actor prefabs, spawns a prefab actor. If it exists in spawn data, creates a spawn group."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The spawn position or search area. When (-1, -1), spawns in a random occupiable tile within the task's bounding area. Otherwise, spawns at or near this coordinate, with behavior varying based on spawn type."
-            },
-            {
               "name": "bools[0]",
               "description": "For actor prefabs: whether to preserve the exact actor ID instead of generating a unique one. For spawn data: whether spawned actors should look at the center of the spawn area instead of the player."
             },
@@ -3725,6 +3736,10 @@
             {
               "name": "strings[1]",
               "description": "For actor prefabs: animation to play on spawn. For spawn data: group ID override for the created actors."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The spawn position or search area. When (-1, -1), spawns in a random occupiable tile within the task's bounding area. Otherwise, spawns at or near this coordinate, with behavior varying based on spawn type."
             }
           ]
         }
@@ -3746,10 +3761,6 @@
               "description": "Group ID override for the created actors."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The spawn position or search area. Behavior matches the spawn task."
-            },
-            {
               "name": "bools[0]",
               "description": "Whether spawned actors should look at the center of the spawn area instead of the player."
             },
@@ -3762,7 +3773,12 @@
               "description": "Power level offset added to party power level, enemy spawn modifier, and spawnPowerMod global variable."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The spawn position or search area. Behavior matches the spawn task."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -3782,10 +3798,6 @@
               "description": "Group ID override for the created actors."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "Additional positioning parameters passed to the spawn task."
-            },
-            {
               "name": "bools[0]",
               "description": "Whether spawned actors should look at the center of the spawn area instead of the player."
             },
@@ -3798,7 +3810,12 @@
               "description": "Power level offset added to party power level, enemy spawn modifier, and spawnPowerMod global variable."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "Additional positioning parameters passed to the spawn task."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -3814,10 +3831,6 @@
               "description": "The actor prefab ID to spawn. Must be a valid prefab in the actor prefab definitions."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "Travel point coordinates. The X value selects which travel point within the set (by index), and the Y value identifies which travel point set to use (travel point type)."
-            },
-            {
               "name": "bools[0]",
               "description": "Whether to preserve the exact actor ID instead of generating a unique one."
             }
@@ -3826,6 +3839,10 @@
             {
               "name": "strings[1]",
               "description": "Animation to play on the spawned actor."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "Travel point coordinates. The X value selects which travel point within the set (by index), and the Y value identifies which travel point set to use (travel point type)."
             }
           ]
         }
@@ -3858,10 +3875,6 @@
               "description": "The special property name to search for on items. Actors spawn on tiles containing items with this property."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "Optional target position. When not (-1, -1), spawned actors look at this coordinate after spawning."
-            },
-            {
               "name": "bools[0]",
               "description": "Whether to prevent group duplication. When true, does not spawn if a group with this ID already exists."
             },
@@ -3870,7 +3883,12 @@
               "description": "Power level offset added to party power level, enemy spawn modifier, and spawnPowerMod global variable."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "Optional target position. When not (-1, -1), spawned actors look at this coordinate after spawning."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -3907,10 +3925,6 @@
               "description": "The spawn data ID to use for creating the fleet. Must exist in spawn data definitions."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The position where the fleet should spawn."
-            },
-            {
               "name": "bools[0]",
               "description": "Whether the fleet is a merchant fleet."
             },
@@ -3927,6 +3941,10 @@
             {
               "name": "strings[1]",
               "description": "Custom faction override or additional fleet parameter."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The position where the fleet should spawn."
             }
           ]
         }
@@ -4108,10 +4126,6 @@
             {
               "name": "strings[0]",
               "description": "The ID of the special zone to load."
-            },
-            {
-              "name": "tileCoords[0]",
-              "description": "The world position for the special zone. The X and Y values set the position directly."
             }
           ],
           "optional": [
@@ -4126,6 +4140,10 @@
             {
               "name": "floats[0]",
               "description": "Depth modification for the special zone rendering. Affects the draw order relative to other elements."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The world position for the special zone. The X and Y values set the position directly."
             }
           ]
         }
@@ -4137,12 +4155,7 @@
       "uses": [
         {
           "description": "Loads the player's flagship boarding zone as a special zone overlay at a specific world position. Automatically determines the boarding zone ID from the player fleet's flagship. The special zone can be scaled, positioned with precision, and configured to draw only when roofs are visible.",
-          "required": [
-            {
-              "name": "tileCoords[0]",
-              "description": "The world position for the special zone. The X and Y values set the position directly."
-            }
-          ],
+          "required": [],
           "optional": [
             {
               "name": "strings[1]",
@@ -4155,6 +4168,10 @@
             {
               "name": "floats[0]",
               "description": "Depth modification for the special zone rendering. Affects the draw order relative to other elements."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The world position for the special zone. The X and Y values set the position directly."
             }
           ]
         }
@@ -4168,10 +4185,6 @@
           "description": "Moves the special zone to a new target position with optional movement speed and easing. Can optionally create a yo-yo effect where the special zone returns to its starting position after reaching the target.",
           "required": [
             {
-              "name": "tileCoords[0]",
-              "description": "The target position to move the special zone to. The X and Y values set the target directly."
-            },
-            {
               "name": "bools[0]",
               "description": "Whether to use easing for the movement. When true, the movement is smoothed/eased rather than linear."
             },
@@ -4184,6 +4197,10 @@
             {
               "name": "bools[1]",
               "description": "Whether to create a yo-yo effect. When true, the special zone will return to its current position after reaching the target."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The target position to move the special zone to. The X and Y values set the target directly."
             }
           ]
         }
@@ -4233,15 +4250,16 @@
           "description": "Arranges all party members and barracks crew in a grid formation for display. Positions actors in rows with customizable spacing, with active party members slightly elevated. All actors face 90 degrees (east) and are added to the zone if not already present.",
           "required": [
             {
-              "name": "tileCoords[0]",
-              "description": "The starting position for the lineup grid. Actors are arranged in rows starting from this coordinate."
-            },
-            {
               "name": "floats[0]",
               "description": "The spacing between actors in the grid. Defaults to 1 if 0 or less. Determines horizontal distance between adjacent actors."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The starting position for the lineup grid. Actors are arranged in rows starting from this coordinate."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -4404,12 +4422,7 @@
       "uses": [
         {
           "description": "Initiates combat mode at a specific position with a customizable battlefield radius. Optionally specifies which actor initiated the combat. The position determines the center of the combat area.",
-          "required": [
-            {
-              "name": "tileCoords[0]",
-              "description": "The center position of the combat battlefield. Combat encounters are centered around this coordinate."
-            }
-          ],
+          "required": [],
           "optional": [
             {
               "name": "strings[0]",
@@ -4418,6 +4431,10 @@
             {
               "name": "floats[0]",
               "description": "The battlefield radius in tiles. Defaults to 18 if not provided or if 0. Determines how large the combat area is."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The center position of the combat battlefield. Combat encounters are centered around this coordinate."
             }
           ]
         }
@@ -4435,15 +4452,16 @@
               "description": "The action ID to execute when the timer expires."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The position for both the combat center and the timed action's target coordinate."
-            },
-            {
               "name": "floats[0]",
               "description": "The delay in seconds before the timed action executes."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The position for both the combat center and the timed action's target coordinate."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -4507,13 +4525,13 @@
       "uses": [
         {
           "description": "Arranges all dead party members in a graveyard formation. Places deceased actors on platforms in a grid pattern, makes them petrified and uncontrollable, heals them, and drops their inventories. Actors are positioned in rows with 2-tile spacing, up to a maximum of 122 corpses.",
-          "required": [
+          "required": [],
+          "optional": [
             {
               "name": "tileCoords[0]",
               "description": "The starting position for the graveyard grid. Dead actors are arranged in rows starting from this coordinate."
             }
-          ],
-          "optional": []
+          ]
         }
       ],
       "aliases": []
@@ -8360,7 +8378,12 @@
               "description": "The zone ID from which to retrieve items. This zone is loaded temporarily, its pickable items are collected, and then it's unloaded."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The location to place the retrieved items in the current zone."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -8482,10 +8505,6 @@
               "description": "The duration of the movement animation in seconds. The journal will smoothly tween from its current position to the destination over this time period."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The destination coordinates for the journal window position. The X and Y values from this tile coordinate are used as the target screen position in pixels. This position can be modified by the bool parameters."
-            },
-            {
               "name": "bools[0]",
               "description": "Whether to mirror the X position from the right edge of the screen. When true, the X coordinate is measured from the right edge instead of the left, allowing for right-aligned positioning."
             },
@@ -8494,7 +8513,12 @@
               "description": "Whether to center the journal on screen. When true, ignores the tile coordinate position and centers the journal both horizontally and vertically on the screen. This takes precedence over the mirror setting."
             }
           ],
-          "optional": []
+          "optional": [
+            {
+              "name": "tileCoords[0]",
+              "description": "The destination coordinates for the journal window position. The X and Y values from this tile coordinate are used as the target screen position in pixels. This position can be modified by the bool parameters."
+            }
+          ]
         }
       ],
       "aliases": []
@@ -8554,13 +8578,14 @@
             {
               "name": "strings[0]",
               "description": "The terrain type ID to modify. This identifies which terrain type's sprite offset multipliers should be changed."
-            },
+            }
+          ],
+          "optional": [
             {
               "name": "tileCoords[0]",
               "description": "The sprite offset multiplier values. The X coordinate sets the horizontal sprite offset multiplier, and the Y coordinate sets the vertical sprite offset multiplier for the terrain type."
             }
-          ],
-          "optional": []
+          ]
         }
       ],
       "aliases": []
@@ -8574,13 +8599,14 @@
             {
               "name": "strings[0]",
               "description": "The terrain type ID to modify. This identifies which terrain type's sprite offset modulo values should be changed."
-            },
+            }
+          ],
+          "optional": [
             {
               "name": "tileCoords[0]",
               "description": "The sprite offset modulo values. The X coordinate sets the horizontal sprite offset modulo, and the Y coordinate sets the vertical sprite offset modulo for the terrain type."
             }
-          ],
-          "optional": []
+          ]
         }
       ],
       "aliases": []
@@ -8594,13 +8620,14 @@
             {
               "name": "strings[0]",
               "description": "The terrain type ID prefix. All terrain types whose IDs start with this string will have their sprite offset modulo values updated. For example, 'grass' would affect 'grass1', 'grass2', 'grassland', etc."
-            },
+            }
+          ],
+          "optional": [
             {
               "name": "tileCoords[0]",
               "description": "The sprite offset modulo values to apply. The X coordinate sets the horizontal sprite offset modulo, and the Y coordinate sets the vertical sprite offset modulo for all matching terrain types."
             }
-          ],
-          "optional": []
+          ]
         }
       ],
       "aliases": []
@@ -8627,10 +8654,6 @@
               "description": "The radius of the square area to modify. The fog state is set for all tiles in a square from (center - radius) to (center + radius). This is cast to an integer."
             },
             {
-              "name": "tileCoords[0]",
-              "description": "The center point of the fog modification area. The fog of war state will be changed for tiles around this coordinate."
-            },
-            {
               "name": "bools[0]",
               "description": "The fog state to set. When true, tiles are marked as known (revealed). When false, tiles are marked as unknown (hidden/fogged)."
             }
@@ -8639,6 +8662,10 @@
             {
               "name": "strings[0]",
               "description": "The zone ID for which to modify fog of war. If provided and not empty, modifies fog for that zone instead of the current zone. This allows modifying fog in zones the player isn't currently in. If empty or not provided, uses the current zone."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The center point of the fog modification area. The fog of war state will be changed for tiles around this coordinate."
             }
           ]
         }
@@ -8743,12 +8770,7 @@
       "uses": [
         {
           "description": "Moves actors away from a specific location to nearby positions outside a defined radius. This finds all actors within a radius of a center point, then relocates them to occupiable tiles just outside that radius. Optionally filters by faction and can trigger pain animations. This is useful for clearing an area of actors or creating space around a specific location. If party actors are relocated, their movement paths are cleared.",
-          "required": [
-            {
-              "name": "tileCoords[0]",
-              "description": "The center point from which actors should be relocated. Actors within the specified radius of this coordinate will be moved to positions outside the radius."
-            }
-          ],
+          "required": [],
           "optional": [
             {
               "name": "floats[0]",
@@ -8761,6 +8783,10 @@
             {
               "name": "bools[0]",
               "description": "Whether to play a pain animation when relocating actors. When true, each relocated actor plays their pain animation as they are moved, providing visual feedback of the displacement."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The center point from which actors should be relocated. Actors within the specified radius of this coordinate will be moved to positions outside the radius."
             }
           ]
         }
@@ -8773,10 +8799,6 @@
         {
           "description": "Relocates actors to specific travel points in the zone. This finds all actors within a radius of a center coordinate (optionally filtered by faction), then distributes them to available travel point items in the zone. The actors are placed on travel points matching a specific set number. This is useful for teleporting groups of actors to designated spawn points or positioning areas.",
           "required": [
-            {
-              "name": "tileCoords[0]",
-              "description": "The center point for finding actors to relocate. All actors within the specified radius of this coordinate are candidates for relocation."
-            },
             {
               "name": "bools[0]",
               "description": "First boolean parameter passed to the actor placement function, controlling some aspect of how actors are positioned on travel points."
@@ -8798,6 +8820,10 @@
             {
               "name": "strings[1]",
               "description": "The travel point set number. Actors are placed on travel point items matching this set number. If not provided, defaults to 0. This is parsed as an integer."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The center point for finding actors to relocate. All actors within the specified radius of this coordinate are candidates for relocation."
             }
           ]
         }
