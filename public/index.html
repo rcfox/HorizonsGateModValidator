@@ -22,24 +22,13 @@
               <a href="dynamic-text.html" class="nav-link">Dynamic Text Reference</a>
             </div>
           </div>
-          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
-            🌙
-          </button>
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌙</button>
         </div>
       </header>
 
-      <details class="known-issues">
-        <summary>Known Issues</summary>
-        <ul>
-          <li><strong>Formula validation limitations:</strong> Formula parser doesn't handle @ expressions (@F, @G, etc.) yet.</li>
-          <li><strong>Task validation incomplete:</strong> Task required arguments and task enum values are not yet validated.</li>
-          <li><strong>Dialog text formatting:</strong> Text formatting tags (e.g., <code>&lt;foo=bar&gt;</code>) in dialog strings are not yet supported.</li>
-        </ul>
-      </details>
-
       <main id="main">
         <!-- File tree (hidden by default) -->
-        <div id="fileTree" class="file-tree-section" style="display: none;">
+        <div id="fileTree" class="file-tree-section" style="display: none">
           <div class="section-header">
             <h2>Files</h2>
           </div>
@@ -52,22 +41,16 @@
             <div class="actions">
               <button id="clearBtn" class="btn btn-secondary">Clear</button>
               <div class="upload-dropdown">
-                <button id="uploadBtn" class="btn btn-secondary">
-                  Open ▾
-                </button>
+                <button id="uploadBtn" class="btn btn-secondary">Open ▾</button>
                 <div class="upload-menu">
                   <button id="uploadFilesBtn" class="upload-menu-item">Open Files</button>
                   <button id="uploadDirBtn" class="upload-menu-item">Open Directory</button>
                 </div>
-                <input type="file" id="fileInput" style="display: none;" multiple />
-                <input type="file" id="dirInput" style="display: none;" webkitdirectory directory />
+                <input type="file" id="fileInput" style="display: none" multiple />
+                <input type="file" id="dirInput" style="display: none" webkitdirectory directory />
               </div>
-              <button id="loadSampleBtn" class="btn btn-secondary">
-                Load Sample
-              </button>
-              <button id="downloadZipBtn" class="btn btn-secondary" style="display: none;">
-                Export ZIP
-              </button>
+              <button id="loadSampleBtn" class="btn btn-secondary">Load Sample</button>
+              <button id="downloadZipBtn" class="btn btn-secondary" style="display: none">Export ZIP</button>
               <button id="validateBtn" class="btn btn-primary">Validate</button>
             </div>
           </div>
@@ -115,10 +98,7 @@ Example:
             <div id="validationStatus" class="status"></div>
           </div>
           <div id="results" class="results-container">
-            <p class="placeholder">
-              No validation results yet. Paste your mod code and click
-              "Validate".
-            </p>
+            <p class="placeholder">No validation results yet. Paste your mod code and click "Validate".</p>
           </div>
         </div>
       </main>
