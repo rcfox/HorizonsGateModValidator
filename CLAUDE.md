@@ -92,30 +92,59 @@ file.txt:71: warning: Numeric enum value used for itemCategory
 ## Project Structure
 
 ### Source Files (`/src`)
-- **cli.ts** - Command-line interface (compiles to `dist/cli.js`)
+- **cli.ts** - Command-line interface (compiles to `dist/src/cli.js`)
 - **validator.ts** - Main validation orchestrator
 - **parser.ts** - Parses mod file format into structured objects
 - **lexer.ts** - Tokenizes mod file content
 - **property-validator.ts** - Validates property values against expected types
-- **formula-validator.ts** - Validates formula syntax and functions
+- **formula-parser.ts** - Parses formula strings into ASTs
+- **formula-ast-validator.ts** - Validates formula ASTs
+- **formula-validator.ts** - High-level formula validation coordinator
+- **task-validator.ts** - Validates task strings and parameters
+- **value-validators.ts** - Validators for primitive types (boolean, integer, float, etc.)
 - **string-similarity.ts** - Levenshtein distance for typo suggestions (MAX_EDIT_DISTANCE = 3)
 - **types.ts** - TypeScript type definitions
+- **formula-metadata.ts** - Metadata loading for formula operators/functions
 - **mod-schema.json** - Generated schema with class definitions, type aliases, and enums
 - **mod-schema.d.ts** - TypeScript definitions for schema
+- **formula.json** - Formula operator and function metadata
+- **dynamic-text.json** - Dynamic text syntax metadata
+- **tasks.json** - Task reference metadata
+
+### Source Files (`/src/pages`)
+Browser application code (compiled to `public/app.bundle.js`):
+- **index.ts** - Entry point for app bundle, initializes all pages
+- **validator-page.ts** - Main validator UI (index.html) - file tree, editor, validation results, corrections
+- **formulas-page.ts** - Formula reference page (formulas.html)
+- **tasks-page.ts** - Task reference page (tasks.html)
+- **dynamic-text-page.ts** - Dynamic text reference page (dynamic-text.html)
+- **shared-utils.ts** - Shared utilities for all pages (theme, HTML escaping, DOM helpers)
+
+### Source Files (`/src/tools`)
+- **formula-visualizer.ts** - CLI tool to visualize formula ASTs (for debugging)
 
 ### Tests (`/test`)
-- **test-utils.ts** - Contains several helper functions for writing tests.
-- Several test files, named by functionality.
+- **test-utils.ts** - Contains several helper functions for writing tests
+- Several test files, named by functionality
 
 ### Web UI (`/public`)
 - **index.html** - Main validator page
-- **app.js** - UI logic, theme management, validation triggers, auto-correction
-- **styles.css** - Styling with light/dark mode support (defaults to system preference)
-- **validator.bundle.js** - Built bundle (gitignored, generated at build time)
+- **formulas.html** - Formula reference page
+- **tasks.html** - Task reference page
+- **dynamic-text.html** - Dynamic text reference page
+- **shared-base.css** - Base styles shared across all pages
+- **shared-reference.css** - Styles for reference pages (formulas, tasks, dynamic-text)
+- **validator.css** - Validator page specific styles
+- **formulas.css** - Formula reference page specific styles
+- **tasks.css** - Task reference page specific styles
+- **dynamic-text.css** - Dynamic text reference page specific styles
+- **app.bundle.js** - Browser app bundle (gitignored, generated at build time from `src/pages/index.ts`)
+- **validator.bundle.js** - Validator logic bundle (gitignored, generated at build time from `src/index.ts`)
+- **\*.bundle.js.map** - Source maps for bundles (gitignored)
 
 ### Build Tools
 - **extract_schema.cjs** - Extracts schema from C# source code in `/home/rcfox/code/hg/Tactics/`
-- **build-bundle.js** - Creates browser bundle using esbuild
+- **build-bundle.js** - Creates browser bundles using esbuild (validator.bundle.js and app.bundle.js)
 
 ## Key Features
 
