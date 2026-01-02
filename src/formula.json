@@ -3161,7 +3161,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns 1 if a zone has been visited (exists in fog of war), otherwise 0",
+          "description": "Returns 1 if a zone has been visited in this play session (ie: since loading a save), otherwise 0",
           "returns": "boolean",
           "example": "z:dungeon1",
           "arguments": [
