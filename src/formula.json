@@ -2324,7 +2324,7 @@
         {
           "description": "Gets a global variable by concatenating a prefix with the current location ID",
           "returns": "float",
-          "example": "gPlusLocID:visited",
+          "example": "gPlusLocID:firstVisit_",
           "arguments": [
             {
               "name": "prefix",
@@ -2935,7 +2935,7 @@
         {
           "description": "Returns time elapsed since a global var formed by prefix + current location ID",
           "returns": "float",
-          "example": "gPlusLocIDTimeSince:visited",
+          "example": "gPlusLocIDTimeSince:firstVisit_",
           "arguments": [
             {
               "name": "prefix",
