@@ -980,7 +980,7 @@
       "name": "setGlobalVarWithCommas",
       "uses": [
         {
-          "description": "Sets a global variable to a comma-separated concatenation of multiple string values. All strings after the first are joined together with commas between them, creating a single comma-delimited string value. This is useful for storing lists or multiple values in a single global variable.",
+          "description": "Sets a global variable to a comma-separated concatenation of multiple string values. All strings after the first are joined together with commas between them, creating a single comma-delimited string value. This is useful for setting a global variable value that contains commas, as setGlobalVar would only take the value up until the first comma when used in a task string.",
           "required": [
             {
               "name": "strings[0]",
@@ -3953,17 +3953,17 @@
             },
             {
               "name": "bools[1]",
-              "description": "Whether the fleet is allied to the player."
+              "description": "Whether the fleet is elite."
             },
             {
               "name": "floats[0]",
-              "description": "Power level or other numeric parameter for fleet spawning."
+              "description": "Desired power level of the fleet, clamped to the minimum and maximum actors defined in the fleet spawn data."
             }
           ],
           "optional": [
             {
               "name": "strings[1]",
-              "description": "Custom faction override or additional fleet parameter."
+              "description": "The ID of the actor to use as commodore of the fleet."
             },
             {
               "name": "tileCoords[0]",
