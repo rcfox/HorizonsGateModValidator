@@ -3948,6 +3948,10 @@
               "description": "The spawn data ID to use for creating the fleet. Must exist in spawn data definitions."
             },
             {
+              "name": "strings[1]",
+              "description": "The ID of the actor prefab to use as commodore of the fleet."
+            },
+            {
               "name": "bools[0]",
               "description": "Whether the fleet is a merchant fleet."
             },
@@ -3961,10 +3965,6 @@
             }
           ],
           "optional": [
-            {
-              "name": "strings[1]",
-              "description": "The ID of the actor to use as commodore of the fleet."
-            },
             {
               "name": "tileCoords[0]",
               "description": "The position where the fleet should spawn."
