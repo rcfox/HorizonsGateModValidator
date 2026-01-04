@@ -89,6 +89,37 @@ describe('Task String Validation', () => {
       // Should have hint for unknown task (actoin is close to action, so it hints with corrections)
       expectMessage(result, { text: 'Unknown task', severity: 'hint' });
     });
+
+    test('validates as task string when actorValue = "trigger"', () => {
+      const modContent = `[ActorValueAffecter] ID=test;
+        actorValue=trigger;
+        magnitude=abil;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+      expectValid(result);
+    });
+
+    test('errors when actorValue = "trigger" and magnitude is empty', () => {
+      const modContent = `[ActorValueAffecter] ID=test;
+        actorValue=trigger;
+        magnitude=;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+
+      // Should have error for empty magnitude
+      expectMessage(result, { text: 'requires non-empty magnitude', severity: 'error' });
+    });
+
+    test('hints on invalid task when actorValue = "trigger"', () => {
+      const modContent = `[ActorValueAffecter] ID=test;
+        actorValue=trigger;
+        magnitude=actoin;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+
+      // Should have hint for unknown task (actoin is close to action, so it hints with corrections)
+      expectMessage(result, { text: 'Unknown task', severity: 'hint' });
+    });
   });
 
   describe('@-prefix parameter validation', () => {

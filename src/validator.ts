@@ -587,15 +587,16 @@ export class ModValidator {
       }
 
       // Special case: ActorValueAffecter.magnitude should be validated as task string
-      // when actorValue property equals "task"
+      // when actorValue property equals "task" or "trigger"
       if (resolvedTypeName === 'ActorValueAffecter' && cleanPropName === 'magnitude') {
         const actorValueProp = obj.properties.get('actorValue');
-        if (actorValueProp && actorValueProp.value.trim() === 'task') {
-          // ERROR: magnitude must not be empty when actorValue = "task"
+        const actorValue = actorValueProp?.value.trim();
+        if (actorValueProp && (actorValue === 'task' || actorValue === 'trigger')) {
+          // ERROR: magnitude must not be empty when actorValue = "task" or "trigger"
           if (propValue.trim() === '') {
             messages.push({
               severity: 'error',
-              message: 'ActorValueAffecter with actorValue="task" requires non-empty magnitude',
+              message: `ActorValueAffecter with actorValue="${actorValue}" requires non-empty magnitude`,
               filePath: propInfo.filePath,
               line: propInfo.valueStartLine,
               context: 'The magnitude property should contain a task string (e.g., "action,actionID")',
