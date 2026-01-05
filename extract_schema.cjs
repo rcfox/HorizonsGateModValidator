@@ -1025,6 +1025,7 @@ function extractSchema(tacticsDir) {
   schema['Palette'] = {
     category: 'special',
     fields: [
+      { name: 'ID', type: 'string', csType: 'string' },
       { name: 'num', type: 'integer', csType: 'int' },
       { name: 'animated', type: 'boolean', csType: 'bool' },
       { name: 'animatedSlow', type: 'boolean', csType: 'bool' },

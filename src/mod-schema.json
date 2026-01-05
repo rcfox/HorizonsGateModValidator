@@ -8223,6 +8223,11 @@
       "category": "special",
       "fields": [
         {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
           "name": "num",
           "type": "integer",
           "csType": "int"
