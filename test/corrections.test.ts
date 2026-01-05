@@ -487,5 +487,98 @@ applyWeponBuffs=true;`;
       expect(correction.endLine).toBe(2);
       expect(correction.endColumn).toBe(22);
     });
+
+    test('detects missing semicolon when followed by another property on same line', () => {
+      const modContent = '[ItemType] ID=foo name=bar;';
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      // Should detect missing semicolon after ID=foo
+      const msg = findMessage(result.errors, 'does not end with semicolon');
+      expectToBeDefined(msg);
+      expect(msg.message).toContain('ID');
+      expectToBeDefined(msg.corrections);
+      expect(msg.corrections.length).toBeGreaterThan(0);
+
+      const correction = msg.corrections[0]!;
+      expect(correction.replacementText).toBe(';');
+      expect(correction.startLine).toBe(1);
+      expect(correction.endLine).toBe(1);
+    });
+
+    test('detects missing semicolon with tab indentation', () => {
+      const modContent = '[Action] ID=test;\n\tcasterAnimation=broadswing\n\tapplyWeaponBuffs=true;';
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      const msg = findMessage(result.errors, 'does not end with semicolon');
+      expectToBeDefined(msg);
+      expect(msg.message).toContain('casterAnimation');
+      expectToBeDefined(msg.corrections);
+      expect(msg.corrections.length).toBeGreaterThan(0);
+
+      const correction = msg.corrections[0]!;
+      expect(correction.replacementText).toBe(';');
+      expect(correction.startLine).toBe(2);
+      expect(correction.endLine).toBe(2);
+    });
+
+    test('detects missing semicolon with space indentation', () => {
+      const modContent = '[Action] ID=test;\n    casterAnimation=broadswing\n    applyWeaponBuffs=true;';
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      const msg = findMessage(result.errors, 'does not end with semicolon');
+      expectToBeDefined(msg);
+      expect(msg.message).toContain('casterAnimation');
+      expectToBeDefined(msg.corrections);
+
+      const correction = msg.corrections[0]!;
+      expect(correction.replacementText).toBe(';');
+      expect(correction.startLine).toBe(2);
+    });
+
+    test('detects missing semicolon with no indentation', () => {
+      const modContent = '[Action] ID=test;\ncasterAnimation=broadswing\napplyWeaponBuffs=true;';
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      const msg = findMessage(result.errors, 'does not end with semicolon');
+      expectToBeDefined(msg);
+      expect(msg.message).toContain('casterAnimation');
+      expectToBeDefined(msg.corrections);
+
+      const correction = msg.corrections[0]!;
+      expect(correction.replacementText).toBe(';');
+      expect(correction.startLine).toBe(2);
+    });
+
+    test('detects missing semicolon with mixed whitespace', () => {
+      const modContent = '[Action] ID=test;\n\t  casterAnimation=broadswing\n  \tapplyWeaponBuffs=true;';
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      const msg = findMessage(result.errors, 'does not end with semicolon');
+      expectToBeDefined(msg);
+      expect(msg.message).toContain('casterAnimation');
+      expectToBeDefined(msg.corrections);
+
+      const correction = msg.corrections[0]!;
+      expect(correction.replacementText).toBe(';');
+      expect(correction.startLine).toBe(2);
+    });
+
+    test('does not false positive on multi-line formulas', () => {
+      const modContent = `[FormulaGlobal] ID=test;
+\tformula=c:HP+
+\t\tc:STR*2+
+\t\t5;`;
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      // Should not have any semicolon errors - this is a valid multi-line formula
+      const semicolonErrors = result.errors.filter(e => e.message.includes('semicolon'));
+      expect(semicolonErrors.length).toBe(0);
+    });
   });
 });

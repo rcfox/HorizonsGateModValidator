@@ -220,6 +220,15 @@ export class ModParser {
         break; // Stop at comments
       }
 
+      // Check if we've hit a new property (KEY=VALUE pattern) even on the same line
+      if (this.check(TokenType.IDENTIFIER)) {
+        const nextToken = this.peekNext();
+        if (nextToken?.type === TokenType.EQUALS) {
+          // This is a new property, stop here
+          break;
+        }
+      }
+
       // Check if we hit a newline
       if (this.check(TokenType.NEWLINE)) {
         this.advance(); // consume newline
@@ -234,15 +243,29 @@ export class ModParser {
           break;
         }
 
+        // Skip leading whitespace on the next line to check for KEY=VALUE pattern
+        const savedPosition = this.current;
+        while (!this.isAtEnd() && this.check(TokenType.STRING_VALUE)) {
+          const token = this.peek();
+          // Only skip if it's pure whitespace
+          if (token.value.trim().length === 0) {
+            this.advance();
+          } else {
+            break;
+          }
+        }
+
         // Look ahead to see if this is KEY=VALUE pattern
         if (this.check(TokenType.IDENTIFIER)) {
           const nextToken = this.peekNext();
           if (nextToken?.type === TokenType.EQUALS) {
-            // This is a new property, stop here
+            // This is a new property, stop here (don't restore position, we want to skip the whitespace)
             break;
           }
-          // Otherwise, this is a continuation line - keep collecting
         }
+
+        // Not a new property, restore position to include the whitespace as part of continuation
+        this.current = savedPosition;
 
         continue; // Continue to next token
       }

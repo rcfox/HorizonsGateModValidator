@@ -97,7 +97,25 @@ export class ModLexer {
       case '\t':
         // Skip whitespace unless we're in value mode
         if (this.inValueMode) {
-          // In value mode, whitespace is part of the value
+          // Check if whitespace is followed by IDENTIFIER= (new property)
+          let lookahead = this.current;
+          // Skip additional whitespace
+          while (lookahead < this.source.length && this.isWhitespace(this.source[lookahead])) {
+            lookahead++;
+          }
+          // Check if we have an identifier starting here
+          if (lookahead < this.source.length && this.isAlphaNumeric(this.source[lookahead])) {
+            while (lookahead < this.source.length && this.isIdentifierChar(this.source[lookahead])) {
+              lookahead++;
+            }
+            // Check if it's followed by =
+            if (lookahead < this.source.length && this.source[lookahead] === '=') {
+              // This is a new property! Exit value mode and skip the whitespace
+              this.inValueMode = false;
+              break; // Don't call scanValue(), just skip the whitespace
+            }
+          }
+          // Not a new property, whitespace is part of the value
           this.scanValue();
         }
         // Otherwise skip whitespace
@@ -134,10 +152,26 @@ export class ModLexer {
   }
 
   private scanIdentifierOrValue(): void {
-    // If we're in value mode, scan as a value to preserve whitespace
+    // If we're in value mode, check if this looks like a new property first
     if (this.inValueMode) {
-      this.scanValue();
-      return;
+      // Look ahead to see if this is IDENTIFIER= pattern (new property)
+      let lookahead = this.current;
+
+      // Scan the potential identifier
+      while (lookahead < this.source.length && this.isIdentifierChar(this.source[lookahead])) {
+        lookahead++;
+      }
+
+      // Check if it's followed by =
+      if (lookahead < this.source.length && this.source[lookahead] === '=') {
+        // This is a new property! Exit value mode and scan as identifier
+        this.inValueMode = false;
+        // Continue below to scan as identifier
+      } else {
+        // Not a new property, scan as value
+        this.scanValue();
+        return;
+      }
     }
 
     const start = this.current - 1;
@@ -154,12 +188,36 @@ export class ModLexer {
   private scanValue(): void {
     const start = this.current - 1;
 
-    // Scan until semicolon or newline (values can contain spaces)
+    // Scan until semicolon, newline, or a pattern that looks like a new property (IDENTIFIER=)
     while (!this.isAtEnd()) {
       const char = this.peek();
       if (char === ';' || char === '\n') {
         break;
       }
+
+      // Check if we're about to hit a new property (whitespace followed by IDENTIFIER=)
+      if (this.isWhitespace(char)) {
+        // Look ahead to see if this whitespace is followed by IDENTIFIER=
+        let lookahead = this.current + 1;
+        // Skip whitespace
+        while (lookahead < this.source.length && this.isWhitespace(this.source[lookahead])) {
+          lookahead++;
+        }
+        // Check if we have an identifier starting here
+        if (lookahead < this.source.length && this.isAlphaNumeric(this.source[lookahead])) {
+          // Scan the identifier
+          while (lookahead < this.source.length && this.isIdentifierChar(this.source[lookahead])) {
+            lookahead++;
+          }
+          // Check if it's followed by =
+          if (lookahead < this.source.length && this.source[lookahead] === '=') {
+            // This is a new property! Stop scanning the value here and exit value mode
+            this.inValueMode = false;
+            break;
+          }
+        }
+      }
+
       this.advance();
     }
 
@@ -169,11 +227,18 @@ export class ModLexer {
     }
   }
 
-  private isIdentifierChar(char: string): boolean {
+  private isWhitespace(char: string | undefined): char is string {
+    return char === ' ' || char === '\t';
+  }
+
+  private isIdentifierChar(char: string | undefined): char is string {
     return this.isAlphaNumeric(char) || char === '_' || char === '+' || char === '!';
   }
 
-  private isAlphaNumeric(char: string): boolean {
+  private isAlphaNumeric(char: string | undefined): char is string {
+    if (!char) {
+      return false;
+    }
     return /[a-zA-Z0-9]/.test(char);
   }
 
