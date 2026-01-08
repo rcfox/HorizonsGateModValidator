@@ -3470,11 +3470,11 @@
           "required": [
             {
               "name": "strings[0]",
-              "description": "The color name to use for the zone darkness. Should be a valid color identifier that can be looked up in the game's color data."
+              "description": "The color name to use for the zone darkness. Should be a valid color identifier that can be looked up in the game's color data. Alternatively, this can be a color-component value with \"R,G,B\" or \"R,G,B,A\" with values specified between 0-255. Note: When specified as a task string, the color components will be split up and probably crash the game. It's possible to set a global variable with setGlobalVarWithCommas and then use @GmyColorVar to correctly insert a color-component value into a task string."
             },
             {
               "name": "bools[0]",
-              "description": "Whether to also apply the darkness color to the camera immediately. When true, sets the camera's darkness color to match the zone darkness color."
+              "description": "Whether to also apply the darkness color to the camera immediately. When true, skips the gradual transition to the new color."
             }
           ],
           "optional": []
