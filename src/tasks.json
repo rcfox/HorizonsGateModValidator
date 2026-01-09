@@ -1295,11 +1295,11 @@
       "name": "modFame",
       "uses": [
         {
-          "description": "Modifies the player's fame (reputation) with a specific faction or entity. Fame affects how NPCs and factions react to the player and can unlock special dialog options or quests. The fame value can be increased or decreased.",
+          "description": "Modifies the player's fame of a certain type with a visual flourish. The fame value is stored in the \"fame_<fameType>\" global variable. Default fame types include: \"explore\", \"trade\", \"combat\", \"piracy\". If you want to add a new type of fame, be sure to include icon images in your mod called \"fame_<fameType>.png\" and \"fame_<fameType>_outlined.png\" or else the game will crash.",
           "required": [
             {
               "name": "strings[0]",
-              "description": "The ID of the faction or entity whose fame should be modified."
+              "description": "The type of fame. Usually one of: \"explore\", \"trade\", \"combat\", \"piracy\""
             },
             {
               "name": "floats[0]",
