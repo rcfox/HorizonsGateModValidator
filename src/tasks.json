@@ -3736,38 +3736,129 @@
       "name": "spawn",
       "uses": [
         {
-          "description": "Spawns actors in the zone from either actor prefabs or spawn data. When using actor prefabs, creates a single actor at the specified location with optional ID preservation and animation. When using spawn data, creates a group of actors at power level relative to the party, with customizable facing, positioning, and visual effects. Actors can be spawned at specific coordinates or within a bounding area.",
+          "description": "Spawns an actor in the zone from an actor prefabs at the location specified by (X, Y) with optional ID preservation and animation. Actors can be spawned at specific coordinates or within a bounding area.",
           "required": [
             {
               "name": "strings[0]",
-              "description": "Either an actor prefab ID or spawn data ID. If it exists in actor prefabs, spawns a prefab actor. If it exists in spawn data, creates a spawn group."
+              "description": "The actor prefab ID. If this doesn't exist, it will attempt to spawn from spawn data."
             },
             {
               "name": "bools[0]",
-              "description": "For actor prefabs: whether to preserve the exact actor ID instead of generating a unique one. For spawn data: whether spawned actors should look at the center of the spawn area instead of the player."
-            },
-            {
-              "name": "bools[1]",
-              "description": "For spawn data only: when true and coordinates are provided, or when true regardless of coordinates, spawned actors look at the player instead of facing randomly."
+              "description": "Whether to preserve the exact actor ID instead of generating a unique one."
             },
             {
               "name": "floats[0]",
-              "description": "For actor prefabs: the facing rotation in degrees. For spawn data: power level offset added to party power level, enemy spawn modifier, and spawnPowerMod global variable."
+              "description": "The actor's facing rotation in degrees."
             }
           ],
           "optional": [
             {
               "name": "strings[1]",
-              "description": "For actor prefabs: animation to play on spawn. For spawn data: group ID override for the created actors."
+              "description": "The animation to play on spawn."
             },
             {
               "name": "tileCoords[0]",
-              "description": "The spawn position or search area. When (-1, -1), spawns in a random occupiable tile within the task's bounding area. Otherwise, spawns at or near this coordinate, with behavior varying based on spawn type."
+              "description": "The spawn position or search area. When (-1, -1) or not set, spawns in a random occupiable tile within the task's bounding area. Otherwise, spawns at or near this coordinate, with behavior varying based on spawn type."
+            }
+          ]
+        },
+        {
+          "description": "Spawns actors in the zone from spawn data. Creates a group of actors at power level relative to the party, with customizable facing, positioning, and visual effects. Actors can be spawned at specific coordinates or within a bounding area.",
+          "required": [
+            {
+              "name": "strings[0]",
+              "description": "The spawn data ID. Note: It will first check for an actor prefab with this ID, so make sure the IDs aren't shared."
+            },
+            {
+              "name": "bools[0]",
+              "description": "Whether spawned actors should look at the center of the spawn area instead of the player."
+            },
+            {
+              "name": "bools[1]",
+              "description": "Whether spawned actors should face the player. Only takes effect if bools[0] is false. If this is false, but an X value was specified, actors will also look at the player."
+            },
+            {
+              "name": "floats[0]",
+              "description": "Power level offset added to party power level, enemy spawn modifier, and spawnPowerMod global variable."
+            }
+          ],
+          "optional": [
+            {
+              "name": "strings[1]",
+              "description": "Group ID override for the created actors."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The spawn position or search area. When (-1, -1) or unset, spawns in a random occupiable tile within the task's bounding area. Otherwise, spawns at or near this coordinate, with behavior varying based on spawn type."
             }
           ]
         }
       ],
-      "aliases": ["spawn_actorPrefab", "spawn_actorPrefab_point"]
+      "aliases": ["spawn_actorPrefab"]
+    },
+    {
+      "name": "spawn_actorPrefab_point",
+      "uses": [
+        {
+          "description": "Spawns an actor in the zone from an actor prefabs at the travel point specified by (X, Y) with optional ID preservation and animation. Actors can be spawned at specific coordinates or within a bounding area.",
+          "required": [
+            {
+              "name": "strings[0]",
+              "description": "The actor prefab ID. If this doesn't exist, it will attempt to spawn from spawn data."
+            },
+            {
+              "name": "bools[0]",
+              "description": "Whether to preserve the exact actor ID instead of generating a unique one."
+            },
+            {
+              "name": "floats[0]",
+              "description": "The actor's facing rotation in degrees."
+            }
+          ],
+          "optional": [
+            {
+              "name": "strings[1]",
+              "description": "The animation to play on spawn."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "Travel point coordinates. The X value selects which travel point within the set (by index), and the Y value identifies which travel point set to use (travel point type)."
+            }
+          ]
+        },
+        {
+          "description": "Spawns actors in the zone from spawn data. Creates a group of actors at power level relative to the party, with customizable facing, positioning, and visual effects. Actors can be spawned at specific coordinates or within a bounding area. Travel points are not used. This case is identical to the spawn task.",
+          "required": [
+            {
+              "name": "strings[0]",
+              "description": "The spawn data ID. Note: It will first check for an actor prefab with this ID, so make sure the IDs aren't shared."
+            },
+            {
+              "name": "bools[0]",
+              "description": "Whether spawned actors should look at the center of the spawn area instead of the player."
+            },
+            {
+              "name": "bools[1]",
+              "description": "Whether spawned actors should face the player. Only takes effect if bools[0] is false. If this is false, but an X value was specified, actors will also look at the player."
+            },
+            {
+              "name": "floats[0]",
+              "description": "Power level offset added to party power level, enemy spawn modifier, and spawnPowerMod global variable."
+            }
+          ],
+          "optional": [
+            {
+              "name": "strings[1]",
+              "description": "Group ID override for the created actors."
+            },
+            {
+              "name": "tileCoords[0]",
+              "description": "The spawn position or search area. When (-1, -1) or unset, spawns in a random occupiable tile within the task's bounding area. Otherwise, spawns at or near this coordinate, with behavior varying based on spawn type."
+            }
+          ]
+        }
+      ],
+      "aliases": []
     },
     {
       "name": "spawn_g",
