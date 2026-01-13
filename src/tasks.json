@@ -3115,7 +3115,7 @@
       "name": "addToParty",
       "uses": [
         {
-          "description": "Adds a specific actor to the player's party. If the actor is not found in the zone, the task fails and returns false, which may affect subsequent task execution.",
+          "description": "Adds a specific actor to the player's party. If the actor is not found in the zone, the task fails and if used in a trigger, cancels the rest of the trigger's effects.",
           "required": [
             {
               "name": "strings[0]",
@@ -3158,7 +3158,7 @@
       "name": "removeFromParty",
       "uses": [
         {
-          "description": "Removes a specific actor from the player's party without adding them to the barracks. Optionally also removes them from the fleet. If the actor is not currently in the party, the task fails and returns false, which may affect subsequent task execution.",
+          "description": "Removes a specific actor from the player's party without adding them to the barracks. Optionally also removes them from the fleet. If the actor is not currently in the party, the task fails and if used in a trigger, cancels the rest of the trigger's effects.",
           "required": [
             {
               "name": "strings[0]",
