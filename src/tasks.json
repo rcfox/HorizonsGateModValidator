@@ -2359,13 +2359,13 @@
             {
               "name": "bools[0]",
               "description": "Force-fit flag. When true, forces the item to be placed even if the tile is full."
-            }
-          ],
-          "optional": [
+            },
             {
               "name": "floats[0]",
-              "description": "The quantity of items to add. If not provided or 0, defaults to 1."
+              "description": "The quantity of items to add. If less than 1, it uses 1 instead."
             },
+          ],
+          "optional": [
             {
               "name": "tileCoords[0]",
               "description": "The tile coordinate where the item should be placed. Must be provided (not (-1, -1))."
@@ -2382,14 +2382,13 @@
             {
               "name": "strings[1]",
               "description": "The ID of the actor who should receive the item. The actor must exist in the current zone."
-            }
-          ],
-          "optional": [
+            },
             {
               "name": "floats[0]",
-              "description": "The quantity of items to add. If not provided or 0, defaults to 1."
-            }
-          ]
+              "description": "The quantity of items to add. If less than 1, it uses 1 instead."
+            },
+          ],
+          "optional": []
         },
         {
           "description": "Adds an item to the task actor's inventory, cargo, or stash depending on item type. Cargo items go to cargo inventory, other items are equipped on the actor if possible. If the actor is controllable, plays a pickup sound. Only adds items the actor doesn't already have.",
@@ -2397,14 +2396,13 @@
             {
               "name": "strings[0]",
               "description": "The ID of the item to add. Must be a valid item type defined in the game data."
-            }
-          ],
-          "optional": [
+            },
             {
               "name": "floats[0]",
-              "description": "The quantity of items to add. If not provided or 0, defaults to 1. Actual amount added is reduced by quantity already owned."
-            }
-          ]
+              "description": "The quantity of items to add. If less than 1, it uses 1 instead."
+            },
+          ],
+          "optional": []
         }
       ],
       "aliases": []
@@ -2418,16 +2416,16 @@
             {
               "name": "strings[0]",
               "description": "The ID of the item to add to the container. Must be a valid item type defined in the game data."
-            }
+            },
+            {
+              "name": "floats[0]",
+              "description": "The quantity of items to add. If less than 1, it uses 1 instead."
+            },
           ],
           "optional": [
             {
               "name": "strings[1]",
               "description": "The ID of the specific container item to target. If provided and non-empty, only containers with this ID will be used. If empty or not provided, any suitable container is used."
-            },
-            {
-              "name": "floats[0]",
-              "description": "The quantity of items to add to the container. If not provided or 0, defaults to 1."
             },
             {
               "name": "tileCoords[0]",
@@ -2449,6 +2447,10 @@
               "description": "The ID of the item to spawn, or the name of a global variable containing the item ID. Must be a valid item type (either directly or after global variable lookup)."
             },
             {
+              "name": "floats[0]",
+              "description": "The quantity of items to add. If less than 1, it uses 1 instead."
+            },
+            {
               "name": "bools[0]",
               "description": "Force-fit flag. When true, forces the item to spawn even if the tile is full."
             },
@@ -2458,10 +2460,6 @@
             }
           ],
           "optional": [
-            {
-              "name": "floats[0]",
-              "description": "The quantity of items to spawn. If not provided or 0, defaults to 1."
-            },
             {
               "name": "strings[1]",
               "description": "The ID of a visual effect to play at the spawn location. If provided and non-empty, displays this effect when the item spawns."
@@ -2480,15 +2478,15 @@
               "description": "The ID of the item to spawn, or the name of a global variable containing the item ID. Must be a valid item type (either directly or after global variable lookup)."
             },
             {
+              "name": "floats[0]",
+              "description": "The quantity of items to add. If less than 1, it uses 1 instead."
+            },
+            {
               "name": "bools[0]",
               "description": "Force-fit flag. When true, forces the item to spawn even if the chosen tile is full."
             }
           ],
           "optional": [
-            {
-              "name": "floats[0]",
-              "description": "The quantity of items to spawn. If not provided or 0, defaults to 1."
-            },
             {
               "name": "strings[1]",
               "description": "The ID of a visual effect to play at the spawn location. If provided and non-empty, displays this effect when the item spawns."
