@@ -3741,6 +3741,10 @@
               "description": "The actor prefab ID. If this doesn't exist, it will attempt to spawn from spawn data."
             },
             {
+              "name": "strings[1]",
+              "description": "The animation to play on spawn."
+            },
+            {
               "name": "bools[0]",
               "description": "Whether to preserve the exact actor ID instead of generating a unique one."
             },
@@ -3750,10 +3754,6 @@
             }
           ],
           "optional": [
-            {
-              "name": "strings[1]",
-              "description": "The animation to play on spawn."
-            },
             {
               "name": "tileCoords[0]",
               "description": "The spawn position or search area. When (-1, -1) or not set, spawns in a random occupiable tile within the task's bounding area. Otherwise, spawns at or near this coordinate, with behavior varying based on spawn type."
@@ -3766,6 +3766,10 @@
             {
               "name": "strings[0]",
               "description": "The spawn data ID. Note: It will first check for an actor prefab with this ID, so make sure the IDs aren't shared."
+            },
+            {
+              "name": "strings[1]",
+              "description": "Group ID override for the created actors."
             },
             {
               "name": "bools[0]",
@@ -3781,10 +3785,6 @@
             }
           ],
           "optional": [
-            {
-              "name": "strings[1]",
-              "description": "Group ID override for the created actors."
-            },
             {
               "name": "tileCoords[0]",
               "description": "The spawn position or search area. When (-1, -1) or unset, spawns in a random occupiable tile within the task's bounding area. Otherwise, spawns at or near this coordinate, with behavior varying based on spawn type."
