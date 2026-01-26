@@ -13,6 +13,7 @@ import type {
   TaskMetadata,
   TasksData,
   TaskParameter,
+  TaskUseCase,
   ParsedParameter,
   ParsedTaskString,
   PositionInfo,
@@ -822,15 +823,63 @@ export class TaskValidator {
       return resultMessages;
     }
 
-    return [
-      {
+    // Find the closest use case (fewest missing required parameters) and report specific errors
+    const getMissingParams = (useCase: TaskUseCase) => {
+      const missingParams: Array<{ param: TaskParameter; arrayName: string; requiredIndex: number }> = [];
+
+      for (const param of useCase.required) {
+        // Parse the parameter name to get array name and index (handles both [N] and [N+])
+        const match = param.name.match(/^(\w+)\[(\d+)\+?\]$/);
+        if (match) {
+          const arrayName = match[1]!;
+          const requiredIndex = parseInt(match[2]!, 10);
+          const actualCount = destinationsWithImplicit[arrayName as keyof typeof destinationsWithImplicit];
+
+          // If actualCount <= requiredIndex, this parameter is missing
+          if (typeof actualCount === 'number' && actualCount <= requiredIndex) {
+            missingParams.push({ param, arrayName, requiredIndex });
+          }
+        }
+      }
+
+      return missingParams;
+    };
+
+    const useCaseMissingCounts = task.uses.map(useCase => ({
+      useCase,
+      missingParams: getMissingParams(useCase),
+    }));
+
+    const closestMatch = useCaseMissingCounts.reduce((best, current) =>
+      current.missingParams.length < best.missingParams.length ? current : best
+    );
+
+    const messages: ValidationMessage[] = [];
+
+    // Emit error for each missing required parameter
+    for (const missing of closestMatch.missingParams) {
+      messages.push({
         severity: 'error',
-        message: `Task '${taskName}' parameters don't match any use case.`,
+        message: `Task '${taskName}' is missing required parameter ${missing.param.name}`,
+        filePath: propInfo.filePath,
+        line: propInfo.valueStartLine,
+        context: missing.param.description,
+        taskReference: taskName,
+      });
+    }
+
+    // If there are multiple use cases, emit info message
+    if (task.uses.length > 1) {
+      messages.push({
+        severity: 'info',
+        message: `Task '${taskName}' has ${task.uses.length} use cases. Check the documentation to confirm the intended use case.`,
         filePath: propInfo.filePath,
         line: propInfo.valueStartLine,
         taskReference: taskName,
-      },
-    ];
+      });
+    }
+
+    return messages;
   }
 
   /**

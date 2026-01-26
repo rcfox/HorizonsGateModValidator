@@ -44,8 +44,10 @@ describe('Task String Validation', () => {
 
       const result = validator.validate(modContent, 'test.txt');
 
-      // 'action' requires parameters - should show all possible use cases
-      expectMessage(result, { text: "parameters don't match any use case", severity: 'error' });
+      // 'action' requires parameters - should report specific missing parameter
+      expectMessage(result, { text: "is missing required parameter strings[0]", severity: 'error' });
+      // 'action' has multiple use cases - should inform user to check documentation
+      expectMessage(result, { text: "has 3 use cases", severity: 'info' });
     });
   });
 
@@ -434,7 +436,8 @@ describe('Task String Validation', () => {
         specialEffect=moveCamXY;`;
 
       const result = validator.validate(modContent, 'test.txt');
-      expectMessage(result, { text: "parameters don't match any use case", severity: 'error' });
+      // With implicit float, we have 1 float but need 2, so floats[1] is missing
+      expectMessage(result, { text: "is missing required parameter floats[1]", severity: 'error' });
     });
 
     test('does not add implicit float for other object types', () => {
@@ -446,7 +449,7 @@ describe('Task String Validation', () => {
       const result = validator.validate(modContent, 'test.txt');
 
       // Should error because delayActions requires a float and no implicit one is provided
-      expectMessage(result, { text: "parameters don't match any use case", severity: 'error' });
+      expectMessage(result, { text: "is missing required parameter floats[0]", severity: 'error' });
     });
 
     test('does not warn about too many when implicit float causes excess', () => {

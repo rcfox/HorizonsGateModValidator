@@ -10,67 +10,27 @@ import {
   setupCopyButtons,
   getElementById,
   querySelectorAllAs,
+  convertTaskParamToFriendlyName,
 } from './shared-utils.js';
 import type { TasksData, TaskMetadata } from '../types.js';
 import rawTasksData from '../tasks.json';
 
 const tasksData = rawTasksData as TasksData;
 
-// Convert array notation to user-friendly variable names
-function convertToFriendlyNames(text: string): string {
-  return (
-    text
-      // tileCoords with property access (must come first, most specific)
-      .replace(/tileCoords\[(\d+)\]\.X/g, (_match, num) => {
-        const n = parseInt(num);
-        return n === 0 ? 'xValue' : `xValue${n + 1}`;
-      })
-      .replace(/tileCoords\[(\d+)\]\.Y/g, (_match, num) => {
-        const n = parseInt(num);
-        return n === 0 ? 'yValue' : `yValue${n + 1}`;
-      })
-
-      // tileCoords general (any index or no index)
-      .replace(/tileCoords\[\d+\]/g, '(xValue, yValue)')
-      .replace(/tileCoords/g, '(xValue, yValue)')
-
-      // strings (specific indexes first, then general)
-      .replace(/strings\[0\]/g, 'sValue')
-      .replace(/strings\[1\]/g, 'sValue2')
-      .replace(/strings\[(\d+)\]/g, (_match, num) => {
-        const n = parseInt(num);
-        return n === 0 ? 'sValue' : `sValue${n + 1}`;
-      })
-
-      // floats
-      .replace(/floats\[0\]/g, 'fValue')
-      .replace(/floats\[1\]/g, 'fValue2')
-      .replace(/floats\[(\d+)\]/g, (_match, num) => {
-        const n = parseInt(num);
-        return n === 0 ? 'fValue' : `fValue${n + 1}`;
-      })
-
-      // bools
-      .replace(/bools\[0\]/g, 'bValue1')
-      .replace(/bools\[1\]/g, 'bValue2')
-      .replace(/bools\[(\d+)\]/g, (_match, num) => `bValue${parseInt(num) + 1}`)
-  );
-}
-
 // Convert task data to use friendly names
 function convertTaskData(tasks: TaskMetadata[]): TaskMetadata[] {
   return tasks.map(task => ({
     ...task,
-    name: convertToFriendlyNames(task.name),
+    name: convertTaskParamToFriendlyName(task.name),
     uses: task.uses.map(useCase => ({
-      description: convertToFriendlyNames(useCase.description),
+      description: convertTaskParamToFriendlyName(useCase.description),
       required: useCase.required.map(arg => ({
-        name: convertToFriendlyNames(arg.name),
-        description: convertToFriendlyNames(arg.description),
+        name: convertTaskParamToFriendlyName(arg.name),
+        description: convertTaskParamToFriendlyName(arg.description),
       })),
       optional: useCase.optional.map(arg => ({
-        name: convertToFriendlyNames(arg.name),
-        description: convertToFriendlyNames(arg.description),
+        name: convertTaskParamToFriendlyName(arg.name),
+        description: convertTaskParamToFriendlyName(arg.description),
       })),
     })),
   }));

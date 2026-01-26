@@ -10,6 +10,7 @@ import {
   assertInstanceOf,
   querySelectorAs,
   assertDefined,
+  convertTaskParamToFriendlyName,
 } from './shared-utils.js';
 import type {
   ValidationResult,
@@ -2237,14 +2238,18 @@ export function initValidatorApp(): void {
     const filePathHTML = showFilePath ? `<span class="message-file-path"></span>:` : '';
     const line = showFilePath ? msg.line : `Line ${msg.line}`;
 
+    // Convert task parameter names to friendly names for task-related messages
+    const displayMessage = msg.taskReference ? convertTaskParamToFriendlyName(msg.message) : msg.message;
+    const displayContext = msg.taskReference && msg.context ? convertTaskParamToFriendlyName(msg.context) : msg.context;
+
     return `
         <div class="message ${msg.severity} ${cursorClass}" data-message-id="${messageId}">
             <div class="message-header">
                 <span class="message-icon">${icon}</span>
-                <span>${msg.message}</span>
+                <span>${displayMessage}</span>
             </div>
             ${msg.line ? `<div class="message-line-info">${filePathHTML}<span class="message-line-number">${line}</span></div>` : ''}
-            ${msg.context ? `<div class="message-context">${escapeHtml(msg.context)}</div>` : ''}
+            ${displayContext ? `<div class="message-context">${escapeHtml(displayContext)}</div>` : ''}
             ${correctionsHTML}
             ${formulaReferenceHTML}
             ${taskReferenceHTML}

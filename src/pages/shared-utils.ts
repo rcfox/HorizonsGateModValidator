@@ -147,6 +147,50 @@ export function escapeRegex(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+/**
+ * Convert task parameter array notation to user-friendly variable names
+ * e.g., "strings[0]" -> "sValue", "floats[1]" -> "fValue2"
+ */
+export function convertTaskParamToFriendlyName(text: string): string {
+  return (
+    text
+      // tileCoords with property access (must come first, most specific)
+      .replace(/tileCoords\[(\d+)\]\.X/g, (_match, num) => {
+        const n = parseInt(num);
+        return n === 0 ? 'xValue' : `xValue${n + 1}`;
+      })
+      .replace(/tileCoords\[(\d+)\]\.Y/g, (_match, num) => {
+        const n = parseInt(num);
+        return n === 0 ? 'yValue' : `yValue${n + 1}`;
+      })
+
+      // tileCoords general (any index or no index)
+      .replace(/tileCoords\[\d+\]/g, '(xValue, yValue)')
+      .replace(/tileCoords/g, '(xValue, yValue)')
+
+      // strings (specific indexes first, then general)
+      .replace(/strings\[0\]/g, 'sValue')
+      .replace(/strings\[1\]/g, 'sValue2')
+      .replace(/strings\[(\d+)\]/g, (_match, num) => {
+        const n = parseInt(num);
+        return n === 0 ? 'sValue' : `sValue${n + 1}`;
+      })
+
+      // floats
+      .replace(/floats\[0\]/g, 'fValue')
+      .replace(/floats\[1\]/g, 'fValue2')
+      .replace(/floats\[(\d+)\]/g, (_match, num) => {
+        const n = parseInt(num);
+        return n === 0 ? 'fValue' : `fValue${n + 1}`;
+      })
+
+      // bools
+      .replace(/bools\[0\]/g, 'bValue1')
+      .replace(/bools\[1\]/g, 'bValue2')
+      .replace(/bools\[(\d+)\]/g, (_match, num) => `bValue${parseInt(num) + 1}`)
+  );
+}
+
 // ============================================================================
 // Search Functionality
 // ============================================================================
