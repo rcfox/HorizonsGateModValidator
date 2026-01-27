@@ -313,7 +313,7 @@ export function setupExpandCollapse(itemSelector: string, expandBtnId: string, c
 }
 
 // ============================================================================
-// Copy Link Buttons
+// Copy Buttons
 // ============================================================================
 
 export function setupCopyButtons(containerSelector: string): void {
@@ -322,28 +322,45 @@ export function setupCopyButtons(containerSelector: string): void {
 
   container.addEventListener('click', async e => {
     const target = assertInstanceOf(e.target, HTMLElement, 'Copy button click event');
-    const btn = target.closest('.copy-link-btn');
-    if (!btn) return;
 
-    e.stopPropagation();
-    const url = btn.getAttribute('data-url');
-
-    if (url) {
-      try {
-        await navigator.clipboard.writeText(url);
-        const originalText = btn.textContent;
-        btn.textContent = '✓';
-        btn.classList.add('copied');
-
-        setTimeout(() => {
-          btn.textContent = originalText;
-          btn.classList.remove('copied');
-        }, 2000);
-      } catch (err) {
-        console.error('Failed to copy:', err);
+    // Check for copy link button
+    const linkBtn = target.closest('.copy-link-btn');
+    if (linkBtn) {
+      e.stopPropagation();
+      const url = linkBtn.getAttribute('data-url');
+      if (url) {
+        await copyToClipboard(linkBtn, url);
       }
+      return;
+    }
+
+    // Check for copy name button
+    const nameBtn = target.closest('.copy-name-btn');
+    if (nameBtn) {
+      e.stopPropagation();
+      const name = nameBtn.getAttribute('data-name');
+      if (name) {
+        await copyToClipboard(nameBtn, name);
+      }
+      return;
     }
   });
+}
+
+async function copyToClipboard(btn: Element, text: string): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(text);
+    const originalText = btn.textContent;
+    btn.textContent = '✓';
+    btn.classList.add('copied');
+
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.classList.remove('copied');
+    }, 2000);
+  } catch (err) {
+    console.error('Failed to copy:', err);
+  }
 }
 
 // ============================================================================

@@ -186,6 +186,7 @@ export function initTasksApp(): void {
         <div class="task-details">
           <div class="task-header-row">
             <div class="task-description">${highlight(useCase.description)}</div>
+            <button class="copy-name-btn" data-name="${task.name}" title="Copy name">📋</button>
             <button class="copy-link-btn" data-url="${taskUrl}" title="Copy link to this task">🔗</button>
           </div>
 

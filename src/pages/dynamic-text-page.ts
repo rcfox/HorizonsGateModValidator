@@ -79,7 +79,9 @@ export function initDynamicTextApp(): void {
   const tagParam = urlParams.get('tag');
   if (tagParam) {
     const matchingTag = sortedTags.find(
-      tag => tag.name.toLowerCase() === tagParam.toLowerCase() || tag.aliases.some(a => a.toLowerCase() === tagParam.toLowerCase())
+      tag =>
+        tag.name.toLowerCase() === tagParam.toLowerCase() ||
+        tag.aliases.some(a => a.toLowerCase() === tagParam.toLowerCase())
     );
 
     if (matchingTag) {
@@ -180,6 +182,7 @@ export function initDynamicTextApp(): void {
         <div class="tag-details">
           <div class="tag-header-row">
             <div class="tag-description">${highlight(tag.description)}</div>
+            <button class="copy-name-btn" data-name="&lt;${tag.name}=&gt;" title="Copy name">📋</button>
             <button class="copy-link-btn" data-url="${tagUrl}" title="Copy link to this tag">🔗</button>
           </div>
 

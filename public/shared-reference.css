@@ -259,8 +259,9 @@ body {
     flex: 1;
 }
 
-/* Copy button */
-.copy-link-btn {
+/* Copy buttons */
+.copy-link-btn,
+.copy-name-btn {
     background: none;
     border: none;
     font-size: 18px;
@@ -272,12 +273,14 @@ body {
     color: var(--text-muted);
 }
 
-.copy-link-btn:hover {
+.copy-link-btn:hover,
+.copy-name-btn:hover {
     background-color: var(--code-bg);
     color: var(--primary-color);
 }
 
-.copy-link-btn.copied {
+.copy-link-btn.copied,
+.copy-name-btn.copied {
     color: var(--success-color);
 }
 

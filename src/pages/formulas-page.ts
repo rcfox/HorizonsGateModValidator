@@ -190,6 +190,7 @@ export function initFormulasApp(): void {
         <div class="operator-details">
           <div class="operator-header-row">
             <div class="operator-description">${highlight(use.description)}</div>
+            <button class="copy-name-btn" data-name="${operator.name}" title="Copy name">📋</button>
             <button class="copy-link-btn" data-url="${operatorUrl}" title="Copy link to this operator">🔗</button>
           </div>
 
