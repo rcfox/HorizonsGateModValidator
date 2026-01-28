@@ -1461,6 +1461,18 @@
       "aliases": []
     },
     {
+      "name": "gDyn",
+      "description": "Displays a global variable value that is dynamically evaluated each frame, making it suitable for values that change during text animation. Allocates space for 4 digits when measuring text width.",
+      "required": [
+        {
+          "name": "Argument 1",
+          "description": "Global variable name to retrieve dynamically"
+        }
+      ],
+      "optional": [],
+      "aliases": []
+    },
+    {
       "name": "overworldPos",
       "description": "Displays the player's current position on the overworld as latitude/longitude coordinates. Uses player position if in 'eral' zone, otherwise uses current location coordinates. Empty if game not loaded.",
       "required": [],
