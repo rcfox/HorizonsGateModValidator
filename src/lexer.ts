@@ -187,6 +187,12 @@ export class ModLexer {
 
   private scanValue(): void {
     const start = this.current - 1;
+    let angleBracketDepth = 0;
+
+    // Check if the first character is already '<'
+    if (this.source[start] === '<') {
+      angleBracketDepth = 1;
+    }
 
     // Scan until semicolon, newline, or a pattern that looks like a new property (IDENTIFIER=)
     while (!this.isAtEnd()) {
@@ -195,8 +201,15 @@ export class ModLexer {
         break;
       }
 
-      // Check if we're about to hit a new property (whitespace followed by IDENTIFIER=)
-      if (this.isWhitespace(char)) {
+      // Track angle brackets for dynamic text tags
+      if (char === '<') {
+        angleBracketDepth++;
+      } else if (char === '>') {
+        angleBracketDepth = Math.max(0, angleBracketDepth - 1);
+      }
+
+      // Only check for new property pattern if we're not inside a dynamic text tag
+      if (angleBracketDepth === 0 && this.isWhitespace(char)) {
         // Look ahead to see if this whitespace is followed by IDENTIFIER=
         let lookahead = this.current + 1;
         // Skip whitespace

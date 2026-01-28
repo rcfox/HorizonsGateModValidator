@@ -95,6 +95,41 @@ describe('Mod File Parsing', () => {
     });
   });
 
+  describe('Dynamic text tags in property values', () => {
+    test('parses dynamic text tag with = in argument', () => {
+      const input = '[ItemType] ID=foo; name=<textIf=  and Burn=c:rank-2>;';
+      const parser = new ModParser(input, 'test.txt');
+      const { objects, errors } = parser.parse();
+
+      expectValid(errors);
+      expect(objects).toHaveLength(1);
+      expect(objects[0]?.properties.size).toBe(2);
+      expect(objects[0]?.properties.get('name')?.value).toBe('<textIf=  and Burn=c:rank-2>');
+    });
+
+    test('parses multiple dynamic text tags with = in arguments', () => {
+      const input = '[ItemType] ID=foo; name=<color=red=>Hello<color=> <textIf=World=c:HP>;';
+      const parser = new ModParser(input, 'test.txt');
+      const { objects, errors } = parser.parse();
+
+      expectValid(errors);
+      expect(objects).toHaveLength(1);
+      expect(objects[0]?.properties.get('name')?.value).toBe('<color=red=>Hello<color=> <textIf=World=c:HP>');
+    });
+
+    test('parses property after dynamic text tag value', () => {
+      const input = '[ItemType] ID=foo; name=<n=>; tooltip=test;';
+      const parser = new ModParser(input, 'test.txt');
+      const { objects, errors } = parser.parse();
+
+      expectValid(errors);
+      expect(objects).toHaveLength(1);
+      expect(objects[0]?.properties.size).toBe(3);
+      expect(objects[0]?.properties.get('name')?.value).toBe('<n=>');
+      expect(objects[0]?.properties.get('tooltip')?.value).toBe('test');
+    });
+  });
+
   describe('Comments', () => {
     test('ignores comment lines', () => {
       const input = `-- This is a comment

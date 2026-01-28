@@ -5,6 +5,7 @@
 
 import { FieldType, ValidationMessage, PropertyInfo } from './types.js';
 import { validateFormula } from './formula-validator.js';
+import { validateDynamicText } from './dynamic-text-validator.js';
 import { findSimilar, MAX_EDIT_DISTANCE } from './string-similarity.js';
 import modSchemaData from './mod-schema.json' with { type: 'json' };
 import type { SchemaData } from './types.js';
@@ -112,7 +113,8 @@ export class PropertyValidator {
         break;
 
       case 'string':
-        // Strings are always valid
+        // Validate dynamic text tags in string values
+        messages.push(...validateDynamicText(cleanValue, propInfo));
         break;
 
       case 'Vector2':
@@ -141,7 +143,7 @@ export class PropertyValidator {
 
       case 'List<string>':
         messages.push(
-          ...this.validateListString(propertyName, cleanValue, hasOverwritePrefix, propInfo.filePath, line)
+          ...this.validateListString(propertyName, cleanValue, hasOverwritePrefix, propInfo)
         );
         break;
 
@@ -506,15 +508,15 @@ export class PropertyValidator {
 
   private validateListString(
     _name: string,
-    _value: string,
+    value: string,
     _isOverwrite: boolean,
-    _filePath: string,
-    _line: number
+    propInfo: PropertyInfo
   ): ValidationMessage[] {
     // Strings in lists are comma-separated
     // With ! prefix, it overwrites the list, otherwise appends
     // Empty strings are allowed if it's a single append
-    return [];
+    // Validate dynamic text tags in the value
+    return validateDynamicText(value, propInfo);
   }
 
   private validateListInteger(

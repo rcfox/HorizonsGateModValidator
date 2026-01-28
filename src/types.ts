@@ -308,3 +308,73 @@ export interface FormulaToken {
   value: string;
   args?: string[]; // For function calls
 }
+
+/**
+ * Dynamic text tag argument metadata from dynamic-text.json
+ */
+export interface DynamicTextArgument {
+  name: string; // e.g., "Argument 1", "Argument 2"
+  description: string;
+}
+
+/**
+ * Dynamic text command metadata (for <cmd=> tag)
+ */
+export interface DynamicTextCommand {
+  name: string;
+  description: string;
+  required: DynamicTextArgument[];
+  optional: DynamicTextArgument[];
+  aliases: string[];
+}
+
+/**
+ * Dynamic text tag metadata from dynamic-text.json
+ */
+export interface DynamicTextTag {
+  name: string;
+  description: string;
+  required: DynamicTextArgument[];
+  optional: DynamicTextArgument[];
+  aliases: string[];
+  commands?: DynamicTextCommand[]; // Only for <cmd=> tag
+}
+
+/**
+ * Root structure of dynamic-text.json
+ */
+export interface DynamicTextData {
+  tags: DynamicTextTag[];
+}
+
+/**
+ * Parsed dynamic text tag argument with position tracking
+ */
+export type ParsedDynamicTextArgument = WithPosition<{
+  value: string;
+}>;
+
+/**
+ * Parsed dynamic text tag with position tracking
+ */
+export interface ParsedDynamicTextTag {
+  type: 'tag';
+  tagName: string;
+  tagNamePosition: PositionInfo;
+  arguments: ParsedDynamicTextArgument[];
+  position: PositionInfo; // Position of entire tag (< to >)
+}
+
+/**
+ * Bare string segment (text outside of tags)
+ */
+export interface ParsedDynamicTextBareString {
+  type: 'bareString';
+  value: string;
+  position: PositionInfo;
+}
+
+/**
+ * A segment of parsed dynamic text (either a tag or bare string)
+ */
+export type ParsedDynamicTextSegment = ParsedDynamicTextTag | ParsedDynamicTextBareString;

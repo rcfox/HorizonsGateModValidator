@@ -42,6 +42,11 @@ import {
 } from './formula-metadata.js';
 import type { PositionInfo, WithPosition } from './types.js';
 import { isValidFloat } from './value-validators.js';
+import {
+  type TextPosition,
+  createPositionInfo,
+  advancePosition,
+} from './position-utils.js';
 
 // Re-export validator for convenience
 export { validateAST, formatValidationErrors, type ValidationError } from './formula-ast-validator.js';
@@ -132,15 +137,6 @@ export type ASTNode =
 export type FunctionArg = StringArg | FunctionStyleArg;
 
 /**
- * Position in formula with line and column tracking
- */
-export interface FormulaPosition {
-  line: number; // Line offset from start (0-indexed)
-  column: number; // Column on that line (0-indexed)
-  offset: number; // Absolute character offset
-}
-
-/**
  * Tokenizes a formula into operands and operators
  * Handles unary operators (only - is supported, + crashes the game)
  * Respects parentheses - operators inside parentheses are part of operands, not top-level operators
@@ -149,20 +145,20 @@ export interface FormulaPosition {
 function tokenizeFormula(formula: string): {
   operands: string[];
   operators: string[];
-  positions: FormulaPosition[];
+  positions: TextPosition[];
   unaryOperandIndices: Map<number, number>;
 } {
   // Parse character by character, skipping whitespace but tracking positions
   const operands: string[] = [];
   const operators: string[] = [];
-  const positions: FormulaPosition[] = [];
+  const positions: TextPosition[] = [];
   const unaryOperandIndices = new Map<number, number>();
 
   let line = 0;
   let column = 0;
   let i = 0;
   let currentOperand = '';
-  let currentOperandStart: FormulaPosition | null = null;
+  let currentOperandStart: TextPosition | null = null;
   let justPushedOperand = false;
   let parenDepth = 0;
 
@@ -297,56 +293,11 @@ function tokenizeFormula(formula: string): {
 }
 
 /**
- * Calculate end position from start position and text length
- * Handles multi-line text by counting newlines
- */
-function calculateEndPosition(startPos: FormulaPosition, text: string): { line: number; column: number } {
-  let line = startPos.line;
-  let column = startPos.column;
-
-  for (const char of text) {
-    if (char === '\n') {
-      line++;
-      column = 0;
-    } else {
-      column++;
-    }
-  }
-
-  return { line, column };
-}
-
-/**
- * Create a complete PositionInfo from start position and text
- */
-function createPositionInfo(startPos: FormulaPosition, text: string): PositionInfo {
-  const endPos = calculateEndPosition(startPos, text);
-  return {
-    startLine: startPos.line,
-    startColumn: startPos.column,
-    endLine: endPos.line,
-    endColumn: endPos.column,
-  };
-}
-
-/**
- * Advance position by a given text (for calculating relative positions)
- */
-function advancePosition(pos: FormulaPosition, text: string): FormulaPosition {
-  const endPos = calculateEndPosition(pos, text);
-  return {
-    line: endPos.line,
-    column: endPos.column,
-    offset: pos.offset + text.length,
-  };
-}
-
-/**
  * Parses a single operand string into an ASTNode
  * @param operand The operand string to parse
  * @param startPos Position where this operand starts
  */
-function parseOperand(operand: string, startPos: FormulaPosition): ASTNode {
+function parseOperand(operand: string, startPos: TextPosition): ASTNode {
   const posInfo = createPositionInfo(startPos, operand);
 
   // Check if it's a literal number
@@ -392,7 +343,7 @@ function parseOperand(operand: string, startPos: FormulaPosition): ASTNode {
  * @param operand The operand string to parse
  * @param startPos Position where this operand starts
  */
-function parseParenthesizedOperand(operand: string, startPos: FormulaPosition): MathFunctionNode {
+function parseParenthesizedOperand(operand: string, startPos: TextPosition): MathFunctionNode {
   const parenIndex = operand.indexOf('(');
   const name = operand.substring(0, parenIndex);
   const argString = operand.substring(parenIndex + 1, operand.length - 1); // Remove '(' and ')'
@@ -439,7 +390,7 @@ function parseParenthesizedOperand(operand: string, startPos: FormulaPosition): 
  * @param arg The argument string to parse
  * @param startPos Position where this argument starts
  */
-function parseFunctionStyleArg(arg: string, startPos: FormulaPosition): { name: string; params: ASTNode[] } | null {
+function parseFunctionStyleArg(arg: string, startPos: TextPosition): { name: string; params: ASTNode[] } | null {
   const parenIndex = arg.indexOf('(');
   if (parenIndex === -1) {
     return null;
@@ -537,7 +488,7 @@ function splitByDelimitersRespectingParens(str: string, additionalDelimiters: st
  * @param operand The operand string to parse
  * @param startPos Position where this operand starts
  */
-function parseFunctionCall(operand: string, startPos: FormulaPosition): FunctionCallNode {
+function parseFunctionCall(operand: string, startPos: TextPosition): FunctionCallNode {
   // Extract function name first (before any delimiters)
   const firstDelimiter = operand.search(/[:]/);
   const functionName = firstDelimiter === -1 ? operand : operand.substring(0, firstDelimiter);
@@ -778,7 +729,7 @@ function buildOperationTree(
  * @param formula The formula string to parse
  * @param basePos Optional base position for nested formulas (defaults to line 0, column 0)
  */
-export function parseFormula(formula: string, basePos?: FormulaPosition): ASTNode {
+export function parseFormula(formula: string, basePos?: TextPosition): ASTNode {
   // Check for invalid characters immediately after colon
   // Colons must be followed by a letter or digit (not underscore)
   // Invalid: abs:(1-2), abs:-2, min:+5, min: d:foo (space after colon), c:_foo (underscore)
@@ -813,7 +764,7 @@ export function parseFormula(formula: string, basePos?: FormulaPosition): ASTNod
     }
 
     // If we have a base position, offset the position
-    const adjustedPos: FormulaPosition = basePos
+    const adjustedPos: TextPosition = basePos
       ? {
           line: basePos.line + pos.line,
           column: pos.line === 0 ? basePos.column + pos.column : pos.column,
