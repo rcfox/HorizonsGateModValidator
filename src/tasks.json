@@ -7822,12 +7822,12 @@
       "name": "xp",
       "uses": [
         {
-          "description": "Debug command that awards experience points to all party members. Each party actor in the current party receives the same amount of XP. This XP is applied to the party member's currently active class. By default, this awards 9999 XP to each party member.",
+          "description": "Awards experience points to all party members. Each party actor in the current party receives the same amount of XP. This XP is applied to the party member's currently active class.",
           "required": [],
           "optional": [
             {
               "name": "floats[0]",
-              "description": "The amount of experience points to award to each party member. This value is cast to an integer before being applied. If not provided, defaults to 9999 XP."
+              "description": "The amount of experience points to award to each party member. If not provided, defaults to 9999 XP."
             }
           ]
         }
@@ -7838,11 +7838,11 @@
       "name": "crewxp",
       "uses": [
         {
-          "description": "Debug command that awards experience points to all crew members. Unlike the 'xp' task which only affects active party members, this command awards XP to all crew members in the player's roster. The XP is applied through the crew award system.",
+          "description": "Awards experience points to all crew members. Unlike the 'xp' task which only affects active party members, this command awards XP to all crew members in the player's roster.",
           "required": [
             {
               "name": "floats[0]",
-              "description": "The amount of experience points to award to all crew members. This value is cast to an integer before being distributed to the crew."
+              "description": "The amount of experience points to award to all crew members."
             }
           ],
           "optional": []
@@ -7916,12 +7916,12 @@
       "name": "gp",
       "uses": [
         {
-          "description": "Debug command that adds money to the player's current funds. By default, this adds 500 gold pieces to the player's total money. The amount can be customized by providing a float value.",
+          "description": "Adds money to the player's current funds.",
           "required": [],
           "optional": [
             {
               "name": "floats[0]",
-              "description": "The amount of money to add to the player's funds. This value is cast to an integer before being added. If not provided, defaults to 500."
+              "description": "The amount of money to add to the player's funds. If not provided, defaults to 500."
             }
           ]
         }
