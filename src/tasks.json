@@ -412,7 +412,7 @@
             },
             {
               "name": "floats[0]",
-              "description": "An integer value (cast from float) passed to the flee dialog. This may control flee cost or other flee-related parameters."
+              "description": "The direction the party will be facing, in degrees."
             }
           ],
           "optional": [
@@ -431,7 +431,7 @@
             },
             {
               "name": "floats[0]",
-              "description": "A parameter passed to the zone travel function. This may control travel-related behavior or timing."
+              "description": "The direction the party will be facing, in degrees."
             },
             {
               "name": "bools[0]",
@@ -452,7 +452,7 @@
       "name": "travel_point",
       "uses": [
         {
-          "description": "Initiates travel to a zone using a point-based coordinate system when in combat mode. This prompts the player with a flee dialog, using a special coordinate format (-99, point_value) to identify the destination. This is typically used for abstract travel points rather than specific tile coordinates.",
+          "description": "When in combat, prompts the player to flee. If accepted, moves the party to a new zone at the specified travel point.",
           "required": [
             {
               "name": "strings[0]",
@@ -460,13 +460,13 @@
             },
             {
               "name": "floats[0]",
-              "description": "The point value used to identify the destination location within the zone, passed to the flee dialog with the special -99 X coordinate format."
+              "description": "The travel point to move to."
             }
           ],
           "optional": []
         },
         {
-          "description": "Initiates direct travel to a zone using a point-based coordinate system when outside of combat mode. The player is moved to the specified zone using a special coordinate format (-99, point_value) that identifies a travel point rather than a tile coordinate. This allows control over autosave behavior and whether the zone is entered via console mode.",
+          "description": "Moves the party to a new zone at the specified travel point.",
           "required": [
             {
               "name": "strings[0]",
@@ -474,7 +474,7 @@
             },
             {
               "name": "floats[0]",
-              "description": "The point value that identifies the destination location within the zone. This is used as the Y coordinate in a special TileCoord(-99, point_value) format."
+              "description": "The travel point to move to."
             }
           ],
           "optional": [
@@ -495,7 +495,7 @@
       "name": "travel_point_g",
       "uses": [
         {
-          "description": "Initiates travel to a zone using a point-based coordinate system when in combat mode, with the zone ID retrieved from a global variable. This prompts the player with a flee dialog. The zone name is looked up from the global variable specified in the first string parameter.",
+          "description": "When in combat, prompts the player to flee. If accepted, moves the party to a new zone at the specified travel point. The zone name is looked up from the global variable specified in the first string parameter.",
           "required": [
             {
               "name": "strings[0]",
@@ -503,13 +503,13 @@
             },
             {
               "name": "floats[0]",
-              "description": "The point value used to identify the destination location within the zone, passed to the flee dialog with the special -99 X coordinate format."
+              "description": "The travel point to move to."
             }
           ],
           "optional": []
         },
         {
-          "description": "Initiates direct travel to a zone using a point-based coordinate system when outside of combat mode, with the zone ID retrieved from a global variable. The zone name is looked up from the global variable specified in the first string parameter. This allows control over autosave behavior and whether the zone is entered via console mode.",
+          "description": "Moves the party to a new zone at the specified travel point. The zone name is looked up from the global variable specified in the first string parameter.",
           "required": [
             {
               "name": "strings[0]",
@@ -517,7 +517,7 @@
             },
             {
               "name": "floats[0]",
-              "description": "The point value that identifies the destination location within the zone. This is used as the Y coordinate in a special TileCoord(-99, point_value) format."
+              "description": "The travel point to move to."
             }
           ],
           "optional": [
@@ -582,7 +582,7 @@
           "required": [
             {
               "name": "floats[0]",
-              "description": "An integer value (cast from float) passed to the flee dialog, likely controlling flee cost or other flee parameters."
+              "description": "The direction the party will be facing, in degrees."
             }
           ],
           "optional": []
@@ -592,7 +592,7 @@
           "required": [
             {
               "name": "floats[0]",
-              "description": "A parameter passed to the zone travel function, likely controlling travel-related timing or behavior."
+              "description": "The direction the party will be facing, in degrees."
             },
             {
               "name": "bools[0]",
@@ -608,7 +608,7 @@
       "name": "travel_noSave",
       "uses": [
         {
-          "description": "Initiates travel to another zone when in combat mode, prompting a flee dialog. This is similar to the standard travel task but specifically designed for scenarios where autosave should not occur.",
+          "description": "Initiates travel to another zone. This is similar to the standard travel task but specifically designed for scenarios where autosave should not occur. When in combat mode, prompts a flee dialog.",
           "required": [
             {
               "name": "strings[0]",
@@ -616,32 +616,13 @@
             },
             {
               "name": "floats[0]",
-              "description": "An integer value (cast from float) passed to the flee dialog, likely controlling flee cost or other flee parameters."
+              "description": "The direction the party will be facing, in degrees."
             }
           ],
           "optional": [
             {
               "name": "tileCoords[0]",
               "description": "The target tile coordinate, used in the flee prompt parameters. If not provided, defaults to tile (-1, -1)."
-            }
-          ]
-        },
-        {
-          "description": "Directly travels to another zone when outside of combat mode, explicitly disabling autosave during the transition. This performs both a zone travel and a zone move operation, ensuring the player is relocated without triggering an autosave. A brief interaction delay is applied after the transition.",
-          "required": [
-            {
-              "name": "strings[0]",
-              "description": "The ID of the destination zone to travel to. This should match a zone defined in the game data."
-            },
-            {
-              "name": "floats[0]",
-              "description": "A timing parameter passed to both the travel and move functions, controlling transition speed or delay."
-            }
-          ],
-          "optional": [
-            {
-              "name": "tileCoords[0]",
-              "description": "The tile coordinate where the player should arrive in the destination zone. If not provided, defaults to tile (-1, -1)."
             }
           ]
         }
@@ -8256,11 +8237,11 @@
       "name": "weather",
       "uses": [
         {
-          "description": "Debug command that changes the current weather in the game world. This immediately sets the weather to the specified type, affecting visual effects and potentially gameplay mechanics.",
+          "description": "Changes the current weather in the game world. This immediately sets the weather to the specified type, affecting visual effects and potentially gameplay mechanics.",
           "required": [
             {
               "name": "strings[0]",
-              "description": "The weather type to set. This should be a valid weather type name from the WeatherType enum (e.g., 'Clear', 'Rain', 'Storm', etc.)."
+              "description": "The weather type to set. Valid values are: none, rain, storm, snow, gale, krill"
             }
           ],
           "optional": []
