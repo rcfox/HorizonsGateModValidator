@@ -54,7 +54,7 @@ Tasks must be recorded in the same order which they appear in the switch stateme
 
 This is a documentation extraction task, not a formal static analysis. Apply the rules consistently, but do not attempt to prove completeness or soundness.
 
-# Ouputs
+# Outputs
 
 Record any errors to ./errors.md and continue with the rest of the tasks.
 
