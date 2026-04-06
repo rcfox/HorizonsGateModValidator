@@ -998,7 +998,7 @@
       "name": "modGlobalVar",
       "uses": [
         {
-          "description": "Modifies a global variable by adding a numeric value to its current value. If the variable doesn't exist or is non-numeric, the behavior depends on the underlying modGlobalVar implementation. This is useful for incrementing counters, scores, or other numeric game state.",
+          "description": "Modifies a global variable by adding a numeric value to its current value. If the variable doesn't exist, it is created with a value of 0 before the modification is applied. If the variable exists but contains a non-numeric value, it will error. This is useful for incrementing counters, scores, or other numeric game state.",
           "required": [
             {
               "name": "strings[0]",
@@ -3715,11 +3715,11 @@
       "name": "spawn",
       "uses": [
         {
-          "description": "Spawns an actor in the zone from an actor prefabs at the location specified by (X, Y) with optional ID preservation and animation. Actors can be spawned at specific coordinates or within a bounding area.",
+          "description": "Spawns an actor in the zone from an actor prefab. If no tile coordinate is provided, places the actor at a random occupiable tile within the trigger area. If a tile coordinate is provided, the actor is placed at exactly that position regardless of whether the tile is occupiable. If the actor prefab ID does not exist, it falls through to the spawn data version of this task (see second use), which has different argument meanings.",
           "required": [
             {
               "name": "strings[0]",
-              "description": "The actor prefab ID. If this doesn't exist, it will attempt to spawn from spawn data."
+              "description": "The actor prefab ID. If this doesn't exist, it falls through to the spawn data version (see second use), which has different argument meanings."
             },
             {
               "name": "strings[1]",
@@ -3737,12 +3737,12 @@
           "optional": [
             {
               "name": "tileCoords[0]",
-              "description": "The spawn position or search area. When (-1, -1) or not set, spawns in a random occupiable tile within the task's bounding area. Otherwise, spawns at or near this coordinate, with behavior varying based on spawn type."
+              "description": "The tile coordinate to spawn the actor at. If not provided, a random occupiable tile in the trigger area is used. If provided, the actor is placed at exactly this position regardless of occupiability."
             }
           ]
         },
         {
-          "description": "Spawns actors in the zone from spawn data. Creates a group of actors at power level relative to the party, with customizable facing, positioning, and visual effects. Actors can be spawned at specific coordinates or within a bounding area.",
+          "description": "Spawns actors in the zone from spawn data. Creates a group of actors at a power level relative to the party. If no tile coordinate is provided, actors are placed at random occupiable tiles within the trigger area. If a tile coordinate is provided, the spawn area starts at that tile and extends toward the bottom-right: Y is enlarged by 1 and X is enlarged by 1.5 times the number of actors to spawn. If only one actor is being spawned and the exact tile is occupiable, it spawns at exactly that tile. If no occupiable tiles are found in the spawn area, nothing is spawned.",
           "required": [
             {
               "name": "strings[0]",
@@ -3768,7 +3768,7 @@
           "optional": [
             {
               "name": "tileCoords[0]",
-              "description": "The spawn position or search area. When (-1, -1) or unset, spawns in a random occupiable tile within the task's bounding area. Otherwise, spawns at or near this coordinate, with behavior varying based on spawn type."
+              "description": "The spawn area origin. If not provided, actors spawn at random occupiable tiles within the trigger area. If provided, the spawn area extends from this tile toward the bottom-right (Y+1, X + 1.5 * actor count), and actors are placed at random occupiable tiles within that area."
             }
           ]
         }
@@ -3779,11 +3779,11 @@
       "name": "spawn_actorPrefab_point",
       "uses": [
         {
-          "description": "Spawns an actor in the zone from an actor prefabs at the travel point specified by (X, Y) with optional ID preservation and animation. Actors can be spawned at specific coordinates or within a bounding area.",
+          "description": "Spawns an actor in the zone from an actor prefab at a travel point specified by (X, Y) with optional ID preservation and animation.",
           "required": [
             {
               "name": "strings[0]",
-              "description": "The actor prefab ID. If this doesn't exist, it will attempt to spawn from spawn data."
+              "description": "The actor prefab ID. If this doesn't exist, it falls through to the spawn data version (see second use), which has different argument meanings."
             },
             {
               "name": "bools[0]",
@@ -3806,7 +3806,7 @@
           ]
         },
         {
-          "description": "Spawns actors in the zone from spawn data. Creates a group of actors at power level relative to the party, with customizable facing, positioning, and visual effects. Actors can be spawned at specific coordinates or within a bounding area. Travel points are not used. This case is identical to the spawn task.",
+          "description": "Spawns actors in the zone from spawn data. Creates a group of actors at a power level relative to the party. Travel points are not used. If no tile coordinate is provided, actors are placed at random occupiable tiles within the trigger area. If a tile coordinate is provided, the spawn area starts at that tile and extends toward the bottom-right: Y is enlarged by 1 and X is enlarged by 1.5 times the number of actors to spawn. If only one actor is being spawned and the exact tile is occupiable, it spawns at exactly that tile. If no occupiable tiles are found in the spawn area, nothing is spawned.",
           "required": [
             {
               "name": "strings[0]",
@@ -3832,7 +3832,7 @@
             },
             {
               "name": "tileCoords[0]",
-              "description": "The spawn position or search area. When (-1, -1) or unset, spawns in a random occupiable tile within the task's bounding area. Otherwise, spawns at or near this coordinate, with behavior varying based on spawn type."
+              "description": "The spawn area origin. If not provided, actors spawn at random occupiable tiles within the trigger area. If provided, the spawn area extends from this tile toward the bottom-right (Y+1, X + 1.5 * actor count), and actors are placed at random occupiable tiles within that area."
             }
           ]
         }
@@ -4154,7 +4154,7 @@
             },
             {
               "name": "bools[0]",
-              "description": "Whether to affect actors always, regardless of other conditions. Modifies which actors respond to the attention call."
+              "description": "If true, affects actors regardless of other conditions: being able to act, having intelligence > 0, matching roof state (normally only attracts if both the actor and the target position are under a roof, or neither is), and having an AI that allows changing behavior (e.g. not patrol or idle_ignoreAttention). Note: only has effect when no tileCoords[0] is provided."
             },
             {
               "name": "floats[0]",
@@ -4174,7 +4174,7 @@
           "optional": [
             {
               "name": "bools[0]",
-              "description": "Whether to affect actors always, regardless of other conditions. Modifies which actors respond to the attention call."
+              "description": "If true, affects actors regardless of other conditions: being able to act, having intelligence > 0, matching roof state (normally only attracts if both the actor and the target position are under a roof, or neither is), and having an AI that allows changing behavior (e.g. not patrol or idle_ignoreAttention)."
             },
             {
               "name": "floats[0]",

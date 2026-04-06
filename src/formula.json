@@ -2799,14 +2799,14 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns the world time value stored in a global variable",
+          "description": "Returns the world time when a global variable was last set or modified",
           "returns": "float",
           "example": "gTime:lastVisit",
           "arguments": [
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable containing time"
+              "description": "Name of the global variable to check the last modification time of"
             }
           ]
         }
@@ -2818,14 +2818,14 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns the time elapsed since the world time stored in a global variable",
+          "description": "Returns the world time elapsed since a global variable was last set or modified",
           "returns": "float",
-          "example": "gTimeSince:eventTime",
+          "example": "gTimeSince:questStarted",
           "arguments": [
             {
               "name": "varName",
               "type": "string",
-              "description": "Name of the global variable containing time"
+              "description": "Name of the global variable to check the last modification time of"
             }
           ]
         }
@@ -2837,14 +2837,14 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns 1 if the time since a stored time is less than a threshold, otherwise 0",
+          "description": "Returns 1 if the world time elapsed since a global variable was last set or modified is less than a threshold, otherwise 0",
           "returns": "boolean",
           "example": "gTimeSinceLessThan:cooldown:100",
           "arguments": [
             {
               "name": "varName",
               "type": "string",
-              "description": "Global var containing time"
+              "description": "Name of the global variable to check"
             },
             {
               "name": "threshold",
@@ -2861,14 +2861,14 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns 1 if the time since a stored time is less than or equal to a threshold, otherwise 0",
+          "description": "Returns 1 if the world time elapsed since a global variable was last set or modified is less than or equal to a threshold, otherwise 0",
           "returns": "boolean",
-          "example": "gTimeSinceLessThanOrEqual:duration:50",
+          "example": "gTimeSinceLessThanOrEqual:lastPurchase:50",
           "arguments": [
             {
               "name": "varName",
               "type": "string",
-              "description": "Global var containing time"
+              "description": "Name of the global variable to check"
             },
             {
               "name": "threshold",
@@ -2885,14 +2885,14 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns 1 if time since stored time exceeds threshold OR variable doesn't exist, otherwise 0",
+          "description": "Returns 1 if the world time elapsed since a global variable was last set or modified exceeds a threshold, OR the variable has never been assigned, otherwise 0",
           "returns": "boolean",
           "example": "gTimeSinceMoreThanOrNeverAssigned:lastEvent:200",
           "arguments": [
             {
               "name": "varName",
               "type": "string",
-              "description": "Global var containing time"
+              "description": "Name of the global variable to check"
             },
             {
               "name": "threshold",
@@ -2909,14 +2909,14 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns 1 if the time since a stored time exceeds a threshold, otherwise 0",
+          "description": "Returns 1 if the world time elapsed since a global variable was last set or modified exceeds a threshold, otherwise 0",
           "returns": "boolean",
-          "example": "gTimeSinceMoreThan:respawnTime:300",
+          "example": "gTimeSinceMoreThan:areaCleared:300",
           "arguments": [
             {
               "name": "varName",
               "type": "string",
-              "description": "Global var containing time"
+              "description": "Name of the global variable to check"
             },
             {
               "name": "threshold",
@@ -2972,7 +2972,7 @@
       "aliases": ["geo2"],
       "uses": [
         {
-          "description": "Returns the elemental strength of an element in the area around the caster (radius 3, power 2)",
+          "description": "Returns the elemental strength of an element in the area around the caster (max value 3, radius 2)",
           "returns": "float",
           "example": "geo:fire",
           "arguments": [
@@ -2993,7 +2993,7 @@
       "aliases": ["geo2_noVisuals"],
       "uses": [
         {
-          "description": "Returns elemental strength around caster without showing visual effects (radius 3, power 2)",
+          "description": "Returns elemental strength around caster without showing visual effects (max value 3, radius 2)",
           "returns": "float",
           "example": "geo_noVisuals:ice",
           "arguments": [
@@ -3013,7 +3013,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns the elemental strength of an element around the caster (radius 3, power 1)",
+          "description": "Returns the elemental strength of an element around the caster (max value 3, radius 1)",
           "returns": "float",
           "example": "geo1:elec",
           "arguments": [
@@ -3033,7 +3033,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns the elemental strength of an element around the caster (radius 3, power 0, no visuals)",
+          "description": "Returns the elemental strength of an element around the caster (max value 3, radius 0, no visuals)",
           "returns": "float",
           "example": "geo0:wind",
           "arguments": [
@@ -3053,7 +3053,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns the elemental strength at specific coordinates (radius 3, power 0, no visuals)",
+          "description": "Returns the elemental strength at specific coordinates (max value 3, radius 0, no visuals)",
           "returns": "float",
           "example": "geoXY:fire:15:20",
           "arguments": [
