@@ -36,7 +36,7 @@ export class PropertyValidator {
     const line = propInfo.valueStartLine;
 
     // Handle the special ! prefix for overwriting lists
-    const hasOverwritePrefix = propertyName.startsWith('!');
+    //const hasOverwritePrefix = propertyName.startsWith('!');
     const cleanValue = value.trim();
 
     if (cleanValue === '') {
@@ -46,7 +46,11 @@ export class PropertyValidator {
 
     // Special case: DialogNode/DialogOption/DialogNodeOverride.specialEffect - validate as task strings
     // TODO: Also validate trigger IDs when we have complete trigger metadata
-    if ((className === 'DialogNode' || className === 'DialogOption' || className === 'DialogNodeOverride') && propertyName === 'specialEffect' && expectedType === 'List<string>') {
+    if (
+      (className === 'DialogNode' || className === 'DialogOption' || className === 'DialogNodeOverride') &&
+      propertyName === 'specialEffect' &&
+      expectedType === 'List<string>'
+    ) {
       // Each property assignment is one element in the list, so validate the entire value as a single task string
       // Pass className and propertyName for context-aware validation (implicit float 0)
       messages.push(...this.taskValidator.validateTaskString(cleanValue, propInfo, className, propertyName));
@@ -54,6 +58,7 @@ export class PropertyValidator {
     }
 
     switch (expectedType) {
+      case 'bool':
       case 'boolean':
         if (!isValidBoolean(cleanValue)) {
           const similar = findSimilar(value, ['true', 'false'], MAX_EDIT_DISTANCE);
@@ -76,6 +81,7 @@ export class PropertyValidator {
         }
         break;
 
+      case 'int':
       case 'integer':
         if (!isValidInteger(cleanValue)) {
           messages.push({
@@ -141,34 +147,6 @@ export class PropertyValidator {
         messages.push(...validateFormula(cleanValue, propInfo, propertyName, className));
         break;
 
-      case 'List<string>':
-        messages.push(
-          ...this.validateListString(propertyName, cleanValue, hasOverwritePrefix, propInfo)
-        );
-        break;
-
-      case 'List<integer>':
-        messages.push(
-          ...this.validateListInteger(propertyName, cleanValue, hasOverwritePrefix, propInfo.filePath, line)
-        );
-        break;
-
-      case 'List<float>':
-        messages.push(...this.validateListFloat(propertyName, cleanValue, hasOverwritePrefix, propInfo.filePath, line));
-        break;
-
-      case 'List<Vector2>':
-        messages.push(...this.validateVector2(propertyName, cleanValue, propInfo.filePath, line));
-        break;
-
-      case 'List<TileCoord>':
-        messages.push(...this.validateTileCoord(propertyName, cleanValue, propInfo.filePath, line));
-        break;
-
-      case 'List<Formula>':
-        messages.push(...validateFormula(cleanValue, propInfo, propertyName, className));
-        break;
-
       default:
         // Check if this is an enum type (direct or namespaced)
         let resolvedEnumType = this.resolveEnumName(expectedType, className);
@@ -177,36 +155,51 @@ export class PropertyValidator {
           break;
         }
 
-        // Check if this is a List<Enum> or HashSet<Enum> type
-        const listEnumMatch = expectedType.match(/^(?:List|HashSet)<(\w+)>$/);
-        if (listEnumMatch) {
-          const enumName = listEnumMatch[1];
-          if (!enumName) {
-            throw new Error(`Failed to extract enum name from type '${expectedType}'`);
-          }
-          // Try to find the enum (might be namespaced)
-          const resolvedEnumName = this.resolveEnumName(enumName, className);
+        // Check if this is a List<X> or HashSet<X> type — split on commas and validate each element
+        const collectionMatch = expectedType.match(/^(?:List|HashSet)<(.+)>$/);
+        if (collectionMatch) {
+          const elementType = collectionMatch[1]!;
+          const baseName = propertyName.startsWith('!') ? propertyName.slice(1) : propertyName;
 
-          if (resolvedEnumName) {
-            // List/HashSet of enum values - validate each comma-separated value
+          // Types that DataManager parses as fixed-size CSV (components within a single element)
+          const compoundComponentCount: Partial<Record<string, number>> = {
+            Vector2: 2,
+            TileCoord: 2,
+            Rectangle: 4,
+          };
+
+          const componentCount = compoundComponentCount[elementType];
+          if (componentCount !== undefined) {
+            const allParts = cleanValue.split(',').map(p => p.trim());
+            if (allParts.length > componentCount) {
+              messages.push({
+                severity: 'warning',
+                message: `Too many comma-separated values for ${expectedType}`,
+                filePath: propInfo.filePath,
+                line,
+                context: `${elementType} uses ${componentCount} components; extra values are silently ignored by the game`,
+                suggestion: `Use separate property assignments for each element`,
+              });
+            }
+            messages.push(...this.validateProperty(baseName, allParts.slice(0, componentCount).join(','), elementType, propInfo, className));
+          } else {
             const parts = cleanValue
               .split(',')
               .map(p => p.trim())
               .filter(p => p.length > 0);
             for (const part of parts) {
-              messages.push(...this.validateEnum(propertyName, part, resolvedEnumName, propInfo));
+              messages.push(...this.validateProperty(baseName, part, elementType, propInfo, className));
             }
-            break;
           }
+          break;
         }
 
-        // Unknown type or complex type - issue warning but don't fail
-        if (
-          expectedType.startsWith('List<') ||
-          expectedType.startsWith('Dictionary<') ||
-          expectedType.startsWith('HashSet<')
-        ) {
-          // Collection types - generally accept comma-separated values
+        // Check if this is a Dictionary type
+        const dictMatch = expectedType.match(/^Dictionary<(\w+),\s*(.+)>$/);
+        if (dictMatch) {
+          const keyType = dictMatch[1]!;
+          const valueType = dictMatch[2]!;
+          messages.push(...this.validateDictionaryEntry(propertyName, cleanValue, keyType, valueType, propInfo, className));
           break;
         }
         messages.push({
@@ -241,6 +234,56 @@ export class PropertyValidator {
    */
   validateTaskName(taskName: string, propInfo: PropertyInfo): ValidationMessage[] {
     return this.taskValidator.validateTaskName(taskName, propInfo);
+  }
+
+  /**
+   * Validate a dictionary entry in the form "key=value".
+   * Key and value types are validated via the common validateProperty path.
+   */
+  private validateDictionaryEntry(
+    propertyName: string,
+    value: string,
+    keyType: string,
+    valueType: string,
+    propInfo: PropertyInfo,
+    className: string
+  ): ValidationMessage[] {
+    const messages: ValidationMessage[] = [];
+    const line = propInfo.valueStartLine;
+
+    const equalsIndex = value.indexOf('=');
+    if (equalsIndex === -1) {
+      messages.push({
+        severity: 'error',
+        message: `Invalid Dictionary entry for ${propertyName}`,
+        filePath: propInfo.filePath,
+        line,
+        context: `Expected format: key=value, got '${value}'`,
+      });
+      return messages;
+    }
+
+    const key = value.substring(0, equalsIndex).trim();
+    const dictValue = value.substring(equalsIndex + 1).trim();
+    const baseName = propertyName.startsWith('!') ? propertyName.slice(1) : propertyName;
+
+    if (key.length === 0) {
+      messages.push({
+        severity: 'error',
+        message: `Empty Dictionary key for ${baseName}`,
+        filePath: propInfo.filePath,
+        line,
+        context: 'Dictionary keys must be non-empty',
+      });
+    } else {
+      messages.push(...this.validateProperty(baseName, key, keyType, propInfo, className));
+    }
+
+    if (dictValue.length > 0) {
+      messages.push(...this.validateProperty(baseName, dictValue, valueType, propInfo, className));
+    }
+
+    return messages;
   }
 
   /**
@@ -504,102 +547,5 @@ export class PropertyValidator {
   private validateTileCoord(name: string, value: string, filePath: string, line: number): ValidationMessage[] {
     // TileCoord is same as Vector2
     return this.validateVector2(name, value, filePath, line);
-  }
-
-  private validateListString(
-    _name: string,
-    value: string,
-    _isOverwrite: boolean,
-    propInfo: PropertyInfo
-  ): ValidationMessage[] {
-    // Strings in lists are comma-separated
-    // With ! prefix, it overwrites the list, otherwise appends
-    // Empty strings are allowed if it's a single append
-    // Validate dynamic text tags in the value
-    return validateDynamicText(value, propInfo);
-  }
-
-  private validateListInteger(
-    name: string,
-    value: string,
-    isOverwrite: boolean,
-    filePath: string,
-    line: number
-  ): ValidationMessage[] {
-    const messages: ValidationMessage[] = [];
-
-    if (isOverwrite) {
-      // Comma-separated list of integers
-      const parts = value
-        .split(',')
-        .map(p => p.trim())
-        .filter(p => p.length > 0);
-      for (const part of parts) {
-        if (!isValidInteger(part)) {
-          messages.push({
-            severity: 'error',
-            message: `Invalid integer in list for ${name}`,
-            filePath,
-            line,
-            context: `Expected integer, got '${part}'`,
-          });
-        }
-      }
-    } else {
-      // Single integer to append
-      if (!isValidInteger(value)) {
-        messages.push({
-          severity: 'error',
-          message: `Invalid integer for ${name}`,
-          filePath,
-          line,
-          context: `Expected integer, got '${value}'`,
-        });
-      }
-    }
-
-    return messages;
-  }
-
-  private validateListFloat(
-    name: string,
-    value: string,
-    isOverwrite: boolean,
-    filePath: string,
-    line: number
-  ): ValidationMessage[] {
-    const messages: ValidationMessage[] = [];
-
-    if (isOverwrite) {
-      // Comma-separated list of floats
-      const parts = value
-        .split(',')
-        .map(p => p.trim())
-        .filter(p => p.length > 0);
-      for (const part of parts) {
-        if (!isValidFloat(part)) {
-          messages.push({
-            severity: 'error',
-            message: `Invalid float in list for ${name}`,
-            filePath,
-            line,
-            context: `Expected number, got '${part}'`,
-          });
-        }
-      }
-    } else {
-      // Single float to append
-      if (!isValidFloat(value)) {
-        messages.push({
-          severity: 'error',
-          message: `Invalid float for ${name}`,
-          filePath,
-          line,
-          context: `Expected number, got '${value}'`,
-        });
-      }
-    }
-
-    return messages;
   }
 }

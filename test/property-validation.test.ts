@@ -169,37 +169,137 @@ describe('Property Validation', () => {
     });
   });
 
-  describe('List validation', () => {
+  describe('Collection (List and HashSet) validation', () => {
     const validator = new PropertyValidator();
 
-    test('validates List<integer> with ! prefix (overwrite)', () => {
-      const propInfo = createPropertyInfo('1,2,3');
-      const messages = validator.validateProperty('!testProp', '1,2,3', 'List<integer>', propInfo, 'TestClass');
-      expectValid(messages);
-    });
-
-    test('rejects invalid integers in List<integer>', () => {
-      const propInfo = createPropertyInfo('1,abc,3');
-      const messages = validator.validateProperty('!testProp', '1,abc,3', 'List<integer>', propInfo, 'TestClass');
-      expectMessage(messages, { text: 'Invalid integer in list', severity: 'error' });
-    });
-
-    test('validates List<float> with ! prefix', () => {
-      const propInfo = createPropertyInfo('1.5,2.7,3.14');
-      const messages = validator.validateProperty('!testProp', '1.5,2.7,3.14', 'List<float>', propInfo, 'TestClass');
-      expectValid(messages);
-    });
-
-    test('rejects invalid floats in List<float>', () => {
-      const propInfo = createPropertyInfo('1.5,abc,3.14');
-      const messages = validator.validateProperty('!testProp', '1.5,abc,3.14', 'List<float>', propInfo, 'TestClass');
-      expectMessage(messages, { text: 'Invalid float in list', severity: 'error' });
-    });
-
-    test('validates single integer append (no ! prefix)', () => {
+    test('validates single List<integer> element', () => {
       const propInfo = createPropertyInfo('42');
       const messages = validator.validateProperty('testProp', '42', 'List<integer>', propInfo, 'TestClass');
       expectValid(messages);
+    });
+
+    test('validates comma-separated List<integer> elements', () => {
+      const propInfo = createPropertyInfo('1,2,3');
+      const messages = validator.validateProperty('testProp', '1,2,3', 'List<integer>', propInfo, 'TestClass');
+      expectValid(messages);
+    });
+
+    test('rejects invalid integer in List<integer>', () => {
+      const propInfo = createPropertyInfo('1,abc,3');
+      const messages = validator.validateProperty('testProp', '1,abc,3', 'List<integer>', propInfo, 'TestClass');
+      expectMessage(messages, { text: 'Invalid integer value', severity: 'error' });
+    });
+
+    test('validates comma-separated List<float> elements', () => {
+      const propInfo = createPropertyInfo('1.5,2.7,3.14');
+      const messages = validator.validateProperty('testProp', '1.5,2.7,3.14', 'List<float>', propInfo, 'TestClass');
+      expectValid(messages);
+    });
+
+    test('rejects invalid float in List<float>', () => {
+      const propInfo = createPropertyInfo('1.5,abc,3.14');
+      const messages = validator.validateProperty('testProp', '1.5,abc,3.14', 'List<float>', propInfo, 'TestClass');
+      expectMessage(messages, { text: 'Invalid float value', severity: 'error' });
+    });
+
+    test('HashSet<integer> rejects invalid integer the same as List<integer>', () => {
+      const propInfo = createPropertyInfo('abc');
+      const messages = validator.validateProperty('testProp', 'abc', 'HashSet<integer>', propInfo, 'TestClass');
+      expectMessage(messages, { text: 'Invalid integer value', severity: 'error' });
+    });
+  });
+
+  describe('Dictionary validation', () => {
+    const validator = new PropertyValidator();
+
+    test('accepts valid Dictionary<string, string> entry', () => {
+      const propInfo = createPropertyInfo('armR=ekrast_armR');
+      const messages = validator.validateProperty('testProp', 'armR=ekrast_armR', 'Dictionary<string, string>', propInfo, 'TestClass');
+      expectValid(messages);
+    });
+
+    test('accepts valid Dictionary<string, integer> entry', () => {
+      const propInfo = createPropertyInfo('myKey=42');
+      const messages = validator.validateProperty('testProp', 'myKey=42', 'Dictionary<string, integer>', propInfo, 'TestClass');
+      expectValid(messages);
+    });
+
+    test('rejects invalid integer in Dictionary<string, integer>', () => {
+      const propInfo = createPropertyInfo('myKey=notAnInt');
+      const messages = validator.validateProperty('testProp', 'myKey=notAnInt', 'Dictionary<string, integer>', propInfo, 'TestClass');
+      expectMessage(messages, { text: 'Invalid integer value', severity: 'error' });
+    });
+
+    test('accepts valid Dictionary<string, int> entry', () => {
+      const propInfo = createPropertyInfo('myKey=7');
+      const messages = validator.validateProperty('testProp', 'myKey=7', 'Dictionary<string, int>', propInfo, 'TestClass');
+      expectValid(messages);
+    });
+
+    test('accepts valid Dictionary<string, float> entry', () => {
+      const propInfo = createPropertyInfo('myKey=1.5');
+      const messages = validator.validateProperty('testProp', 'myKey=1.5', 'Dictionary<string, float>', propInfo, 'TestClass');
+      expectValid(messages);
+    });
+
+    test('rejects invalid float in Dictionary<string, float>', () => {
+      const propInfo = createPropertyInfo('myKey=notAFloat');
+      const messages = validator.validateProperty('testProp', 'myKey=notAFloat', 'Dictionary<string, float>', propInfo, 'TestClass');
+      expectMessage(messages, { text: 'Invalid float value', severity: 'error' });
+    });
+
+    test('accepts valid Dictionary<string, List<float>> entry (single append)', () => {
+      const propInfo = createPropertyInfo('myKey=3.14');
+      const messages = validator.validateProperty('testProp', 'myKey=3.14', 'Dictionary<string, List<float>>', propInfo, 'TestClass');
+      expectValid(messages);
+    });
+
+    test('rejects invalid float in Dictionary<string, List<float>>', () => {
+      const propInfo = createPropertyInfo('myKey=notAFloat');
+      const messages = validator.validateProperty('testProp', 'myKey=notAFloat', 'Dictionary<string, List<float>>', propInfo, 'TestClass');
+      expectMessage(messages, { text: 'Invalid float value', severity: 'error' });
+    });
+
+    test('accepts valid Dictionary<string, List<string>> entry without validation', () => {
+      const propInfo = createPropertyInfo('myKey=anything');
+      const messages = validator.validateProperty('testProp', 'myKey=anything', 'Dictionary<string, List<string>>', propInfo, 'TestClass');
+      expectValid(messages);
+    });
+
+    test('raises info for unsupported Dictionary value type', () => {
+      const propInfo = createPropertyInfo('myKey=someValue');
+      const messages = validator.validateProperty('testProp', 'myKey=someValue', 'Dictionary<string, Actor>', propInfo, 'TestClass');
+      expectMessage(messages, { text: 'Cannot validate type Actor', severity: 'info' });
+    });
+
+    test('raises info for Dictionary<string, List<Keyframe>>', () => {
+      const propInfo = createPropertyInfo('myKey=someValue');
+      const messages = validator.validateProperty('testProp', 'myKey=someValue', 'Dictionary<string, List<Keyframe>>', propInfo, 'TestClass');
+      expectMessage(messages, { text: 'Cannot validate type Keyframe', severity: 'info' });
+    });
+
+    test('errors on missing = in Dictionary entry', () => {
+      const propInfo = createPropertyInfo('noEqualsSign');
+      const messages = validator.validateProperty('testProp', 'noEqualsSign', 'Dictionary<string, string>', propInfo, 'TestClass');
+      expectMessage(messages, { text: 'Invalid Dictionary entry', severity: 'error' });
+    });
+
+    test('errors on empty Dictionary key', () => {
+      const propInfo = createPropertyInfo('=value');
+      const messages = validator.validateProperty('testProp', '=value', 'Dictionary<string, string>', propInfo, 'TestClass');
+      expectMessage(messages, { text: 'Empty Dictionary key', severity: 'error' });
+    });
+
+    test('validates integer key in Dictionary<integer, string>', () => {
+      const propInfo = createPropertyInfo('42=value');
+      const messages = validator.validateProperty('testProp', '42=value', 'Dictionary<integer, string>', propInfo, 'TestClass');
+      expectValid(messages);
+    });
+
+    test('rejects invalid integer key in Dictionary<integer, string>', () => {
+      const propInfo = createPropertyInfo('notAnInt=value');
+      const messages = validator.validateProperty('testProp', 'notAnInt=value', 'Dictionary<integer, string>', propInfo, 'TestClass');
+      expectMessage(messages, { text: 'Invalid integer value', severity: 'error' });
     });
   });
 

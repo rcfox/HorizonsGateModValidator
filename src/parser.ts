@@ -224,8 +224,14 @@ export class ModParser {
       if (this.check(TokenType.IDENTIFIER)) {
         const nextToken = this.peekNext();
         if (nextToken?.type === TokenType.EQUALS) {
-          // This is a new property, stop here
-          break;
+          // If no value tokens collected yet, this might be a dictionary entry (key=value;).
+          // Look ahead: if there's a semicolon before the next newline, treat it as part of the value.
+          if (valueParts.length === 0 && this.hasSemicolonBeforeNewline()) {
+            // Dictionary-style entry, continue collecting
+          } else {
+            // This is a new property, stop here
+            break;
+          }
         }
       }
 
@@ -395,6 +401,21 @@ export class ModParser {
     this.current = savedCurrent;
 
     return shouldWarn;
+  }
+
+  /**
+   * Look ahead from the current position to check if there is a SEMICOLON
+   * before the next NEWLINE or EOF. Does not consume any tokens.
+   */
+  private hasSemicolonBeforeNewline(): boolean {
+    let i = this.current;
+    while (i < this.tokens.length) {
+      const token = this.tokens[i]!;
+      if (token.type === TokenType.SEMICOLON) return true;
+      if (token.type === TokenType.NEWLINE || token.type === TokenType.EOF) return false;
+      i++;
+    }
+    return false;
   }
 
   private skipWhitespaceAndComments(): void {

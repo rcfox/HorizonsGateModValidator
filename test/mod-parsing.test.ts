@@ -268,4 +268,55 @@ describe('Mod File Parsing', () => {
       expect(objects[0]?.properties.has('bodyPart2')).toBe(true);
     });
   });
+
+  describe('Dictionary property values', () => {
+    test('parses dictionary entry as key=value within the property value', () => {
+      const input = '[ActorType] ID=foo;\n\tdefaultBodyPartSprites=armR=ekrast_armR;';
+      const parser = new ModParser(input, 'test.txt');
+      const { objects, errors } = parser.parse();
+
+      expectValid(errors);
+      expect(objects).toHaveLength(1);
+      // The dictionary entry 'armR=ekrast_armR' should be the value of defaultBodyPartSprites,
+      // not parsed as a separate property named 'armR'
+      expect(objects[0]?.properties.has('defaultBodyPartSprites')).toBe(true);
+      expect(objects[0]?.properties.get('defaultBodyPartSprites')?.value).toBe('armR=ekrast_armR');
+      expect(objects[0]?.properties.has('armR')).toBe(false);
+    });
+
+    test('parses multiple dictionary entries as separate properties', () => {
+      const input = '[ActorType] ID=foo;\n\tdefaultBodyPartSprites=armR=ekrast_armR;\n\tdefaultBodyPartSprites=armL=ekrast_armL;';
+      const parser = new ModParser(input, 'test.txt');
+      const { objects, errors } = parser.parse();
+
+      expectValid(errors);
+      expect(objects).toHaveLength(1);
+      expect(objects[0]?.properties.has('defaultBodyPartSprites')).toBe(true);
+      expect(objects[0]?.properties.get('defaultBodyPartSprites')?.value).toBe('armR=ekrast_armR');
+      // Second entry gets a '+' suffix to avoid key collision
+      expect(objects[0]?.properties.has('defaultBodyPartSprites+')).toBe(true);
+      expect(objects[0]?.properties.get('defaultBodyPartSprites+')?.value).toBe('armL=ekrast_armL');
+    });
+
+    test('still parses two properties on the same line with semicolons', () => {
+      const input = '[Action] ID=test; applyWeaponBuffs=true;';
+      const parser = new ModParser(input, 'test.txt');
+      const { objects, errors } = parser.parse();
+
+      expectValid(errors);
+      expect(objects[0]?.properties.get('ID')?.value).toBe('test');
+      expect(objects[0]?.properties.get('applyWeaponBuffs')?.value).toBe('true');
+    });
+
+    test('does not treat dynamic text tag with = as a dictionary entry', () => {
+      const input = '[ItemType] ID=foo; name=<color=red>Hello</color>;';
+      const parser = new ModParser(input, 'test.txt');
+      const { objects, errors } = parser.parse();
+
+      expectValid(errors);
+      expect(objects[0]?.properties.size).toBe(2);
+      expect(objects[0]?.properties.get('name')?.value).toBe('<color=red>Hello</color>');
+      expect(objects[0]?.properties.has('color')).toBe(false);
+    });
+  });
 });
