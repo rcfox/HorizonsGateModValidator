@@ -917,6 +917,7 @@ function extractSchema(tacticsDir) {
 
   // Fix known property type issues
   fixfReqTypes(schema);
+  fixKnownEnumTypes(schema);
 
   // Special case: DialogNodeOverride accepts both its own fields AND DialogNode fields
   // because DataManager creates both from the same valuesDict
@@ -1064,6 +1065,32 @@ function extractSchema(tacticsDir) {
   const functionalAliases = extractFunctionalAliases(dataManagerPath);
 
   return { schema, typeAliases, functionalAliases, enums };
+}
+
+/**
+ * Fix known enum type issues that can't be automatically detected.
+ * These are fields whose C# type is an enum but the constructor type inference
+ * produces a less specific type (e.g., string or integer) because it uses
+ * int.TryParse + cast rather than a directly recognisable parse pattern.
+ */
+function fixKnownEnumTypes(schema) {
+  console.log('\nFixing known enum type issues...');
+
+  const fixes = [
+    // shape is `public AoEShapeType shape` but the constructor uses
+    // int.TryParse(v["shape"], out result) followed by (AoEShapeType)result,
+    // which the type inferrer doesn't recognise, so it falls back to string.
+    { className: 'AreaOfEffect', fieldName: 'shape', enumType: 'AoEShapeType' },
+  ];
+
+  for (const { className, fieldName, enumType } of fixes) {
+    if (!schema[className]) continue;
+    const field = schema[className].fields.find(f => f.name === fieldName);
+    if (field && field.type !== enumType) {
+      console.log(`  Fixing ${className}.${fieldName}: ${field.type} -> ${enumType}`);
+      field.type = enumType;
+    }
+  }
 }
 
 /**

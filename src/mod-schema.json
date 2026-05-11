@@ -81,6 +81,11 @@
           "csType": "string"
         },
         {
+          "name": "journalID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
           "name": "defaultSpriteOffset",
           "type": "integer",
           "csType": "int"
@@ -131,6 +136,21 @@
           "csType": "int"
         },
         {
+          "name": "spriteOffsetRandomMin",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "spriteOffsetRandomMax",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "spriteOffsetRandomMult",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
           "name": "color",
           "type": "Color",
           "csType": "Color"
@@ -154,6 +174,11 @@
           "name": "treatAsSameGroup",
           "type": "List<string>",
           "csType": "List<string>"
+        },
+        {
+          "name": "animation",
+          "type": "string",
+          "csType": "string"
         },
         {
           "name": "terrainElement",
@@ -217,6 +242,11 @@
         },
         {
           "name": "canTeleportOver",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "haltSlidingItems",
           "type": "boolean",
           "csType": "bool"
         },
@@ -456,6 +486,16 @@
           "csType": "float"
         },
         {
+          "name": "damageMod",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
+          "name": "healMod",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
           "name": "quantityMod",
           "type": "integer",
           "csType": "int"
@@ -472,8 +512,8 @@
         },
         {
           "name": "fx",
-          "type": "string",
-          "csType": "string"
+          "type": "List<string>",
+          "csType": "List<string>"
         },
         {
           "name": "aiRatingMod",
@@ -489,6 +529,11 @@
           "name": "delayUntilCanReactAgain",
           "type": "float",
           "csType": "float"
+        },
+        {
+          "name": "fReq",
+          "type": "Formula",
+          "csType": "Formula"
         },
         {
           "name": "ID",
@@ -550,6 +595,41 @@
           "name": "bubbleIcon",
           "type": "string",
           "csType": "string"
+        },
+        {
+          "name": "bubbleIconRank2",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "drawBubbleIconWhileIncapped",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "drawBubbleIconWhileCurrentTurn",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "paletteOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "idleAnimOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "fxEvery4Frames",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "appendMagnitudeToFXID",
+          "type": "boolean",
+          "csType": "bool"
         },
         {
           "name": "minimum",
@@ -633,6 +713,16 @@
         },
         {
           "name": "actorPaletteOverrideDuration",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "actorPaletteOverride_harmless",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "actorPaletteOverrideDuration_harmless",
           "type": "float",
           "csType": "float"
         },
@@ -732,6 +822,11 @@
           "csType": "bool"
         },
         {
+          "name": "AICanRankUp",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
           "name": "cloneFrom",
           "type": "string",
           "csType": "string",
@@ -757,6 +852,12 @@
           "virtual": true
         },
         {
+          "name": "sourceAVAffecter",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
+        },
+        {
           "name": "magnitude",
           "type": "float",
           "csType": "float",
@@ -766,12 +867,6 @@
           "name": "duration",
           "type": "float",
           "csType": "float",
-          "virtual": true
-        },
-        {
-          "name": "sourceAVAffecter",
-          "type": "string",
-          "csType": "string",
           "virtual": true
         },
         {
@@ -844,6 +939,11 @@
           "csType": "float"
         },
         {
+          "name": "spriteIgnoreDarkness",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
           "name": "previewSprite",
           "type": "string",
           "csType": "string"
@@ -909,6 +1009,11 @@
           "csType": "bool"
         },
         {
+          "name": "doNotFlipBasedOnFacingRot",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
           "name": "facingRotIsActualRot",
           "type": "boolean",
           "csType": "bool"
@@ -940,6 +1045,11 @@
         },
         {
           "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "loadedFromMod",
           "type": "string",
           "csType": "string"
         },
@@ -1039,6 +1149,11 @@
           "csType": "bool"
         },
         {
+          "name": "unbypassableCorpse",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
           "name": "directionless",
           "type": "boolean",
           "csType": "bool"
@@ -1049,12 +1164,32 @@
           "csType": "bool"
         },
         {
+          "name": "drawShadowOffset",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
           "name": "cannotStartCombat",
           "type": "boolean",
           "csType": "bool"
         },
         {
+          "name": "canCarryItemsOrWeapons",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "canUseItemsOrWeapons",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
           "name": "canUseItems",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "AIignoresDelayedAoEs",
           "type": "boolean",
           "csType": "bool"
         },
@@ -1080,6 +1215,16 @@
         },
         {
           "name": "canSeeActEval",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "doesNotBlockLoE",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "intangibleWhileMoving",
           "type": "boolean",
           "csType": "bool"
         },
@@ -1292,6 +1437,11 @@
           "name": "armorPalette",
           "type": "string",
           "csType": "string"
+        },
+        {
+          "name": "equipmentDoesntChangeArmorPalette",
+          "type": "boolean",
+          "csType": "bool"
         },
         {
           "name": "defaultFaction",
@@ -1708,8 +1858,8 @@
       "fields": [
         {
           "name": "shape",
-          "type": "integer",
-          "csType": "int",
+          "type": "AoEShapeType",
+          "csType": "string",
           "virtual": true
         },
         {
@@ -1771,6 +1921,11 @@
           "name": "aoeCasterAsOrigin",
           "type": "boolean",
           "csType": "bool"
+        },
+        {
+          "name": "originOffset",
+          "type": "TileCoord",
+          "csType": "TileCoord"
         },
         {
           "name": "airborne",
@@ -1873,7 +2028,22 @@
           "csType": "bool"
         },
         {
+          "name": "maxRangeAddDistanceFromCasterMult",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
           "name": "ignoreCannotTarget",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "reverseTileOrder",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "sortTileOrderByDistanceToOrigin",
           "type": "boolean",
           "csType": "bool"
         },
@@ -1908,9 +2078,19 @@
           "csType": "float"
         },
         {
+          "name": "coneAngle_exclude_canExcludeOrigin",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
           "name": "fReq",
           "type": "Formula",
           "csType": "Formula"
+        },
+        {
+          "name": "onlyTilesContiguousFromOrigin",
+          "type": "boolean",
+          "csType": "bool"
         },
         {
           "name": "ID",
@@ -1944,12 +2124,32 @@
           "csType": "HashSet<specialProperty>"
         },
         {
+          "name": "exclusiveEquipmentCategory",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "exclusiveEquipmentCategory_includeWeapons",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "showIconInTooltip",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
           "name": "name",
           "type": "string",
           "csType": "string"
         },
         {
           "name": "description",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "tooltipTopRight",
           "type": "string",
           "csType": "string"
         },
@@ -1964,6 +2164,11 @@
           "csType": "int"
         },
         {
+          "name": "animation",
+          "type": "string",
+          "csType": "string"
+        },
+        {
           "name": "sprite",
           "type": "integer",
           "csType": "int"
@@ -1975,6 +2180,11 @@
         },
         {
           "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "loadedFromMod",
           "type": "string",
           "csType": "string"
         },
@@ -2040,18 +2250,28 @@
         },
         {
           "name": "spawnFX",
-          "type": "string",
-          "csType": "string"
+          "type": "List<string>",
+          "csType": "List<string>"
         },
         {
           "name": "spawnFXColor",
-          "type": "string",
-          "csType": "string"
+          "type": "List<string>",
+          "csType": "List<string>"
         },
         {
           "name": "drawSprite",
-          "type": "string",
-          "csType": "string"
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "drawSprite_usesPalettes",
+          "type": "List<bool>",
+          "csType": "List<bool>"
+        },
+        {
+          "name": "drawSprite_depthMod",
+          "type": "List<float>",
+          "csType": "List<float>"
         },
         {
           "name": "element",
@@ -2134,9 +2354,19 @@
           "csType": "string"
         },
         {
+          "name": "pushFX",
+          "type": "string",
+          "csType": "string"
+        },
+        {
           "name": "cantFitInTileWith",
           "type": "List<string>",
           "csType": "List<string>"
+        },
+        {
+          "name": "maxVolumeCanFitInTileWith",
+          "type": "float",
+          "csType": "float"
         },
         {
           "name": "journalID",
@@ -2157,6 +2387,26 @@
           "name": "reactions_inArmor",
           "type": "List<ElementReaction>",
           "csType": "List<ElementReaction>"
+        },
+        {
+          "name": "quantityChangesSpriteUpTo",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "adjustSprite",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "setRotWhenPlaced",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "drawTileWhenOffscreen",
+          "type": "boolean",
+          "csType": "bool"
         },
         {
           "name": "invisible",
@@ -2318,6 +2568,36 @@
           "csType": "bool"
         },
         {
+          "name": "interruptibleByDamage",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "spriteOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "paletteOverride",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "spriteWidthOverride",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "spriteHeightOverride",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "spriteOffset",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
           "name": "durationUntilAttackKeyframe",
           "type": "float",
           "csType": "float"
@@ -2431,6 +2711,16 @@
         },
         {
           "name": "sheatheWeapon",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "holdForAtLeastOneFrame",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "ignoreSpeed",
           "type": "boolean",
           "csType": "bool"
         },
@@ -2569,11 +2859,6 @@
           "csType": "Vector2"
         },
         {
-          "name": "broken",
-          "type": "boolean",
-          "csType": "bool"
-        },
-        {
           "name": "specialInfoTC",
           "type": "TileCoord",
           "csType": "TileCoord"
@@ -2597,6 +2882,11 @@
           "name": "index_temp",
           "type": "integer",
           "csType": "int"
+        },
+        {
+          "name": "broken",
+          "type": "boolean",
+          "csType": "bool"
         },
         {
           "name": "containedIn",
@@ -2976,6 +3266,11 @@
           "csType": "string"
         },
         {
+          "name": "loadedFromMod",
+          "type": "string",
+          "csType": "string"
+        },
+        {
           "name": "sprite",
           "type": "string",
           "csType": "string"
@@ -3002,6 +3297,11 @@
         },
         {
           "name": "controllable",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "equipmentDoesntChangeArmorPalette",
           "type": "boolean",
           "csType": "bool"
         },
@@ -3331,6 +3631,11 @@
           "csType": "float"
         },
         {
+          "name": "HPBeforeLastHPDamageTaken",
+          "type": "float",
+          "csType": "float"
+        },
+        {
           "name": "lastHPDamageTaken",
           "type": "float",
           "csType": "float"
@@ -3556,6 +3861,11 @@
           "csType": "float"
         },
         {
+          "name": "tilesMovedThisTurn",
+          "type": "float",
+          "csType": "float"
+        },
+        {
           "name": "childActors",
           "type": "List<string>",
           "csType": "List<string>"
@@ -3722,9 +4032,9 @@
           "csType": "bool"
         },
         {
-          "name": "broken",
-          "type": "boolean",
-          "csType": "bool"
+          "name": "timer",
+          "type": "float",
+          "csType": "float"
         },
         {
           "name": "specialInfoTC",
@@ -3757,6 +4067,11 @@
           "csType": "string"
         },
         {
+          "name": "broken",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
           "name": "q",
           "type": "string",
           "csType": "string",
@@ -3776,12 +4091,6 @@
         },
         {
           "name": "br",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
-          "name": "timer",
           "type": "string",
           "csType": "string",
           "virtual": true
@@ -3864,6 +4173,16 @@
           "csType": "string"
         },
         {
+          "name": "inTile",
+          "type": "TileCoord",
+          "csType": "TileCoord"
+        },
+        {
+          "name": "inActorID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
           "name": "canContainAnything",
           "type": "boolean",
           "csType": "bool"
@@ -3925,8 +4244,13 @@
         },
         {
           "name": "locationItem",
-          "type": "string",
-          "csType": "string"
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "locationItemOffset",
+          "type": "List<Vector2>",
+          "csType": "List<Vector2>"
         },
         {
           "name": "externalSong",
@@ -3972,6 +4296,11 @@
           "name": "discoverable_fReq",
           "type": "Formula",
           "csType": "Formula"
+        },
+        {
+          "name": "enterOnTravelPointNum",
+          "type": "integer",
+          "csType": "int"
         },
         {
           "name": "showNameAsAPopupOnEntering",
@@ -4819,7 +5148,8 @@
         {
           "name": "taskString",
           "type": "string",
-          "csType": "string"
+          "csType": "string",
+          "virtual": true
         },
         {
           "name": "XYRefersToThisZone",
@@ -4869,6 +5199,11 @@
         },
         {
           "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "loadedFromMod",
           "type": "string",
           "csType": "string"
         },
@@ -5096,6 +5431,11 @@
           "csType": "Formula"
         },
         {
+          "name": "fReq_failedText",
+          "type": "string",
+          "csType": "string"
+        },
+        {
           "name": "numTargets",
           "type": "Formula",
           "csType": "Formula"
@@ -5126,9 +5466,19 @@
           "csType": "float"
         },
         {
+          "name": "AICaresAboutMovingIntoMult",
+          "type": "float",
+          "csType": "float"
+        },
+        {
           "name": "AIRatingMult",
           "type": "float",
           "csType": "float"
+        },
+        {
+          "name": "ignoredByDumbAI",
+          "type": "boolean",
+          "csType": "bool"
         },
         {
           "name": "autolearnedByAI",
@@ -5226,6 +5576,16 @@
           "csType": "bool"
         },
         {
+          "name": "appendToCasterAnimation",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
+          "name": "appendToCasterAnimation_fReq",
+          "type": "List<Formula>",
+          "csType": "List<Formula>"
+        },
+        {
           "name": "casterAnimationSpeed",
           "type": "float",
           "csType": "float"
@@ -5234,6 +5594,11 @@
           "name": "casterAnimationLoops",
           "type": "integer",
           "csType": "int"
+        },
+        {
+          "name": "setItemType_drawSprite",
+          "type": "Dictionary<string, string>",
+          "csType": "Dictionary<string, string>"
         },
         {
           "name": "cloneFrom",
@@ -5291,6 +5656,11 @@
           "csType": "bool"
         },
         {
+          "name": "weaponAvAffecter_useOffhand",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
           "name": "removeTheseElementsFromWeaponAvAffecter",
           "type": "List<Element>",
           "csType": "List<Element>"
@@ -5307,6 +5677,11 @@
         },
         {
           "name": "useMyAoEWhenAddingAsWeaponAvAffecter",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "delayFurtherAvAffecters",
           "type": "boolean",
           "csType": "bool"
         },
@@ -5331,6 +5706,11 @@
           "csType": "bool"
         },
         {
+          "name": "hideActEvalAt0PercentChance",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
           "name": "prefixIcon",
           "type": "string",
           "csType": "string"
@@ -5351,6 +5731,11 @@
           "csType": "bool"
         },
         {
+          "name": "canBeRemovedByNonspecificAVEffectRemoval",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
           "name": "useCasterAsOriginForDirectionalEffects",
           "type": "boolean",
           "csType": "bool"
@@ -5367,6 +5752,11 @@
         },
         {
           "name": "rotOverride",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "rotMod",
           "type": "integer",
           "csType": "int"
         },
@@ -5392,6 +5782,16 @@
         },
         {
           "name": "applyElementToTile",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "applyElementToWeaponInsteadOfActor",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "inflictsTrueDamage",
           "type": "boolean",
           "csType": "bool"
         },
@@ -6105,6 +6505,11 @@
           "csType": "float"
         },
         {
+          "name": "actorCountIgnoresPowerLevel",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
           "name": "maxDifferentTypes",
           "type": "float",
           "csType": "float"
@@ -6585,6 +6990,11 @@
           "csType": "bool"
         },
         {
+          "name": "fleetsCanBeTracked",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
           "name": "cloneFrom",
           "type": "string",
           "csType": "string",
@@ -6644,6 +7054,26 @@
         },
         {
           "name": "targetPosOffset",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "targetRandPosOffset",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "positionIsScreenPosition",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "originOffset",
+          "type": "Vector2",
+          "csType": "Vector2"
+        },
+        {
+          "name": "originOffsetPerParticle",
           "type": "Vector2",
           "csType": "Vector2"
         },
@@ -6778,6 +7208,11 @@
           "csType": "ScreenTint"
         },
         {
+          "name": "screenwave",
+          "type": "Screenwave",
+          "csType": "Screenwave"
+        },
+        {
           "name": "timeSpeedModOverride",
           "type": "boolean",
           "csType": "bool"
@@ -6848,9 +7283,39 @@
           "csType": "bool"
         },
         {
+          "name": "rotateStartingVelocAccel",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
           "name": "useTerrainDepth",
           "type": "boolean",
           "csType": "bool"
+        },
+        {
+          "name": "useActorDepth",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "addTileHeightDepth",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "useItemSpeedIfItemFX",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "ignoreDarkness",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "snapTexToNearestPixel",
+          "type": "integer",
+          "csType": "int"
         },
         {
           "name": "loopAroundZoneEdge",
@@ -6859,6 +7324,16 @@
         },
         {
           "name": "drawOnlyIfRoofsAreDrawn",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "zoneParallaxWidth",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "useTileTerrainData",
           "type": "boolean",
           "csType": "bool"
         },
@@ -6913,9 +7388,24 @@
           "csType": "string"
         },
         {
+          "name": "spawnFXatEnd_fReq",
+          "type": "string",
+          "csType": "string"
+        },
+        {
           "name": "spawnFXatEndAoEID",
           "type": "string",
           "csType": "string"
+        },
+        {
+          "name": "spawnFXatEndInheritRot",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "spawnFXatEndInheritVeloc",
+          "type": "float",
+          "csType": "float"
         },
         {
           "name": "spawnFXatEndIfActorNear",
@@ -7063,6 +7553,61 @@
           "csType": "bool"
         },
         {
+          "name": "preventOtherTints",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "ID",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        },
+        {
+          "name": "cloneFrom",
+          "type": "string",
+          "csType": "string",
+          "virtual": true,
+          "source": "DataManager (common)"
+        }
+      ],
+      "supportsCloneFrom": true
+    },
+    "Screenwave": {
+      "category": "nested",
+      "fields": [
+        {
+          "name": "screenWaveFreq",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenWaveFreqVeloc",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenWaveFreqAccel",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenWaveAmp",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "screenWaveSpeed",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "duration",
+          "type": "float",
+          "csType": "float"
+        },
+        {
           "name": "ID",
           "type": "string",
           "csType": "string",
@@ -7153,6 +7698,31 @@
           "name": "pB",
           "type": "string",
           "csType": "string"
+        },
+        {
+          "name": "useItemSpeedIfItemFX",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "actorSpriteFX",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "actorID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "trackActorPosition",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "offsetFromActorPosition",
+          "type": "Vector2",
+          "csType": "Vector2"
         },
         {
           "name": "speed",
@@ -7250,9 +7820,29 @@
           "csType": "float"
         },
         {
+          "name": "snapTexToNearestPixel",
+          "type": "integer",
+          "csType": "int"
+        },
+        {
+          "name": "addTileHeightDepth",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
           "name": "useTerrainDepth",
           "type": "boolean",
           "csType": "bool"
+        },
+        {
+          "name": "useActorDepth",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "depthMod",
+          "type": "float",
+          "csType": "float"
         },
         {
           "name": "loop",
@@ -7280,6 +7870,16 @@
           "csType": "bool"
         },
         {
+          "name": "zoneParallaxWidth",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "useTileTerrainData",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
           "name": "playWhileGameIsPaused",
           "type": "boolean",
           "csType": "bool"
@@ -7300,9 +7900,24 @@
           "csType": "string"
         },
         {
+          "name": "spawnFXatEnd_fReq",
+          "type": "string",
+          "csType": "string"
+        },
+        {
           "name": "spawnFXatEndAoEID",
           "type": "string",
           "csType": "string"
+        },
+        {
+          "name": "spawnFXatEndInheritRot",
+          "type": "boolean",
+          "csType": "bool"
+        },
+        {
+          "name": "spawnFXatEndInheritVeloc",
+          "type": "float",
+          "csType": "float"
         },
         {
           "name": "spawnFXatEndIfActorNear",
@@ -7653,6 +8268,11 @@
           "csType": "float"
         },
         {
+          "name": "backgroundTex",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
           "name": "travelSong",
           "type": "string",
           "csType": "string"
@@ -7736,6 +8356,16 @@
           "name": "zoneFX_y",
           "type": "List<float>",
           "csType": "List<float>"
+        },
+        {
+          "name": "lockCameraAtX",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "lockCameraAtY",
+          "type": "float",
+          "csType": "float"
         },
         {
           "name": "timeUntilNewDay",
@@ -8039,6 +8669,11 @@
           "csType": "float"
         },
         {
+          "name": "backgroundTex",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
           "name": "travelSong",
           "type": "string",
           "csType": "string"
@@ -8122,6 +8757,16 @@
           "name": "zoneFX_y",
           "type": "List<float>",
           "csType": "List<float>"
+        },
+        {
+          "name": "lockCameraAtX",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "lockCameraAtY",
+          "type": "float",
+          "csType": "float"
         },
         {
           "name": "timeUntilNewDay",
@@ -8499,6 +9144,11 @@
           "csType": "float"
         },
         {
+          "name": "backgroundTex",
+          "type": "List<string>",
+          "csType": "List<string>"
+        },
+        {
           "name": "travelSong",
           "type": "string",
           "csType": "string"
@@ -8582,6 +9232,16 @@
           "name": "zoneFX_y",
           "type": "List<float>",
           "csType": "List<float>"
+        },
+        {
+          "name": "lockCameraAtX",
+          "type": "float",
+          "csType": "float"
+        },
+        {
+          "name": "lockCameraAtY",
+          "type": "float",
+          "csType": "float"
         },
         {
           "name": "timeUntilNewDay",
@@ -8739,590 +9399,704 @@
     },
     "Task.TaskType": {
       "none": -1,
-      "clear": 0,
-      "debug_drawStrings": 1,
-      "action": 2,
-      "actionOnPartyNumActor": 3,
-      "applyElement": 4,
-      "applyElementToArea": 5,
-      "applyElementToZone": 6,
-      "setTileTerrain": 7,
-      "script": 8,
-      "consolecommand": 9,
-      "togglePause": 10,
-      "preventInteraction": 11,
-      "delayActions": 12,
-      "cutsceneMode": 13,
-      "timeSpeed": 14,
-      "setFactionHostile": 15,
-      "setFactionAI": 16,
-      "killFaction": 17,
-      "removeFaction": 18,
-      "changeFaction": 19,
-      "moveToNewZone": 20,
-      "travel": 21,
-      "travel_point": 22,
-      "travel_point_g": 23,
-      "travel_leaveLocation": 24,
-      "travel_gVars": 25,
-      "travel_noSave": 26,
-      "travel_procedural": 27,
-      "travel_procedural_point": 28,
-      "travel_setReturnPath": 29,
-      "returnPath": 30,
-      "travel_g": 31,
-      "setGlobalVar": 32,
-      "setGlobalVar_math": 33,
-      "setGlobalVar_toOtherGlobalVar": 34,
-      "setGlobalVar_toPartyActorID": 35,
-      "setGlobalVar_toActorID": 36,
-      "setGlobalVarToZoneProperty": 37,
-      "setGlobalVarWithCommas": 38,
-      "clearGlobalVar": 39,
-      "enableUI": 40,
-      "disableUI": 41,
-      "unlockHelpGem": 42,
-      "enableHelpGem": 43,
-      "disableHelpGem": 44,
-      "save": 45,
-      "quietsave": 46,
-      "heal": 47,
-      "healparty": 48,
-      "healfaction": 49,
-      "fullrestore": 50,
-      "revive": 51,
-      "fx": 52,
-      "sfx": 53,
-      "fxOnTalker": 54,
-      "fxOnParty": 55,
-      "damageNumber": 56,
-      "damageNumber_worldTime": 57,
-      "animate": 58,
-      "textOverlay": 59,
-      "textOverlay_tween": 60,
-      "textOverlay_dynamic": 61,
-      "pointCameraAt": 62,
-      "lockCameraAt": 63,
-      "scaleCameraTo": 64,
-      "setRoofDrawNoMatterWhat": 65,
-      "cancelIfEnemiesPresent": 66,
-      "cancelIfEnemiesNotPresent": 67,
-      "cancelIfItemPresent": 68,
-      "cancelIfItemNotPresent": 69,
-      "cancelIf": 70,
-      "facingRot": 71,
-      "facingRotParty": 72,
-      "song": 73,
-      "playSong": 74,
-      "playNearestLocationSong": 75,
-      "setZoneSongs": 76,
-      "removeItem": 77,
-      "removeActorItem": 78,
-      "removeItemsNearPlayerActor": 79,
-      "removeItemOfValue": 80,
-      "removeEmptyItem": 81,
-      "removeAllItems": 82,
-      "removeAllItemsOfValue": 83,
-      "removeHeldItems": 84,
-      "addItem": 85,
-      "addItemToContainer": 86,
-      "spawnItem": 87,
-      "moveItems": 88,
-      "moveItemsToActor": 89,
-      "replaceEquipment": 90,
-      "dropItem": 91,
-      "buryAllItemsOfType": 92,
-      "buryGlobalVarItems": 93,
-      "buryLocations": 94,
-      "reactOnMatchingItems": 95,
-      "specialKeyStatusUpdate": 96,
-      "removeActor": 97,
-      "removeActorType": 98,
-      "removeActors_despawnable": 99,
-      "setActorFloat": 100,
-      "setActorBool": 101,
-      "setActorAI": 102,
-      "setActorName": 103,
-      "setActorIdleAnimOverride": 104,
-      "setActorDialogNodeID": 105,
-      "setActorAIActions": 106,
-      "setActorPalettes": 107,
-      "setFaceSprite": 108,
-      "setCurrentActor_partSpritesThatTakePriorityOverClass": 109,
-      "giveActorsBaseXP": 110,
-      "moveActor": 111,
-      "moveActor_point": 112,
-      "movePartyTo": 113,
-      "movePartyTo_point": 114,
-      "movePartyBy": 115,
-      "moveAllActorsBy": 116,
-      "addToParty": 117,
-      "addTalkerToParty": 118,
-      "addTalkerToParty_temp": 119,
-      "removeFromParty": 120,
-      "handleTiredStates": 121,
-      "hideParty": 122,
-      "path": 123,
-      "pathParty": 124,
-      "destination": 125,
-      "movement": 126,
-      "addZoneFX": 127,
-      "createZoneSpecialFX": 128,
-      "removeZoneFX": 129,
-      "setZonePalettes": 130,
-      "setZonePeaceful": 131,
-      "disableFog": 132,
-      "setZoneRollingPinStyle": 133,
-      "screenDarkWaveEffect": 134,
-      "changeZoneDarkColor": 135,
-      "setZoneDarkColor": 136,
-      "setZoneDarkness": 137,
-      "setZoneDarknessToWorldDarkness": 138,
-      "screenWaveEffect": 139,
-      "setZoneBG": 140,
-      "setZoneBGFX": 141,
-      "initWaypoints": 142,
-      "safe": 143,
-      "sendAISignal": 144,
-      "disableTrigger": 145,
-      "resetTrigger": 146,
-      "enableTrigger": 147,
-      "trigger": 148,
-      "addTrigger": 149,
-      "removeTrigger": 150,
-      "specialSpawn": 151,
-      "spawn": 152,
-      "spawn_g": 153,
-      "spawn_g_nearPlayer": 154,
-      "spawn_actorPrefab": 155,
-      "spawn_actorPrefab_point": 156,
-      "spawn_actorPrefab_point_specialZone": 157,
-      "spawn_location": 158,
-      "spawn_onItem": 159,
-      "spawn_seamonster": 160,
-      "spawn_sm": 161,
-      "spawn_fleet": 162,
-      "spawn_corpse": 163,
-      "talk": 164,
-      "tryDialog": 165,
-      "tryDialog_commodore": 166,
-      "exitDialog": 167,
-      "attractAttention": 168,
-      "attractAttentionToPlayer": 169,
-      "executeDialogEffect": 170,
-      "loadSpecialZone": 171,
-      "loadSpecialZone_precision": 172,
-      "loadSpecialZone_playerFlagship": 173,
-      "loadSpecialZone_playerFlagship_precision": 174,
-      "moveSpecialZone": 175,
-      "moveSpecialZone_precision": 176,
-      "scaleSpecialZone": 177,
-      "mergeSpecialZone": 178,
-      "barracksLineup": 179,
-      "unlockExtras": 180,
-      "trySetAchievement": 181,
-      "resetLocations": 182,
-      "refreshUndamagedShipZones": 183,
-      "boardActor": 184,
-      "endBoarding": 185,
-      "enterFleetBattle": 186,
-      "setDialogSpeed": 187,
-      "setMoney": 188,
-      "enterCombat": 189,
-      "enterCombat_timer": 190,
-      "exitCombat": 191,
-      "offerRest": 192,
-      "advanceTimers": 193,
-      "scoreScreen": 194,
-      "setupGraveyard": 195,
-      "endGame": 196,
-      "handleDeaths": 197,
-      "getResponse_combat": 198,
-      "getResponse_peace": 199,
-      "getResponse_bribe": 200,
-      "getBribeAmount": 201,
-      "subtractBribeAmount": 202,
-      "stealloc": 203,
-      "add50gp": 204,
-      "addgp": 205,
-      "subtractgp": 206,
-      "subtract10gp": 207,
-      "subtract20gp": 208,
-      "subtract30gp": 209,
-      "subtract40gp": 210,
-      "subtract50gp": 211,
-      "subtract60gp": 212,
-      "subtract75gp": 213,
-      "subtract100gp": 214,
-      "subtract130gp": 215,
-      "subtract150gp": 216,
-      "subtract200gp": 217,
-      "subtract250gp": 218,
-      "subtract300gp": 219,
-      "subtract350gp": 220,
-      "subtract400gp": 221,
-      "subtract500gp": 222,
-      "subtract800gp": 223,
-      "subtract1000gp": 224,
-      "subtract5000gp": 225,
-      "subtract10000gp": 226,
-      "subtractAllgp": 227,
-      "dominateworld": 228,
-      "giveGlobalVarGP": 229,
-      "enterSellMode": 230,
-      "openCargo": 231,
-      "autobuy_food": 232,
-      "enterSellMode_cargo": 233,
-      "enterSellMode_stash": 234,
-      "enterBuyMode": 235,
-      "enterBuyMode_location": 236,
-      "enterBuyMode_locationItems": 237,
-      "enterBuyMode_fleet": 238,
-      "setBuyPriceMult": 239,
-      "buyItem_confirmWindow": 240,
-      "buyGoods_confirmWindow": 241,
-      "buyFood_fillCargo": 242,
-      "buyFood": 243,
-      "buyGoods": 244,
-      "giveFood": 245,
-      "lose10Food": 246,
-      "removeCargo": 247,
-      "removeCargo_g": 248,
-      "removeItem_g": 249,
-      "removeItemFromParty": 250,
-      "refreshStatMods": 251,
-      "grantXPShare_5percent": 252,
-      "hostile": 253,
-      "playerInitiateCombat": 254,
-      "enemyInitiateCombat": 255,
-      "enterFleetBattle_player": 256,
-      "giveQuestItemReward": 257,
-      "reassignQuestItem": 258,
-      "gotoNodeIf": 259,
-      "gotoIf": 260,
-      "gotoNodeDelay": 261,
-      "delayDialog": 262,
-      "incOnNewDay": 263,
-      "incDefaultNode": 264,
-      "setMyNode": 265,
-      "setDefaultNode": 266,
-      "setAsDialogNode": 267,
-      "setAsMyNode": 268,
-      "setMyNodeIf": 269,
-      "setDefaultNodeIf": 270,
-      "clearDialogNode": 271,
-      "flee": 272,
-      "enemyFlee": 273,
-      "playerFlee": 274,
-      "enemyMoraleUp": 275,
-      "enemyMoraleDown": 276,
-      "playerMoraleUp": 277,
-      "crewMorale": 278,
-      "peace": 279,
-      "peaceXPrewardOnly": 280,
-      "moveCamXY": 281,
-      "moveXY": 282,
-      "moveX1": 283,
-      "moveY1": 284,
-      "moveXNeg1": 285,
-      "moveYNeg1": 286,
-      "playerFacingRot": 287,
-      "playerAnim": 288,
-      "facingRot90": 289,
-      "facingRot180": 290,
-      "facingRot0": 291,
-      "facingRot270": 292,
-      "facingRotPrev": 293,
-      "setPrevFacingRot": 294,
-      "lookAtTalker": 295,
-      "lookAtPlayer": 296,
-      "setAI_idle": 297,
-      "setAI_idle_flag": 298,
-      "die": 299,
-      "crash": 300,
-      "escapeGate": 301,
-      "removeTalker": 302,
-      "setDialogWindowSizeY": 303,
-      "setNPCDialogWindowSizeY": 304,
-      "setOnlyNPCDialogWindowSizeY": 305,
-      "setDialogWindowSizeYAuto": 306,
-      "setPCDialogWindowSizeY": 307,
-      "resetPCDialogWindowSizeY": 308,
-      "showCharstats": 309,
-      "showQuickslots": 310,
-      "hideQuickslots": 311,
-      "setCombatUIVisible": 312,
-      "showEscFactionWindow": 313,
-      "hideEscWindows": 314,
-      "unlockGem": 315,
-      "modGlobalVar": 316,
-      "modNodeIDGlobalVar_1": 317,
-      "modNodeIDGlobalVar_999": 318,
-      "setNodeIDGlobalVar_1": 319,
-      "appendToGlobalVar": 320,
-      "appendToGlobalVar_math": 321,
-      "appendToGlobalVar_string": 322,
-      "appendToGlobalVar_zoneID": 323,
-      "appendToGlobalVar_locID": 324,
-      "setGlobalVarTo0": 325,
-      "setGlobalVarToTalkerID": 326,
-      "setGlobalVarWithTalkerID": 327,
-      "setGlobalVarToLocID": 328,
-      "setGlobalVarToPartyActorNum": 329,
-      "setGlobalVarPlusLocID": 330,
-      "setGlobalVarPlusLocID_math": 331,
-      "setGlobalVarPlusZoneID": 332,
-      "modFame": 333,
-      "goToNodeID_plus_GlobalVar": 334,
-      "scoreScreenResponse": 335,
-      "research_report": 336,
-      "cartographer_report": 337,
-      "donate": 338,
-      "jobDialogOptions": 339,
-      "refreshLocQuests": 340,
-      "cancelQuest": 341,
-      "cancelRoyalQuest": 342,
-      "cleanUpQuest": 343,
-      "royalJobDialogOptions": 344,
-      "refreshRoyalQuests": 345,
-      "refreshRoyalTitle": 346,
-      "setupBuyShipDialog": 347,
-      "buyShip": 348,
-      "giveShip": 349,
-      "renameShip": 350,
-      "addToFleet": 351,
-      "addToFleet_andSwapWithFleet_slot": 352,
-      "removeFromParty_slot": 353,
-      "removeFromFleet_slot": 354,
-      "researchFromFleet_slot": 355,
-      "enterPort": 356,
-      "enterLocation": 357,
-      "buyLocationFood": 358,
-      "invest": 359,
-      "modTalkerFavor": 360,
-      "modLocFavor": 361,
-      "modLocWealthLevel": 362,
-      "setLocDiscoverable": 363,
-      "createMonsterDenNearby": 364,
-      "bezoar_setupportselect": 365,
-      "cameraAtPlayer": 366,
-      "cameraAtTalker": 367,
-      "cameraAtPoint": 368,
-      "cameraAtPointLock": 369,
-      "talkToOtherActor": 370,
-      "giveItem": 371,
-      "triggerEffect": 372,
-      "dialogEffect": 373,
-      "nextDialogNode_hideWindow": 374,
-      "closeCharEdit": 375,
-      "gameOver": 376,
-      "autosaveASAP": 377,
-      "noSpeechFXLookOrAnim": 378,
-      "speechFX": 379,
-      "fxOnPlayerRank": 380,
-      "returnMissingPartyMembers": 381,
-      "modPlayerFactionFavor": 382,
-      "modTalkerFactionFavor": 383,
-      "refreshStatModifiers": 384,
-      "storeBoost": 385,
-      "recoverOverboardPartyActors": 386,
-      "talkToCommodore": 387,
-      "talkToFirstMate": 388,
-      "talkToFlagship": 389,
-      "setupFleetLooting": 390,
-      "captureShips_afterCombat": 391,
-      "captureShipNum": 392,
-      "lootFleet_afterCombat": 393,
-      "openFleetWindow": 394,
-      "openFleetWindow_delay": 395,
-      "openFleetWindow_talker": 396,
-      "closeFleetWindow": 397,
-      "showFleetInfo": 398,
-      "repairFleet_pay": 399,
-      "repairFleet_free": 400,
-      "retro": 401,
-      "help": 402,
-      "h": 403,
-      "csave": 404,
-      "testitemload": 405,
-      "howmanyitems": 406,
-      "convertRGB": 407,
-      "screenshot": 408,
-      "screenpic": 409,
-      "anim": 410,
-      "fullheal": 411,
-      "rest": 412,
-      "testboatanim": 413,
-      "bighead": 414,
-      "screenscale": 415,
-      "res": 416,
-      "go": 417,
-      "gob": 418,
-      "p": 419,
-      "world": 420,
-      "w": 421,
-      "loads": 422,
-      "z": 423,
-      "sp": 424,
-      "bz": 425,
-      "k": 426,
-      "kills": 427,
-      "kill": 428,
-      "killall": 429,
-      "killcrew": 430,
-      "reviveall": 431,
-      "win": 432,
-      "setk": 433,
-      "set": 434,
-      "get": 435,
-      "calc": 436,
-      "math": 437,
-      "resetfog": 438,
-      "fog": 439,
-      "cfog": 440,
-      "clearfog": 441,
-      "hidemapicon": 442,
-      "hidemapicons": 443,
-      "clearitems": 444,
-      "removeitems": 445,
-      "clearroofs": 446,
-      "clearroof": 447,
-      "deleteZone": 448,
-      "forget": 449,
-      "resetloc": 450,
-      "resetlocation": 451,
-      "resetlocations": 452,
-      "refreshloc": 453,
-      "resetprocgen": 454,
-      "resetwp": 455,
-      "resetwaypoint": 456,
-      "resetwaypoints": 457,
-      "build": 458,
-      "b": 459,
-      "overseer": 460,
-      "gm": 461,
-      "godmode": 462,
-      "abil": 463,
-      "crewxp": 464,
-      "xp": 465,
-      "allxp": 466,
-      "xpall": 467,
-      "xpcosts": 468,
-      "xpcost": 469,
-      "testskillcost": 470,
-      "allc": 471,
-      "allclass": 472,
-      "gp": 473,
-      "fl": 474,
-      "tfl": 475,
-      "tm": 476,
-      "tt": 477,
-      "tdm": 478,
-      "tq": 479,
-      "tc": 480,
-      "tcui": 481,
-      "tw": 482,
-      "realtime": 483,
-      "hideparty": 484,
-      "hidep": 485,
-      "mpos": 486,
-      "rankstyle": 487,
-      "clearjournal": 488,
-      "clearj": 489,
-      "filljournal": 490,
-      "fillj": 491,
-      "dm": 492,
-      "debug": 493,
-      "debugMessage": 494,
-      "errors": 495,
-      "resize": 496,
-      "setBPC": 497,
-      "setBP": 498,
-      "time": 499,
-      "wind": 500,
-      "weather": 501,
-      "resetachievements": 502,
-      "formulas": 503,
-      "markTrainerLocDone": 504,
-      "markDojoLocDone": 505,
-      "createTreasureMap": 506,
-      "tMapTest": 507,
-      "addTreasuresToZone": 508,
-      "setupPartyFromGVars": 509,
-      "removeTempPartyActors": 510,
-      "removeExcessLandingPartyActors": 511,
-      "replaceTriggerWithZoneSeries": 512,
-      "location_tryUnlockItems": 513,
-      "getItemsFromZone": 514,
-      "resetFleetAI": 515,
-      "adjustFleetAlliegances": 516,
-      "openJournal": 517,
-      "openJournal_interactive": 518,
-      "closeJournal": 519,
-      "addJournalGoal": 520,
-      "completeJournalGoal": 521,
-      "learnJournalEntry": 522,
-      "moveJournal": 523,
-      "setTerrainType_spriteOffsetMult": 524,
-      "setTerrainType_spriteOffsetModulo": 525,
-      "setTerrainTypes_spriteOffsetModulo": 526,
-      "testzones": 527,
-      "gc": 528,
-      "listfx": 529,
-      "listav": 530,
-      "loadItOnUpYo": 531,
-      "uploadmod": 532,
-      "getmod": 533,
-      "editmod": 534,
-      "editmodtags": 535,
-      "loadModPageInBrowser": 536,
-      "setMainMenuUIVisible": 537,
-      "howmany": 538,
-      "howmanyWorld": 539,
-      "discoverFog": 540,
-      "setFog": 541,
-      "resetAllTileReactTimers": 542,
-      "changePlayerActor": 543,
-      "stopCombatAIActing": 544,
-      "startCombatAIActing": 545,
-      "relocateActors": 546,
-      "relocateActors_point": 547,
-      "task_gvar": 548,
-      "investigator_nearestLoc": 549,
-      "investigator_tradespecial": 550,
-      "investigator_slainenemy": 551,
-      "investigator_fleetpos": 552,
-      "investigator_setupportselect": 553,
-      "setupLocationAsPlayerPort": 554,
-      "addIconToCurrentLocation": 555,
-      "placeActorFromBoardedShip": 556,
-      "setPartyActorAsVendor": 557,
-      "readdVendorToParty": 558,
-      "giveMathXPToActorWithDialogNodeID": 559,
-      "askForNewPortName": 560,
-      "setupCafeFoodDialogOptionsWealth100": 561,
-      "changeCafeFood": 562,
-      "convertPlayerPortsToFaction": 563,
-      "addLocationUnlockable": 564,
-      "setGlobalVarToActorProperty": 565,
-      "UIPartInputCommand": 566,
-      "maximizeWindowSet": 567,
-      "maximizeWindowIfTrue": 568,
-      "changeScreenResolution2": 569,
-      "test": 570,
-      "test2": 571
+      "doNothing": 0,
+      "executeActionMovement": 1,
+      "clear": 2,
+      "debug_drawStrings": 3,
+      "action": 4,
+      "actionOnPartyNumActor": 5,
+      "applyElement": 6,
+      "applyElementToArea": 7,
+      "applyElementToZone": 8,
+      "setTileTerrain": 9,
+      "setTileTerrainArea": 10,
+      "script": 11,
+      "consolecommand": 12,
+      "togglePause": 13,
+      "preventInteraction": 14,
+      "delayActions": 15,
+      "cutsceneMode": 16,
+      "timeSpeed": 17,
+      "setFactionHostile": 18,
+      "setFactionAI": 19,
+      "killFaction": 20,
+      "removeFaction": 21,
+      "changeFaction": 22,
+      "moveToNewZone": 23,
+      "travel": 24,
+      "travel_point": 25,
+      "travel_point_g": 26,
+      "travel_leaveLocation": 27,
+      "travel_gVars": 28,
+      "travel_noSave": 29,
+      "travel_procedural": 30,
+      "travel_procedural_point": 31,
+      "travel_setReturnPath": 32,
+      "returnPath": 33,
+      "travel_g": 34,
+      "setGlobalVar": 35,
+      "setGlobalVar_math": 36,
+      "setGlobalVar_toOtherGlobalVar": 37,
+      "setGlobalVar_toPartyActorID": 38,
+      "setGlobalVar_toActorID": 39,
+      "setGlobalVar_toCrewActorID": 40,
+      "setGlobalVar_toNearestLocID": 41,
+      "setGlobalVar_toNearestPortID": 42,
+      "setGlobalVar_toNearestRandomLocID": 43,
+      "setGlobalVar_toNearestRandomPortID": 44,
+      "setGlobalVarToZoneProperty": 45,
+      "setGlobalVarWithCommas": 46,
+      "clearGlobalVar": 47,
+      "sanitizeGlobalVar": 48,
+      "enableUI": 49,
+      "disableUI": 50,
+      "unlockHelpGem": 51,
+      "enableHelpGem": 52,
+      "disableHelpGem": 53,
+      "save": 54,
+      "quietsave": 55,
+      "heal": 56,
+      "healparty": 57,
+      "healfaction": 58,
+      "fullrestore": 59,
+      "revive": 60,
+      "fx": 61,
+      "sfx": 62,
+      "fxOnTalker": 63,
+      "fxOnParty": 64,
+      "damageNumber": 65,
+      "damageNumber_worldTime": 66,
+      "animate": 67,
+      "textOverlay": 68,
+      "textOverlay_tween": 69,
+      "textOverlay_dynamic": 70,
+      "pointCameraAt": 71,
+      "lockCameraAt": 72,
+      "scaleCameraTo": 73,
+      "setRoofDrawNoMatterWhat": 74,
+      "cancelIfEnemiesPresent": 75,
+      "cancelIfEnemiesNotPresent": 76,
+      "cancelIfItemPresent": 77,
+      "cancelIfItemNotPresent": 78,
+      "cancelIf": 79,
+      "facingRot": 80,
+      "facingRotParty": 81,
+      "song": 82,
+      "playSong": 83,
+      "playNearestLocationSong": 84,
+      "setZoneSongs": 85,
+      "removeItem": 86,
+      "removeActorItem": 87,
+      "removeItemsNearPlayerActor": 88,
+      "removeItemOfValue": 89,
+      "removeEmptyItem": 90,
+      "removeAllItems": 91,
+      "removeAllItemsOfValue": 92,
+      "removeHeldItems": 93,
+      "addItem": 94,
+      "addItemToContainer": 95,
+      "spawnItem": 96,
+      "moveItems": 97,
+      "moveItemsToActor": 98,
+      "setSpecialInfoTC": 99,
+      "replaceEquipment": 100,
+      "dropItem": 101,
+      "buryAllItemsOfType": 102,
+      "buryGlobalVarItems": 103,
+      "buryLocations": 104,
+      "reactOnMatchingItems": 105,
+      "specialKeyStatusUpdate": 106,
+      "removeActor": 107,
+      "removeActorType": 108,
+      "removeActors_despawnable": 109,
+      "setActorFloat": 110,
+      "setActorBool": 111,
+      "setActorAI": 112,
+      "setActorName": 113,
+      "setActorIdleAnimOverride": 114,
+      "setActorDialogNodeID": 115,
+      "setActorAIActions": 116,
+      "setActorMovementType": 117,
+      "setActorPalettes": 118,
+      "setActorArmorPalette": 119,
+      "setActorSkinPalette": 120,
+      "setActorClothPalette": 121,
+      "setActorUnarmoredPalette": 122,
+      "setActorCombatLabel": 123,
+      "setActorCombatLabel_color": 124,
+      "setActorCombatTeam": 125,
+      "setActorCombatMusicOverride": 126,
+      "setActorFaction": 127,
+      "setActorID": 128,
+      "setActorSprite": 129,
+      "setActorBodyPartSprite": 130,
+      "setFaceSprite": 131,
+      "setCurrentActor_partSpritesThatTakePriorityOverClass": 132,
+      "setActor_partSpritesThatTakePriorityOverClass": 133,
+      "giveActorsBaseXP": 134,
+      "moveActor": 135,
+      "moveActor_point": 136,
+      "movePartyTo": 137,
+      "movePartyTo_point": 138,
+      "movePartyBy": 139,
+      "moveAllActorsBy": 140,
+      "addToParty": 141,
+      "addTalkerToParty": 142,
+      "addTalkerToParty_temp": 143,
+      "removeFromParty": 144,
+      "clearPartyPath": 145,
+      "addToLandingParty": 146,
+      "removeFromLandingParty": 147,
+      "handleTiredStates": 148,
+      "hideParty": 149,
+      "path": 150,
+      "pathParty": 151,
+      "destination": 152,
+      "movement": 153,
+      "addZoneFX": 154,
+      "createZoneSpecialFX": 155,
+      "removeZoneFX": 156,
+      "addZoneBackgroundTex": 157,
+      "removeZoneBackgroundTex": 158,
+      "setZonePalettes": 159,
+      "setZonePeaceful": 160,
+      "disableFog": 161,
+      "setZoneRollingPinStyle": 162,
+      "screenDarkWaveEffect": 163,
+      "changeZoneDarkColor": 164,
+      "setZoneDarkColor": 165,
+      "setZoneDarkness": 166,
+      "setZoneDarknessToWorldDarkness": 167,
+      "screenWaveEffect": 168,
+      "setZoneBG": 169,
+      "setZoneBGFX": 170,
+      "setZoneFloatProperty": 171,
+      "setZoneStringProperty": 172,
+      "setZoneBoolProperty": 173,
+      "initWaypoints": 174,
+      "safe": 175,
+      "sendAISignal": 176,
+      "disableTrigger": 177,
+      "resetTrigger": 178,
+      "enableTrigger": 179,
+      "trigger": 180,
+      "addTrigger": 181,
+      "removeTrigger": 182,
+      "setGlobalVarToTriggerProperty": 183,
+      "setGlobalVar_toTriggerNumIDSearch": 184,
+      "setGlobalVar_toTriggerNumID": 185,
+      "setGlobalVar_toTriggerAliasID": 186,
+      "specialSpawn": 187,
+      "spawn": 188,
+      "spawn_g": 189,
+      "spawn_g_nearPlayer": 190,
+      "spawn_actorPrefab": 191,
+      "spawn_actorPrefab_point": 192,
+      "spawn_actorPrefab_point_specialZone": 193,
+      "spawn_location": 194,
+      "spawn_onItem": 195,
+      "spawn_seamonster": 196,
+      "spawn_sm": 197,
+      "spawn_fleet": 198,
+      "spawn_corpse": 199,
+      "talk": 200,
+      "tryDialog": 201,
+      "tryDialog_commodore": 202,
+      "exitDialog": 203,
+      "attractAttention": 204,
+      "attractAttentionToPlayer": 205,
+      "executeDialogEffect": 206,
+      "loadSpecialZone": 207,
+      "loadSpecialZone_precision": 208,
+      "loadSpecialZone_playerFlagship": 209,
+      "loadSpecialZone_playerFlagship_precision": 210,
+      "moveSpecialZone": 211,
+      "moveSpecialZone_precision": 212,
+      "scaleSpecialZone": 213,
+      "mergeSpecialZone": 214,
+      "barracksLineup": 215,
+      "unlockExtras": 216,
+      "trySetAchievement": 217,
+      "resetLocations": 218,
+      "refreshUndamagedShipZones": 219,
+      "boardActor": 220,
+      "endBoarding": 221,
+      "enterFleetBattle": 222,
+      "setDialogSpeed": 223,
+      "setMoney": 224,
+      "enterCombat": 225,
+      "enterCombat_timer": 226,
+      "exitCombat": 227,
+      "offerRest": 228,
+      "advanceTimers": 229,
+      "scoreScreen": 230,
+      "setupGraveyard": 231,
+      "endGame": 232,
+      "handleDeaths": 233,
+      "getResponse_combat": 234,
+      "getResponse_peace": 235,
+      "getResponse_bribe": 236,
+      "getBribeAmount": 237,
+      "subtractBribeAmount": 238,
+      "stealloc": 239,
+      "add50gp": 240,
+      "addgp": 241,
+      "subtractgp": 242,
+      "subtract10gp": 243,
+      "subtract20gp": 244,
+      "subtract30gp": 245,
+      "subtract40gp": 246,
+      "subtract50gp": 247,
+      "subtract60gp": 248,
+      "subtract75gp": 249,
+      "subtract100gp": 250,
+      "subtract130gp": 251,
+      "subtract150gp": 252,
+      "subtract200gp": 253,
+      "subtract250gp": 254,
+      "subtract300gp": 255,
+      "subtract350gp": 256,
+      "subtract400gp": 257,
+      "subtract500gp": 258,
+      "subtract800gp": 259,
+      "subtract1000gp": 260,
+      "subtract5000gp": 261,
+      "subtract10000gp": 262,
+      "subtractAllgp": 263,
+      "dominateworld": 264,
+      "giveGlobalVarGP": 265,
+      "enterSellMode": 266,
+      "openCargo": 267,
+      "autobuy_food": 268,
+      "enterSellMode_cargo": 269,
+      "enterSellMode_stash": 270,
+      "enterBuyMode": 271,
+      "enterBuyMode_location": 272,
+      "enterBuyMode_locationItems": 273,
+      "enterBuyMode_fleet": 274,
+      "setBuyPriceMult": 275,
+      "buyItem_confirmWindow": 276,
+      "buyGoods_confirmWindow": 277,
+      "buyFood_fillCargo": 278,
+      "buyFood": 279,
+      "buyGoods": 280,
+      "giveFood": 281,
+      "lose10Food": 282,
+      "removeCargo": 283,
+      "removeCargo_g": 284,
+      "removeItem_g": 285,
+      "removeItemFromParty": 286,
+      "refreshStatMods": 287,
+      "grantXPShare_5percent": 288,
+      "hostile": 289,
+      "playerInitiateCombat": 290,
+      "enemyInitiateCombat": 291,
+      "enterFleetBattle_player": 292,
+      "giveQuestItemReward": 293,
+      "reassignQuestItem": 294,
+      "gotoNodeIf": 295,
+      "gotoIf": 296,
+      "gotoNodeDelay": 297,
+      "delayDialog": 298,
+      "incOnNewDay": 299,
+      "incDefaultNode": 300,
+      "setMyNode": 301,
+      "setDefaultNode": 302,
+      "setAsDialogNode": 303,
+      "setAsMyNode": 304,
+      "setMyNodeIf": 305,
+      "setDefaultNodeIf": 306,
+      "clearDialogNode": 307,
+      "flee": 308,
+      "enemyFlee": 309,
+      "playerFlee": 310,
+      "enemyMoraleUp": 311,
+      "enemyMoraleDown": 312,
+      "playerMoraleUp": 313,
+      "crewMorale": 314,
+      "peace": 315,
+      "peaceXPrewardOnly": 316,
+      "moveCamXY": 317,
+      "moveXY": 318,
+      "moveX1": 319,
+      "moveY1": 320,
+      "moveXNeg1": 321,
+      "moveYNeg1": 322,
+      "playerFacingRot": 323,
+      "playerAnim": 324,
+      "facingRot90": 325,
+      "facingRot180": 326,
+      "facingRot0": 327,
+      "facingRot270": 328,
+      "facingRotPrev": 329,
+      "setPrevFacingRot": 330,
+      "lookAtTalker": 331,
+      "lookAtPlayer": 332,
+      "setAI_idle": 333,
+      "setAI_idle_flag": 334,
+      "die": 335,
+      "crash": 336,
+      "escapeGate": 337,
+      "removeTalker": 338,
+      "setDialogWindowSizeY": 339,
+      "setNPCDialogWindowSizeY": 340,
+      "setOnlyNPCDialogWindowSizeY": 341,
+      "setDialogWindowSizeYAuto": 342,
+      "setPCDialogWindowSizeY": 343,
+      "resetPCDialogWindowSizeY": 344,
+      "showCharstats": 345,
+      "showQuickslots": 346,
+      "hideQuickslots": 347,
+      "setCombatUIVisible": 348,
+      "showEscFactionWindow": 349,
+      "hideEscWindows": 350,
+      "unlockGem": 351,
+      "modGlobalVar": 352,
+      "modNodeIDGlobalVar_1": 353,
+      "modNodeIDGlobalVar_999": 354,
+      "setNodeIDGlobalVar_1": 355,
+      "appendToGlobalVar": 356,
+      "appendToGlobalVar_math": 357,
+      "appendToGlobalVar_string": 358,
+      "appendToGlobalVar_zoneID": 359,
+      "appendToGlobalVar_locID": 360,
+      "setGlobalVarTo0": 361,
+      "setGlobalVarToTalkerID": 362,
+      "setGlobalVarWithTalkerID": 363,
+      "setGlobalVarToLocID": 364,
+      "setGlobalVarToPartyActorNum": 365,
+      "setGlobalVarPlusLocID": 366,
+      "setGlobalVarPlusLocID_math": 367,
+      "setGlobalVarPlusZoneID": 368,
+      "modFame": 369,
+      "goToNodeID_plus_GlobalVar": 370,
+      "scoreScreenResponse": 371,
+      "research_report": 372,
+      "cartographer_report": 373,
+      "donate": 374,
+      "jobDialogOptions": 375,
+      "refreshLocQuests": 376,
+      "cancelQuest": 377,
+      "cancelRoyalQuest": 378,
+      "cleanUpQuest": 379,
+      "royalJobDialogOptions": 380,
+      "refreshRoyalQuests": 381,
+      "refreshRoyalTitle": 382,
+      "setupBuyShipDialog": 383,
+      "buyShip": 384,
+      "giveShip": 385,
+      "renameShip": 386,
+      "addToFleet": 387,
+      "addToFleet_andSwapWithFleet_slot": 388,
+      "removeFromParty_slot": 389,
+      "removeFromFleet_slot": 390,
+      "researchFromFleet_slot": 391,
+      "enterPort": 392,
+      "enterLocation": 393,
+      "buyLocationFood": 394,
+      "invest": 395,
+      "modTalkerFavor": 396,
+      "modLocFavor": 397,
+      "modLocWealthLevel": 398,
+      "setLocDiscoverable": 399,
+      "createMonsterDenNearby": 400,
+      "bezoar_setupportselect": 401,
+      "cameraAtPlayer": 402,
+      "cameraAtTalker": 403,
+      "cameraAtPoint": 404,
+      "cameraAtPointLock": 405,
+      "talkToOtherActor": 406,
+      "giveItem": 407,
+      "triggerEffect": 408,
+      "dialogEffect": 409,
+      "nextDialogNode_hideWindow": 410,
+      "closeCharEdit": 411,
+      "gameOver": 412,
+      "autosaveASAP": 413,
+      "noSpeechFXLookOrAnim": 414,
+      "speechFX": 415,
+      "fxOnPlayerRank": 416,
+      "returnMissingPartyMembers": 417,
+      "modPlayerFactionFavor": 418,
+      "modTalkerFactionFavor": 419,
+      "refreshStatModifiers": 420,
+      "storeBoost": 421,
+      "recoverOverboardPartyActors": 422,
+      "talkToCommodore": 423,
+      "talkToFirstMate": 424,
+      "talkToFlagship": 425,
+      "setupFleetLooting": 426,
+      "captureShips_afterCombat": 427,
+      "captureShipNum": 428,
+      "lootFleet_afterCombat": 429,
+      "openFleetWindow": 430,
+      "openFleetWindow_delay": 431,
+      "openFleetWindow_talker": 432,
+      "closeFleetWindow": 433,
+      "showFleetInfo": 434,
+      "repairFleet_pay": 435,
+      "repairFleet_free": 436,
+      "retro": 437,
+      "help": 438,
+      "h": 439,
+      "csave": 440,
+      "testitemload": 441,
+      "howmanyitems": 442,
+      "convertRGB": 443,
+      "screenshot": 444,
+      "screenpic": 445,
+      "anim": 446,
+      "fullheal": 447,
+      "rest": 448,
+      "testboatanim": 449,
+      "bighead": 450,
+      "screenscale": 451,
+      "res": 452,
+      "go": 453,
+      "gob": 454,
+      "p": 455,
+      "world": 456,
+      "w": 457,
+      "loads": 458,
+      "z": 459,
+      "sp": 460,
+      "bz": 461,
+      "k": 462,
+      "kills": 463,
+      "kill": 464,
+      "killall": 465,
+      "killcrew": 466,
+      "reviveall": 467,
+      "win": 468,
+      "setk": 469,
+      "set": 470,
+      "get": 471,
+      "calc": 472,
+      "math": 473,
+      "resetfog": 474,
+      "fog": 475,
+      "cfog": 476,
+      "clearfog": 477,
+      "hidemapicon": 478,
+      "hidemapicons": 479,
+      "clearitems": 480,
+      "clearactors": 481,
+      "removeitems": 482,
+      "clearroofs": 483,
+      "clearroof": 484,
+      "deleteZone": 485,
+      "forget": 486,
+      "resetloc": 487,
+      "resetlocation": 488,
+      "resetlocations": 489,
+      "refreshloc": 490,
+      "resetprocgen": 491,
+      "resetwp": 492,
+      "resetwaypoint": 493,
+      "resetwaypoints": 494,
+      "build": 495,
+      "b": 496,
+      "overseer": 497,
+      "gm": 498,
+      "godmode": 499,
+      "abil": 500,
+      "crewxp": 501,
+      "xp": 502,
+      "allxp": 503,
+      "xpall": 504,
+      "xpcosts": 505,
+      "xpcost": 506,
+      "testskillcost": 507,
+      "allc": 508,
+      "allclass": 509,
+      "gp": 510,
+      "fl": 511,
+      "tfl": 512,
+      "tm": 513,
+      "tt": 514,
+      "tdm": 515,
+      "tq": 516,
+      "tc": 517,
+      "tcui": 518,
+      "tw": 519,
+      "realtime": 520,
+      "hideparty": 521,
+      "hidep": 522,
+      "mpos": 523,
+      "rankstyle": 524,
+      "clearjournal": 525,
+      "clearj": 526,
+      "filljournal": 527,
+      "fillj": 528,
+      "dm": 529,
+      "debug": 530,
+      "debugMessage": 531,
+      "errors": 532,
+      "resize": 533,
+      "setBPC": 534,
+      "setBP": 535,
+      "time": 536,
+      "wind": 537,
+      "weather": 538,
+      "resetachievements": 539,
+      "formulas": 540,
+      "sc": 541,
+      "sanitizecheck": 542,
+      "testts": 543,
+      "testtaskstring": 544,
+      "markTrainerLocDone": 545,
+      "markDojoLocDone": 546,
+      "createTreasureMap": 547,
+      "tMapTest": 548,
+      "addTreasuresToZone": 549,
+      "setupPartyFromGVars": 550,
+      "removeTempPartyActors": 551,
+      "removeExcessLandingPartyActors": 552,
+      "replaceTriggerWithZoneSeries": 553,
+      "applyTerrainReplacersAndItemRemovers": 554,
+      "location_tryUnlockItems": 555,
+      "getItemsFromZone": 556,
+      "resetFleetAI": 557,
+      "adjustFleetAlliegances": 558,
+      "openJournal": 559,
+      "openJournal_interactive": 560,
+      "closeJournal": 561,
+      "addJournalGoal": 562,
+      "completeJournalGoal": 563,
+      "removeJournalGoal": 564,
+      "setGlobalVar_toJournalGoalVar": 565,
+      "learnJournalEntry": 566,
+      "moveJournal": 567,
+      "setTerrainType_spriteOffsetMult": 568,
+      "setTerrainType_spriteOffsetModulo": 569,
+      "setTerrainTypes_spriteOffsetModulo": 570,
+      "testzones": 571,
+      "gc": 572,
+      "listfx": 573,
+      "listav": 574,
+      "loadItOnUpYo": 575,
+      "uploadmod": 576,
+      "getmod": 577,
+      "editmod": 578,
+      "editmodtags": 579,
+      "loadModPageInBrowser": 580,
+      "setMainMenuUIVisible": 581,
+      "howmany": 582,
+      "howmanyWorld": 583,
+      "discoverFog": 584,
+      "setFog": 585,
+      "resetAllTileReactTimers": 586,
+      "changePlayerActor": 587,
+      "stopCombatAIActing": 588,
+      "startCombatAIActing": 589,
+      "relocateActors": 590,
+      "relocateActors_point": 591,
+      "task": 592,
+      "task_gvar": 593,
+      "investigator_nearestLoc": 594,
+      "investigator_tradespecial": 595,
+      "investigator_slainenemy": 596,
+      "investigator_setupfleetposselect": 597,
+      "investigator_fleetpos": 598,
+      "investigator_setupportselect": 599,
+      "setupLocationAsPlayerPort": 600,
+      "addIconToCurrentLocation": 601,
+      "addIconToLocationID": 602,
+      "placeActorFromBoardedShip": 603,
+      "setPartyActorAsVendor": 604,
+      "readdVendorToParty": 605,
+      "giveMathXPToActorWithDialogNodeID": 606,
+      "askForNewPortName": 607,
+      "setupCafeFoodDialogOptionsWealth100": 608,
+      "changeCafeFood": 609,
+      "convertPlayerPortsToFaction": 610,
+      "addLocationUnlockable": 611,
+      "setGlobalVarToActorProperty": 612,
+      "setGlobalVarToPlayerFleetShipProperty": 613,
+      "setGlobalVar_toActorMostUsedActionID": 614,
+      "learnJournalEntry_silent": 615,
+      "unlearnJournalEntry": 616,
+      "setGlobalVarToActorTypeProperty": 617,
+      "setGlobalVarToItemTypeProperty": 618,
+      "setGlobalVarToLocationProperty": 619,
+      "setGlobalVarToTerrainTypeProperty": 620,
+      "setGlobalVarToActionProperty": 621,
+      "setGlobalVarToFactionProperty": 622,
+      "setGlobalVarToActorClassProperty": 623,
+      "setGlobalVarToSupportAbilityProperty": 624,
+      "setGlobalVar_toActorItemTypeInSlot": 625,
+      "setGlobalVar_toActorAugmentItemTypeInMainWeapon": 626,
+      "setGlobalVar_toActorAugmentItemTypeInOffhandWeapon": 627,
+      "setGlobalVar_toActorAugmentItemTypeInArmor": 628,
+      "setGlobalVar_toItemTypeIDAtTile": 629,
+      "setGlobalVar_toItemTypeIDAtTileWithSpecialProp": 630,
+      "setGlobalVar_toActorTypeID": 631,
+      "setGlobalVar_toPartyActorTypeID": 632,
+      "setGlobalVar_toRandomActorTypeName": 633,
+      "setGlobalVar_toActorClassID": 634,
+      "setGlobalVar_toClassIDThatHasActionID": 635,
+      "setGlobalVar_toClassIDThatHasSupportAbilityID": 636,
+      "setGlobalVar_toActorSupportAbilityID": 637,
+      "setGlobalVar_toLocationStashItemIDSlot": 638,
+      "setGlobalVar_toLocationCargoItemIDSlot": 639,
+      "setGlobalVar_toLocationShipIDSlot": 640,
+      "setGlobalVar_toLocationFactionID": 641,
+      "modLocationIDFactionIDFavor": 642,
+      "setLocZoneID": 643,
+      "setLocName": 644,
+      "removeIconFromLocationID": 645,
+      "swapIconForLocationID": 646,
+      "addItemToLocationID": 647,
+      "removeItemFromLocationID": 648,
+      "addUnlockableItemToLocationID": 649,
+      "removeUnlockableItemFromLocationID": 650,
+      "changeTradeGood": 651,
+      "addSpawnDataToLocationID": 652,
+      "removeSpawnDataFromLocationID": 653,
+      "setLocMinimapIcon": 654,
+      "setLocEnterable": 655,
+      "setLocPort": 656,
+      "setLocUndiscoverable": 657,
+      "clearLocationItemsFromZone": 658,
+      "addLocationItemToZone": 659,
+      "removeLocationTag": 660,
+      "addLocationTag": 661,
+      "setLocationLocation": 662,
+      "setLocTravelPoint": 663,
+      "breakAllStashItems": 664,
+      "repairAllStashItems": 665,
+      "addItemToFleetCargo": 666,
+      "removeItemFromFleetCargo": 667,
+      "setGlobalVar_toFleetCargoItemIDSlot": 668,
+      "setGlobalVar_toFleetShipID": 669,
+      "setGlobalVar_toFleetCommodoreID": 670,
+      "setGlobalVar_toJournalNote": 671,
+      "setJournalNote": 672,
+      "setGlobalVarTo_mousePointingAt": 673,
+      "setGlobalVarTo_mouseOverWindow": 674,
+      "UIPartInputCommand": 675,
+      "maximizeWindowSet": 676,
+      "maximizeWindowIfTrue": 677,
+      "changeScreenResolution2": 678,
+      "test": 679,
+      "test2": 680
     },
     "Action.specialProperty": {
       "requiresCasting": 4,
       "requiresCharging": 5,
       "cancelChargingOnMove": 6,
+      "delayMovement01": 172,
+      "delayMovement02": 173,
+      "delayMovement05": 174,
       "slowMovement": 8,
       "fastMovement": 9,
       "instantMovement": 99,
+      "matchMovementSpeedToAnimationDuration": 169,
       "moveCasterTowardTarget": 10,
       "swapCasterWithTarget": 11,
       "swapCasterWithTarget_delay": 111,
       "moveCasterNextToTarget": 12,
+      "moveCasterNextToTowardTarget": 167,
       "moveCasterToTarget": 13,
       "walkCasterToTarget": 14,
       "swapTargetWithTarget": 15,
@@ -9330,6 +10104,7 @@
       "moveCasterPastTargetOrTowards": 166,
       "redoMovementAnalysis": 1000,
       "swapTargetWithTarget_movement": 155,
+      "movementIsNotIntangible": 175,
       "casterTurnAround": 176,
       "onlyAffectFirstTarget": 199,
       "useFirstTargetToSecondTargetAsOrigin": 1999,
@@ -9343,6 +10118,7 @@
       "cantUseInCombat": 32,
       "cantUseInActionMode": 322,
       "autocastInTravel": 33,
+      "autocastInCombat": 35,
       "startBattleOnCooldown": 34,
       "dontLookAtTarget": 48,
       "treatOriginRotAsDirectionFromCasterToTarget": 49,
@@ -9354,6 +10130,7 @@
       "limitRemoteBombsTo5InTravelMode": 70,
       "removeCaster": 80,
       "removeCaster_XP": 81,
+      "whenRemovingCaster_dropEnemyLoot": 82,
       "usableWithoutACaster": 90,
       "cantUseWithoutCrew": 91,
       "moveEvenWhenNotExecuteAfterCast": 125,
@@ -9366,9 +10143,17 @@
       "hideEvaluateWindow": 177,
       "showConfirmOptionAlways": 178,
       "doNotShowConfirmOption": 179,
+      "cantUseWithoutSelectingGreenTile": 180,
+      "castWhenActorEntersTile": 181,
+      "onlyCastWhenEnemyEntersTile": 182,
+      "onlyCastWhenAllyEntersTile": 183,
+      "recalcActionAoEFromEachTarget": 187,
+      "targetRandomTileFromActionAoEWhenReacting": 188,
       "applyWeaponBuffsTwice": 190,
       "doNotApplyActionUsedToItemUsed": 191,
-      "repositionIfCasterIsPushed": 192
+      "repositionIfCasterIsPushed": 192,
+      "FXOnTargetUsesPreviousTargetAsOrigin": 194,
+      "FXOnTargetDoesntShowIfOriginIsCaster": 195
     },
     "TerrainType.SpriteType": {
       "none": -1,
@@ -9465,6 +10250,7 @@
       "pushable": 3,
       "pushableXOnly": 3991,
       "pushableYOnly": 3992,
+      "pushableMax1": 3993,
       "big": 4,
       "huge": 5,
       "consumeOnUse": 7,
@@ -9476,10 +10262,17 @@
       "cannotBePickedUp": 10,
       "cannotUseInContainer": 11,
       "dontWarnForUseInContainer": 111,
+      "canUseInStash": 52,
+      "weaponUsableInContainer": 53,
       "applyAVEffectsToTile": 11111,
       "twoHanded": 12,
+      "usableWithTwoHanded": 32,
       "unbreakable": 122,
       "cannotEverBePushed": 13,
+      "cannotBePulled": 19,
+      "cantPushSmallerItemsOnMyTile": 14,
+      "blockItemPushes": 17,
+      "haltSlidingItems": 18,
       "drawSpecialTC": 15,
       "drawSpecialTCTopLayer": 16,
       "adjustSpriteYUp1": 1096,
@@ -9560,6 +10353,7 @@
       "container4x4": 64,
       "container5x5": 65,
       "container8x8": 66,
+      "dumpContainerWhenReacted": 67,
       "containerWood": 70,
       "containerSkull": 71,
       "containerMetal": 72,
@@ -9569,6 +10363,7 @@
       "defaultContainsMythrilEquipment": 732,
       "defaultContainsToolEquipment": 733,
       "stackCannotBeSplit": 80,
+      "stackCannotBeJoined": 86,
       "defaultStack_2": 81,
       "defaultStack_x2": 82,
       "defaultStack_x3": 83,
@@ -9579,6 +10374,8 @@
       "hideTimer": 119,
       "timer": 120,
       "timer_advanceOnScreenOnly": 121,
+      "timer_advanceOffScreenOnly": 123,
+      "timerTooltipAddsTimerUpReactionNewIDs": 124,
       "hiddenFromBuildMode": 130101,
       "noTooltip": 130,
       "noTooltips": 130,
@@ -9605,6 +10402,8 @@
       "canReactIndefinitely": 170,
       "dontCloneReactions": 171,
       "dontIncrementTimerInInventory": 172,
+      "resetTimerWhenHeld": 173,
+      "alwaysShowTimer": 174,
       "raiseTileDepth1050": 180,
       "raiseTileDepth2050": 181,
       "raiseItemsDepth900": 18002,
@@ -9637,6 +10436,7 @@
       "replaceWith_toMake_list": 230,
       "replaceWith_globalVarMatch": 229,
       "replaceWith_assign_globalVar": 23019,
+      "replaceWith_resetGlobalVarWhenAllSpawned": 23020,
       "randomRotateWhenPlaced": 231,
       "randomFlipWhenPlaced": 232,
       "randomOffsetYUp4WhenPlaced": 2321,
@@ -9687,10 +10487,13 @@
       "slopeS": 3311,
       "slopeE": 3312,
       "slopeW": 3313,
+      "canBePushedWhileUnderAnActor": 363,
       "attachedToPushable": 353,
       "removeWhenAtZoneEdge": 354,
       "reduceItemGrabRangeWhenStoodUpon": 35619,
       "canAlwaysReachThisTile": 357,
+      "canOnlyReachThisTileFromWithin5": 364,
+      "canOnlyReachThisTileFromWithin5_overrideGateHand": 365,
       "rollingPin_drawLower": 358,
       "rollingPin_drawY3Lower": 3580,
       "rollingPin_drawSplit": 3581,
@@ -9749,11 +10552,12 @@
       "spawnpoint": 777
     },
     "AoEShapeType": {
-      "plusShape": 0,
-      "walkpathShape": 1,
+      "plus": 0,
+      "walkpath": 1,
       "walkpathShape_straightLinesPlus2": 111,
-      "lineShape": 2,
-      "wideLineShape": 3,
+      "line": 2,
+      "wideLine": 3,
+      "circle": 4,
       "player": 5,
       "playerParty": 6,
       "allButPlayerParty": 66,
@@ -9782,6 +10586,7 @@
       "melee": 2,
       "ranged": 3,
       "use": 10,
+      "examine": 9,
       "slash": 11,
       "smash": 12,
       "heavySlash": 13,
@@ -9820,6 +10625,7 @@
       "HPbased": 44,
       "breakItem": 45,
       "shatter": 46,
+      "repairItem": 47,
       "weapon": 49,
       "sword": 50,
       "dagger": 51,
@@ -9876,6 +10682,8 @@
       "endTurn": 1033,
       "moveAbilUsed": 1030,
       "usedMeleeWeaponAtk": 1034,
+      "moveSelected": 1031,
+      "undoMove": 1032,
       "daytime": 10344,
       "nighttime": 1035,
       "nightime": 1035,
@@ -9909,6 +10717,7 @@
       "replaceCapsule": 142,
       "stairs": 145,
       "itemPushed": 150,
+      "iWasPushed": 151,
       "burst1": 160,
       "burstSpread1": 161,
       "burst2": 162,
@@ -9932,6 +10741,8 @@
       "closeGates": 706,
       "gameLoaded": 777,
       "leavingZone": 778,
+      "enterZone": 779,
+      "buttonInteracted": 780,
       "removeShadow": 711,
       "somethingHappened": 712,
       "monsterBeaconUsed": 1133,
