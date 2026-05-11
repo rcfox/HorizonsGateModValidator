@@ -1858,7 +1858,7 @@
       "fields": [
         {
           "name": "shape",
-          "type": "AoEShapeType",
+          "type": "integer",
           "csType": "string",
           "virtual": true
         },
