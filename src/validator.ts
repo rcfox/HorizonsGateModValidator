@@ -3,7 +3,7 @@
  * Orchestrates all validation steps
  */
 
-import { ValidationResult, ValidationMessage, ModSchema, ParsedObject, SchemaData, ClassSchema } from './types.js';
+import { ValidationResult, ValidationMessage, ModSchema, ParsedObject, SchemaData, ClassSchema, ValidationErrorCode } from './types.js';
 import { ModParser } from './parser.js';
 import { PropertyValidator } from './property-validator.js';
 import { findSimilar, MAX_EDIT_DISTANCE } from './string-similarity.js';
@@ -233,6 +233,8 @@ export class ModValidator {
             correctionIcon: '🎯',
             corrections,
             isCrossFile: true,
+            errorCode: ValidationErrorCode.DUPLICATE_ID_IDENTICAL,
+            errorCodeContext: { objectType: resolvedType, id: objId },
           });
         } else {
           // Multiple groups means there are conflicting definitions
@@ -392,6 +394,8 @@ export class ModValidator {
                 correctionIcon: '🎯',
                 corrections,
                 isCrossFile: true,
+                errorCode: ValidationErrorCode.DUPLICATE_ID_IDENTICAL,
+                errorCodeContext: { objectType: resolvedType, id: objId },
               });
             } else {
               // Single object in this group (unique definition among the duplicates)
@@ -404,6 +408,8 @@ export class ModValidator {
                 correctionIcon: '🎯',
                 corrections,
                 isCrossFile: true,
+                errorCode: ValidationErrorCode.DUPLICATE_ID_CONFLICTING,
+                errorCodeContext: { objectType: resolvedType, id: objId },
               });
             }
           }
@@ -439,6 +445,8 @@ export class ModValidator {
         line: obj.startLine,
         context: 'This object type is not recognized',
         corrections,
+        errorCode: ValidationErrorCode.UNKNOWN_OBJECT_TYPE,
+        errorCodeContext: { objectType: obj.type },
       });
       return messages;
     }
@@ -450,6 +458,8 @@ export class ModValidator {
         filePath: obj.filePath,
         line: obj.startLine,
         suggestion: 'Add: ID = yourUniqueID;',
+        errorCode: ValidationErrorCode.MISSING_ID_PROPERTY,
+        errorCodeContext: { objectType: obj.type },
       });
     }
 
@@ -460,6 +470,8 @@ export class ModValidator {
         filePath: obj.filePath,
         line: obj.startLine,
         context: 'The cloneFrom property will be ignored',
+        errorCode: ValidationErrorCode.UNSUPPORTED_CLONE_FROM,
+        errorCodeContext: { objectType: obj.type },
       });
     }
 
@@ -582,6 +594,8 @@ export class ModValidator {
           context: `Value: ${propValue}`,
           suggestion: corrections.length === 0 ? 'Check for typos in property name' : undefined,
           corrections,
+          errorCode: ValidationErrorCode.UNKNOWN_PROPERTY,
+          errorCodeContext: { propertyName: cleanPropName, objectType: resolvedTypeName },
         });
         continue;
       }
@@ -600,6 +614,7 @@ export class ModValidator {
               filePath: propInfo.filePath,
               line: propInfo.valueStartLine,
               context: 'The magnitude property should contain a task string (e.g., "action,actionID")',
+              errorCode: ValidationErrorCode.EMPTY_MAGNITUDE,
             });
             continue;
           }
@@ -669,6 +684,7 @@ export class ModValidator {
         context: 'taskString takes precedence and effectID will be ignored',
         filePath: effectID.filePath,
         line: effectID.nameStartLine,
+        errorCode: ValidationErrorCode.TRIGGER_EFFECT_AMBIGUOUS,
       });
     }
 
@@ -684,6 +700,7 @@ export class ModValidator {
         message: 'TriggerEffect has neither effectID nor taskString',
         filePath: obj.filePath,
         line: obj.startLine,
+        errorCode: ValidationErrorCode.TRIGGER_EFFECT_INCOMPLETE,
       });
       return messages;
     }
@@ -733,6 +750,8 @@ export class ModValidator {
               replacementText: ` ID=${actionId};`,
             },
           ],
+          errorCode: ValidationErrorCode.ACTION_MISSING_ID,
+          errorCodeContext: { objectType: obj.type, actionId },
         });
         return false;
       }
@@ -753,6 +772,8 @@ export class ModValidator {
               replacementText: actionId,
             },
           ],
+          errorCode: ValidationErrorCode.ACTION_ID_MISMATCH,
+          errorCodeContext: { objectType: obj.type, actionId },
         });
         return false;
       }
@@ -777,6 +798,8 @@ export class ModValidator {
             message: `Action '${actionId}' must be followed by [ActionAoE]`,
             filePath: action.filePath,
             line: action.endLine,
+            errorCode: ValidationErrorCode.ACTION_MISSING_AOE,
+            errorCodeContext: { actionId },
           });
         }
         return false;
@@ -802,6 +825,8 @@ export class ModValidator {
               message: `Action '${actionId}' must have at least one [AvAffecter] following after the [ActionAoE]`,
               filePath: action.filePath,
               line: action.endLine,
+              errorCode: ValidationErrorCode.ACTION_MISSING_AVAFFECTER,
+              errorCodeContext: { actionId },
             });
           }
           return false;
@@ -824,6 +849,8 @@ export class ModValidator {
             message: `AvAffecter for Action '${actionId}' must be followed by [AvAffecterAoE]`,
             filePath: currentObj.filePath,
             line: currentObj.endLine,
+            errorCode: ValidationErrorCode.AVAFFECTER_MISSING_AOE,
+            errorCodeContext: { actionId },
           });
           return false;
         }
@@ -849,6 +876,8 @@ export class ModValidator {
           message: `Action '${actionId}' must be followed by [ActionAoE], but found [${obj.type}]`,
           filePath: obj.filePath,
           line: obj.startLine,
+          errorCode: ValidationErrorCode.ACTION_WRONG_NEXT_TYPE,
+          errorCodeContext: { actionId, foundType: obj.type },
         });
         return false;
       }
@@ -881,6 +910,8 @@ export class ModValidator {
           message: `Action '${actionId}' expected at least one [AvAffecter], but found [${obj.type}]`,
           filePath: obj.filePath,
           line: obj.startLine,
+          errorCode: ValidationErrorCode.ACTION_MISSING_AVAFFECTER,
+          errorCodeContext: { actionId, foundType: obj.type },
         });
         return false;
       }
@@ -900,6 +931,8 @@ export class ModValidator {
           message: `AvAffecter for Action '${actionId}' must be followed by [AvAffecterAoE], but found [${obj.type}]`,
           filePath: obj.filePath,
           line: obj.startLine,
+          errorCode: ValidationErrorCode.AVAFFECTER_WRONG_NEXT_TYPE,
+          errorCodeContext: { actionId, foundType: obj.type },
         });
         return false;
       }

@@ -3,7 +3,7 @@
  * Converts tokens into structured object representations
  */
 
-import { Token, TokenType, ParsedObject, PropertyInfo, ValidationMessage } from './types.js';
+import { Token, TokenType, ParsedObject, PropertyInfo, ValidationMessage, ValidationErrorCode } from './types.js';
 import { ModLexer } from './lexer.js';
 
 export class ModParser {
@@ -61,6 +61,7 @@ export class ModParser {
             filePath: this.filePath,
             line: token.line,
             context: `Found "${token.value}", expected [ObjectType]`,
+            errorCode: ValidationErrorCode.UNEXPECTED_TOKEN,
           });
         }
         this.advance(); // Skip the problematic token
@@ -82,6 +83,7 @@ export class ModParser {
         filePath: this.filePath,
         line: this.peek().line,
         context: `Found ${this.peek().value}`,
+        errorCode: ValidationErrorCode.EXPECTED_TYPE_NAME,
       });
       return null;
     }
@@ -101,6 +103,7 @@ export class ModParser {
         filePath: this.filePath,
         line: this.peek().line,
         context: `Found ${this.peek().value} in [${objectType}]`,
+        errorCode: ValidationErrorCode.EXPECTED_CLOSING_BRACKET,
       });
       // Try to recover by finding the next ]
       while (!this.isAtEnd() && !this.check(TokenType.RIGHT_BRACKET)) {
@@ -188,6 +191,8 @@ export class ModParser {
         filePath: this.filePath,
         line: propertyLine,
         context: `Found ${this.peek().value}`,
+        errorCode: ValidationErrorCode.EXPECTED_EQUALS,
+        errorCodeContext: { propertyName },
       });
       this.skipToNextLine();
       return null;
@@ -340,6 +345,8 @@ export class ModParser {
               replacementText: ';',
             },
           ],
+          errorCode: ValidationErrorCode.MISSING_SEMICOLON,
+          errorCodeContext: { propertyName },
         });
       }
     }

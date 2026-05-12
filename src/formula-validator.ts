@@ -3,7 +3,7 @@
  * Validates formula syntax using the AST parser and validator
  */
 
-import { ValidationMessage, Correction, PropertyInfo } from './types.js';
+import { ValidationMessage, Correction, PropertyInfo, ValidationErrorCode } from './types.js';
 import { parseFormula, validateAST, type ValidationError } from './formula-parser.js';
 
 /**
@@ -53,6 +53,7 @@ export function validateFormula(
       message: `Formula parse error: ${errorMessage}`,
       filePath: propInfo.filePath,
       line: propInfo.valueStartLine,
+      errorCode: ValidationErrorCode.FORMULA_PARSE_ERROR,
     });
   }
 

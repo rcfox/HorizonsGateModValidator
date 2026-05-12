@@ -20,6 +20,7 @@ import type {
   PropertyInfo,
   ValidationMessage,
 } from './types.js';
+import { ValidationErrorCode } from './types.js';
 import { findSimilar, MAX_EDIT_DISTANCE } from './string-similarity.js';
 import { isValidFloat } from './value-validators.js';
 import { validateFormula } from './formula-validator.js';
@@ -89,6 +90,8 @@ export class TaskValidator {
           filePath: propInfo.filePath,
           line: propInfo.valueStartLine,
           corrections,
+          errorCode: ValidationErrorCode.UNKNOWN_TASK,
+          errorCodeContext: { taskName },
         });
       } else {
         // No similar task names
@@ -97,6 +100,8 @@ export class TaskValidator {
           message: `Unknown task: '${taskName}'`,
           filePath: propInfo.filePath,
           line: propInfo.valueStartLine,
+          errorCode: ValidationErrorCode.UNKNOWN_TASK,
+          errorCodeContext: { taskName },
         });
       }
     }
@@ -156,6 +161,8 @@ export class TaskValidator {
           filePath: propInfo.filePath,
           line: propInfo.valueStartLine + parsed.taskNamePosition.startLine,
           corrections,
+          errorCode: ValidationErrorCode.UNKNOWN_TASK,
+          errorCodeContext: { taskName: parsed.taskName },
         });
       } else {
         // No similar task names - might be a trigger name, report as hint
@@ -165,6 +172,8 @@ export class TaskValidator {
           filePath: propInfo.filePath,
           line: propInfo.valueStartLine + parsed.taskNamePosition.startLine,
           context: 'Task name not found in tasks.json. This might be a trigger name (not yet validated).',
+          errorCode: ValidationErrorCode.UNKNOWN_TASK,
+          errorCodeContext: { taskName: parsed.taskName },
         });
       }
 
@@ -544,6 +553,8 @@ export class TaskValidator {
             filePath: propInfo.filePath,
             line: absoluteLine,
             context: `Formula string cannot be empty`,
+            errorCode: ValidationErrorCode.EMPTY_FORMULA_PARAM,
+            errorCodeContext: { source: parsed.source },
           });
         } else {
           // Validate formula syntax
@@ -574,6 +585,8 @@ export class TaskValidator {
               filePath: propInfo.filePath,
               line: absoluteLine,
               context: parsed.source === '@A' ? 'Actor reference cannot be empty' : 'String value cannot be empty',
+              errorCode: ValidationErrorCode.EMPTY_STRING_PARAM,
+              errorCodeContext: { source: parsed.source },
             });
           }
         }
@@ -589,6 +602,8 @@ export class TaskValidator {
               filePath: propInfo.filePath,
               line: absoluteLine,
               context: parsed.source === '@T' ? 'Travel point ID cannot be empty' : 'Actor reference cannot be empty',
+              errorCode: ValidationErrorCode.EMPTY_TILE_COORD_PARAM,
+              errorCodeContext: { source: parsed.source },
             });
           }
         } else if (parsed.source === '@X' || parsed.source === '@Y') {
@@ -600,6 +615,7 @@ export class TaskValidator {
               filePath: propInfo.filePath,
               line: absoluteLine,
               context: `Expected float value, got '${parsed.value}'`,
+              errorCode: ValidationErrorCode.INVALID_COORDINATE,
             });
           }
         }
@@ -613,6 +629,7 @@ export class TaskValidator {
             filePath: propInfo.filePath,
             line: absoluteLine,
             context: `Global variable name cannot be empty`,
+            errorCode: ValidationErrorCode.EMPTY_GLOBAL_VAR,
           });
         }
         break;
@@ -626,6 +643,7 @@ export class TaskValidator {
             filePath: propInfo.filePath,
             line: absoluteLine,
             context: `Expected float value for delay`,
+            errorCode: ValidationErrorCode.INVALID_DELAY,
           });
         }
         // Hint if delay is in the middle (not first, not last)
@@ -636,6 +654,7 @@ export class TaskValidator {
             filePath: propInfo.filePath,
             line: absoluteLine,
             context: `Delay parameters are typically placed at the beginning or end of the task string`,
+            errorCode: ValidationErrorCode.DELAY_MIDDLE_POSITION,
           });
         }
         break;
@@ -650,6 +669,7 @@ export class TaskValidator {
           filePath: propInfo.filePath,
           line: absoluteLine,
           context: `Global variable name cannot be empty`,
+          errorCode: ValidationErrorCode.EMPTY_GLOBAL_VAR,
         });
       }
     }
@@ -706,6 +726,8 @@ export class TaskValidator {
             filePath: propInfo.filePath,
             line: propInfo.valueStartLine,
             taskReference: taskName,
+            errorCode: ValidationErrorCode.TASK_PARAM_TOO_FEW,
+            errorCodeContext: { taskName, paramType: arrayName },
           });
         }
       }
@@ -751,6 +773,8 @@ export class TaskValidator {
             line: propInfo.valueStartLine,
             context: `Extra parameters may be ignored`,
             taskReference: taskName,
+            errorCode: ValidationErrorCode.TASK_TOO_MANY_PARAMS,
+            errorCodeContext: { taskName, paramType: arrayName },
           });
         }
       }
@@ -815,6 +839,8 @@ export class TaskValidator {
                   replacementText: ',0',
                 },
               ],
+              errorCode: ValidationErrorCode.TASK_IMPLICIT_FLOAT,
+              errorCodeContext: { propertyName: propertyName ?? '' },
             });
           }
         }
@@ -865,6 +891,8 @@ export class TaskValidator {
         line: propInfo.valueStartLine,
         context: missing.param.description,
         taskReference: taskName,
+        errorCode: ValidationErrorCode.TASK_MISSING_PARAM,
+        errorCodeContext: { taskName, paramName: missing.param.name },
       });
     }
 
@@ -876,6 +904,8 @@ export class TaskValidator {
         filePath: propInfo.filePath,
         line: propInfo.valueStartLine,
         taskReference: taskName,
+        errorCode: ValidationErrorCode.TASK_MULTIPLE_USE_CASES,
+        errorCodeContext: { taskName },
       });
     }
 

@@ -2,6 +2,10 @@
  * Core type definitions for mod validation
  */
 
+import type { ErrorContext } from './error-codes.js';
+export { ValidationErrorCode } from './error-codes.js';
+export type { ErrorContext } from './error-codes.js';
+
 export type FieldType =
   | 'boolean'
   | 'integer'
@@ -167,7 +171,7 @@ export interface Correction {
   displayText?: string; // Optional display text (e.g., "filename:line")
 }
 
-export interface ValidationMessage {
+interface BaseValidationMessage {
   severity: ValidationSeverity;
   message: string;
   filePath: string;
@@ -183,6 +187,8 @@ export interface ValidationMessage {
   documentationUrl?: string | undefined; // External documentation URL
   documentationLabel?: string | undefined; // Label for the documentation link
 }
+
+export type ValidationMessage = BaseValidationMessage & ErrorContext;
 
 export interface ValidationResult {
   errors: ValidationMessage[];

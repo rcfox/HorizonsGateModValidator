@@ -38,6 +38,8 @@ import {
   type FormulaData,
 } from './formula-metadata.js';
 import { isValidFloat, isValidInteger, isValidByte } from './value-validators.js';
+import { ValidationErrorCode } from './types.js';
+import type { ErrorContext } from './types.js';
 
 const data = formulaData as FormulaData;
 
@@ -47,14 +49,14 @@ for (const op of data.operators) {
   operatorMap.set(op.name, op);
 }
 
-export interface ValidationError {
+export type ValidationError = {
   message: string;
   context?: string | undefined;
   node: ASTNode | FunctionArg;
   path: string; // Path to the node in the tree for context
   operatorName: string | null; // Operator name for linking to formula reference
   suggestions: string[]; // Suggested corrections for typos
-}
+} & ErrorContext;
 
 /**
  * Validates an AST against formula.json metadata
@@ -127,6 +129,8 @@ function validateFunctionCall(node: FunctionCallNode, path: string, allowXParame
       path,
       operatorName: null,
       suggestions,
+      errorCode: ValidationErrorCode.UNKNOWN_OPERATOR,
+      errorCodeContext: { operatorName: node.name.value },
     });
     return errors;
   }
@@ -144,6 +148,8 @@ function validateFunctionCall(node: FunctionCallNode, path: string, allowXParame
       path,
       operatorName: node.name.value,
       suggestions: [],
+      errorCode: ValidationErrorCode.OPERATOR_WRONG_SYNTAX,
+      errorCodeContext: { operatorName: node.name.value },
     });
   }
 
@@ -171,6 +177,8 @@ function validateFunctionCall(node: FunctionCallNode, path: string, allowXParame
       path,
       operatorName: node.name.value,
       suggestions: [],
+      errorCode: ValidationErrorCode.OPERATOR_WRONG_ARG_COUNT,
+      errorCodeContext: { operatorName: node.name.value },
     });
 
     // Skip argument validation since no use case matches
@@ -202,6 +210,8 @@ function validateFunctionCall(node: FunctionCallNode, path: string, allowXParame
         path: `${path}.body`,
         operatorName: node.name.value,
         suggestions: [],
+        errorCode: ValidationErrorCode.OPERATOR_UNEXPECTED_BODY,
+        errorCodeContext: { operatorName: node.name.value },
       });
     } else {
       // Recursively validate the body
@@ -252,6 +262,8 @@ function validateParameterType(
           path,
           operatorName,
           suggestions: [],
+          errorCode: ValidationErrorCode.OPERATOR_WRONG_PARAM_TYPE,
+          errorCodeContext: { operatorName, paramName: expectedArg.name },
         });
       }
       break;
@@ -298,6 +310,8 @@ function validateFunctionArg(
             path,
             operatorName,
             suggestions: [],
+            errorCode: ValidationErrorCode.OPERATOR_WRONG_ARG_TYPE,
+            errorCodeContext: { operatorName, argName: expectedArg.name },
           });
         }
         break;
@@ -311,6 +325,8 @@ function validateFunctionArg(
             path,
             operatorName,
             suggestions: [],
+            errorCode: ValidationErrorCode.OPERATOR_WRONG_ARG_TYPE,
+            errorCodeContext: { operatorName, argName: expectedArg.name },
           });
         }
         break;
@@ -324,6 +340,8 @@ function validateFunctionArg(
             path,
             operatorName,
             suggestions: [],
+            errorCode: ValidationErrorCode.OPERATOR_WRONG_ARG_TYPE,
+            errorCodeContext: { operatorName, argName: expectedArg.name },
           });
         }
         break;
@@ -337,6 +355,8 @@ function validateFunctionArg(
             path,
             operatorName,
             suggestions: [],
+            errorCode: ValidationErrorCode.OPERATOR_WRONG_ARG_TYPE,
+            errorCodeContext: { operatorName, argName: expectedArg.name },
           });
         }
         break;
@@ -376,6 +396,8 @@ function validateFunctionArg(
               path,
               operatorName: null,
               suggestions,
+              errorCode: ValidationErrorCode.UNKNOWN_OPERATOR,
+              errorCodeContext: { operatorName: `${operatorName}:${value}` },
             });
           }
         }
@@ -389,6 +411,8 @@ function validateFunctionArg(
           path,
           operatorName,
           suggestions: [],
+          errorCode: ValidationErrorCode.OPERATOR_WRONG_ARG_TYPE,
+          errorCodeContext: { operatorName, argName: expectedArg.name },
         });
         break;
 
@@ -435,6 +459,8 @@ function validateFunctionArg(
           path,
           operatorName: null,
           suggestions,
+          errorCode: ValidationErrorCode.UNKNOWN_OPERATOR,
+          errorCodeContext: { operatorName: `${operatorName}:${arg.name}` },
         });
         return errors;
       }
@@ -496,6 +522,8 @@ function validateFunctionArg(
             path,
             operatorName: specificOperatorName,
             suggestions: [],
+            errorCode: ValidationErrorCode.OPERATOR_NO_PARAMS,
+            errorCodeContext: { operatorName: specificOperatorName },
           });
         }
       }
@@ -524,6 +552,8 @@ function validateMathFunction(node: MathFunctionNode, path: string, allowXParame
       path,
       operatorName: null,
       suggestions: [],
+      errorCode: ValidationErrorCode.UNKNOWN_OPERATOR,
+      errorCodeContext: { operatorName: node.name.value },
     });
     return errors;
   }
@@ -536,6 +566,8 @@ function validateMathFunction(node: MathFunctionNode, path: string, allowXParame
       path,
       operatorName: node.name.value,
       suggestions: [],
+      errorCode: ValidationErrorCode.OPERATOR_WRONG_SYNTAX,
+      errorCodeContext: { operatorName: node.name.value },
     });
   }
 

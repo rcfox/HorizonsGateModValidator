@@ -20,6 +20,7 @@ import type {
   PropertyInfo,
   ValidationMessage,
 } from './types.js';
+import { ValidationErrorCode } from './types.js';
 import { findSimilar, MAX_EDIT_DISTANCE } from './string-similarity.js';
 import { validateFormula } from './formula-validator.js';
 import { parseDynamicText, containsDynamicText } from './dynamic-text-parser.js';
@@ -174,6 +175,8 @@ function validateUnknownTag(tag: ParsedDynamicTextTag, propInfo: PropertyInfo): 
         filePath: propInfo.filePath,
         line: absoluteTagNamePos.startLine,
         corrections,
+        errorCode: ValidationErrorCode.UNKNOWN_DYNAMIC_TAG,
+        errorCodeContext: { tagName: tag.tagName },
       },
     ];
   }
@@ -184,6 +187,8 @@ function validateUnknownTag(tag: ParsedDynamicTextTag, propInfo: PropertyInfo): 
       message: `Unknown dynamic text tag: '${tag.tagName}'`,
       filePath: propInfo.filePath,
       line: absoluteTagNamePos.startLine,
+      errorCode: ValidationErrorCode.UNKNOWN_DYNAMIC_TAG,
+      errorCodeContext: { tagName: tag.tagName },
     },
   ];
 }
@@ -202,6 +207,7 @@ function validateCommandTag(tag: ParsedDynamicTextTag, propInfo: PropertyInfo): 
       filePath: propInfo.filePath,
       line: absoluteTagPos.startLine,
       context: `Expected format: <cmd=commandName=...=>`,
+      errorCode: ValidationErrorCode.COMMAND_MISSING_NAME,
     });
     return messages;
   }
@@ -237,6 +243,8 @@ function validateCommandTag(tag: ParsedDynamicTextTag, propInfo: PropertyInfo): 
       filePath: propInfo.filePath,
       line: absoluteTagPos.startLine,
       context: missingArg?.description,
+      errorCode: ValidationErrorCode.COMMAND_MISSING_ARG,
+      errorCodeContext: { commandName, argName: missingArg?.name ?? 'argument' },
     });
   }
 
@@ -247,6 +255,8 @@ function validateCommandTag(tag: ParsedDynamicTextTag, propInfo: PropertyInfo): 
       filePath: propInfo.filePath,
       line: absoluteTagPos.startLine,
       context: `Expected at most ${requiredCount + optionalCount} argument(s), got ${providedForTooMany}`,
+      errorCode: ValidationErrorCode.COMMAND_TOO_MANY_ARGS,
+      errorCodeContext: { commandName },
     });
   }
 
@@ -289,6 +299,8 @@ function validateUnknownCommand(commandArg: ParsedDynamicTextArgument, propInfo:
         filePath: propInfo.filePath,
         line: absoluteCmdPos.startLine,
         corrections,
+        errorCode: ValidationErrorCode.UNKNOWN_DYNAMIC_COMMAND,
+        errorCodeContext: { commandName },
       },
     ];
   }
@@ -299,6 +311,8 @@ function validateUnknownCommand(commandArg: ParsedDynamicTextArgument, propInfo:
       message: `Unknown command: '${commandName}'`,
       filePath: propInfo.filePath,
       line: absoluteCmdPos.startLine,
+      errorCode: ValidationErrorCode.UNKNOWN_DYNAMIC_COMMAND,
+      errorCodeContext: { commandName },
     },
   ];
 }
@@ -328,6 +342,8 @@ function validateArgumentCounts(
       filePath: propInfo.filePath,
       line: absoluteTagPos.startLine,
       context: missingArg?.description,
+      errorCode: ValidationErrorCode.TAG_MISSING_ARG,
+      errorCodeContext: { tagName: tag.tagName, argName: missingArg?.name ?? 'argument' },
     });
   }
 
@@ -338,6 +354,8 @@ function validateArgumentCounts(
       filePath: propInfo.filePath,
       line: absoluteTagPos.startLine,
       context: `Expected at most ${requiredCount + optionalCount} argument(s), got ${providedForTooMany}`,
+      errorCode: ValidationErrorCode.TAG_TOO_MANY_ARGS,
+      errorCodeContext: { tagName: tag.tagName },
     });
   }
 
@@ -359,6 +377,7 @@ function validateNoNestedBrackets(args: ParsedDynamicTextArgument[], propInfo: P
         filePath: propInfo.filePath,
         line: absoluteArgPos.startLine,
         context: `The '<' character in argument '${arg.value}' indicates a nested tag, which will not be handled by the game correctly.`,
+        errorCode: ValidationErrorCode.NESTED_ANGLE_BRACKETS,
       });
     }
   }
@@ -415,6 +434,8 @@ function validateTrailingEquals(tag: ParsedDynamicTextTag, propInfo: PropertyInf
       filePath: propInfo.filePath,
       line: absoluteTagPos.startLine,
       context: `Convention is to end tags with '=' even when there are no arguments (e.g., <${tag.tagName}=>)`,
+      errorCode: ValidationErrorCode.TAG_MISSING_TRAILING_EQUALS,
+      errorCodeContext: { tagName: tag.tagName },
     },
   ];
 }

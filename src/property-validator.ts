@@ -3,7 +3,7 @@
  * Validates that property values match their expected types
  */
 
-import { FieldType, ValidationMessage, PropertyInfo } from './types.js';
+import { FieldType, ValidationMessage, PropertyInfo, ValidationErrorCode } from './types.js';
 import { validateFormula } from './formula-validator.js';
 import { validateDynamicText } from './dynamic-text-validator.js';
 import { findSimilar, MAX_EDIT_DISTANCE } from './string-similarity.js';
@@ -77,6 +77,8 @@ export class PropertyValidator {
             line,
             context: `Expected 'true' or 'false', got '${cleanValue}'`,
             corrections,
+            errorCode: ValidationErrorCode.INVALID_BOOLEAN,
+            errorCodeContext: { propertyName },
           });
         }
         break;
@@ -90,6 +92,8 @@ export class PropertyValidator {
             filePath: propInfo.filePath,
             line,
             context: `Expected whole number, got '${cleanValue}'`,
+            errorCode: ValidationErrorCode.INVALID_INTEGER,
+            errorCodeContext: { propertyName },
           });
         }
         break;
@@ -102,6 +106,8 @@ export class PropertyValidator {
             filePath: propInfo.filePath,
             line,
             context: `Expected number, got '${cleanValue}'`,
+            errorCode: ValidationErrorCode.INVALID_FLOAT,
+            errorCodeContext: { propertyName },
           });
         }
         break;
@@ -114,6 +120,8 @@ export class PropertyValidator {
             filePath: propInfo.filePath,
             line,
             context: `Expected number 0-255, got '${cleanValue}'`,
+            errorCode: ValidationErrorCode.INVALID_BYTE,
+            errorCodeContext: { propertyName },
           });
         }
         break;
@@ -179,6 +187,8 @@ export class PropertyValidator {
                 line,
                 context: `${elementType} uses ${componentCount} components; extra values are silently ignored by the game`,
                 suggestion: `Use separate property assignments for each element`,
+                errorCode: ValidationErrorCode.TOO_MANY_LIST_VALUES,
+                errorCodeContext: { propertyName, elementType },
               });
             }
             messages.push(...this.validateProperty(baseName, allParts.slice(0, componentCount).join(','), elementType, propInfo, className));
@@ -208,6 +218,8 @@ export class PropertyValidator {
           filePath: propInfo.filePath,
           line,
           context: 'Type validation not implemented for this type',
+          errorCode: ValidationErrorCode.UNVALIDATED_TYPE,
+          errorCodeContext: { propertyName, typeName: expectedType },
         });
         break;
     }
@@ -259,6 +271,8 @@ export class PropertyValidator {
         filePath: propInfo.filePath,
         line,
         context: `Expected format: key=value, got '${value}'`,
+        errorCode: ValidationErrorCode.INVALID_DICT_ENTRY,
+        errorCodeContext: { propertyName },
       });
       return messages;
     }
@@ -274,6 +288,8 @@ export class PropertyValidator {
         filePath: propInfo.filePath,
         line,
         context: 'Dictionary keys must be non-empty',
+        errorCode: ValidationErrorCode.EMPTY_DICT_KEY,
+        errorCodeContext: { propertyName: baseName },
       });
     } else {
       messages.push(...this.validateProperty(baseName, key, keyType, propInfo, className));
@@ -323,6 +339,8 @@ export class PropertyValidator {
           message: `Invalid ${enumName} value '${value}' for ${propertyName}`,
           filePath: propInfo.filePath,
           line,
+          errorCode: ValidationErrorCode.INVALID_ENUM_VALUE,
+          errorCodeContext: { propertyName, enumName },
         });
       }
       return messages;
@@ -343,6 +361,8 @@ export class PropertyValidator {
           documentationUrl:
             'https://docs.google.com/document/d/15H0QN-tm2ERGXdeV2esavm6u-eaNniliTs4ZlAML79U/edit?tab=t.0#heading=h.75sdxuctqmty',
           documentationLabel: 'Modder Community Element Registry',
+          errorCode: ValidationErrorCode.CUSTOM_ELEMENT_VALUE,
+          errorCodeContext: { propertyName },
         });
         return messages;
       }
@@ -368,6 +388,8 @@ export class PropertyValidator {
           line,
           context: `Use the enum name instead of the numeric value '${value}'`,
           corrections,
+          errorCode: ValidationErrorCode.NUMERIC_ENUM_VALUE,
+          errorCodeContext: { propertyName, enumName },
         });
       } else {
         messages.push({
@@ -377,6 +399,8 @@ export class PropertyValidator {
           line,
           context: `'${value}' is not a valid ${enumName} value`,
           suggestion: `Use enum names instead of numbers`,
+          errorCode: ValidationErrorCode.INVALID_ENUM_NUMERIC,
+          errorCodeContext: { propertyName, enumName },
         });
       }
       return messages;
@@ -402,6 +426,8 @@ export class PropertyValidator {
         filePath: propInfo.filePath,
         line,
         corrections,
+        errorCode: ValidationErrorCode.INVALID_ENUM_VALUE,
+        errorCodeContext: { propertyName, enumName },
       });
     }
 
@@ -419,6 +445,8 @@ export class PropertyValidator {
         filePath,
         line,
         context: `Expected format: x,y (got ${parts.length} values)`,
+        errorCode: ValidationErrorCode.INVALID_VECTOR2,
+        errorCodeContext: { propertyName: name },
       });
       return messages;
     }
@@ -431,6 +459,8 @@ export class PropertyValidator {
         filePath,
         line,
         context: `Expected format: x,y`,
+        errorCode: ValidationErrorCode.VECTOR2_MISSING_COMPONENT,
+        errorCodeContext: { propertyName: name, component: 'X' },
       });
     } else if (!isValidFloat(x)) {
       messages.push({
@@ -439,6 +469,8 @@ export class PropertyValidator {
         filePath,
         line,
         context: `Expected number, got '${x}'`,
+        errorCode: ValidationErrorCode.VECTOR2_INVALID_COMPONENT,
+        errorCodeContext: { propertyName: name, component: 'X' },
       });
     }
 
@@ -450,6 +482,8 @@ export class PropertyValidator {
         filePath,
         line,
         context: `Expected format: x,y`,
+        errorCode: ValidationErrorCode.VECTOR2_MISSING_COMPONENT,
+        errorCodeContext: { propertyName: name, component: 'Y' },
       });
     } else if (!isValidFloat(y)) {
       messages.push({
@@ -458,6 +492,8 @@ export class PropertyValidator {
         filePath,
         line,
         context: `Expected number, got '${y}'`,
+        errorCode: ValidationErrorCode.VECTOR2_INVALID_COMPONENT,
+        errorCodeContext: { propertyName: name, component: 'Y' },
       });
     }
 
@@ -475,6 +511,8 @@ export class PropertyValidator {
         filePath,
         line,
         context: `Expected format: x,y,z (got ${parts.length} values)`,
+        errorCode: ValidationErrorCode.INVALID_VECTOR3,
+        errorCodeContext: { propertyName: name },
       });
       return messages;
     }
@@ -489,6 +527,8 @@ export class PropertyValidator {
           filePath,
           line,
           context: `Expected format: x,y,z`,
+          errorCode: ValidationErrorCode.VECTOR3_MISSING_COMPONENT,
+          errorCodeContext: { propertyName: name, component: componentNames[i]! },
         });
       } else if (!isValidFloat(component)) {
         messages.push({
@@ -497,6 +537,8 @@ export class PropertyValidator {
           filePath,
           line,
           context: `Expected number, got '${component}'`,
+          errorCode: ValidationErrorCode.VECTOR3_INVALID_COMPONENT,
+          errorCodeContext: { propertyName: name, component: componentNames[i]! },
         });
       }
     }
@@ -515,6 +557,8 @@ export class PropertyValidator {
         filePath,
         line,
         context: `Expected format: x,y,width,height (got ${parts.length} values)`,
+        errorCode: ValidationErrorCode.INVALID_RECTANGLE,
+        errorCodeContext: { propertyName: name },
       });
       return messages;
     }
@@ -529,6 +573,8 @@ export class PropertyValidator {
           filePath,
           line,
           context: `Expected format: x,y,width,height`,
+          errorCode: ValidationErrorCode.RECTANGLE_MISSING_COMPONENT,
+          errorCodeContext: { propertyName: name, component: componentNames[i]! },
         });
       } else if (!isValidInteger(component)) {
         messages.push({
@@ -537,6 +583,8 @@ export class PropertyValidator {
           filePath,
           line,
           context: `Expected integer, got '${component}'`,
+          errorCode: ValidationErrorCode.RECTANGLE_INVALID_COMPONENT,
+          errorCodeContext: { propertyName: name, component: componentNames[i]! },
         });
       }
     }
