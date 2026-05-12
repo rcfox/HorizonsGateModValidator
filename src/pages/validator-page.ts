@@ -275,7 +275,7 @@ export function initValidatorApp(): void {
   let fileTree: FileNodeDirectory | null = null;
 
   // View mode for multi-file validation results
-  type ResultsViewMode = 'all' | 'current';
+  type ResultsViewMode = 'all' | 'current' | 'suppressed';
   let resultsViewMode: ResultsViewMode = 'all';
 
   // Correction data storage (for XSS safety - avoid putting user data in HTML attributes)
@@ -298,6 +298,24 @@ export function initValidatorApp(): void {
   const visibleItemsPerGroup = new Map<string, number>(); // Track visible count per group
   let objectSearchTerm = ''; // Current search term
   const ITEMS_PER_PAGE = 100; // Show 100 items at a time
+
+  // Suppression state — persisted to localStorage
+  interface SuppressionRule {
+    errorCode: string;
+    errorCodeContext?: Record<string, string>;
+  }
+  const SUPPRESSION_STORAGE_KEY = 'hg-validator-suppressions';
+  let suppressionRules: SuppressionRule[] = (() => {
+    try {
+      const stored = localStorage.getItem(SUPPRESSION_STORAGE_KEY);
+      return stored ? (JSON.parse(stored) as SuppressionRule[]) : [];
+    } catch {
+      return [];
+    }
+  })();
+
+  // Cache of the last single-file validation result, used when re-rendering after suppression changes
+  let lastSingleFileResult: ValidationResult | null = null;
 
   // DOM elements
   const modInput = getElementByIdAs('modInput', HTMLTextAreaElement);
@@ -325,10 +343,27 @@ export function initValidatorApp(): void {
   statusButtonsContainer.appendChild(allFilesStatus);
   statusButtonsContainer.appendChild(currentFileStatus);
 
-  // Insert container next to the original status
+  // Ignored-messages count button — shown in both single-file and multi-file modes
+  const ignoredStatusBtn = document.createElement('div');
+  ignoredStatusBtn.className = 'status status-button ignored-status-btn';
+  ignoredStatusBtn.title = 'Show ignored messages';
+  ignoredStatusBtn.style.display = 'none';
+  ignoredStatusBtn.addEventListener('click', () => switchViewMode('suppressed'));
+
+  // Make validationStatus (single-file mode) a clickable status button like allFilesStatus
+  validationStatus.classList.add('status-button', 'active');
+  validationStatus.title = 'Show validation messages';
+  validationStatus.addEventListener('click', () => switchViewMode('all'));
+
+  // Group all status elements together so they sit flush beside each other
+  const statusGroup = document.createElement('div');
+  statusGroup.className = 'status-group';
   const resultsHeader = validationStatus.parentElement;
   if (resultsHeader) {
-    validationStatus.after(statusButtonsContainer);
+    resultsHeader.appendChild(statusGroup);
+    statusGroup.appendChild(validationStatus); // moves validationStatus into group
+    statusGroup.appendChild(statusButtonsContainer);
+    statusGroup.appendChild(ignoredStatusBtn);
   }
 
   // New elements for file tree
@@ -1171,20 +1206,6 @@ export function initValidatorApp(): void {
       return true; // First occurrence, keep it
     });
 
-    // Display messages
-    if (deduplicatedMessages.length === 0) {
-      resultsContainer.innerHTML = `
-            <div class="message success">
-                <div class="message-header">
-                    <span class="message-icon">✓</span>
-                    <span>No issues found!</span>
-                </div>
-                <div class="message-text">All ${textFiles.length} file(s) appear to be valid.</div>
-            </div>
-        `;
-      return;
-    }
-
     // Helper to extract duplicate ID info from message
     const getDuplicateIdInfo = (msg: ValidationMessage): { id: string; type: string } | null => {
       // Match pattern: ID 'foo' for ItemType
@@ -1298,11 +1319,30 @@ export function initValidatorApp(): void {
       return (a.line || 0) - (b.line || 0);
     });
 
-    const html = deduplicatedMessages.map(msg => createMessageHTML(msg)).join('');
+    // Filter out suppressed messages (after dedup and sort, to preserve group ordering)
+    const visibleMessages = deduplicatedMessages.filter(m => !isSuppressed(m));
+    const suppressedCount = deduplicatedMessages.length - visibleMessages.length;
+
+    if (visibleMessages.length === 0) {
+      resultsContainer.innerHTML = `
+            <div class="message success">
+                <div class="message-header">
+                    <span class="message-icon">✓</span>
+                    <span>No issues found!</span>
+                </div>
+                <div class="message-text">All ${textFiles.length} file(s) appear to be valid.</div>
+            </div>
+        `;
+      updateIgnoredStatusBtn(suppressedCount);
+      return;
+    }
+
+    const html = visibleMessages.map(msg => createMessageHTML(msg)).join('');
     resultsContainer.innerHTML = html;
 
     // Populate file paths using textContent for XSS safety
     populateMessageFilePaths();
+    updateIgnoredStatusBtn(suppressedCount);
   }
 
   async function handleDownloadZip(): Promise<void> {
@@ -1377,7 +1417,7 @@ export function initValidatorApp(): void {
       (f): f is FileNodeTextFile => f.type === 'text-file'
     );
 
-    // Aggregate totals for all files (ValidationResult already includes cross-file messages)
+    // Aggregate totals for all files, excluding suppressed messages
     let totalErrors = 0;
     let totalWarnings = 0;
     let totalHints = 0;
@@ -1385,17 +1425,23 @@ export function initValidatorApp(): void {
 
     for (const fileNode of textFiles) {
       if (fileNode.validationResult) {
-        totalErrors += fileNode.validationResult.errors.length;
-        totalWarnings += fileNode.validationResult.warnings.length;
-        totalHints += fileNode.validationResult.hints.length;
-        totalInfo += fileNode.validationResult.info.length;
+        totalErrors += fileNode.validationResult.errors.filter(m => !isSuppressed(m)).length;
+        totalWarnings += fileNode.validationResult.warnings.filter(m => !isSuppressed(m)).length;
+        totalHints += fileNode.validationResult.hints.filter(m => !isSuppressed(m)).length;
+        totalInfo += fileNode.validationResult.info.filter(m => !isSuppressed(m)).length;
       }
     }
 
-    // Count files with issues (ValidationResult already includes cross-file messages)
-    const filesWithErrors = textFiles.filter(f => (f.validationResult?.errors.length || 0) > 0).length;
-    const filesWithWarnings = textFiles.filter(f => (f.validationResult?.warnings.length || 0) > 0).length;
-    const filesWithHints = textFiles.filter(f => (f.validationResult?.hints.length || 0) > 0).length;
+    // Count files with visible issues
+    const filesWithErrors = textFiles.filter(
+      f => (f.validationResult?.errors.filter(m => !isSuppressed(m)).length || 0) > 0
+    ).length;
+    const filesWithWarnings = textFiles.filter(
+      f => (f.validationResult?.warnings.filter(m => !isSuppressed(m)).length || 0) > 0
+    ).length;
+    const filesWithHints = textFiles.filter(
+      f => (f.validationResult?.hints.filter(m => !isSuppressed(m)).length || 0) > 0
+    ).length;
 
     const s = (count: number): string => {
       return count !== 1 ? 's' : '';
@@ -1424,11 +1470,11 @@ export function initValidatorApp(): void {
     if (fileManager.currentFilePath) {
       const currentFile = fileManager.files.get(fileManager.currentFilePath);
       if (currentFile?.type === 'text-file' && currentFile.validationResult) {
-        // ValidationResult already includes cross-file messages
-        const currentErrors = currentFile.validationResult.errors.length;
-        const currentWarnings = currentFile.validationResult.warnings.length;
-        const currentHints = currentFile.validationResult.hints.length;
-        const currentInfo = currentFile.validationResult.info.length;
+        // Filter suppressed messages for the current file counts
+        const currentErrors = currentFile.validationResult.errors.filter(m => !isSuppressed(m)).length;
+        const currentWarnings = currentFile.validationResult.warnings.filter(m => !isSuppressed(m)).length;
+        const currentHints = currentFile.validationResult.hints.filter(m => !isSuppressed(m)).length;
+        const currentInfo = currentFile.validationResult.info.filter(m => !isSuppressed(m)).length;
 
         currentFileStatus.classList.remove('success', 'error', 'warning');
         if (currentErrors > 0) {
@@ -1449,13 +1495,26 @@ export function initValidatorApp(): void {
         }
       }
     }
+
+    updateIgnoredStatusBtn();
   }
 
   /**
    * Refresh the results display based on current view mode
    */
   function refreshResultsDisplay(): void {
-    if (!fileManager) return;
+    if (resultsViewMode === 'suppressed') {
+      displaySuppressedMessages();
+      return;
+    }
+
+    if (!fileManager) {
+      // Single-file mode: re-display last result if available
+      if (lastSingleFileResult) {
+        displayResults(lastSingleFileResult);
+      }
+      return;
+    }
 
     const textFiles = Array.from(fileManager.files.values()).filter(
       (f): f is FileNodeTextFile => f.type === 'text-file'
@@ -1479,22 +1538,19 @@ export function initValidatorApp(): void {
   }
 
   /**
-   * Switch between showing all files and current file only
+   * Switch between showing all files, current file only, or suppressed messages
    */
   function switchViewMode(mode: ResultsViewMode): void {
-    if (!fileManager) return;
+    if (mode === 'current' && !fileManager) return;
 
     // Update mode
     resultsViewMode = mode;
 
     // Update active state
-    if (mode === 'all') {
-      allFilesStatus.classList.add('active');
-      currentFileStatus.classList.remove('active');
-    } else {
-      allFilesStatus.classList.remove('active');
-      currentFileStatus.classList.add('active');
-    }
+    validationStatus.classList.toggle('active', mode === 'all');
+    allFilesStatus.classList.toggle('active', mode === 'all');
+    currentFileStatus.classList.toggle('active', mode === 'current');
+    ignoredStatusBtn.classList.toggle('active', mode === 'suppressed');
 
     // Refresh display
     refreshResultsDisplay();
@@ -1551,11 +1607,12 @@ export function initValidatorApp(): void {
           // Show placeholder for empty content
           resultsContainer.innerHTML = '<p class="placeholder">No content to validate.</p>';
           validationStatus.textContent = '';
-          validationStatus.className = 'status';
+          validationStatus.className = 'status status-button active';
         } else {
           // Show validation results
           const crossFileMessages = validator.getCrossFileValidationMessages();
           const resultWithCrossFile = mergeCrossFileMessages(result, filePath, crossFileMessages);
+          lastSingleFileResult = resultWithCrossFile;
           displayResults(resultWithCrossFile);
         }
 
@@ -1587,8 +1644,10 @@ export function initValidatorApp(): void {
       validationStatus.style.display = '';
       statusButtonsContainer.style.display = 'none';
       resultsViewMode = 'all';
+      validationStatus.classList.add('active');
       allFilesStatus.classList.add('active');
       currentFileStatus.classList.remove('active');
+      ignoredStatusBtn.classList.remove('active');
 
       // Reset tab state
       currentTab = 'messages';
@@ -1616,17 +1675,21 @@ export function initValidatorApp(): void {
       resultsContainer.innerHTML =
         '<p class="placeholder">No validation results yet. Paste your mod code and click "Validate".</p>';
       validationStatus.textContent = '';
-      validationStatus.className = 'status';
+      validationStatus.className = 'status status-button active';
     } else {
       // Single file mode - just clear
       clearValidatorCache();
+      lastSingleFileResult = null;
 
       modInput.value = '';
       updateLineNumbers();
       resultsContainer.innerHTML =
         '<p class="placeholder">No validation results yet. Paste your mod code and click "Validate".</p>';
       validationStatus.textContent = '';
-      validationStatus.className = 'status';
+      validationStatus.className = 'status status-button active';
+      ignoredStatusBtn.style.display = 'none';
+      ignoredStatusBtn.classList.remove('active');
+      resultsViewMode = 'all';
     }
   }
 
@@ -2119,36 +2182,318 @@ export function initValidatorApp(): void {
     });
   }
 
+  // ── Suppression helpers ──────────────────────────────────────────────────────
+
+  function saveSuppressions(): void {
+    localStorage.setItem(SUPPRESSION_STORAGE_KEY, JSON.stringify(suppressionRules));
+  }
+
+  function getMsgContext(msg: ValidationMessage): Record<string, string> | undefined {
+    if ('errorCodeContext' in msg) {
+      return (msg as { errorCodeContext: Record<string, string> }).errorCodeContext;
+    }
+    return undefined;
+  }
+
+  function getMsgContextKeys(msgCtx: Record<string, string>): string[] {
+    return Object.keys(msgCtx).filter(k => (msgCtx as Record<string, string | undefined>)[k] !== undefined);
+  }
+
+  // Returns true if `rule` applies to `msg`: same error code, and rule's context
+  // (if any) is a subset of the message's context.
+  function isSuppressedByRule(msg: ValidationMessage, rule: SuppressionRule): boolean {
+    if (rule.errorCode !== msg.errorCode) return false;
+    if (!rule.errorCodeContext) return true; // "ignore all" rule matches any message with this error code
+    const msgCtx = getMsgContext(msg);
+    if (!msgCtx) return false;
+    return Object.entries(rule.errorCodeContext).every(([k, v]) => msgCtx[k] === v);
+  }
+
+  // Returns true if two rules are identical (same error code and same context keys/values).
+  function rulesAreEqual(a: SuppressionRule, b: SuppressionRule): boolean {
+    if (a.errorCode !== b.errorCode) return false;
+    const aCtx = a.errorCodeContext;
+    const bCtx = b.errorCodeContext;
+    if (!aCtx && !bCtx) return true;
+    if (!aCtx || !bCtx) return false;
+    const aKeys = Object.keys(aCtx);
+    const bKeys = Object.keys(bCtx);
+    if (aKeys.length !== bKeys.length) return false;
+    return aKeys.every(k => aCtx[k] === bCtx[k]);
+  }
+
+  function isSuppressed(msg: ValidationMessage): boolean {
+    return suppressionRules.some(rule => isSuppressedByRule(msg, rule));
+  }
+
+  function getSuppressionOptions(msg: ValidationMessage): Array<{ label: string; rule: SuppressionRule }> {
+    const msgCtx = getMsgContext(msg);
+    const keys = msgCtx ? getMsgContextKeys(msgCtx) : [];
+    const options: Array<{ label: string; rule: SuppressionRule }> = [];
+
+    // 2^n options: empty subset (ignore all) plus all non-empty subsets of context keys
+    const n = keys.length;
+    for (let mask = 0; mask < 1 << n; mask++) {
+      if (mask === 0) {
+        options.push({ label: `Ignore all ${msg.errorCode}`, rule: { errorCode: msg.errorCode } });
+      } else {
+        const subset = keys.filter((_, i) => mask & (1 << i));
+        const ctx = Object.fromEntries(subset.map(k => [k, msgCtx![k]!]));
+        const ctxStr = subset.map(k => `${k}=${msgCtx![k]}`).join(', ');
+        options.push({
+          label: `Ignore ${msg.errorCode} where ${ctxStr}`,
+          rule: { errorCode: msg.errorCode, errorCodeContext: ctx },
+        });
+      }
+    }
+
+    return options;
+  }
+
+  function addSuppression(rule: SuppressionRule): void {
+    if (!suppressionRules.some(r => rulesAreEqual(r, rule))) {
+      suppressionRules.push(rule);
+      saveSuppressions();
+    }
+  }
+
+  function removeSuppression(msg: ValidationMessage): void {
+    suppressionRules = suppressionRules.filter(rule => !isSuppressedByRule(msg, rule));
+    saveSuppressions();
+  }
+
+  function showIgnoreModal(msg: ValidationMessage): void {
+    const options = getSuppressionOptions(msg);
+
+    if (options.length === 1) {
+      // No errorCodeContext — suppress directly without modal
+      addSuppression(assertDefined(options[0], 'Single suppression option must exist').rule);
+      refreshAfterSuppressionChange();
+      return;
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'ignore-modal-overlay';
+
+    const dialog = document.createElement('div');
+    dialog.className = 'ignore-modal';
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+
+    const title = document.createElement('p');
+    title.className = 'ignore-modal-title';
+    title.textContent = `Ignore ${msg.errorCode}`;
+    dialog.appendChild(title);
+
+    // getSuppressionOptions always puts the "ignore all" rule first (mask === 0 in the bitmask loop).
+    const ignoreAllRule = assertDefined(options[0], 'Ignore-all option must exist').rule;
+    const ignoreAllBtn = document.createElement('button');
+    ignoreAllBtn.className = 'ignore-modal-option';
+    ignoreAllBtn.textContent = 'Ignore all';
+    ignoreAllBtn.addEventListener('click', () => {
+      addSuppression(ignoreAllRule);
+      overlay.remove();
+      refreshAfterSuppressionChange();
+    });
+    dialog.appendChild(ignoreAllBtn);
+
+    // Remaining options: context-filtered permutations shown as a table (one row per option).
+    const msgCtx = getMsgContext(msg)!;
+    const keys = getMsgContextKeys(msgCtx);
+    const contextOptions = options.slice(1); // all non-empty subset options (mask !== 0)
+
+    const tableLabel = document.createElement('p');
+    tableLabel.className = 'ignore-modal-table-label';
+    tableLabel.textContent = 'Ignore all that match...';
+    dialog.appendChild(tableLabel);
+
+    const table = document.createElement('table');
+    table.className = 'ignore-modal-table';
+
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    for (const key of keys) {
+      const th = document.createElement('th');
+      th.textContent = key;
+      headerRow.appendChild(th);
+    }
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    for (const option of contextOptions) {
+      const row = document.createElement('tr');
+      row.classList.add('ignore-modal-table-row');
+      row.addEventListener('click', () => {
+        addSuppression(option.rule);
+        overlay.remove();
+        refreshAfterSuppressionChange();
+      });
+
+      for (const key of keys) {
+        const td = document.createElement('td');
+        const val = option.rule.errorCodeContext?.[key];
+        if (val !== undefined) {
+          td.textContent = val;
+        } else {
+          td.textContent = '—';
+          td.classList.add('ignore-modal-wildcard');
+        }
+        row.appendChild(td);
+      }
+      tbody.appendChild(row);
+    }
+    table.appendChild(tbody);
+    dialog.appendChild(table);
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'ignore-modal-cancel';
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.addEventListener('click', () => overlay.remove());
+
+    dialog.appendChild(cancelBtn);
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.remove();
+    });
+  }
+
+  /**
+   * Collect all messages from all files (or the single-file result),
+   * deduplicating cross-file messages the same way displayAggregatedResults does.
+   */
+  function getAllMessages(): ValidationMessage[] {
+    if (fileManager) {
+      const result: ValidationMessage[] = [];
+      const seenCrossFile = new Set<string>();
+      for (const fileNode of fileManager.files.values()) {
+        if (fileNode.type !== 'text-file' || !fileNode.validationResult) continue;
+        const { errors, warnings, hints, info } = fileNode.validationResult;
+        for (const msg of [...errors, ...warnings, ...hints, ...info]) {
+          if (msg.isCrossFile) {
+            const key = JSON.stringify(msg);
+            if (seenCrossFile.has(key)) continue;
+            seenCrossFile.add(key);
+          }
+          result.push(msg);
+        }
+      }
+      return result;
+    }
+    if (lastSingleFileResult) {
+      return [
+        ...lastSingleFileResult.errors,
+        ...lastSingleFileResult.warnings,
+        ...lastSingleFileResult.hints,
+        ...lastSingleFileResult.info,
+      ];
+    }
+    return [];
+  }
+
+  /**
+   * Update the ignored-messages button with the current suppressed count.
+   * If count drops to zero while in suppressed view, switches back to 'all'.
+   */
+  function updateIgnoredStatusBtn(count?: number): void {
+    const resolvedCount = count !== undefined ? count : getAllMessages().filter(m => isSuppressed(m)).length;
+    if (resolvedCount > 0) {
+      const s = resolvedCount !== 1 ? 's' : '';
+      ignoredStatusBtn.textContent = `${resolvedCount} Ignored Error${s}`;
+      ignoredStatusBtn.style.display = '';
+    } else {
+      ignoredStatusBtn.style.display = 'none';
+      ignoredStatusBtn.classList.remove('active');
+      if (resultsViewMode === 'suppressed') {
+        switchViewMode('all');
+      }
+    }
+  }
+
+  /**
+   * Show only suppressed messages (called when resultsViewMode === 'suppressed').
+   */
+  function displaySuppressedMessages(): void {
+    correctionsMap.clear();
+    messagesMap.clear();
+
+    const allMsgs = getAllMessages();
+    const suppressed = allMsgs.filter(m => isSuppressed(m));
+
+    updateIgnoredStatusBtn(suppressed.length);
+
+    // When count hits zero, updateIgnoredStatusBtn calls switchViewMode('all'), which
+    // re-renders the error list and sets resultsViewMode = 'all'. Guard against
+    // overwriting that render by bailing out if the mode has already changed.
+    if (resultsViewMode !== 'suppressed') return;
+
+    if (suppressed.length === 0) {
+      resultsContainer.innerHTML = '<p class="placeholder">No ignored messages.</p>';
+      return;
+    }
+
+    const html = suppressed.map(msg => createMessageHTML(msg, 'suppressed')).join('');
+    resultsContainer.innerHTML = html;
+    populateMessageFilePaths();
+  }
+
+  /**
+   * Re-render the current view after suppression rules change.
+   */
+  function refreshAfterSuppressionChange(): void {
+    if (resultsViewMode === 'suppressed') {
+      displaySuppressedMessages();
+    } else if (fileManager) {
+      refreshResultsDisplay();
+    } else if (lastSingleFileResult) {
+      displayResults(lastSingleFileResult);
+    }
+  }
+
+  // ── End suppression helpers ───────────────────────────────────────────────────
+
   function displayResults(result: ValidationResult): void {
     // Clear old data to prevent memory leaks
     correctionsMap.clear();
     messagesMap.clear();
 
+    // Partition messages into visible and suppressed
+    const allMessages = [...result.errors, ...result.warnings, ...result.hints, ...result.info];
+    const visibleMessages = allMessages.filter(m => !isSuppressed(m));
+
+    const visibleErrors = visibleMessages.filter(m => m.severity === 'error');
+    const visibleWarnings = visibleMessages.filter(m => m.severity === 'warning');
+    const visibleHints = visibleMessages.filter(m => m.severity === 'hint');
+    const visibleInfo = visibleMessages.filter(m => m.severity === 'info');
+
     // Update status (cross-file messages already included in result)
-    const hasMessages =
-      result.errors.length > 0 || result.warnings.length > 0 || result.hints.length > 0 || result.info.length > 0;
+    const hasMessages = visibleMessages.length > 0;
 
     if (!hasMessages) {
       validationStatus.textContent = '✓ Valid';
-      validationStatus.className = 'status success';
-    } else if (result.errors.length > 0) {
-      validationStatus.textContent = `✗ ${result.errors.length} Error${result.errors.length !== 1 ? 's' : ''}`;
-      validationStatus.className = 'status error';
-    } else if (result.warnings.length > 0) {
-      validationStatus.textContent = `⚠ ${result.warnings.length} Warning${result.warnings.length !== 1 ? 's' : ''}`;
-      validationStatus.className = 'status warning';
-    } else if (result.hints.length > 0) {
-      validationStatus.textContent = `💡 ${result.hints.length} Hint${result.hints.length !== 1 ? 's' : ''}`;
-      validationStatus.className = 'status success';
+      validationStatus.className = 'status status-button active success';
+    } else if (visibleErrors.length > 0) {
+      validationStatus.textContent = `✗ ${visibleErrors.length} Error${visibleErrors.length !== 1 ? 's' : ''}`;
+      validationStatus.className = 'status status-button active error';
+    } else if (visibleWarnings.length > 0) {
+      validationStatus.textContent = `⚠ ${visibleWarnings.length} Warning${visibleWarnings.length !== 1 ? 's' : ''}`;
+      validationStatus.className = 'status status-button active warning';
+    } else if (visibleHints.length > 0) {
+      validationStatus.textContent = `💡 ${visibleHints.length} Hint${visibleHints.length !== 1 ? 's' : ''}`;
+      validationStatus.className = 'status status-button active success';
     } else {
-      validationStatus.textContent = `ℹ ${result.info.length} Info message${result.info.length !== 1 ? 's' : ''}`;
-      validationStatus.className = 'status success';
+      validationStatus.textContent = `ℹ ${visibleInfo.length} Info message${visibleInfo.length !== 1 ? 's' : ''}`;
+      validationStatus.className = 'status status-button active success';
     }
 
-    // Display all messages (cross-file messages already included)
-    const messages = [...result.errors, ...result.warnings, ...result.hints, ...result.info];
+    // Always recount globally — suppressedCount here is only from this one file,
+    // which would incorrectly hide the button when ignored errors live in other files.
+    updateIgnoredStatusBtn();
 
-    if (messages.length === 0) {
+    // Display visible messages only
+    if (visibleMessages.length === 0) {
       resultsContainer.innerHTML = `
             <div class="message success">
                 <div class="message-header">
@@ -2161,14 +2506,14 @@ export function initValidatorApp(): void {
       return;
     }
 
-    const html = messages.map(msg => createMessageHTML(msg)).join('');
+    const html = visibleMessages.map(msg => createMessageHTML(msg)).join('');
     resultsContainer.innerHTML = html;
 
     // Populate file paths using textContent for XSS safety
     populateMessageFilePaths();
   }
 
-  function createMessageHTML(msg: ValidationMessage): string {
+  function createMessageHTML(msg: ValidationMessage, mode: 'normal' | 'suppressed' = 'normal'): string {
     const icon = getIcon(msg.severity);
     const cursorClass = msg.line ? 'clickable' : '';
 
@@ -2176,6 +2521,10 @@ export function initValidatorApp(): void {
     const messageId = generateMessageId();
     messagesMap.set(messageId, msg);
 
+    const ignoreButtonHTML =
+      mode === 'suppressed'
+        ? `<button class="message-unignore-btn" data-message-id="${messageId}" title="Un-ignore this message" aria-label="Un-ignore">⊘</button>`
+        : `<button class="message-ignore-btn" data-message-id="${messageId}" title="Ignore this type of message" aria-label="Ignore">⊘</button>`;
     // Create corrections HTML if available
     let correctionsHTML = '';
     if (msg.corrections && msg.corrections.length > 0) {
@@ -2244,6 +2593,7 @@ export function initValidatorApp(): void {
 
     return `
         <div class="message ${msg.severity} ${cursorClass}" data-message-id="${messageId}">
+            ${ignoreButtonHTML}
             <div class="message-header">
                 <span class="message-icon">${icon}</span>
                 <span>${displayMessage}</span>
@@ -2463,6 +2813,35 @@ export function initValidatorApp(): void {
   // Handle clicks on objects and messages
   document.addEventListener('click', e => {
     const target = e.target as HTMLElement;
+
+    // Check if clicked on an ignore button
+    const ignoreBtn = target.closest('.message-ignore-btn');
+    if (ignoreBtn) {
+      e.stopPropagation();
+      const messageId = ignoreBtn.getAttribute('data-message-id');
+      if (messageId) {
+        const msg = messagesMap.get(messageId);
+        if (msg) {
+          showIgnoreModal(msg);
+        }
+      }
+      return;
+    }
+
+    // Check if clicked on an un-ignore button
+    const unignoreBtn = target.closest('.message-unignore-btn');
+    if (unignoreBtn) {
+      e.stopPropagation();
+      const messageId = unignoreBtn.getAttribute('data-message-id');
+      if (messageId) {
+        const msg = messagesMap.get(messageId);
+        if (msg) {
+          removeSuppression(msg);
+          refreshAfterSuppressionChange();
+        }
+      }
+      return;
+    }
 
     // Check if clicked on an object item
     const objectItem = target.closest('.object-item.clickable');

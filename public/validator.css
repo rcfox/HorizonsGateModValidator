@@ -343,6 +343,13 @@ main.with-file-tree {
     border: 1px solid rgba(250, 173, 20, 0.3);
 }
 
+/* Wrapper that groups all status elements on the right side of the results header */
+.status-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
 /* Status buttons container */
 .status-buttons-container {
     display: flex;
@@ -372,7 +379,9 @@ main.with-file-tree {
 
 /* Validation messages */
 .message {
+    position: relative;
     padding: 12px;
+    padding-right: 36px; /* room for ignore button */
     margin-bottom: 10px;
     border-radius: 4px;
     border-left: 4px solid;
@@ -483,6 +492,180 @@ main.with-file-tree {
     margin-top: 4px;
     margin-left: 24px;
     font-family: monospace;
+}
+
+/* Ignore / un-ignore buttons on message cards */
+.message-ignore-btn,
+.message-unignore-btn {
+    position: absolute;
+    top: 8px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-muted);
+    padding: 2px 4px;
+    border-radius: 3px;
+    line-height: 1;
+    transition: color 0.15s, background-color 0.15s;
+    z-index: 1;
+}
+
+.message-ignore-btn {
+    right: 8px;
+}
+
+.message-unignore-btn {
+    right: 8px;
+}
+
+.message-ignore-btn:hover {
+    color: var(--text-primary);
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
+.message-unignore-btn:hover {
+    color: var(--primary-color);
+    background-color: rgba(74, 144, 226, 0.1);
+}
+
+/* Ignored-messages count button */
+.ignored-status-btn {
+    background-color: rgba(128, 128, 128, 0.1);
+    color: var(--text-muted);
+    border: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+.ignored-status-btn.active {
+    opacity: 1;
+    filter: none;
+    cursor: pointer;
+    background-color: rgba(128, 128, 128, 0.2);
+}
+
+/* Ignore modal */
+.ignore-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-overlay);
+}
+
+.ignore-modal {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    min-width: 300px;
+    max-width: 480px;
+    box-shadow: var(--shadow);
+}
+
+.ignore-modal-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+}
+
+.ignore-modal-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--code-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.ignore-modal-option:hover {
+    background-color: rgba(74, 144, 226, 0.1);
+    border-color: var(--primary-color);
+}
+
+.ignore-modal-table-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 4px 0 6px;
+}
+
+.ignore-modal-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 4px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-family: var(--font-mono);
+}
+
+.ignore-modal-table thead th {
+    text-align: left;
+    padding: 3px 12px;
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 12px;
+}
+
+.ignore-modal-table-row {
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.ignore-modal-table-row td {
+    padding: 8px 12px;
+    background: var(--code-bg);
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.ignore-modal-table-row td:first-child {
+    border-left: 1px solid var(--border-color);
+    border-radius: 4px 0 0 4px;
+}
+
+.ignore-modal-table-row td:last-child {
+    border-right: 1px solid var(--border-color);
+    border-radius: 0 4px 4px 0;
+}
+
+.ignore-modal-table-row td:first-child:last-child {
+    border-radius: 4px;
+}
+
+.ignore-modal-table-row:hover td {
+    background-color: rgba(74, 144, 226, 0.1);
+    border-color: var(--primary-color);
+}
+
+.ignore-modal-wildcard {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.ignore-modal-cancel {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.15s;
+}
+
+.ignore-modal-cancel:hover {
+    background-color: var(--code-bg);
 }
 
 /* File tree styles */
