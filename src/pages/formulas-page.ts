@@ -12,6 +12,7 @@ import {
   querySelectorAllAs,
 } from './shared-utils.js';
 import rawFormulasData from '../formula.json';
+import rawFormulasDataPrev from '../formula_prev.json';
 
 interface FormulaArgument {
   name: string;
@@ -29,7 +30,6 @@ interface FormulaUse {
 
 interface FormulaOperator {
   name: string;
-  category: string;
   isFunctionStyle: boolean;
   aliases?: string[];
   uses: FormulaUse[];
@@ -41,6 +41,26 @@ interface FormulasData {
 }
 
 const formulasData = rawFormulasData as FormulasData;
+const formulasDataPrev = rawFormulasDataPrev as FormulasData;
+
+const prevOperatorByAlias = new Map<string, FormulaOperator>();
+for (const op of formulasDataPrev.operators) {
+  prevOperatorByAlias.set(op.name, op);
+  if (op.aliases) {
+    for (const alias of op.aliases) {
+      prevOperatorByAlias.set(alias, op);
+    }
+  }
+}
+
+function findPrevOperator(operator: FormulaOperator): FormulaOperator | undefined {
+  const candidates = [operator.name, ...(operator.aliases ?? [])];
+  for (const id of candidates) {
+    const prev = prevOperatorByAlias.get(id);
+    if (prev) return prev;
+  }
+  return undefined;
+}
 
 export function initFormulasApp(): void {
   // Check if we're on the formulas page
@@ -70,6 +90,9 @@ export function initFormulasApp(): void {
 
   // Setup copy buttons
   setupCopyButtons('#operatorsList');
+
+  // Setup version tabs (event delegation, survives re-renders)
+  setupVersionTabs();
 
   // Initial render
   renderOperators(filteredOperators, search.highlightMatch);
@@ -113,7 +136,6 @@ export function initFormulasApp(): void {
     const term = searchTerm.toLowerCase();
     if (operator.name.toLowerCase().includes(term)) return true;
     if (operator.aliases && operator.aliases.some(a => a.toLowerCase().includes(term))) return true;
-    if (operator.category.toLowerCase().includes(term)) return true;
 
     return operator.uses.some(use => {
       if (use.description.toLowerCase().includes(term)) return true;
@@ -144,55 +166,48 @@ export function initFormulasApp(): void {
     operatorsList.innerHTML = operators.map(op => renderOperator(op, highlightMatch)).join('');
   }
 
-  function renderOperator(operator: FormulaOperator, highlight: (text: string) => string): string {
+  function buildSignature(operator: FormulaOperator, use: FormulaUse): string {
+    if (operator.isFunctionStyle) {
+      if (!use.arguments || use.arguments.length === 0) {
+        return operator.name;
+      }
+      if (operator.name.startsWith('m:')) {
+        const allArgs = use.arguments.map(arg => arg.name).join(':');
+        return `${operator.name}(${allArgs})`;
+      }
+      if (use.arguments.length === 1) {
+        return `${operator.name}:${use.arguments[0]?.name}`;
+      }
+      const firstArg = use.arguments[0]?.name;
+      const restArgs = use.arguments
+        .slice(1)
+        .map(arg => arg.name)
+        .join(':');
+      return `${operator.name}:${firstArg}(${restArgs})`;
+    }
+    const argNames = use.arguments ? use.arguments.map(arg => arg.name).join(':') : '';
+    return argNames ? `${operator.name}:${argNames}` : operator.name;
+  }
+
+  function renderUseBody(
+    operator: FormulaOperator,
+    use: FormulaUse,
+    highlight: (text: string) => string,
+    showSignature: boolean
+  ): string {
     const hasAliases = operator.aliases && operator.aliases.length > 0;
-    const issueTitle = encodeURIComponent(`[Formula Documentation] Issue with "${operator.name}" operator`);
-    const issueBody = encodeURIComponent(
-      `**Operator Name:** \`${operator.name}\`\n\n**Issue Description:**\n<!-- Describe what's wrong or unclear about this operator's documentation -->\n\n\n**Expected:**\n<!-- What should the documentation say? -->\n\n\n<!-- Please provide as much detail as possible -->`
-    );
-    const issueUrl = `https://github.com/rcfox/HorizonsGateModValidator/issues/new?title=${issueTitle}&body=${issueBody}`;
+    const hasArguments = use.arguments && use.arguments.length > 0;
+    const signature = buildSignature(operator, use);
 
-    return operator.uses
-      .map((use, useIndex) => {
-        const operatorKey = `${operator.name}-use-${useIndex}`;
-        const operatorUrl = `${window.location.origin}${window.location.pathname}?operator=${encodeURIComponent(operator.name)}`;
-        const hasArguments = use.arguments && use.arguments.length > 0;
-
-        // Build operator signature
-        let signature: string;
-        if (operator.isFunctionStyle) {
-          if (!use.arguments || use.arguments.length === 0) {
-            signature = operator.name;
-          } else if (operator.name.startsWith('m:')) {
-            const allArgs = use.arguments.map(arg => arg.name).join(':');
-            signature = `${operator.name}(${allArgs})`;
-          } else if (use.arguments.length === 1) {
-            signature = `${operator.name}:${use.arguments[0]?.name}`;
-          } else {
-            const firstArg = use.arguments[0]?.name;
-            const restArgs = use.arguments
-              .slice(1)
-              .map(arg => arg.name)
-              .join(':');
-            signature = `${operator.name}:${firstArg}(${restArgs})`;
+    return `
+          ${
+            showSignature
+              ? `<div class="prev-signature">
+                  <code class="info-code">${highlight(signature)}</code>
+                </div>`
+              : ''
           }
-        } else {
-          const argNames = use.arguments ? use.arguments.map(arg => arg.name).join(':') : '';
-          signature = argNames ? `${operator.name}:${argNames}` : operator.name;
-        }
-
-        return `
-      <details class="operator-item" data-operator-key="${operatorKey}">
-        <summary class="operator-summary">
-          <span class="operator-name">${highlight(signature)}</span>
-          <span class="operator-brief">${highlight(use.description)}</span>
-        </summary>
-        <div class="operator-details">
-          <div class="operator-header-row">
-            <div class="operator-description">${highlight(use.description)}</div>
-            <button class="copy-name-btn" data-name="${operator.name}" title="Copy name">📋</button>
-            <button class="copy-link-btn" data-url="${operatorUrl}" title="Copy link to this operator">🔗</button>
-          </div>
+          <div class="operator-description">${highlight(use.description)}</div>
 
           <div class="operator-info-sections">
             <div class="info-section">
@@ -236,6 +251,57 @@ export function initFormulasApp(): void {
               </ul>
             </div>`
               : '<p class="no-arguments">No arguments</p>'
+          }`;
+  }
+
+  function renderOperator(operator: FormulaOperator, highlight: (text: string) => string): string {
+    const issueTitle = encodeURIComponent(`[Formula Documentation] Issue with "${operator.name}" operator`);
+    const issueBody = encodeURIComponent(
+      `**Operator Name:** \`${operator.name}\`\n\n**Issue Description:**\n<!-- Describe what's wrong or unclear about this operator's documentation -->\n\n\n**Expected:**\n<!-- What should the documentation say? -->\n\n\n<!-- Please provide as much detail as possible -->`
+    );
+    const issueUrl = `https://github.com/rcfox/HorizonsGateModValidator/issues/new?title=${issueTitle}&body=${issueBody}`;
+    const prevOperator = findPrevOperator(operator);
+
+    return operator.uses
+      .map((use, useIndex) => {
+        const operatorKey = `${operator.name}-use-${useIndex}`;
+        const operatorUrl = `${window.location.origin}${window.location.pathname}?operator=${encodeURIComponent(operator.name)}`;
+        const signature = buildSignature(operator, use);
+
+        const currentBody = renderUseBody(operator, use, highlight, false);
+        const prevBody = prevOperator
+          ? prevOperator.uses.map(u => renderUseBody(prevOperator, u, highlight, prevOperator.uses.length > 1)).join('<hr class="version-use-separator" />')
+          : '';
+
+        return `
+      <details class="operator-item" data-operator-key="${operatorKey}">
+        <summary class="operator-summary">
+          <span class="operator-name">${highlight(signature)}</span>
+          <span class="operator-brief">${highlight(use.description)}</span>
+        </summary>
+        <div class="operator-details">
+          <div class="operator-header-row">
+            ${
+              prevOperator
+                ? `<div class="version-tabs" role="tablist">
+                    <button type="button" class="version-tab active" data-version="current" role="tab">v${formulasData.gameVersion}</button>
+                    <button type="button" class="version-tab" data-version="prev" role="tab">v${formulasDataPrev.gameVersion}</button>
+                  </div>`
+                : '<div class="version-tabs-spacer"></div>'
+            }
+            <button class="copy-name-btn" data-name="${operator.name}" title="Copy name">📋</button>
+            <button class="copy-link-btn" data-url="${operatorUrl}" title="Copy link to this operator">🔗</button>
+          </div>
+
+          <div class="version-content active" data-version="current">
+            ${currentBody}
+          </div>
+          ${
+            prevOperator
+              ? `<div class="version-content" data-version="prev">
+                  ${prevBody}
+                </div>`
+              : ''
           }
 
           <div class="operator-disclaimer">
@@ -245,6 +311,25 @@ export function initFormulasApp(): void {
       </details>`;
       })
       .join('');
+  }
+
+  function setupVersionTabs(): void {
+    const operatorsList = getElementById('operatorsList');
+    operatorsList.addEventListener('click', e => {
+      const target = e.target;
+      if (!(target instanceof HTMLElement)) return;
+      const tab = target.closest('.version-tab');
+      if (!tab) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const details = tab.closest('.operator-details');
+      if (!details) return;
+      const version = tab.getAttribute('data-version');
+      details.querySelectorAll('.version-tab').forEach(t => t.classList.toggle('active', t === tab));
+      details
+        .querySelectorAll('.version-content')
+        .forEach(c => c.classList.toggle('active', c.getAttribute('data-version') === version));
+    });
   }
 
   function updateCount(showing: number, total: number): void {

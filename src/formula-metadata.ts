@@ -20,7 +20,6 @@ export interface FormulaUse {
 
 export interface FormulaOperator {
   name: string;
-  category: string;
   isFunctionStyle: boolean;
   alternateDelimiters?: string[];
   delegatesTo?: string; // For operators like mIs0, mMin0 that validate functionName against m: sub-operators
@@ -135,22 +134,6 @@ export function hasFormulaBody(operatorName: string): boolean {
  */
 export function getAllOperatorNames(): string[] {
   return data.operators.map(op => op.name);
-}
-
-/**
- * Get operator categories
- */
-export function getOperatorsByCategory(): Map<string, string[]> {
-  const categoryMap = new Map<string, string[]>();
-
-  for (const op of data.operators) {
-    if (!categoryMap.has(op.category)) {
-      categoryMap.set(op.category, []);
-    }
-    categoryMap.get(op.category)!.push(op.name);
-  }
-
-  return categoryMap;
 }
 
 /**
