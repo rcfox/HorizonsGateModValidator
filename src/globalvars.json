@@ -1679,7 +1679,7 @@
       { "where": "mission setup triggers", "op": "set" },
       { "where": "tSetRefreshGlobals", "op": "clear" }
     ],
-    "readBy": [{ "where": "InputManager", "note": "prevents leaving the zone" }],
+    "readBy": [{ "where": "InputManager", "note": "Adds an \"Abort Mission\" button to the menu which triggers tScoreScreen and removes half of the player's money." }],
     "related": ["cantEscape"]
   },
   {
