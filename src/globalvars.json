@@ -1877,21 +1877,6 @@
     ]
   },
   {
-    "name": "D_{dialogNodeID}_controller",
-    "isTemplate": true,
-    "params": [{ "name": "dialogNodeID", "type": "DialogNode.ID" }],
-    "description": "Companion to D_{dialogNodeID} used by dialog flow controllers (e.g., D_merchant_sPort_createPort5_controller). Tracks whether a controller dialog branch has fired.",
-    "valueShape": "counter",
-    "lifetime": "persistent",
-    "category": "dialog",
-    "setBy": [
-      { "where": "controller-dialog setup logic", "op": "set" },
-      { "where": "Task.cs", "op": "set" }
-    ],
-    "readBy": [{ "where": "GameState.checkedGlobalVarAchievements" }, { "where": "dialog fReq formulas" }],
-    "related": ["D_{dialogNodeID}"]
-  },
-  {
     "name": "investigatorAnswer_{actorID}",
     "isTemplate": true,
     "params": [{ "name": "actorID", "type": "Actor.ID" }],
@@ -1943,7 +1928,7 @@
   },
   {
     "name": "cartographerContractLoc",
-    "description": "Location currently under the player's cartographer contract. Drives the compass tooltip icon.",
+    "description": "Location currently under the player's cartographer contract. Adds a compass-shaped tooltip icon to the port.",
     "valueShape": "id",
     "idType": "Location.ID",
     "lifetime": "persistent",
@@ -2232,7 +2217,7 @@
       {
         "where": "GameState.checkedGlobalVarAchievements",
         "op": "set",
-        "note": "triggered by D_merchant_sPort_createPort5 or its controller"
+        "note": "triggered by D_merchant_sPort_createPort5 or D_merchant_sPort_createPort5_controller"
       }
     ],
     "readBy": [{ "where": "GameState.tryAllAchievements" }]
