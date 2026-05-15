@@ -7,3 +7,4 @@ import './validator-page.js';
 import './formulas-page.js';
 import './tasks-page.js';
 import './dynamic-text-page.js';
+import './globalvars-page.js';

@@ -14,14 +14,16 @@ body {
 /* Main layout */
 .formulas-main,
 .tasks-main,
-.dynamic-text-main {
+.dynamic-text-main,
+.globalvars-main {
     display: flex;
     flex-direction: column;
 }
 
 .formulas-section,
 .tasks-section,
-.dynamic-text-section {
+.dynamic-text-section,
+.globalvars-section {
     background: var(--surface-color);
     border-radius: 8px;
     box-shadow: var(--shadow);
@@ -33,7 +35,8 @@ body {
 /* Special section header for reference pages */
 .formulas-section .section-header,
 .tasks-section .section-header,
-.dynamic-text-section .section-header {
+.dynamic-text-section .section-header,
+.globalvars-section .section-header {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
@@ -49,7 +52,8 @@ body {
 
 .operator-count,
 .task-count,
-.tag-count {
+.tag-count,
+.globalvar-count {
     font-size: 0.9rem;
     color: var(--text-muted);
     font-weight: normal;
@@ -108,7 +112,8 @@ body {
 /* Controls */
 .formulas-controls,
 .tasks-controls,
-.dynamic-text-controls {
+.dynamic-text-controls,
+.globalvars-controls {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
@@ -135,7 +140,8 @@ body {
 /* Lists */
 .operators-list,
 .tasks-list,
-.tags-list {
+.tags-list,
+.globalvars-list {
     display: flex;
     flex-direction: column;
 }
@@ -143,7 +149,8 @@ body {
 /* Items (details elements) */
 .operator-item,
 .task-item,
-.tag-item {
+.tag-item,
+.globalvar-item {
     background: var(--code-bg);
     border: 1px solid var(--border-color);
     border-radius: 6px;
@@ -153,14 +160,16 @@ body {
 
 .operator-item:hover,
 .task-item:hover,
-.tag-item:hover {
+.tag-item:hover,
+.globalvar-item:hover {
     border-color: var(--primary-color);
     box-shadow: 0 2px 4px rgba(74, 144, 226, 0.1);
 }
 
 .operator-item[open],
 .task-item[open],
-.tag-item[open] {
+.tag-item[open],
+.globalvar-item[open] {
     background: var(--surface-color);
     border-color: var(--primary-color);
 }
@@ -168,7 +177,8 @@ body {
 /* Summaries */
 .operator-summary,
 .task-summary,
-.tag-summary {
+.tag-summary,
+.globalvar-summary {
     display: flex;
     align-items: flex-start;
     gap: 12px;
@@ -180,13 +190,15 @@ body {
 
 .operator-summary::-webkit-details-marker,
 .task-summary::-webkit-details-marker,
-.tag-summary::-webkit-details-marker {
+.tag-summary::-webkit-details-marker,
+.globalvar-summary::-webkit-details-marker {
     display: none;
 }
 
 .operator-summary::before,
 .task-summary::before,
-.tag-summary::before {
+.tag-summary::before,
+.globalvar-summary::before {
     content: '▶';
     color: var(--text-muted);
     font-size: 12px;
@@ -197,13 +209,15 @@ body {
 
 .operator-item[open] .operator-summary::before,
 .task-item[open] .task-summary::before,
-.tag-item[open] .tag-summary::before {
+.tag-item[open] .tag-summary::before,
+.globalvar-item[open] .globalvar-summary::before {
     transform: rotate(90deg);
 }
 
 .operator-name,
 .task-name,
-.tag-name {
+.tag-name,
+.globalvar-name {
     font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
     font-weight: 600;
     color: var(--primary-color);
@@ -213,7 +227,8 @@ body {
 
 .operator-brief,
 .task-brief,
-.tag-brief {
+.tag-brief,
+.globalvar-brief {
     color: var(--text-color);
     font-size: 14px;
     line-height: 1.5;
@@ -226,14 +241,16 @@ body {
 
 .operator-item[open] .operator-brief,
 .task-item[open] .task-brief,
-.tag-item[open] .tag-brief {
+.tag-item[open] .tag-brief,
+.globalvar-item[open] .globalvar-brief {
     display: none;
 }
 
 /* Details */
 .operator-details,
 .task-details,
-.tag-details {
+.tag-details,
+.globalvar-details {
     padding: 0 16px 16px 44px;
     border-top: 1px solid var(--border-color);
     margin-top: -6px;
@@ -242,7 +259,8 @@ body {
 
 .operator-header-row,
 .task-header-row,
-.tag-header-row {
+.tag-header-row,
+.globalvar-header-row {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -252,7 +270,8 @@ body {
 
 .operator-description,
 .task-description,
-.tag-description {
+.tag-description,
+.globalvar-description {
     color: var(--text-color);
     font-size: 14px;
     line-height: 1.6;
@@ -287,7 +306,8 @@ body {
 /* Arguments */
 .operator-arguments,
 .task-arguments,
-.tag-arguments {
+.tag-arguments,
+.globalvar-arguments {
     margin-top: 16px;
 }
 
@@ -342,7 +362,8 @@ body {
 /* Disclaimers */
 .operator-disclaimer,
 .task-disclaimer,
-.tag-disclaimer {
+.tag-disclaimer,
+.globalvar-disclaimer {
     margin-top: 16px;
     padding-top: 12px;
     border-top: 1px solid var(--border-color);
@@ -378,7 +399,8 @@ mark {
 /* Highlight effect for URL-linked items */
 .operator-highlight,
 .task-highlight,
-.tag-highlight {
+.tag-highlight,
+.globalvar-highlight {
     animation: reference-item-pulse 2s ease-in-out;
 }
 
@@ -399,20 +421,23 @@ mark {
 @media (max-width: 768px) {
     .operator-summary,
     .task-summary,
-    .tag-summary {
+    .tag-summary,
+    .globalvar-summary {
         flex-direction: column;
         gap: 8px;
     }
 
     .operator-name,
     .task-name,
-    .tag-name {
+    .tag-name,
+    .globalvar-name {
         min-width: auto;
     }
 
     .operator-details,
     .task-details,
-    .tag-details {
+    .tag-details,
+    .globalvar-details {
         padding-left: 28px;
     }
 }

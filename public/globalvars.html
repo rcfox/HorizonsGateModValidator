@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Horizon's Gate Formula Reference</title>
+    <title>Horizon's Gate Global Variable Reference</title>
     <link rel="stylesheet" href="shared-base.css" />
     <link rel="stylesheet" href="shared-reference.css" />
-    <link rel="stylesheet" href="formulas.css" />
+    <link rel="stylesheet" href="globalvars.css" />
   </head>
   <body>
     <div class="container">
       <header>
-        <h1>Horizon's Gate Formula Reference</h1>
+        <h1>Horizon's Gate Global Variable Reference</h1>
         <div class="header-actions">
           <div class="nav-menu">
             <button class="nav-menu-button">Menu</button>
@@ -24,22 +24,18 @@
               <a href="globalvars.html" class="nav-link">Global Variable Reference</a>
             </div>
           </div>
-          <button
-            id="themeToggle"
-            class="theme-toggle"
-            aria-label="Toggle theme"
-          >
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
             🌙
           </button>
         </div>
       </header>
 
-      <main class="formulas-main">
-        <div class="formulas-section">
+      <main class="globalvars-main">
+        <div class="globalvars-section">
           <div class="section-header">
-            <h2>Formula Operators</h2>
+            <h2>Global Variables</h2>
             <div id="gameVersion" class="game-version"></div>
-            <div id="operatorCount" class="operator-count"></div>
+            <div id="globalvarCount" class="globalvar-count"></div>
           </div>
 
           <div class="search-wrapper">
@@ -47,31 +43,29 @@
               type="text"
               id="searchInput"
               class="search-input"
-              placeholder="Search operators, descriptions, categories, or arguments..."
+              placeholder="Search names, descriptions, categories, or references..."
               autocomplete="off"
             />
-            <button
-              id="clearSearch"
-              class="clear-search"
-              aria-label="Clear search"
-            >
-              ×
-            </button>
+            <button id="clearSearch" class="clear-search" aria-label="Clear search">×</button>
           </div>
 
-          <div class="formulas-controls">
+          <div class="globalvars-controls">
+            <label class="filter-label">
+              Category:
+              <select id="categoryFilter" class="filter-select">
+                <option value="">All</option>
+              </select>
+            </label>
             <button id="expandAll" class="btn btn-secondary">Expand All</button>
-            <button id="collapseAll" class="btn btn-secondary">
-              Collapse All
-            </button>
+            <button id="collapseAll" class="btn btn-secondary">Collapse All</button>
             <label class="highlight-checkbox">
               <input type="checkbox" id="highlightToggle" checked />
               Highlight matches
             </label>
           </div>
 
-          <div id="operatorsList" class="operators-list">
-            <p class="placeholder">Loading operators...</p>
+          <div id="globalvarsList" class="globalvars-list">
+            <p class="placeholder">Loading global variables...</p>
           </div>
         </div>
       </main>
