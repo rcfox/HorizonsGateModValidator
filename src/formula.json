@@ -1996,7 +1996,7 @@
     {
       "name": "dMax",
       "category": "global-var",
-      "isFunctionStyle": true,
+      "isFunctionStyle": false,
       "delegatesTo": "d",
       "uses": [
         {
@@ -2021,7 +2021,7 @@
     {
       "name": "dMin",
       "category": "global-var",
-      "isFunctionStyle": true,
+      "isFunctionStyle": false,
       "delegatesTo": "d",
       "uses": [
         {
