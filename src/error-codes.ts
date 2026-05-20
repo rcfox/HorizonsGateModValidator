@@ -75,6 +75,8 @@ export const ValidationErrorCode = {
   TASK_MISSING_PARAM: 'TASK_MISSING_PARAM',
   TASK_MULTIPLE_USE_CASES: 'TASK_MULTIPLE_USE_CASES',
   TASK_IMPLICIT_FLOAT: 'TASK_IMPLICIT_FLOAT',
+  TASK_CONSOLE_COMMAND: 'TASK_CONSOLE_COMMAND',
+  TASK_DEPRECATED: 'TASK_DEPRECATED',
 
   // Formula validation
   FORMULA_PARSE_ERROR: 'FORMULA_PARSE_ERROR',
@@ -172,6 +174,8 @@ export type ErrorContext =
   | { errorCode: typeof C.TASK_MISSING_PARAM; errorCodeContext: { taskName: string; paramName: string } }
   | { errorCode: typeof C.TASK_MULTIPLE_USE_CASES; errorCodeContext: { taskName: string } }
   | { errorCode: typeof C.TASK_IMPLICIT_FLOAT; errorCodeContext: { propertyName: string } }
+  | { errorCode: typeof C.TASK_CONSOLE_COMMAND; errorCodeContext: { taskName: string } }
+  | { errorCode: typeof C.TASK_DEPRECATED; errorCodeContext: { taskName: string } }
 
   // ── Formula validation ─────────────────────────────────────────────────────
   | { errorCode: typeof C.FORMULA_PARSE_ERROR }

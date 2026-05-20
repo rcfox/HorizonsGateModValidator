@@ -180,6 +180,33 @@ export class TaskValidator {
       return messages; // Can't validate parameters without task metadata
     }
 
+    const taskNameLine = propInfo.valueStartLine + parsed.taskNamePosition.startLine;
+
+    if (task.consoleCommand) {
+      messages.push({
+        severity: 'warning',
+        message: `Task '${parsed.taskName}' is intended for the debugging console and may not work correctly in mods`,
+        filePath: propInfo.filePath,
+        line: taskNameLine,
+        taskReference: parsed.taskName,
+        errorCode: ValidationErrorCode.TASK_CONSOLE_COMMAND,
+        errorCodeContext: { taskName: parsed.taskName },
+      });
+    }
+
+    if (task.officialDescription && task.officialDescription.includes('DO NOT USE')) {
+      messages.push({
+        severity: 'warning',
+        message: `Task '${parsed.taskName}' is marked 'DO NOT USE' by the Horizon's Gate developer`,
+        filePath: propInfo.filePath,
+        line: taskNameLine,
+        context: task.officialDescription,
+        taskReference: parsed.taskName,
+        errorCode: ValidationErrorCode.TASK_DEPRECATED,
+        errorCodeContext: { taskName: parsed.taskName },
+      });
+    }
+
     // Validate parameter syntax
     for (let i = 0; i < parsed.parameters.length; i++) {
       const param = parsed.parameters[i]!;
