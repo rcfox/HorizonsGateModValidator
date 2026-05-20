@@ -189,7 +189,7 @@ describe('Task String Validation', () => {
       expectMessage(result, { text: 'Coordinate value', severity: 'error' });
     });
 
-    test('validates @R formula prefix (redundant with @F)', () => {
+    test('validates @R formula prefix (evaluates to float argument)', () => {
       const modContent = `[DialogNode] ID=testNode;
         specialEffect=preventInteraction,@Rc:HP>10;`;
 
@@ -269,6 +269,48 @@ describe('Task String Validation', () => {
 
       // Should have error for empty actor reference
       expectMessage(result, { text: '@XYA prefix requires non-empty value', severity: 'error' });
+    });
+
+    test('validates @XYT current-action-task tileCoord (no argument)', () => {
+      const modContent = `[DialogNode] ID=testNode;
+        specialEffect=applyElement,fire,@XYT;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+      expectValid(result);
+    });
+
+    test('validates @XYI item-id tileCoord', () => {
+      const modContent = `[DialogNode] ID=testNode;
+        specialEffect=applyElement,fire,@XYIitemID;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+      expectValid(result);
+    });
+
+    test('errors on empty @XYI item ID', () => {
+      const modContent = `[DialogNode] ID=testNode;
+        specialEffect=applyElement,fire,@XYI;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+
+      expectMessage(result, { text: '@XYI prefix requires non-empty value', severity: 'error' });
+    });
+
+    test('validates @XYL location-id tileCoord', () => {
+      const modContent = `[DialogNode] ID=testNode;
+        specialEffect=applyElement,fire,@XYLlocationID;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+      expectValid(result);
+    });
+
+    test('errors on empty @XYL location ID', () => {
+      const modContent = `[DialogNode] ID=testNode;
+        specialEffect=applyElement,fire,@XYL;`;
+
+      const result = validator.validate(modContent, 'test.txt');
+
+      expectMessage(result, { text: '@XYL prefix requires non-empty value', severity: 'error' });
     });
 
     test('validates @G global variable substitution alone', () => {

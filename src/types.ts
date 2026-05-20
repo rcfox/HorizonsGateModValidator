@@ -246,7 +246,12 @@ export type ParsedParameter =
   | WithPosition<{ type: 'string'; value: string; source: 'plain' | '@A' | '@S'; globalVarName?: string }>
   | WithPosition<{ type: 'float'; value: number; source: 'plain' }>
   | WithPosition<{ type: 'bool'; value: boolean; source: 'plain' }>
-  | WithPosition<{ type: 'tileCoord'; source: '@T' | '@XYA' | '@X' | '@Y'; value: string; globalVarName?: string }>
+  | WithPosition<{
+      type: 'tileCoord';
+      source: '@T' | '@XYA' | '@XYT' | '@XYI' | '@XYL' | '@X' | '@Y';
+      value: string;
+      globalVarName?: string;
+    }>
   | WithPosition<{ type: 'formula'; source: '@F' | '@R'; formula: string; globalVarName?: string }>
   | WithPosition<{ type: 'delay'; source: '@'; delayValue: number; globalVarName?: string }>
   | WithPosition<{ type: 'globalVarSubstitution'; source: '@G'; varName: string; originalParam: string }>;

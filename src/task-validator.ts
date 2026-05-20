@@ -371,6 +371,40 @@ export class TaskValidator {
         };
       }
 
+      // @XYT@Gvar → tileCoord (current action task TC) after substitution.
+      // @XYT ignores any trailing value, so the global var is effectively unused.
+      if (prefix === '@XYT') {
+        return {
+          type: 'tileCoord',
+          source: '@XYT',
+          value: '',
+          globalVarName: varName,
+          ...position,
+        };
+      }
+
+      // @XYI@Gvar → tileCoord (nearest item by ID) after substitution
+      if (prefix === '@XYI') {
+        return {
+          type: 'tileCoord',
+          source: '@XYI',
+          value: '', // Will be filled by @G substitution at runtime
+          globalVarName: varName,
+          ...position,
+        };
+      }
+
+      // @XYL@Gvar → tileCoord (location's xy) after substitution
+      if (prefix === '@XYL') {
+        return {
+          type: 'tileCoord',
+          source: '@XYL',
+          value: '', // Will be filled by @G substitution at runtime
+          globalVarName: varName,
+          ...position,
+        };
+      }
+
       // @X@Gvar → tileCoord (X coordinate) after substitution
       if (prefix === '@X') {
         return {
@@ -455,6 +489,36 @@ export class TaskValidator {
       return {
         type: 'tileCoord',
         source: '@XYA',
+        value: param.substring(4),
+        ...position,
+      };
+    }
+
+    // @XYT - Current action task TC (no argument; trailing text is ignored)
+    if (param.startsWith('@XYT')) {
+      return {
+        type: 'tileCoord',
+        source: '@XYT',
+        value: param.substring(4),
+        ...position,
+      };
+    }
+
+    // @XYI - Nearest item by item ID
+    if (param.startsWith('@XYI')) {
+      return {
+        type: 'tileCoord',
+        source: '@XYI',
+        value: param.substring(4),
+        ...position,
+      };
+    }
+
+    // @XYL - Location's xy by location ID
+    if (param.startsWith('@XYL')) {
+      return {
+        type: 'tileCoord',
+        source: '@XYL',
         value: param.substring(4),
         ...position,
       };
@@ -620,15 +684,26 @@ export class TaskValidator {
         break;
 
       case 'tileCoord':
-        if (parsed.source === '@T' || parsed.source === '@XYA') {
+        if (
+          parsed.source === '@T' ||
+          parsed.source === '@XYA' ||
+          parsed.source === '@XYI' ||
+          parsed.source === '@XYL'
+        ) {
           // Skip empty check if @G is present (value will be filled at runtime)
           if (!parsed.globalVarName && parsed.value.trim() === '') {
+            const contextBySource: Record<string, string> = {
+              '@T': 'Travel point ID cannot be empty',
+              '@XYA': 'Actor reference cannot be empty',
+              '@XYI': 'Item ID cannot be empty',
+              '@XYL': 'Location ID cannot be empty',
+            };
             messages.push({
               severity: 'error',
               message: `${parsed.source} prefix requires non-empty value`,
               filePath: propInfo.filePath,
               line: absoluteLine,
-              context: parsed.source === '@T' ? 'Travel point ID cannot be empty' : 'Actor reference cannot be empty',
+              context: contextBySource[parsed.source]!,
               errorCode: ValidationErrorCode.EMPTY_TILE_COORD_PARAM,
               errorCodeContext: { source: parsed.source },
             });
@@ -974,14 +1049,20 @@ export class TaskValidator {
           destinations.bools++;
           break;
         case 'tileCoord':
-          // Only count @Y, @T, and @XYA as they actually add TileCoords
+          // Only count @Y, @T, @XYA, @XYT, @XYI, @XYL as they actually add TileCoords
           // @X only sets the x coordinate and doesn't add a TileCoord until @Y
           if (param.source !== '@X') {
             destinations.tileCoords++;
           }
           break;
         case 'formula':
-          destinations.hasFormula = true;
+          // @F sets fReq (a Formula object on the Task); @R evaluates the formula
+          // at runtime and appends the resulting float to the floats array.
+          if (param.source === '@R') {
+            destinations.floats++;
+          } else {
+            destinations.hasFormula = true;
+          }
           break;
         case 'delay':
           destinations.hasDelay = true;
