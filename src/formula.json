@@ -3323,7 +3323,7 @@
       "aliases": []
     },
     {
-      "name": "data",
+      "name": "d",
       "isFunctionStyle": false,
       "uses": [
         {
@@ -3339,9 +3339,29 @@
             }
           ],
           "context": ["caster", "target", "rank", "targetTC"]
+        },
+        {
+          "description": "Evaluates a named global formula, passing a value as its x parameter. The parameter may be an integer literal, the identifier 'x' (to forward the current x), or a formula expression.",
+          "returns": "float",
+          "example": "d:scalingDmg(5)",
+          "arguments": [
+            {
+              "name": "formulaId",
+              "type": "string",
+              "description": "Identifier of an entry in the formulaGlobals data table whose formula is evaluated with the current caster, target, rank, x, and targetTC.",
+              "optional": false
+            },
+            {
+              "name": "x",
+              "type": "float",
+              "description": "Value passed as the x parameter to the evaluated global formula.",
+              "optional": false
+            }
+          ],
+          "context": ["caster", "target", "rank", "targetTC"]
         }
       ],
-      "aliases": ["Data", "d", "D"]
+      "aliases": ["Data", "data", "D"]
     },
     {
       "name": "dMin0",
@@ -3362,7 +3382,8 @@
           "context": ["caster", "target", "rank", "targetTC"]
         }
       ],
-      "aliases": ["DMin0"]
+      "aliases": ["DMin0"],
+      "delegatesTo": "d"
     },
     {
       "name": "dMax0",
@@ -3383,7 +3404,8 @@
           "context": ["caster", "target", "rank", "targetTC"]
         }
       ],
-      "aliases": ["DMax0"]
+      "aliases": ["DMax0"],
+      "delegatesTo": "d"
     },
     {
       "name": "dMax1",
@@ -3404,7 +3426,8 @@
           "context": ["caster", "target", "rank", "targetTC"]
         }
       ],
-      "aliases": ["DMax1"]
+      "aliases": ["DMax1"],
+      "delegatesTo": "d"
     },
     {
       "name": "dMaxNeg1",
@@ -3425,7 +3448,8 @@
           "context": ["caster", "target", "rank", "targetTC"]
         }
       ],
-      "aliases": ["DMaxNeg1"]
+      "aliases": ["DMaxNeg1"],
+      "delegatesTo": "d"
     },
     {
       "name": "dMax",
@@ -3452,7 +3476,8 @@
           "context": ["caster", "target", "rank", "targetTC"]
         }
       ],
-      "aliases": []
+      "aliases": [],
+      "delegatesTo": "d"
     },
     {
       "name": "dMin",
@@ -3479,7 +3504,8 @@
           "context": ["caster", "target", "rank", "targetTC"]
         }
       ],
-      "aliases": []
+      "aliases": [],
+      "delegatesTo": "d"
     },
     {
       "name": "dsa",
@@ -3506,7 +3532,8 @@
           "context": ["caster", "target", "rank", "targetTC"]
         }
       ],
-      "aliases": []
+      "aliases": [],
+      "delegatesTo": "d"
     },
     {
       "name": "m",
@@ -3521,6 +3548,26 @@
               "name": "mathOperator",
               "type": "string",
               "description": "Name of a math sub-operator to dispatch to. See the m: prefixed entries for the full list of available math operators.",
+              "optional": false
+            }
+          ],
+          "context": ["caster", "target", "rank", "targetTC"]
+        },
+        {
+          "description": "Dispatches to a math sub-operator, passing a value to it. The parameter may be an integer literal or a formula expression.",
+          "returns": "float",
+          "example": "m:rand(100)",
+          "arguments": [
+            {
+              "name": "mathOperator",
+              "type": "string",
+              "description": "Name of a math sub-operator to dispatch to. See the m: prefixed entries for the full list of available math operators.",
+              "optional": false
+            },
+            {
+              "name": "parameter",
+              "type": "float",
+              "description": "Value passed to the math sub-operator.",
               "optional": false
             }
           ],
@@ -3548,7 +3595,8 @@
           "context": ["caster", "target", "rank", "targetTC"]
         }
       ],
-      "aliases": []
+      "aliases": [],
+      "delegatesTo": "m"
     },
     {
       "name": "mathMin0",
@@ -3569,7 +3617,8 @@
           "context": ["caster", "target", "rank", "targetTC"]
         }
       ],
-      "aliases": ["MathMin0", "mMin0", "MMin0"]
+      "aliases": ["MathMin0", "mMin0", "MMin0"],
+      "delegatesTo": "m"
     },
     {
       "name": "ERxn",

@@ -33,11 +33,22 @@ An operator is "function-style" (`"isFunctionStyle": true`) if it takes no colon
 
 Operators invoked via `evaluateMath` should be recorded with the `m:` prefix in their name (e.g., `m:evasionFacing`). The `m`, `M`, `Math`, `math` case labels are the dispatch mechanism and should not be recorded as separate operators. However, `mIs0` and `mMin0` (and their aliases) should be recorded as separate operators since they apply additional logic around the evaluateMath call.
 
+## Delegation
+
+Some operators are thin wrappers around `evaluateGlobalFormula` or `evaluateMath`: they pass `array[1]` straight through to one of those functions, usually applying a clamp or comparison to the result. Capture this relationship with a top-level `"delegatesTo"` field on the operator entry (alongside `name`, `isFunctionStyle`, `uses`, `aliases`):
+
+- If the case body calls `evaluateGlobalFormula(array[1], ...)`, set `"delegatesTo": "d"`.
+- If the case body calls `evaluateMath(array[1], ...)`, set `"delegatesTo": "m"`.
+
+The dispatch roots `d` and `m` themselves do NOT get a `delegatesTo` field — they are the delegation targets, not delegators. Operators that do not delegate to either should omit the field entirely.
+
 ## Aliases
 
 Do not create a new entry for each alias. If two case labels fall through to share code with no conditional behavior on the operator name, treat them as aliases.
 
 Keep the longest name as the canonical name, and add the others to the entry's `"aliases"` array. In the event of a tie, choose one that uses camelcasing, and failing that, just find the lexicographical first.
+
+**Exception for the `d` and `m` dispatch families.** Operators in these families use the shorter spelling as canonical, with the longer spellings as aliases: prefer `d` over `data`, `m` over `math`, `mMin0` over `mathMin0`, and so on for any wrappers around `evaluateGlobalFormula` / `evaluateMath`. The validator's parser hardcodes the short forms when recognizing the dispatch family.
 
 If there are no aliases, set `"aliases": []`.
 
@@ -50,6 +61,8 @@ Some of the operators' case statements are clustered together, sharing common co
 If an operator has multiple distinct behaviors depending on its arguments or context, create separate use entries. When different code paths produce meaningfully different results, split them into separate uses.
 
 When in doubt, prefer splitting behavior into separate uses rather than combining them. It is acceptable to create redundant or overlapping uses; it is not acceptable to merge distinct behaviors into one.
+
+**Parameterized form for `d` and `m`.** Inside `evaluateGlobalFormula` and `evaluateMath`, the body checks `if (s.Contains('('))` and parses a parenthesized parameter on `array[1]` (an int literal, the identifier `x`, or a sub-formula). This is a distinct behavior from the bare form and must be recorded as a separate use case on `d` and `m` — one with just `[formulaId]` / `[mathOperator]`, and a second with that argument followed by a `float`-typed parameter. Delegators (`dMin0`, `mathMin0`, etc.) inherit the parameterized form through their `delegatesTo` link, so do NOT give them duplicate parameterized use cases of their own.
 
 ## Required vs optional arguments
 
