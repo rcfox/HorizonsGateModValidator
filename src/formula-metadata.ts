@@ -9,6 +9,7 @@ export interface FormulaArgument {
   name: string;
   type: string;
   description: string;
+  optional?: boolean;
 }
 
 export interface FormulaUse {

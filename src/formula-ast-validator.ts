@@ -153,11 +153,14 @@ function validateFunctionCall(node: FunctionCallNode, path: string, allowXParame
     });
   }
 
-  // Find use cases that match the provided argument count
+  // Find use cases that match the provided argument count.
+  // Optional arguments (arg.optional === true) make the count a range: required..total.
   const providedArgs = node.args.length + (node.body ? 1 : 0);
   const matchingUses = operator.uses.filter(use => {
-    const expectedArgCount = use.arguments?.length || 0;
-    return expectedArgCount === providedArgs;
+    const args = use.arguments ?? [];
+    const requiredCount = args.filter(a => !a.optional).length;
+    const totalCount = args.length;
+    return providedArgs >= requiredCount && providedArgs <= totalCount;
   });
 
   // If no use cases match the argument count, report an error
@@ -168,7 +171,8 @@ function validateFunctionCall(node: FunctionCallNode, path: string, allowXParame
       if (args.length === 0) {
         return `${node.name.value} (no arguments)`;
       }
-      return `${node.name.value}:${args.map(a => a.name).join(':')}`;
+      const parts = args.map(a => (a.optional ? `[:${a.name}]` : `:${a.name}`)).join('');
+      return `${node.name.value}${parts}`;
     });
 
     errors.push({
