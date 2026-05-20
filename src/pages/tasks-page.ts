@@ -12,10 +12,12 @@ import {
   querySelectorAllAs,
   convertTaskParamToFriendlyName,
 } from './shared-utils.js';
-import type { TasksData, TaskMetadata } from '../types.js';
+import type { TasksData, TaskMetadata, TaskUseCase } from '../types.js';
 import rawTasksData from '../tasks.json';
+import rawTasksDataPrev from '../tasks_prev.json';
 
 const tasksData = rawTasksData as TasksData;
+const tasksDataPrev = rawTasksDataPrev as TasksData;
 
 // Convert task data to use friendly names
 function convertTaskData(tasks: TaskMetadata[]): TaskMetadata[] {
@@ -34,6 +36,26 @@ function convertTaskData(tasks: TaskMetadata[]): TaskMetadata[] {
       })),
     })),
   }));
+}
+
+const convertedPrevTasks = convertTaskData(tasksDataPrev.tasks);
+const prevTaskByAlias = new Map<string, TaskMetadata>();
+for (const task of convertedPrevTasks) {
+  prevTaskByAlias.set(task.name.toLowerCase(), task);
+  if (task.aliases) {
+    for (const alias of task.aliases) {
+      prevTaskByAlias.set(alias.toLowerCase(), task);
+    }
+  }
+}
+
+function findPrevTask(task: TaskMetadata): TaskMetadata | undefined {
+  const candidates = [task.name, ...(task.aliases ?? [])];
+  for (const id of candidates) {
+    const prev = prevTaskByAlias.get(id.toLowerCase());
+    if (prev) return prev;
+  }
+  return undefined;
 }
 
 export function initTasksApp(): void {
@@ -64,6 +86,9 @@ export function initTasksApp(): void {
 
   // Setup copy buttons
   setupCopyButtons('#tasksList');
+
+  // Setup version tabs (event delegation, survives re-renders)
+  setupVersionTabs();
 
   // Initial render
   renderTasks(filteredTasks, search.highlightMatch);
@@ -114,6 +139,9 @@ export function initTasksApp(): void {
     // Search aliases
     if (task.aliases && task.aliases.some(a => a.toLowerCase().includes(term))) return true;
 
+    // Search official description
+    if (task.officialDescription && task.officialDescription.toLowerCase().includes(term)) return true;
+
     // Search within use cases
     return task.uses.some(useCase => {
       if (useCase.description.toLowerCase().includes(term)) return true;
@@ -162,47 +190,12 @@ export function initTasksApp(): void {
     });
   }
 
-  function renderTask(task: TaskMetadata, highlight: (text: string) => string): string {
-    const taskUrl = `${window.location.origin}${window.location.pathname}?task=${encodeURIComponent(task.name)}`;
-    const issueTitle = encodeURIComponent(`[Task Documentation] Issue with "${task.name}" task`);
-    const issueBody = encodeURIComponent(
-      `**Task Name:** \`${task.name}\`\n\n**Issue Description:**\n<!-- Describe what's wrong or unclear about this task's documentation -->\n\n\n**Expected:**\n<!-- What should the documentation say? -->\n\n\n<!-- Please provide as much detail as possible -->`
-    );
-    const issueUrl = `https://github.com/rcfox/HorizonsGateModValidator/issues/new?title=${issueTitle}&body=${issueBody}`;
-    const hasAliases = task.aliases && task.aliases.length > 0;
+  function renderUseCaseBody(useCase: TaskUseCase, highlight: (text: string) => string): string {
+    const hasRequired = useCase.required && useCase.required.length > 0;
+    const hasOptional = useCase.optional && useCase.optional.length > 0;
 
-    return task.uses
-      .map((useCase, useIndex) => {
-        const taskKey = `${task.name}-use-${useIndex}`;
-        const hasRequired = useCase.required && useCase.required.length > 0;
-        const hasOptional = useCase.optional && useCase.optional.length > 0;
-
-        return `
-      <details class="task-item" data-task-name="${task.name}" data-task-key="${taskKey}">
-        <summary class="task-summary">
-          <span class="task-name">${highlight(task.name)}</span>
-          <span class="task-brief">${highlight(useCase.description)}</span>
-        </summary>
-        <div class="task-details">
-          <div class="task-header-row">
-            <div class="task-description">${highlight(useCase.description)}</div>
-            <button class="copy-name-btn" data-name="${task.name}" title="Copy name">📋</button>
-            <button class="copy-link-btn" data-url="${taskUrl}" title="Copy link to this task">🔗</button>
-          </div>
-
-          ${
-            hasAliases
-              ? `
-          <div class="task-info-sections">
-            <div class="info-section">
-              <h4 class="info-header">Aliases</h4>
-              <div class="info-content">
-                <code class="info-code">${task.aliases.map(a => highlight(a)).join(', ')}</code>
-              </div>
-            </div>
-          </div>`
-              : ''
-          }
+    return `
+          <div class="task-description">${highlight(useCase.description)}</div>
 
           ${
             hasRequired
@@ -244,7 +237,95 @@ export function initTasksApp(): void {
               : ''
           }
 
-          ${!hasRequired && !hasOptional ? '<p class="no-arguments">No arguments</p>' : ''}
+          ${!hasRequired && !hasOptional ? '<p class="no-arguments">No arguments</p>' : ''}`;
+  }
+
+  function renderTask(task: TaskMetadata, highlight: (text: string) => string): string {
+    const taskUrl = `${window.location.origin}${window.location.pathname}?task=${encodeURIComponent(task.name)}`;
+    const issueTitle = encodeURIComponent(`[Task Documentation] Issue with "${task.name}" task`);
+    const issueBody = encodeURIComponent(
+      `**Task Name:** \`${task.name}\`\n\n**Issue Description:**\n<!-- Describe what's wrong or unclear about this task's documentation -->\n\n\n**Expected:**\n<!-- What should the documentation say? -->\n\n\n<!-- Please provide as much detail as possible -->`
+    );
+    const issueUrl = `https://github.com/rcfox/HorizonsGateModValidator/issues/new?title=${issueTitle}&body=${issueBody}`;
+    const hasAliases = task.aliases && task.aliases.length > 0;
+    const isDoNotUse = task.officialDescription?.includes('DO NOT USE') ?? false;
+    const prevTask = findPrevTask(task);
+
+    const nameIcons = `${
+      task.consoleCommand
+        ? '<span class="task-name-icon task-icon-console" title="Console Command" aria-label="Console Command">🖥️</span>'
+        : ''
+    }${
+      isDoNotUse
+        ? '<span class="task-name-icon task-icon-warning" title="Do not use" aria-label="Do not use">❌</span>'
+        : ''
+    }`;
+
+    return task.uses
+      .map((useCase, useIndex) => {
+        const taskKey = `${task.name}-use-${useIndex}`;
+
+        const currentBody = `
+          ${renderUseCaseBody(useCase, highlight)}
+
+          ${
+            task.officialDescription
+              ? `
+          <div class="task-official-description">
+            <h4 class="info-header">Official Description</h4>
+            <div class="info-content">${highlight(task.officialDescription)}</div>
+          </div>`
+              : ''
+          }`;
+
+        const prevBody = prevTask
+          ? prevTask.uses.map(u => renderUseCaseBody(u, highlight)).join('<hr class="version-use-separator" />')
+          : '';
+
+        return `
+      <details class="task-item" data-task-name="${task.name}" data-task-key="${taskKey}">
+        <summary class="task-summary">
+          <span class="task-name">${highlight(task.name)}${nameIcons}</span>
+          <span class="task-brief">${highlight(useCase.description)}</span>
+        </summary>
+        <div class="task-details">
+          <div class="task-header-row">
+            ${
+              prevTask
+                ? `<div class="version-tabs" role="tablist">
+                    <button type="button" class="version-tab active" data-version="current" role="tab">v${tasksData.gameVersion}</button>
+                    <button type="button" class="version-tab" data-version="prev" role="tab">v${tasksDataPrev.gameVersion}</button>
+                  </div>`
+                : '<div class="version-tabs-spacer"></div>'
+            }
+            <button class="copy-name-btn" data-name="${task.name}" title="Copy name">📋</button>
+            <button class="copy-link-btn" data-url="${taskUrl}" title="Copy link to this task">🔗</button>
+          </div>
+
+          ${
+            hasAliases
+              ? `
+          <div class="task-info-sections">
+            <div class="info-section">
+              <h4 class="info-header">Aliases</h4>
+              <div class="info-content">
+                <code class="info-code">${task.aliases.map(a => highlight(a)).join(', ')}</code>
+              </div>
+            </div>
+          </div>`
+              : ''
+          }
+
+          <div class="version-content active" data-version="current">
+            ${currentBody}
+          </div>
+          ${
+            prevTask
+              ? `<div class="version-content" data-version="prev">
+                  ${prevBody}
+                </div>`
+              : ''
+          }
 
           <div class="task-disclaimer">
             Due to the number of tasks, these descriptions were initially generated using AI. Report any mistakes here: <a href="${issueUrl}" target="_blank" class="disclaimer-report-link">Report Issue</a>
@@ -253,6 +334,25 @@ export function initTasksApp(): void {
       </details>`;
       })
       .join('');
+  }
+
+  function setupVersionTabs(): void {
+    const tasksList = getElementById('tasksList');
+    tasksList.addEventListener('click', e => {
+      const target = e.target;
+      if (!(target instanceof HTMLElement)) return;
+      const tab = target.closest('.version-tab');
+      if (!tab) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const details = tab.closest('.task-details');
+      if (!details) return;
+      const version = tab.getAttribute('data-version');
+      details.querySelectorAll('.version-tab').forEach(t => t.classList.toggle('active', t === tab));
+      details
+        .querySelectorAll('.version-content')
+        .forEach(c => c.classList.toggle('active', c.getAttribute('data-version') === version));
+    });
   }
 
   function updateCount(showing: number, total: number): void {

@@ -44,3 +44,41 @@
     display: inline-block;
     align-self: flex-start;
 }
+
+/* Task name inline icons (console command, do-not-use) */
+.task-name-icon {
+    display: inline-block;
+    margin-left: 6px;
+    font-size: 13px;
+    cursor: help;
+    vertical-align: baseline;
+}
+
+.task-icon-warning {
+    filter: saturate(1.2);
+}
+
+/* Official description block */
+.task-official-description {
+    margin-top: 16px;
+    padding: 10px 12px;
+    background: var(--code-bg);
+    border-left: 3px solid var(--text-muted);
+    border-radius: 4px;
+}
+
+.task-official-description .info-header {
+    margin: 0 0 6px 0;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+}
+
+.task-official-description .info-content {
+    font-size: 13px;
+    color: var(--text-color);
+    line-height: 1.5;
+    font-style: italic;
+}

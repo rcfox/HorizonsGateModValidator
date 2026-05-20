@@ -383,6 +383,60 @@ body {
     text-decoration: underline;
 }
 
+/* Version tabs (current vs previous game version) */
+.version-tabs {
+    display: flex;
+    gap: 2px;
+    flex: 1;
+    align-items: flex-end;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.version-tabs-spacer {
+    flex: 1;
+}
+
+.version-tab {
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: -1px;
+}
+
+.version-tab:hover {
+    color: var(--text-color);
+    background: var(--code-bg);
+}
+
+.version-tab.active {
+    color: var(--primary-color);
+    background: var(--surface-color);
+    border-color: var(--border-color);
+    border-bottom-color: var(--surface-color);
+    font-weight: 600;
+}
+
+.version-content {
+    display: none;
+}
+
+.version-content.active {
+    display: block;
+}
+
+.version-use-separator {
+    border: none;
+    border-top: 1px dashed var(--border-color);
+    margin: 16px 0;
+}
+
 /* Highlight matches */
 mark {
     background-color: rgba(250, 173, 20, 0.3);

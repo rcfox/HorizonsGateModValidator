@@ -219,6 +219,8 @@ export interface TaskUseCase {
  */
 export interface TaskMetadata {
   name: string;
+  officialDescription: string | null;
+  consoleCommand?: boolean;
   uses: TaskUseCase[];
   aliases: string[];
 }
