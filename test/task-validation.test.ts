@@ -8,7 +8,7 @@ describe('Task String Validation', () => {
   describe('DialogNode.specialEffect validation', () => {
     test('accepts valid task names', () => {
       const modContent = `[DialogNode] ID=testNode;
-        specialEffect=abil;`;
+        specialEffect=preventInteraction;`;
 
       const result = validator.validate(modContent, 'test.txt');
       expectValid(result);
@@ -64,7 +64,7 @@ describe('Task String Validation', () => {
     test('validates as task string when actorValue = "task"', () => {
       const modContent = `[ActorValueAffecter] ID=test;
         actorValue=task;
-        magnitude=abil;`;
+        magnitude=preventInteraction;`;
 
       const result = validator.validate(modContent, 'test.txt');
       expectValid(result);
@@ -95,7 +95,7 @@ describe('Task String Validation', () => {
     test('validates as task string when actorValue = "trigger"', () => {
       const modContent = `[ActorValueAffecter] ID=test;
         actorValue=trigger;
-        magnitude=abil;`;
+        magnitude=preventInteraction;`;
 
       const result = validator.validate(modContent, 'test.txt');
       expectValid(result);
@@ -127,7 +127,7 @@ describe('Task String Validation', () => {
   describe('@-prefix parameter validation', () => {
     test('validates @F formula prefix', () => {
       const modContent = `[DialogNode] ID=testNode;
-        specialEffect=test,@Fc:HP>10;`;
+        specialEffect=preventInteraction,@Fc:HP>10;`;
 
       const result = validator.validate(modContent, 'test.txt');
       expectValid(result);
@@ -191,7 +191,7 @@ describe('Task String Validation', () => {
 
     test('validates @R formula prefix (redundant with @F)', () => {
       const modContent = `[DialogNode] ID=testNode;
-        specialEffect=test,@Rc:HP>10;`;
+        specialEffect=preventInteraction,@Rc:HP>10;`;
 
       const result = validator.validate(modContent, 'test.txt');
       expectValid(result);
@@ -281,7 +281,7 @@ describe('Task String Validation', () => {
 
     test('validates @R@G formula with global variable', () => {
       const modContent = `[DialogNode] ID=testNode;
-        specialEffect=test,@R@GformulaVar;`;
+        specialEffect=preventInteraction,@R@GformulaVar;`;
 
       const result = validator.validate(modContent, 'test.txt');
       expectValid(result);
@@ -345,7 +345,7 @@ describe('Task String Validation', () => {
 
     test('infers float parameters', () => {
       const modContent = `[DialogNode] ID=testNode;
-        specialEffect=abil,1.5;`;
+        specialEffect=preventInteraction,1.5;`;
 
       const result = validator.validate(modContent, 'test.txt');
       expectValid(result);
@@ -397,9 +397,9 @@ describe('Task String Validation', () => {
 
   describe('Implicit float 0 in DialogNode/DialogOption.specialEffect', () => {
     test('accepts task without float when implicit float satisfies requirement', () => {
-      // 'delayActions' requires floats[0], but DialogNode.specialEffect provides implicit 0
+      // 'delayDialog' requires floats[0], but DialogNode.specialEffect provides implicit 0
       const modContent = `[DialogNode] ID=testNode;
-        specialEffect=delayActions;`;
+        specialEffect=delayDialog;`;
 
       const result = validator.validate(modContent, 'test.txt');
       expect(result.errors).toHaveLength(0);
@@ -409,7 +409,7 @@ describe('Task String Validation', () => {
     test('works with DialogOption as well', () => {
       // Test that DialogOption also gets implicit float 0
       const modContent = `[DialogOption] ID=testOption;
-        specialEffect=delayActions;`;
+        specialEffect=delayDialog;`;
 
       const result = validator.validate(modContent, 'test.txt');
 
@@ -421,7 +421,7 @@ describe('Task String Validation', () => {
     test('works with DialogNodeOverride as well', () => {
       // Test that DialogNodeOverride also gets implicit float 0
       const modContent = `[DialogNodeOverride] ID=testOverride;
-        specialEffect=delayActions;`;
+        specialEffect=delayDialog;`;
 
       const result = validator.validate(modContent, 'test.txt');
 
@@ -444,20 +444,20 @@ describe('Task String Validation', () => {
       // ActorValueAffecter.magnitude should NOT get implicit float
       const modContent = `[ActorValueAffecter] ID=test;
         actorValue=task;
-        magnitude=delayActions;`;
+        magnitude=delayDialog;`;
 
       const result = validator.validate(modContent, 'test.txt');
 
-      // Should error because delayActions requires a float and no implicit one is provided
+      // Should error because delayDialog requires a float and no implicit one is provided
       expectMessage(result, { text: "is missing required parameter floats[0]", severity: 'error' });
     });
 
     test('does not warn about too many when implicit float causes excess', () => {
-      // 'abil' has optional floats[0], so max is 1
+      // 'preventInteraction' has optional floats[0], so max is 1
       // Providing 1 float explicitly, implicit adds another = 2 total
       // Should NOT warn about too many since we're within range without the implicit
       const modContent = `[DialogNode] ID=testNode;
-        specialEffect=abil,1;`;
+        specialEffect=preventInteraction,1;`;
 
       const result = validator.validate(modContent, 'test.txt');
 
