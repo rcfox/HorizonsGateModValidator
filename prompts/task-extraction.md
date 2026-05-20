@@ -50,7 +50,7 @@ Descriptions should describe behaviour, not implementation. The audience is game
 
 Official descriptions can be found in Data.cs by looking for `taskDescriptions.Add(Task.TaskType.{taskName}, "...")`. Copy them verbatim to the `officialDescription` field for the task.
 
-Alternatively, an official description may be found in a `consoleCommandDescriptions.Add(Task.TaskType.{taskName}, "...")` line. Copy this as the `officialDescription` and set `"consoleCommand": true`.
+Alternatively, an official description may be found in a `consoleCommandDescriptions.Add("{taskName}", "...")` line. Copy this as the `officialDescription` and set `"consoleCommand": true`.
 
 Sequencing: extract every `uses[].description` and input description from the code **before** reading the official description for the task. Once the official text has been read, do not edit or re-word any `uses[].description` based on it. The official descriptions use a different vocabulary (`sValue`, `fValue`, `b1`) and will contaminate your input naming if mirrored.
 
