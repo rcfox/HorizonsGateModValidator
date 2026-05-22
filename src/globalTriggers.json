@@ -1,0 +1,2399 @@
+[
+  {
+    "name": "autosave",
+    "summary": "Saves the current game state to disk via the autosave path (or to a uniquely-named save when sValue is supplied).",
+    "whenFired": "No engine call site fires this directly; it only runs when invoked by another trigger's 'trigger' task effect or by a dialog effect that names 'autosave'.",
+    "firedBy": ["Other triggers via the 'trigger' task effect", "Dialog effects"],
+    "effects": [
+      {
+        "effectID": "save",
+        "description": "Calls DataManager.autosave with ignoreHardcoreMode=true because sValue is empty; if sValue were set, it would instead write to a save file of that name, appending '+' until the name is unique."
+      }
+    ]
+  },
+  {
+    "name": "tEnterCombat",
+    "summary": "Extension hook fired the moment combat mode begins; ships with no built-in effects, leaving the slot open for mods to attach behaviour.",
+    "whenFired": "Fired once when the engine transitions into combat mode for the current zone; the actor that initiated combat is supplied as the actor source.",
+    "firedBy": [
+      "Engine: ZoneManager dispatches it as combat mode begins (ZoneManager.cs:3272)",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "effects": [],
+    "notes": "Has no triggerEffects from loadGlobalTriggers; modders add behaviour by attaching GlobalTriggerEffect rows or by referencing it from other triggers/dialog effects."
+  },
+  {
+    "name": "tExitCombat",
+    "summary": "Extension hook fired the moment combat mode ends; ships with no built-in effects, leaving the slot open for mods to attach behaviour.",
+    "whenFired": "Fired once when the engine transitions out of combat mode back to travel; the player actor is supplied as the actor source.",
+    "firedBy": [
+      "Engine: ZoneManager dispatches it as combat mode ends (ZoneManager.cs:3621)",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "effects": [],
+    "notes": "Has no triggerEffects from loadGlobalTriggers; modders add behaviour by attaching GlobalTriggerEffect rows or by referencing it from other triggers/dialog effects."
+  },
+  {
+    "name": "tKill",
+    "summary": "Extension hook fired whenever an actor is killed; ships with no built-in effects.",
+    "whenFired": "Fires from the actor-death code path when an actor dies, subject to the trigger's formula gate.",
+    "firedBy": [
+      "Engine: Actor death handling (Actor.cs:6519)",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "effects": [],
+    "notes": "Has no triggerEffects from loadGlobalTriggers; the engine only fires it when checkIfCanTrigger is true, so this slot is intended to be filled by mods via GlobalTriggerEffect rows or by referencing it from other triggers/dialog effects."
+  },
+  {
+    "name": "tEnterBoardingZone",
+    "summary": "Plays the short blackout transition when entering a ship boarding zone and clones in the win/lose end-of-boarding triggers for the new combat.",
+    "whenFired": "Fired by the engine the moment the player enters a boarding-style sub-zone created for ship-vs-ship combat.",
+    "firedBy": ["Engine: ZoneManager.moveToBoardingZone (ZoneManager.cs:2110)"],
+    "flags": { "triggerImmediatelyOnEnteringZone": true, "disableOnZoneEntry": false },
+    "effects": [
+      {
+        "effectID": "fx",
+        "sValue": "blackenScreen_shorter",
+        "description": "Queues the 'blackenScreen_shorter' camera FX, a brief screen blackout used as the boarding-zone transition wipe."
+      },
+      {
+        "effectID": "addTrigger",
+        "sValue": "tEndBoarding_combatWon",
+        "delay": 0.3,
+        "description": "After a 0.3s delay, clones the global trigger named in sValue into the current zone (tEndBoarding_combatWon) so ending combat in victory will fire it and return the player out of the boarding zone."
+      },
+      {
+        "effectID": "addTrigger",
+        "sValue": "tEndBoarding_combatLost",
+        "delay": 0.3,
+        "description": "After a 0.3s delay, clones the global trigger named in sValue into the current zone (tEndBoarding_combatLost) so losing combat will fire it and return the player out of the boarding zone."
+      }
+    ]
+  },
+  {
+    "name": "tBoardingZoneCombat",
+    "summary": "Forces a boarding-zone into combat mode and schedules the 'endBoarding_act' action as an act-timer that fires after a configurable duration.",
+    "whenFired": "No engine call site fires this directly; ZoneManager.setupBoardingZone (ZoneManager.cs:2016) overwrites its fValue with the runtime boardingTime before something else (typically another trigger or dialog effect) invokes it.",
+    "firedBy": ["Other triggers via the 'trigger' task effect", "Dialog effects"],
+    "effects": [
+      {
+        "effectID": "enterCombat_timer",
+        "sValue": "endBoarding_act",
+        "fValue": 80,
+        "xValue": 1,
+        "yValue": 1,
+        "delay": 0.1,
+        "description": "After a 0.1s delay, force-enters combat mode centred on tile (1,1) with a 999-tile battlefield radius, then queues an act-timer that will execute the 'endBoarding_act' action at tile (1,1) after fValue seconds (default 80, but overwritten at runtime - see notes)."
+      }
+    ],
+    "notes": "ZoneManager.cs:2016 reassigns triggerEffects[0].fValue to boardingTime at runtime; the 80f recorded here is only the static default from loadGlobalTriggers and not the value used at play time."
+  },
+  {
+    "name": "tEndBoarding",
+    "summary": "Ends the active boarding sub-zone, unwinding it and restoring the parent zone.",
+    "whenFired": "No engine call site fires this directly; it only runs when invoked by another trigger or dialog effect.",
+    "firedBy": ["Other triggers via the 'trigger' task effect", "Dialog effects"],
+    "effects": [
+      {
+        "effectID": "endBoarding",
+        "description": "Calls ZoneManager.returnFromBoardingZone() with no zone override, unwinding the current boarding zone and restoring the parent zone."
+      }
+    ]
+  },
+  {
+    "name": "tEndBoarding_combatWon",
+    "summary": "Ends the active boarding sub-zone when its combat is won, restoring the parent zone.",
+    "whenFired": "Fires when the Element.combatWon event is raised on the containing zone (the combat-end victory path). Auto-installed into the boarding zone by tEnterBoardingZone's 'addTrigger' effect.",
+    "firedBy": [
+      "The 'addTrigger' effect in tEnterBoardingZone clones this trigger into the current zone",
+      "Element-driven: raised when combat ends in victory"
+    ],
+    "triggeredByElement": ["combatWon"],
+    "flags": { "disableOnZoneEntry": false },
+    "effects": [
+      {
+        "effectID": "endBoarding",
+        "description": "Calls ZoneManager.returnFromBoardingZone() with no zone override, unwinding the current boarding zone and restoring the parent zone."
+      }
+    ],
+    "notes": "The loader also explicitly sets triggerImmediatelyOnEnteringZone=false and onlyExecuteOnce=false; both match the non-zone defaults so they are not recorded as non-default flags."
+  },
+  {
+    "name": "tEndBoarding_combatLost",
+    "summary": "Ends the active boarding sub-zone when its combat is lost, restoring the parent zone.",
+    "whenFired": "Fires when the Element.combatLost event is raised on the containing zone (the combat-end defeat path). Auto-installed into the boarding zone by tEnterBoardingZone's 'addTrigger' effect.",
+    "firedBy": [
+      "The 'addTrigger' effect in tEnterBoardingZone clones this trigger into the current zone",
+      "Element-driven: raised when combat ends in defeat"
+    ],
+    "triggeredByElement": ["combatLost"],
+    "flags": { "disableOnZoneEntry": false },
+    "effects": [
+      {
+        "effectID": "endBoarding",
+        "description": "Calls ZoneManager.returnFromBoardingZone() with no zone override, unwinding the current boarding zone and restoring the parent zone."
+      }
+    ],
+    "notes": "The loader also explicitly sets triggerImmediatelyOnEnteringZone=false and onlyExecuteOnce=false; both match the non-zone defaults so they are not recorded as non-default flags."
+  },
+  {
+    "name": "t_travel_gVars",
+    "summary": "Travels the player back to the zone/tile recorded in the playerPrevZone/playerX/playerY global vars, prompting for a flee confirmation first if currently in combat.",
+    "whenFired": "No engine call site fires this directly; only runs when invoked by another trigger or dialog effect (often to leave a sub-zone back to the parent).",
+    "firedBy": ["Other triggers via the 'trigger' task effect", "Dialog effects"],
+    "effects": [
+      {
+        "effectID": "travel_gVars",
+        "fValue": 90,
+        "bValue1": true,
+        "delay": 0.1,
+        "description": "After a 0.1s delay, reads the playerX/playerY/playerPrevZone global vars and travels back to that zone and tile, passing canAutosave=false (because bValue1 is true, and the task uses !bools[0]). If in combat, shows the flee-confirmation prompt instead. The fValue (90) is forwarded as the travel duration/index argument."
+      }
+    ]
+  },
+  {
+    "name": "tEnterProcZone",
+    "summary": "Plays the short blackout transition when the player enters a procedurally-generated zone.",
+    "whenFired": "Fires the moment any procgen zone finishes loading. Zone.cs's constructor unconditionally clones this trigger into every procgen zone's trigger list, and triggerImmediatelyOnEnteringZone makes it fire on entry.",
+    "firedBy": ["Engine: Zone constructor clones it into every procgen zone (Zone.cs:264)"],
+    "flags": { "triggerImmediatelyOnEnteringZone": true, "disableOnZoneEntry": false },
+    "effects": [
+      {
+        "effectID": "fx",
+        "sValue": "blackenScreen_shorter",
+        "description": "Queues the 'blackenScreen_shorter' camera FX, a brief screen blackout used as the procgen zone transition wipe."
+      }
+    ]
+  },
+  {
+    "name": "tEnterPort",
+    "summary": "Standard port-entry sequence: plays the longer blackout, shows the port-name popup, despawns and respawns the location's hires, refreshes the player's owned port, fires the enterPort dialog, refreshes undamaged ship zones, and increments the portsEntered counter.",
+    "whenFired": "Fires whenever the player enters a port zone. Zone.cs clones any global trigger named in a zone's LevelData.triggers list, so this trigger is attached to port zones via that mechanism.",
+    "firedBy": ["Port zones that list 'tEnterPort' in their LevelData.triggers (cloned in Zone.cs:274-283)"],
+    "effects": [
+      {
+        "effectID": "fx",
+        "sValue": "blackenScreen_load",
+        "description": "Queues the 'blackenScreen_load' camera FX, the longer blackout used when fully loading into a port."
+      },
+      {
+        "effectID": "trigger",
+        "sValue": "tTextOverlayPopup_port",
+        "delay": 0.5,
+        "description": "After 0.5s, fires the global trigger tTextOverlayPopup_port, which renders the current location's name/faction banner as a screen overlay."
+      },
+      {
+        "effectID": "trigger",
+        "sValue": "tDespawnHires",
+        "delay": 0.1,
+        "description": "After 0.1s, fires tDespawnHires to remove any actors flagged canDespawn from the zone."
+      },
+      {
+        "effectID": "trigger",
+        "sValue": "tSpawnHires",
+        "delay": 0.15,
+        "description": "After 0.15s, fires tSpawnHires to repopulate the port's location-driven spawns (cafe/inn hires etc)."
+      },
+      {
+        "effectID": "trigger",
+        "sValue": "tUpdateMyPort",
+        "delay": 0.15,
+        "description": "After 0.15s, fires tUpdateMyPort which awards offline-XP and pending gp to vendors at owned ports."
+      },
+      {
+        "effectID": "tryDialog",
+        "sValue": "enterPort",
+        "delay": 0.2,
+        "description": "After 0.2s, attempts to open the dialog node 'enterPort' (used for arrival dialogs, weather narration, etc)."
+      },
+      {
+        "effectID": "refreshUndamagedShipZones",
+        "delay": 0.1,
+        "description": "After 0.1s, deletes all saved 'bz_<boatID>' (boarding-zone) saves for every boat in the player's fleet, so the next boarding session re-generates from scratch."
+      },
+      {
+        "effectID": "modGlobalVar",
+        "sValue": "portsEntered",
+        "fValue": 1,
+        "delay": 0.1,
+        "description": "After 0.1s, increments the 'portsEntered' global var by 1 (used by metrics and unlock gates that count ports visited)."
+      }
+    ]
+  },
+  {
+    "name": "tEnterLoc",
+    "summary": "Standard non-port location-entry hook: attempts to open the 'enterLoc' dialog node.",
+    "whenFired": "Fires when the player enters a non-port location zone. Zone.cs clones any global trigger named in a zone's LevelData.triggers list, so this trigger is attached to non-port location zones via that mechanism.",
+    "firedBy": [
+      "Non-port location zones that list 'tEnterLoc' in their LevelData.triggers (cloned in Zone.cs:274-283)"
+    ],
+    "effects": [
+      {
+        "effectID": "tryDialog",
+        "sValue": "enterLoc",
+        "description": "Calls InputManager.tryDialog('enterLoc'), which opens the 'enterLoc' dialog node if its preconditions are met; used for arrival cutscenes and per-location narration."
+      }
+    ]
+  },
+  {
+    "name": "tEnterZone",
+    "summary": "Extension hook fired the moment a new zone finishes loading; ships with no built-in effects.",
+    "whenFired": "Fires from ZoneManager.loadNewZone when any zone has finished loading and is about to become active.",
+    "firedBy": [
+      "Engine: ZoneManager dispatches it during zone load (ZoneManager.cs:1394)",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "effects": [],
+    "notes": "Has no triggerEffects from loadGlobalTriggers; modders attach behaviour via DataManager GlobalTriggerEffect rows or by referencing it from other triggers/dialog effects."
+  },
+  {
+    "name": "tExitZone",
+    "summary": "Extension hook fired when the player leaves the current zone; ships with no built-in effects.",
+    "whenFired": "Fires from ZoneManager when the player is about to leave a zone (before the new zone is loaded).",
+    "firedBy": [
+      "Engine: ZoneManager dispatches it as a zone is exited (ZoneManager.cs:959)",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "effects": [],
+    "notes": "Has no triggerEffects from loadGlobalTriggers; modders attach behaviour via DataManager GlobalTriggerEffect rows or by referencing it from other triggers/dialog effects."
+  },
+  {
+    "name": "tEnterGrove",
+    "summary": "Grove-zone entry sequence: opens the 'enterGrove' dialog and, depending on the location's world coordinates, chooses one of three palette/decorate variants.",
+    "whenFired": "Fires the moment a grove zone loads. Zone.cs clones any global trigger named in a zone's LevelData.triggers list and the triggerImmediatelyOnEnteringZone flag makes it fire on entry rather than on player movement.",
+    "firedBy": ["Grove zones that list 'tEnterGrove' in their LevelData.triggers (cloned in Zone.cs:274-283)"],
+    "flags": { "triggerImmediatelyOnEnteringZone": true, "disableOnZoneEntry": false },
+    "effects": [
+      {
+        "effectID": "tryDialog",
+        "sValue": "enterGrove",
+        "description": "Calls InputManager.tryDialog('enterGrove'), opening the grove-arrival dialog node if its preconditions pass."
+      },
+      {
+        "effectID": "trigger",
+        "sValue": "tEnterGroveDecorate1",
+        "sValue2": "m:locXLessThan(300) + m:locYLessThan(400) - 1",
+        "description": "Fires tEnterGroveDecorate1 only when the formula in sValue2 evaluates above zero, i.e. when the current location's world X is less than 300 AND world Y less than 400 (north-western groves)."
+      },
+      {
+        "effectID": "trigger",
+        "sValue": "tEnterGroveDecorate2",
+        "sValue2": "m:locXLessThan(300) + m:locYMoreThan(600) - 1",
+        "description": "Fires tEnterGroveDecorate2 only when the location is far west (X<300) and far south (Y>600), i.e. the south-western groves."
+      },
+      {
+        "effectID": "trigger",
+        "sValue": "tEnterGroveDecorate3",
+        "sValue2": "m:locXMoreThan(400) + m:locYLessThan(150) - 1",
+        "description": "Fires tEnterGroveDecorate3 only when the location is far east (X>400) and far north (Y<150), i.e. the north-eastern groves."
+      }
+    ]
+  },
+  {
+    "name": "tEnterGroveDecorate1",
+    "summary": "Re-skins a grove zone with the 'overworld2' grass and 'overworld3' dark-grass palettes and clears any leftover 'itemNotFound' items.",
+    "whenFired": "No engine call site fires this directly. It is dispatched from tEnterGrove via the 'trigger' task effect when the location's world coordinates fall in the north-west region.",
+    "firedBy": [
+      "The 'trigger' effect in tEnterGrove (gated by 'm:locXLessThan(300) + m:locYLessThan(400) - 1')",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "effects": [
+      {
+        "effectID": "setZonePalettes",
+        "sValue": "zoneGrass",
+        "sValue2": "overworld2",
+        "description": "Sets the zone's 'zoneGrass' palette key to 'overworld2', recolouring all grass tiles to match that palette."
+      },
+      {
+        "effectID": "setZonePalettes",
+        "sValue": "zoneGrassDark",
+        "sValue2": "overworld3",
+        "description": "Sets the zone's 'zoneGrassDark' palette key to 'overworld3', recolouring the dark-grass tile variants."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "itemNotFound",
+        "description": "Scans every tile in the zone and removes any item with ID 'itemNotFound' (a junk-placeholder cleanup)."
+      }
+    ]
+  },
+  {
+    "name": "tEnterGroveDecorate2",
+    "summary": "Re-skins a grove zone with the 'overworld4' grass and 'overworld6' dark-grass palettes and clears any leftover 'itemNotFound' items.",
+    "whenFired": "No engine call site fires this directly. It is dispatched from tEnterGrove via the 'trigger' task effect when the location is in the south-west (X<300 and Y>600).",
+    "firedBy": [
+      "The 'trigger' effect in tEnterGrove (gated by 'm:locXLessThan(300) + m:locYMoreThan(600) - 1')",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "effects": [
+      {
+        "effectID": "setZonePalettes",
+        "sValue": "zoneGrass",
+        "sValue2": "overworld4",
+        "description": "Sets the zone's 'zoneGrass' palette key to 'overworld4'."
+      },
+      {
+        "effectID": "setZonePalettes",
+        "sValue": "zoneGrassDark",
+        "sValue2": "overworld6",
+        "description": "Sets the zone's 'zoneGrassDark' palette key to 'overworld6'."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "itemNotFound",
+        "description": "Scans every tile in the zone and removes any item with ID 'itemNotFound'."
+      }
+    ]
+  },
+  {
+    "name": "tEnterGroveDecorate3",
+    "summary": "Re-skins a grove zone with the 'p65' grass, 'overworld11' dark-grass, and 'p26' dirt palettes and clears any leftover 'itemNotFound' items.",
+    "whenFired": "No engine call site fires this directly. It is dispatched from tEnterGrove via the 'trigger' task effect when the location is in the far north-east (X>400 and Y<150).",
+    "firedBy": [
+      "The 'trigger' effect in tEnterGrove (gated by 'm:locXMoreThan(400) + m:locYLessThan(150) - 1')",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "effects": [
+      {
+        "effectID": "setZonePalettes",
+        "sValue": "zoneGrass",
+        "sValue2": "p65",
+        "description": "Sets the zone's 'zoneGrass' palette key to 'p65'."
+      },
+      {
+        "effectID": "setZonePalettes",
+        "sValue": "zoneGrassDark",
+        "sValue2": "overworld11",
+        "description": "Sets the zone's 'zoneGrassDark' palette key to 'overworld11'."
+      },
+      {
+        "effectID": "setZonePalettes",
+        "sValue": "zoneDirt",
+        "sValue2": "p26",
+        "description": "Sets the zone's 'zoneDirt' palette key to 'p26', recolouring the dirt tiles."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "itemNotFound",
+        "description": "Scans every tile in the zone and removes any item with ID 'itemNotFound'."
+      }
+    ]
+  },
+  {
+    "name": "tEnterDojo",
+    "summary": "Dojo-zone entry sequence: locks player input briefly, blackens the screen, forces combat mode, prunes excess landing-party actors, and dispels the zone.",
+    "whenFired": "Fires when a dojo zone loads. Zone.cs clones any global trigger named in a zone's LevelData.triggers list, so this is attached to dojo zones via that mechanism.",
+    "firedBy": ["Dojo zones that list 'tEnterDojo' in their LevelData.triggers (cloned in Zone.cs:274-283)"],
+    "effects": [
+      {
+        "effectID": "preventInteraction",
+        "fValue": 2,
+        "description": "Sets InputManager.delay_preventInteraction to 2.0s, blocking player input for 2 seconds while the entry cinematic plays."
+      },
+      {
+        "effectID": "fx",
+        "sValue": "blackenScreenShort",
+        "description": "Queues the 'blackenScreenShort' camera FX, a short screen blackout transition for the dojo entry."
+      },
+      {
+        "effectID": "enterCombat",
+        "fValue": 9999,
+        "delay": 2,
+        "description": "After a 2s delay, calls ZoneManager.enterCombatMode at the trigger origin with a 9999-tile (effectively unlimited) battlefield radius, no initiating-actor."
+      },
+      {
+        "effectID": "removeExcessLandingPartyActors",
+        "description": "Removes any party actor that is not part of the current landingParty list, ensuring only the chosen dojo combatants remain."
+      },
+      {
+        "effectID": "action",
+        "sValue": "dispelZone",
+        "description": "Casts the action 'dispelZone' from the current actor on their own tile, clearing zone-wide buffs/debuffs before the dojo match begins."
+      }
+    ]
+  },
+  {
+    "name": "tEnterOverworld",
+    "summary": "Overworld-entry sequence: plays the ocean ambience, picks the nearest-location song, adds buried treasures from quest globals, clears any lingering shipwreck location items, and queues an autosave.",
+    "whenFired": "Fires when the player enters an overworld zone. Zone.cs clones any global trigger named in a zone's LevelData.triggers list, so this is attached to overworld zones via that mechanism.",
+    "firedBy": ["Overworld zones that list 'tEnterOverworld' in their LevelData.triggers (cloned in Zone.cs:274-283)"],
+    "effects": [
+      {
+        "effectID": "fx",
+        "sValue": "sfx_ocean_fadeInOut_rand",
+        "delay": 0.1,
+        "description": "After 0.1s, queues the ambient ocean cross-fade sound effect for the overworld entry."
+      },
+      {
+        "effectID": "playNearestLocationSong",
+        "delay": 0.1,
+        "description": "After 0.1s, looks up the closest discovered Location to the player and plays its externalSong via SoundManager."
+      },
+      {
+        "effectID": "addTreasuresToZone",
+        "delay": 0.1,
+        "description": "After 0.1s, if the global vars treasureTCX/treasureTCY are non-zero, drops a buried 'location_shipwreck' container at that tile pre-filled with gp, cargo_lost, two loot items, and lost_docs; then clears those globals."
+      },
+      {
+        "effectID": "removeEmptyItem",
+        "sValue": "location_shipwreck",
+        "delay": 0.1,
+        "description": "After 0.1s, walks the zone and removes any 'location_shipwreck' container whose contents have been emptied."
+      },
+      {
+        "effectID": "trigger",
+        "sValue": "tOverworldAutosave",
+        "delay": 0.01,
+        "description": "After 0.01s, fires tOverworldAutosave to request an autosave once the world is settled (gated by the 'autosaveInOverworld' global var)."
+      }
+    ]
+  },
+  {
+    "name": "tOverworldAutosave",
+    "summary": "Requests an autosave the next time the engine is in a safe state to do so, and clears the autosaveInOverworld flag so it does not retrigger.",
+    "whenFired": "No engine call site fires this directly; it is invoked by tEnterOverworld and is gated by the 'autosaveInOverworld' global var being non-zero.",
+    "firedBy": [
+      "Fired by tEnterOverworld via the 'trigger' task effect",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "requirementFormula": "g:autosaveInOverworld",
+    "effects": [
+      {
+        "effectID": "autosaveASAP",
+        "delay": 1,
+        "description": "After 1s, sets ZoneManager.autosaveASAP = true so the engine will write an autosave at the next safe opportunity."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "autosaveInOverworld",
+        "description": "Clears (sets to 0) the 'autosaveInOverworld' global var so this trigger will not re-fire until something sets it again."
+      }
+    ]
+  },
+  {
+    "name": "tLoadOverworld",
+    "summary": "Lightweight overworld-load sequence used when re-entering an existing overworld zone: plays the ocean ambience and the nearest-location song.",
+    "whenFired": "Fires when the player re-loads into an overworld zone (e.g., after a load). Zone.cs clones any global trigger named in a zone's LevelData.triggers list, so this is attached to overworld zones via that mechanism.",
+    "firedBy": [
+      "Overworld zones that list 'tLoadOverworld' in their LevelData.triggers (cloned in Zone.cs:274-283)",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "effects": [
+      {
+        "effectID": "fx",
+        "sValue": "sfx_ocean_fadeInOut_rand",
+        "delay": 0.1,
+        "description": "After 0.1s, queues the ambient ocean cross-fade sound effect."
+      },
+      {
+        "effectID": "playNearestLocationSong",
+        "delay": 0.1,
+        "description": "After 0.1s, looks up the closest discovered Location to the player and plays its externalSong via SoundManager."
+      }
+    ]
+  },
+  {
+    "name": "tLoadGame",
+    "summary": "Extension hook fired the moment a saved game finishes loading; ships with no built-in effects.",
+    "whenFired": "Fires from ZoneManager once a saved game has finished loading and the player actor is available.",
+    "firedBy": [
+      "Engine: ZoneManager dispatches it after a save is loaded (ZoneManager.cs:931)",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "effects": [],
+    "notes": "Has no triggerEffects from loadGlobalTriggers; modders attach behaviour via DataManager GlobalTriggerEffect rows or by referencing it from other triggers/dialog effects."
+  },
+  {
+    "name": "tNewDay",
+    "summary": "Extension hook fired at the start of each new in-game day; ships with no built-in effects.",
+    "whenFired": "Fires from GameState whenever the day counter rolls over to a new day.",
+    "firedBy": [
+      "Engine: GameState advances the day (GameState.cs:497)",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "effects": [],
+    "notes": "Has no triggerEffects from loadGlobalTriggers; modders attach behaviour via DataManager GlobalTriggerEffect rows or by referencing it from other triggers/dialog effects."
+  },
+  {
+    "name": "tSpawnHires",
+    "summary": "Repopulates the current location with its auto-spawn hires (cafe NPCs etc.) — but only after enough time has passed since the last visit.",
+    "whenFired": "No engine call site fires this directly; it is invoked by tEnterPort each time the player enters a port (gated by reqFormula).",
+    "firedBy": [
+      "Fired by tEnterPort via the 'trigger' task effect",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "requirementFormula": "actorWithDialogNodeID:cafe - 1 + gIsMoreThan:lastVisit_days:1 + gTimeSinceLessThan:firstVisit_newLoc:1",
+    "effects": [
+      {
+        "effectID": "spawn_location",
+        "description": "Looks up the current Location's auto_spawnDataID list and spawns one (or two/three at higher wealth levels) random entries from it as actors in the zone."
+      }
+    ],
+    "notes": "Reading the formula: requires that the zone currently has an actor whose dialogNodeID equals 'cafe' (subtract 1 inverts it - see Formula.calculate), AND (lastVisit_days has been more than 1 day ago) OR (firstVisit_newLoc was less than 1 day ago - i.e. very recent first visit). The literal '1f' in source becomes '1' when concatenated into the string."
+  },
+  {
+    "name": "tDespawnHires",
+    "summary": "Removes any actor flagged canDespawn from the current zone (e.g. cafe NPCs whose visit has expired).",
+    "whenFired": "No engine call site fires this directly; it is invoked by tEnterPort each time the player enters a port (gated by reqFormula).",
+    "firedBy": [
+      "Fired by tEnterPort via the 'trigger' task effect",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "requirementFormula": "g:lastVisit_days - 1",
+    "effects": [
+      {
+        "effectID": "removeActors_despawnable",
+        "description": "Walks ZoneManager.z.actors and calls ZoneManager.removeActor on every actor whose canDespawn flag is true. With both bools left false the FX-on-flee and XP-on-incapacitation branches are skipped."
+      }
+    ],
+    "notes": "reqFormula 'g:lastVisit_days - 1' requires more than one day since the last visit before despawning is allowed. The literal '1f' in source becomes '1' when concatenated into the string."
+  },
+  {
+    "name": "tUpdateMyPort",
+    "summary": "At an owned port, awards accumulated offline-XP to each of the location's vendor NPCs (cafe, questgiver, smithy, harbor, shipwright, item merchant, museum, training), then resets the location's gp-collection timer.",
+    "whenFired": "No engine call site fires this directly; it is invoked by tEnterPort each time the player enters a port (gated by reqFormula 'gPlusLocID:bought_home_').",
+    "firedBy": [
+      "Fired by tEnterPort via the 'trigger' task effect",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "requirementFormula": "gPlusLocID:bought_home_",
+    "effects": [
+      {
+        "effectID": "giveMathXPToActorWithDialogNodeID",
+        "sValue": "cafe",
+        "sValue2": "gPlusLocIDTimeSince:gpCollect_/24 * d:vendorXPPerDay",
+        "description": "For every actor in the zone whose dialogNodeID is 'cafe', awards XP equal to (hours since the location's gpCollect_ timer / 24) * d:vendorXPPerDay, capped so no actor exceeds the player's totalXPEarned."
+      },
+      {
+        "effectID": "giveMathXPToActorWithDialogNodeID",
+        "sValue": "questgiver",
+        "sValue2": "gPlusLocIDTimeSince:gpCollect_/24 * d:vendorXPPerDay",
+        "description": "Same as above but applied to actors with dialogNodeID 'questgiver'."
+      },
+      {
+        "effectID": "giveMathXPToActorWithDialogNodeID",
+        "sValue": "sport_merchant_smithy",
+        "sValue2": "gPlusLocIDTimeSince:gpCollect_/24 * d:vendorXPPerDay",
+        "description": "Same as above but applied to actors with dialogNodeID 'sport_merchant_smithy'."
+      },
+      {
+        "effectID": "giveMathXPToActorWithDialogNodeID",
+        "sValue": "harbor",
+        "sValue2": "gPlusLocIDTimeSince:gpCollect_/24 * d:vendorXPPerDay",
+        "description": "Same as above but applied to actors with dialogNodeID 'harbor'."
+      },
+      {
+        "effectID": "giveMathXPToActorWithDialogNodeID",
+        "sValue": "shipwright",
+        "sValue2": "gPlusLocIDTimeSince:gpCollect_/24 * d:vendorXPPerDay",
+        "description": "Same as above but applied to actors with dialogNodeID 'shipwright'."
+      },
+      {
+        "effectID": "giveMathXPToActorWithDialogNodeID",
+        "sValue": "merchant_items",
+        "sValue2": "gPlusLocIDTimeSince:gpCollect_/24 * d:vendorXPPerDay",
+        "description": "Same as above but applied to actors with dialogNodeID 'merchant_items'."
+      },
+      {
+        "effectID": "giveMathXPToActorWithDialogNodeID",
+        "sValue": "sport_museum",
+        "sValue2": "gPlusLocIDTimeSince:gpCollect_/24 * d:vendorXPPerDay",
+        "description": "Same as above but applied to actors with dialogNodeID 'sport_museum'."
+      },
+      {
+        "effectID": "giveMathXPToActorWithDialogNodeID",
+        "sValue": "sport_training",
+        "sValue2": "gPlusLocIDTimeSince:gpCollect_/24 * d:vendorXPPerDay",
+        "description": "Same as above but applied to actors with dialogNodeID 'sport_training'."
+      },
+      {
+        "effectID": "setGlobalVarPlusLocID_math",
+        "sValue": "gpCollect_",
+        "sValue2": "gPlusLocID:gpCollect_ + d:gpCollectFromPort",
+        "description": "Sets the location-suffixed global var 'gpCollect_<currentLocationID>' by adding d:gpCollectFromPort to its current value (the offline-gp accumulator the player will then collect)."
+      }
+    ]
+  },
+  {
+    "name": "tHired",
+    "summary": "Hook fired after the player hires a new crew member; defers to tHiredCheck which displays/closes the 'hire a party of 5' journal goal once the crew is large enough.",
+    "whenFired": "No engine call site fires this directly; the hire flow (dialog effects in crew-hire dialogs) is expected to name 'tHired' as a trigger.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "trigger",
+        "sValue": "tHiredCheck",
+        "sValue2": "m:crewSize(5)",
+        "description": "Fires tHiredCheck only when the formula 'm:crewSize(5)' returns above zero, i.e. when the current crew size is at least 5."
+      }
+    ]
+  },
+  {
+    "name": "tHiredCheck",
+    "summary": "When the crew first reaches 5 members and the goal has not yet been completed, adds the 'Hire a party of 5 crew' journal goal, opens the journal, and immediately marks the goal done.",
+    "whenFired": "No engine call site fires this directly; invoked from tHired with the crewSize(5) gate.",
+    "firedBy": [
+      "Fired by tHired via the 'trigger' task effect",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "requirementFormula": "m:crewSize(5) - g:hireCrewGoalDone",
+    "effects": [
+      {
+        "effectID": "preventInteraction",
+        "fValue": 2,
+        "description": "Sets InputManager.delay_preventInteraction to 2.0s, blocking player input for 2 seconds while the goal celebration plays."
+      },
+      {
+        "effectID": "addJournalGoal",
+        "sValue": "* Hire a party of 5 crew.",
+        "bValue1": true,
+        "description": "Adds the journal goal '* Hire a party of 5 crew.' to the player's open-goals list; bValue1=true suppresses the refresh-the-journal celebration (no flash/sfx) because subsequent effects will animate it instead."
+      },
+      {
+        "effectID": "openJournal",
+        "delay": 1.5,
+        "description": "After 1.5s, refreshes and makes the journal window visible (animating a page-flip if it was already open). hideAllBtns defaults false."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "hireCrewGoalDone",
+        "fValue": 1,
+        "delay": 1.5,
+        "description": "After 1.5s, sets the 'hireCrewGoalDone' global var to 1 so this trigger's reqFormula will never pass again."
+      },
+      {
+        "effectID": "completeJournalGoal",
+        "sValue": "* Hire a party of 5 crew.",
+        "delay": 2,
+        "description": "After 2s, marks the matching journal goal complete (with the standard checkmark animation)."
+      }
+    ]
+  },
+  {
+    "name": "tJournalAsk",
+    "summary": "Snaps the camera to the travel point (9,2) almost immediately (used to focus the camera on a journal-related landmark).",
+    "whenFired": "No engine call site fires this directly; only runs when invoked by another trigger or dialog effect.",
+    "firedBy": ["Other triggers via the 'trigger' task effect", "Dialog effects"],
+    "effects": [
+      {
+        "effectID": "cameraAtPoint,9,2,@0.01",
+        "description": "Comma-separated taskString form: invokes the 'cameraAtPoint' task with floats[0]=9 and floats[1]=2 after a 0.01s delay, fixing the camera on the travel point identified by ItemType.getTravelPoint(9, 2)."
+      }
+    ],
+    "notes": "Because the effectID is a comma-separated taskString, the engine routes through Task.createTaskFromSingleString instead of the regular field-mapped path; the sValue/fValue/etc. on the TriggerEffect are ignored."
+  },
+  {
+    "name": "tLeaveLocation",
+    "summary": "Leaves the current location, returning the player to the overworld at travel-point (0,0).",
+    "whenFired": "No engine call site fires this directly; only runs when invoked by another trigger or dialog effect.",
+    "firedBy": ["Other triggers via the 'trigger' task effect", "Dialog effects"],
+    "effects": [
+      {
+        "effectID": "travel_leaveLocation",
+        "xValue": 0,
+        "yValue": 0,
+        "description": "Calls GameState.leaveLocation at travel-point (0,0). If currently in combat instead asks the flee-confirmation. With bools both false the function defaults to using the actor's positionTC and to autosaving on departure."
+      }
+    ],
+    "notes": "xValue/yValue are set to 0 by direct assignments at Data.cs:765-766 after construction; the static defaults from the TriggerEffect constructor would have been -1."
+  },
+  {
+    "name": "tLeaveMonsterDen",
+    "summary": "Leaves a monster-den location back to the overworld, but only if no hostile enemies remain in the zone; also sets the 'questCompleted' global var on success.",
+    "whenFired": "No engine call site fires this directly; only runs when invoked by another trigger or dialog effect (typically the den-cleared dialog).",
+    "firedBy": ["Other triggers via the 'trigger' task effect", "Dialog effects"],
+    "effects": [
+      {
+        "effectID": "travel_leaveLocation",
+        "xValue": 0,
+        "yValue": 0,
+        "delay": 0.05,
+        "description": "After 0.05s, calls GameState.leaveLocation at travel-point (0,0). If currently in combat instead asks the flee-confirmation."
+      },
+      {
+        "effectID": "cancelIfEnemiesPresent",
+        "fValue": 999,
+        "description": "Aborts the trigger chain (return false from executeTask) if any hostile, non-incapacitated actor exists in the zone within 999 tiles - effectively any enemy at all."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "questCompleted",
+        "fValue": 1,
+        "description": "Sets the 'questCompleted' global var to 1, used by den-clear quests to mark the objective satisfied."
+      }
+    ],
+    "notes": "xValue/yValue on effect 0 are set to 0 by direct assignments at Data.cs:768-769 after construction; the static defaults from the TriggerEffect constructor would have been -1."
+  },
+  {
+    "name": "tDelveLose",
+    "summary": "Game-over handler for a failed Delve (the underwater roguelike mode): blocks input, travels the player back to port33 fully healed, sets the 'delveLost' flag, and plays the gate-close FX on every party member.",
+    "whenFired": "Fires when the Element.gameOver event is raised on the zone (e.g. the party is wiped). The disableOnZoneEntry override keeps it armed across zone loads.",
+    "firedBy": [
+      "Element-driven: raised when the game-over condition is met",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "triggeredByElement": ["gameOver"],
+    "flags": { "disableOnZoneEntry": false },
+    "effects": [
+      {
+        "effectID": "preventInteraction",
+        "fValue": 0.8,
+        "description": "Sets InputManager.delay_preventInteraction to 0.8s, blocking input through the start of the failure cinematic."
+      },
+      {
+        "effectID": "travel_point",
+        "sValue": "port33",
+        "fValue": 1,
+        "bValue1": true,
+        "delay": 0.79,
+        "description": "After 0.79s, travels the player to zone 'port33' at travel-point with floats[0]=1; bValue1=true is passed as !canAutosave so autosave is suppressed for this forced return."
+      },
+      {
+        "effectID": "healparty",
+        "delay": 0.79,
+        "description": "After 0.79s, fully heals the entire party (HP and resources) via ZoneManager.party_fullHeal(0)."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "delveLost",
+        "fValue": 1,
+        "description": "Sets the 'delveLost' global var to 1 so subsequent dialog/UI checks know the player just failed a Delve."
+      },
+      {
+        "effectID": "fxOnParty",
+        "sValue": "gateClose",
+        "fValue": 1,
+        "delay": 0.2,
+        "description": "After 0.2s, queues the 'gateClose' camera FX at the position of every party actor."
+      },
+      {
+        "effectID": "fxOnParty",
+        "sValue": "sfx_highestHum",
+        "fValue": 1,
+        "delay": 0.2,
+        "description": "After 0.2s, queues the 'sfx_highestHum' sound effect at the position of every party actor."
+      }
+    ]
+  },
+  {
+    "name": "exitDialog",
+    "summary": "Closes the current dialog window if one is open.",
+    "whenFired": "No engine call site fires this directly; intended to be called from a dialog effect or another trigger to dismiss the open dialog.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "exitDialog",
+        "description": "If InputManager.currentMode == dialog, switches the input mode back to travel, closing the dialog window."
+      }
+    ]
+  },
+  {
+    "name": "exitCombat",
+    "summary": "Force-ends combat mode and resolves it as a win (no fleeing).",
+    "whenFired": "No engine call site fires this directly; intended to be called from dialog or trigger logic that wants to end combat without going through the normal victory path.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "exitCombat",
+        "bValue1": true,
+        "description": "If currently in combat, calls ZoneManager.exitCombatMode with awardXP=!bValue1=false, fleeing=false, forceCombatEnd=true; in effect ends combat immediately and suppresses post-combat XP awarding."
+      }
+    ]
+  },
+  {
+    "name": "tTextOverlayBlack",
+    "summary": "Fades the screen-text overlay to fully opaque black.",
+    "whenFired": "No engine call site fires this directly; called from dialogs or other triggers to install a black-curtain cover over the text overlay.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "textOverlay",
+        "fValue": 255,
+        "description": "Calls InputManager.assignOverlayText with empty text, alpha 255 (fully opaque), and position (0,0); tween=false, dynamicReveal=false - i.e. instantly snaps the overlay to a black field."
+      }
+    ]
+  },
+  {
+    "name": "tTextOverlayNone",
+    "summary": "Clears the screen-text overlay.",
+    "whenFired": "No engine call site fires this directly; called from dialogs or other triggers to hide the text overlay.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "textOverlay",
+        "description": "Calls InputManager.assignOverlayText with empty text and alpha 0; instantly clears the overlay."
+      }
+    ]
+  },
+  {
+    "name": "tTextOverlayPopup",
+    "summary": "Shows a generic banner popup at (0,160) using a tween in, then tweens it back out after 3 seconds.",
+    "whenFired": "No engine call site fires this directly; called from dialogs or other triggers when they want a default banner popup.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "textOverlay_tween",
+        "sValue": "<bg=tbg>",
+        "yValue": 160,
+        "description": "Tweens the overlay text in at position (0,160) showing the dynamic-text tag '<bg=tbg>' (the standard 'tbg' banner background)."
+      },
+      {
+        "effectID": "textOverlay_tween",
+        "yValue": 0,
+        "delay": 3,
+        "description": "After 3s, tweens the overlay back out at position (0,0) with empty text, effectively dismissing the banner."
+      }
+    ]
+  },
+  {
+    "name": "tTextOverlayPopup_port",
+    "summary": "Shows the current port's name and faction banner as a screen overlay, then tweens it away after 3 seconds.",
+    "whenFired": "Fired automatically by the Location class when the player enters a port; tEnterPort also fires it via the 'trigger' task effect.",
+    "firedBy": [
+      "Engine: Location.cs:367 calls executeTrigger after rewriting effects[0].sValue with the port's banner",
+      "Fired by tEnterPort via the 'trigger' task effect"
+    ],
+    "effects": [
+      {
+        "effectID": "textOverlay_tween",
+        "yValue": 160,
+        "description": "Tweens the overlay text in at position (0,160); the sValue is rewritten at runtime by Location.cs to a string like '<iconBig=...> <name><bg=...>' carrying the port's faction icon, name, and banner background."
+      },
+      {
+        "effectID": "textOverlay_tween",
+        "yValue": 0,
+        "delay": 3,
+        "description": "After 3s, tweens the overlay back out at position (0,0) with empty text, dismissing the banner."
+      }
+    ],
+    "notes": "Runtime mutation: Location.cs:361 clears triggerEffects[0].sValue then Location.cs:364 sets it to the actual banner string (with iconBig, location name, and namePopup_texture bg tag) before calling executeTrigger at line 367."
+  },
+  {
+    "name": "tTextOverlayPopup_classUnlocked",
+    "summary": "Shows the 'Class Unlocked!' banner popup, then tweens it away after 3 seconds.",
+    "whenFired": "No engine call site fires this directly; called from dialog or trigger flows when a class unlock is granted.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "textOverlay_tween",
+        "sValue": "Class Unlocked!<bg=fbg>",
+        "yValue": 160,
+        "description": "Tweens the overlay text in at (0,160) showing 'Class Unlocked!' over the 'fbg' (feature) banner background."
+      },
+      {
+        "effectID": "textOverlay_tween",
+        "yValue": 0,
+        "delay": 3,
+        "description": "After 3s, tweens the overlay back out at (0,0) with empty text."
+      }
+    ],
+    "notes": "aliasID mismatch: the dictionary key is 'tTextOverlayPopup_classUnlocked' but the internal aliasID passed to the Trigger constructor is 'tTextOverlayPopup_port'. Lookup goes by the dictionary key but debug logs / once-only flagging will report 'tTextOverlayPopup_port'."
+  },
+  {
+    "name": "tTextOverlayPopup_locationItemsUnlocked",
+    "summary": "Shows a 'New goods available!' (or runtime-overridden) banner popup, then tweens it away after 3 seconds; used when a location unlocks new merchant items.",
+    "whenFired": "Fired automatically by Location when new items unlock at a location; the Location class first rewrites effects[0].sValue with the unlock-specific text before calling executeTrigger.",
+    "firedBy": [
+      "Engine: Location.cs:341 calls executeTrigger after rewriting effects[0].sValue with the unlock text",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "effects": [
+      {
+        "effectID": "textOverlay_tween",
+        "sValue": "New goods available!<bg=fbg>",
+        "yValue": 160,
+        "description": "Tweens the overlay text in at (0,160) showing 'New goods available!' over the 'fbg' (feature) banner background. The sValue is overwritten at runtime by Location.cs to the actual unlock text."
+      },
+      {
+        "effectID": "textOverlay_tween",
+        "yValue": 0,
+        "delay": 3,
+        "description": "After 3s, tweens the overlay back out at (0,0) with empty text."
+      }
+    ],
+    "notes": "aliasID mismatch: the dictionary key is 'tTextOverlayPopup_locationItemsUnlocked' but the internal aliasID passed to the Trigger constructor is 'tTextOverlayPopup_port'. Runtime mutation: Location.cs:339 reassigns triggerEffects[0].sValue before firing the trigger."
+  },
+  {
+    "name": "tSetZoneDarkness",
+    "summary": "Marks the current zone as 'dark' with the supplied colour (defaulting to fully transparent black) and copies that colour onto the camera-level darkness.",
+    "whenFired": "No engine call site fires this directly; ZoneManager.cs:5023 overwrites effects[0].sValue with the colour string for the current outdoor darkness, then some downstream code path invokes the trigger.",
+    "firedBy": ["Other triggers via the 'trigger' task effect", "Dialog effects"],
+    "effects": [
+      {
+        "effectID": "setZoneDarkness",
+        "sValue": "0,0,0,0",
+        "bValue1": true,
+        "description": "Sets ZoneManager.z.dark=true and ZoneManager.z.darknessColor to the colour parsed from sValue ('0,0,0,0' i.e. transparent black by default); because bValue1 is true also copies the result onto Game1.camera.darknessColor."
+      }
+    ],
+    "notes": "Runtime mutation: ZoneManager.cs:5023 reassigns triggerEffects[0].sValue to Data.colorToString(outdoorZoneDarknessColor) before firing the trigger; the '0,0,0,0' recorded here is only the static default from loadGlobalTriggers."
+  },
+  {
+    "name": "tSetZoneDarknessToWorldDarkness",
+    "summary": "Re-computes the current zone's darkness colour from the world/location darkness model and applies it to both the zone and the camera.",
+    "whenFired": "Fires automatically the moment any zone containing it loads, because triggerImmediatelyOnEnteringZone is set. Zone.cs clones any global trigger named in a zone's LevelData.triggers list, so this attaches via that mechanism.",
+    "firedBy": [
+      "Zones that list 'tSetZoneDarknessToWorldDarkness' in their LevelData.triggers (cloned in Zone.cs:274-283)",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "flags": { "triggerImmediatelyOnEnteringZone": true, "disableOnZoneEntry": false },
+    "effects": [
+      {
+        "effectID": "setZoneDarknessToWorldDarkness",
+        "bValue1": true,
+        "description": "Sets ZoneManager.z.dark=true and recomputes z.darknessColor from GameState.getOutdoorZoneDarknessColor for the current Location (with the location's townZoneColorMult if it is a port); because bValue1 is true also copies the result onto Game1.camera.darknessColor."
+      }
+    ]
+  },
+  {
+    "name": "tBlackenScreen",
+    "summary": "Plays the standard full-length screen blackout FX.",
+    "whenFired": "No engine call site fires this directly; called from dialog or trigger flows that need a fade-to-black.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "fx",
+        "sValue": "blackenScreen",
+        "description": "Queues the 'blackenScreen' camera FX, the standard full-length screen blackout transition."
+      }
+    ]
+  },
+  {
+    "name": "damageNumber_worldTime",
+    "summary": "Pops a floating damage-number style label above the player showing the current in-game time of day.",
+    "whenFired": "No engine call site fires this directly; called from dialog or trigger flows that want to surface the current time to the player.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "damageNumber_worldTime",
+        "description": "Calls UIManager.addDamageNumber with the string returned by GameState.getHourMinTime (e.g. '14:30'), anchored to the player's tile, for ~2 seconds."
+      }
+    ]
+  },
+  {
+    "name": "tStartFleetBattle",
+    "summary": "Starts a fleet battle setup: clears placeholder underwater items, spawns the underwaterObjects and sea_flower decorations, opens the enemy-commodore dialog, and sets the fleetBattleStarted flag.",
+    "whenFired": "No engine call site fires this directly; gated by '1 - g:fleetBattleStarted' so it only runs the first time after that var is reset. Called from the fleet-battle entry flow (dialog effects).",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "requirementFormula": "1 - g:fleetBattleStarted",
+    "effects": [
+      {
+        "effectID": "",
+        "description": "No-op placeholder: the effectID is empty so the Task constructor produces no executable task. Reserved as an attachment point and skipped by the engine."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object1",
+        "description": "Walks the zone and removes any 'underwater_object1' items (clears the static placeholder so the upcoming specialSpawn can re-place them)."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object2",
+        "description": "As above for 'underwater_object2'."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object3",
+        "description": "As above for 'underwater_object3'."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object4",
+        "description": "As above for 'underwater_object4'."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object5",
+        "description": "As above for 'underwater_object5'."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object6",
+        "description": "As above for 'underwater_object6'."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object7",
+        "description": "As above for 'underwater_object7'."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object8",
+        "description": "As above for 'underwater_object8'."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object9",
+        "description": "As above for 'underwater_object9'."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object10",
+        "description": "As above for 'underwater_object10'."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object11",
+        "description": "As above for 'underwater_object11'."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object12",
+        "description": "As above for 'underwater_object12'."
+      },
+      { "effectID": "removeAllItems", "sValue": "sea_flower1", "description": "As above for 'sea_flower1'." },
+      { "effectID": "removeAllItems", "sValue": "sea_flower2", "description": "As above for 'sea_flower2'." },
+      { "effectID": "removeAllItems", "sValue": "sea_flower3", "description": "As above for 'sea_flower3'." },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "underwaterObjects1",
+        "delay": 0.1,
+        "description": "After 0.1s, applies the special-spawn group 'underwaterObjects1' to the current zone, placing its items per their spawn rules."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "underwaterObjects2",
+        "delay": 0.1,
+        "description": "After 0.1s, applies the special-spawn group 'underwaterObjects2'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "underwaterObjects3",
+        "delay": 0.1,
+        "description": "After 0.1s, applies the special-spawn group 'underwaterObjects3'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "underwaterObjects4",
+        "delay": 0.1,
+        "description": "After 0.1s, applies the special-spawn group 'underwaterObjects4'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "underwaterObjects5",
+        "delay": 0.1,
+        "description": "After 0.1s, applies the special-spawn group 'underwaterObjects5'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "underwaterObjects6",
+        "delay": 0.1,
+        "description": "After 0.1s, applies the special-spawn group 'underwaterObjects6'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "underwaterObjects7",
+        "delay": 0.1,
+        "description": "After 0.1s, applies the special-spawn group 'underwaterObjects7'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "underwaterObjects8",
+        "delay": 0.1,
+        "description": "After 0.1s, applies the special-spawn group 'underwaterObjects8'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "underwaterObjects9",
+        "delay": 0.1,
+        "description": "After 0.1s, applies the special-spawn group 'underwaterObjects9'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "underwaterObjects10",
+        "delay": 0.1,
+        "description": "After 0.1s, applies the special-spawn group 'underwaterObjects10'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "underwaterObjects11",
+        "delay": 0.1,
+        "description": "After 0.1s, applies the special-spawn group 'underwaterObjects11'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "underwaterObjects12",
+        "delay": 0.1,
+        "description": "After 0.1s, applies the special-spawn group 'underwaterObjects12'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "sea_flower1",
+        "delay": 0.1,
+        "description": "After 0.1s, applies the special-spawn group 'sea_flower1'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "sea_flower2",
+        "delay": 0.1,
+        "description": "After 0.1s, applies the special-spawn group 'sea_flower2'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "sea_flower3",
+        "delay": 0.1,
+        "description": "After 0.1s, applies the special-spawn group 'sea_flower3'."
+      },
+      {
+        "effectID": "tryDialog_commodore",
+        "sValue": "dialog_enemyCommodoreAttacked",
+        "xValue": 0,
+        "yValue": 0,
+        "delay": 2.5,
+        "description": "After 2.5s, opens dialog node 'dialog_enemyCommodoreAttacked' and points the camera at the enemy fleet's flagship (with an 'exclamation' FX over them) if a dialog actually opens."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "fleetBattleStarted",
+        "fValue": 1,
+        "description": "Sets the 'fleetBattleStarted' global var to 1 so the reqFormula '1 - g:fleetBattleStarted' will block re-entry until that var is reset."
+      }
+    ],
+    "notes": "The first triggerEffect is an empty-effectID no-op placeholder produced by 'new TriggerEffect(\"\")'; the actual behaviour lives in effects 1+. See errors.md."
+  },
+  {
+    "name": "tSetupOverworld",
+    "summary": "Initial overworld setup: blackens the screen, resets the world's Location objects (clears their items), buries undiscovered location markers, builds AI waypoints, and retries procgen if the prior pass failed.",
+    "whenFired": "No engine call site fires this directly; called from the overworld-init flow (typically a dialog or other trigger when the overworld is first loaded).",
+    "firedBy": ["Other triggers via the 'trigger' task effect", "Dialog effects"],
+    "effects": [
+      {
+        "effectID": "fx",
+        "sValue": "blackenScreen",
+        "description": "Queues the 'blackenScreen' camera FX, the full-length blackout used to mask the setup work."
+      },
+      {
+        "effectID": "resetLocations",
+        "delay": 0.2,
+        "description": "After 0.2s, calls GameState.resetLocation() which clears item state on all Locations so the overworld can be repopulated cleanly."
+      },
+      {
+        "effectID": "buryLocations",
+        "delay": 0.25,
+        "description": "After 0.25s, walks every Location in the current zone and marks any item with the 'location' specialProperty as buried (so it must be discovered before being seen) on every undiscovered location and its cardinal neighbours."
+      },
+      {
+        "effectID": "initWaypoints",
+        "delay": 0.3,
+        "description": "After 0.3s, calls AIManager.initializeWaypoints with forceRefresh=true to rebuild AI pathfinding nodes for the zone."
+      },
+      {
+        "effectID": "trigger",
+        "sValue": "tRetryProcgen",
+        "sValue2": "g:zoneGenFailed",
+        "delay": 0.35,
+        "description": "After 0.35s, fires tRetryProcgen only when 'g:zoneGenFailed' is non-zero (i.e. the previous procgen pass set the failure flag)."
+      }
+    ]
+  },
+  {
+    "name": "tRetryProcgen",
+    "summary": "Re-runs procgen for every Location in the world after a generation failure, then clears the zoneGenFailed flag.",
+    "whenFired": "No engine call site fires this directly. Invoked by tSetupOverworld via the 'trigger' task effect, and gated by reqFormula 'g:zoneGenFailed'.",
+    "firedBy": [
+      "Fired by tSetupOverworld via the 'trigger' task effect",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "requirementFormula": "g:zoneGenFailed",
+    "effects": [
+      {
+        "effectID": "resetprocgen",
+        "description": "Calls GameState.resetProcgenLocations(), which clears procgen state for every Location so the world can re-roll its generated zones."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "zoneGenFailed",
+        "description": "Clears (sets to 0) the 'zoneGenFailed' global var so subsequent reqFormula checks fail and this trigger does not recurse."
+      }
+    ]
+  },
+  {
+    "name": "tSetupOverworldForest",
+    "summary": "Strips all overworld procgen tree and underwater-object items from the zone, then re-spawns the 'overworld_forest_alt*' decoration groups (plus their edge tiles) to render the alternate forest skin.",
+    "whenFired": "No engine call site fires this directly; called from the procgen forest-setup flow (typically a dialog or other trigger after procgen finishes).",
+    "firedBy": ["Other triggers via the 'trigger' task effect", "Dialog effects"],
+    "effects": [
+      {
+        "effectID": "removeAllItems",
+        "sValue": "outdoor_trees1_procgen",
+        "description": "Removes every 'outdoor_trees1_procgen' item from the zone."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "outdoor_trees2_procgen",
+        "description": "Removes every 'outdoor_trees2_procgen' item from the zone."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "outdoor_trees_behind1_procgen",
+        "description": "Removes every 'outdoor_trees_behind1_procgen' item from the zone."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "outdoor_trees_behind2_procgen",
+        "description": "Removes every 'outdoor_trees_behind2_procgen' item from the zone."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "outdoor_trees_alt1_procgen",
+        "description": "Removes every 'outdoor_trees_alt1_procgen' item from the zone."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "outdoor_trees_alt2_procgen",
+        "description": "Removes every 'outdoor_trees_alt2_procgen' item from the zone."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "outdoor_trees_alt_behind1_procgen",
+        "description": "Removes every 'outdoor_trees_alt_behind1_procgen' item from the zone."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "outdoor_trees_alt_behind2_procgen",
+        "description": "Removes every 'outdoor_trees_alt_behind2_procgen' item from the zone."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object1_procgen",
+        "description": "Removes every 'underwater_object1_procgen' item from the zone."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object2_procgen",
+        "description": "Removes every 'underwater_object2_procgen' item from the zone."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object3_procgen",
+        "description": "Removes every 'underwater_object3_procgen' item from the zone."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object4_procgen",
+        "description": "Removes every 'underwater_object4_procgen' item from the zone."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object5_procgen",
+        "description": "Removes every 'underwater_object5_procgen' item from the zone."
+      },
+      {
+        "effectID": "removeAllItems",
+        "sValue": "underwater_object6_procgen",
+        "description": "Removes every 'underwater_object6_procgen' item from the zone."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "overworld_forest_alt1",
+        "description": "Applies the special-spawn group 'overworld_forest_alt1' to the current zone."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "overworld_forest_alt2",
+        "description": "Applies the special-spawn group 'overworld_forest_alt2'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "overworld_forest_alt3",
+        "description": "Applies the special-spawn group 'overworld_forest_alt3'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "overworld_forest_alt4",
+        "description": "Applies the special-spawn group 'overworld_forest_alt4'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "overworld_forest_alt_edge1a",
+        "description": "Applies the special-spawn group 'overworld_forest_alt_edge1a'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "overworld_forest_alt_edge1b",
+        "description": "Applies the special-spawn group 'overworld_forest_alt_edge1b'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "overworld_forest_alt_edge2a",
+        "description": "Applies the special-spawn group 'overworld_forest_alt_edge2a'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "overworld_forest_alt_edge2b",
+        "description": "Applies the special-spawn group 'overworld_forest_alt_edge2b'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "overworld_forest_alt_edgeN",
+        "description": "Applies the special-spawn group 'overworld_forest_alt_edgeN'."
+      },
+      {
+        "effectID": "specialSpawn",
+        "sValue": "overworld_forest_alt_edgeS",
+        "description": "Applies the special-spawn group 'overworld_forest_alt_edgeS'."
+      }
+    ],
+    "notes": "Outside loadGlobalTriggers, Data.cs around lines 20612-20822 conditionally appends additional 'specialSpawn' effects to this trigger from a separate code path; those dynamic effects are out of scope here. See errors.md."
+  },
+  {
+    "name": "tOverworldEveryTile",
+    "summary": "Fires tSpawn_sm on every overworld travel step taken by the player; the actual roll for whether a sea-monster spawns happens inside tSpawn_sm's reqFormula.",
+    "whenFired": "Fires from ZoneManager every time the player takes a step in overworld travel mode (combat mode is excluded via travelModeOnly). The triggerForEveryStepInArea flag bypasses the standard 'enter the trigger area once' guard.",
+    "firedBy": ["Engine: ZoneManager step-checks fire it on each overworld player step (ZoneManager.cs:5517)"],
+    "flags": { "triggerForEveryStepInArea": true, "triggerOnPlayerActorOnly": true, "travelModeOnly": true },
+    "effects": [
+      {
+        "effectID": "trigger",
+        "sValue": "tSpawn_sm",
+        "description": "Fires the global trigger tSpawn_sm; the sea-monster spawn formula gate lives there, so this effect itself is unconditional."
+      }
+    ]
+  },
+  {
+    "name": "tSpawn_sm",
+    "summary": "Sea-monster spawn roll: when the player is adjacent to deep water and the roll passes, spawns a sea-monster fleet near the player.",
+    "whenFired": "No engine call site fires this directly; it is fired by tOverworldEveryTile on every overworld step. The reqFormula then decides whether the spawn actually happens this step.",
+    "firedBy": [
+      "Fired by tOverworldEveryTile via the 'trigger' task effect",
+      "Other triggers via the 'trigger' task effect",
+      "Dialog effects"
+    ],
+    "requirementFormula": "m:rand(100)-91 - m:numEnemiesWithinX(9)*4.5 - gTimeSinceLessThan:fleetBattleStarted:6 * 100",
+    "flags": { "triggerForEveryStepInArea": true, "triggerOnPlayerActorOnly": true, "travelModeOnly": true },
+    "effects": [
+      {
+        "effectID": "spawn_sm",
+        "description": "If the player is adjacent to deep water, picks a random tile within the 'deepwater_search' AoE, looks up the nearest monsterBeacon item for its quantity (defaulting to 'sm0'), creates the corresponding spawnData group, builds a Fleet for them with faction 'sm', and places it on the chosen tile."
+      }
+    ],
+    "notes": "reqFormula reads as: roll 0..99, subtract 91 (so ~9% baseline pass rate), then subtract 4.5 per nearby enemy within 9 tiles, then subtract 100x if a fleet battle started within the last 6 hours (effectively zeroes the chance after a recent fleet battle)."
+  },
+  {
+    "name": "tScoreScreenFX",
+    "summary": "Sets up the visual backdrop for the score screen: an indefinite-length screen blackout plus the high-hum sound effect.",
+    "whenFired": "No engine call site fires this directly; called from the score-screen entry flow.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "fx",
+        "sValue": "blackenScreen_forever",
+        "description": "Queues the 'blackenScreen_forever' camera FX, a permanent (until cleared) screen blackout suitable for cinematic intermissions."
+      },
+      { "effectID": "fx", "sValue": "sfx_highestHum", "description": "Queues the 'sfx_highestHum' sound effect." }
+    ]
+  },
+  {
+    "name": "tUnlockFX",
+    "summary": "Plays the long good-aura sound effect used for unlock celebrations.",
+    "whenFired": "No engine call site fires this directly; called from dialog or trigger flows that grant an unlock.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "fx",
+        "sValue": "sfx_longGoodAura_louder",
+        "description": "Queues the 'sfx_longGoodAura_louder' sound effect."
+      }
+    ]
+  },
+  {
+    "name": "tMainMenuFX",
+    "summary": "Main-menu intro cinematic: hides the main-menu UI, runs a chain of FX (blackenScreen, gateForm, gateOpen, whiteFade, gateHold), loads the demo cinematic zone at a precise position, spawns the two intro actors, restores the UI, and applies wind/rain/darkness settings.",
+    "whenFired": "No engine call site fires this directly; invoked from the main-menu setup flow.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "setMainMenuUIVisible",
+        "xValue": 0,
+        "yValue": 0,
+        "description": "Calls InputManager.setMainMenuVisible(false) (bValue1 defaults false), hiding the main-menu window during the cinematic."
+      },
+      {
+        "effectID": "fx",
+        "sValue": "blackenScreen_longer",
+        "xValue": 0,
+        "yValue": 0,
+        "bValue1": true,
+        "description": "Queues the 'blackenScreen_longer' FX; with bValue1=true the FX is locked-to-screen at tile (0,0), giving a screen-relative blackout."
+      },
+      {
+        "effectID": "fx",
+        "sValue": "gateForm",
+        "xValue": 0,
+        "yValue": 0,
+        "bValue1": true,
+        "delay": 0.6,
+        "description": "After 0.6s, screen-locked 'gateForm' FX showing the gate animating into existence."
+      },
+      {
+        "effectID": "fx",
+        "sValue": "gateOpen_mainMenu",
+        "xValue": 0,
+        "yValue": 0,
+        "bValue1": true,
+        "delay": 1,
+        "description": "After 1s, screen-locked 'gateOpen_mainMenu' FX showing the gate opening."
+      },
+      {
+        "effectID": "fx",
+        "sValue": "whiteFade_shorter_mainMenu",
+        "xValue": 0,
+        "yValue": 0,
+        "bValue1": true,
+        "delay": 1.6,
+        "description": "After 1.6s, screen-locked 'whiteFade_shorter_mainMenu' FX (the white flash through the gate)."
+      },
+      {
+        "effectID": "fx",
+        "sValue": "gateHoldFade_mainMenu",
+        "xValue": 0,
+        "yValue": 0,
+        "bValue1": true,
+        "delay": 1.9,
+        "description": "After 1.9s, screen-locked 'gateHoldFade_mainMenu' FX (the gate fading out and holding)."
+      },
+      {
+        "effectID": "loadSpecialZone_precision",
+        "sValue": "zScene1aDemo",
+        "fValue": 9999,
+        "xValue": 4600,
+        "yValue": 6390,
+        "delay": 2,
+        "description": "After 2s, loads the special zone 'zScene1aDemo' at sub-tile pixel position (46.00,63.90) (precision divides x/y by 100), with specialZoneDepthMod=9999 to draw behind everything."
+      },
+      {
+        "effectID": "moveSpecialZone_precision",
+        "fValue": 0.02,
+        "xValue": 4600,
+        "yValue": 6382,
+        "bValue2": true,
+        "delay": 2.1,
+        "description": "After 2.1s, slides the special zone toward sub-tile position (46.00,63.82) at speed 0.02; bValue2=true sets the yoyo target to the current position so it oscillates back."
+      },
+      {
+        "effectID": "spawn_actorPrefab_point_specialZone",
+        "xValue": 0,
+        "yValue": 2,
+        "delay": 2.1,
+        "description": "After 2.1s, spawns the first travel-point actor of point '0,2' from ItemType.getTravelPoint into the special zone."
+      },
+      {
+        "effectID": "spawn_actorPrefab_point_specialZone",
+        "xValue": 1,
+        "yValue": 2,
+        "delay": 2.1,
+        "description": "After 2.1s, spawns the second travel-point actor of point '1,2' into the special zone."
+      },
+      {
+        "effectID": "setMainMenuUIVisible",
+        "xValue": 0,
+        "yValue": 0,
+        "bValue1": true,
+        "bValue2": true,
+        "delay": 2.8,
+        "description": "After 2.8s, makes the main-menu window visible again (bValue1) and additionally forces drawMainMenuBG=true and drawUIManager=true (bValue2)."
+      },
+      {
+        "effectID": "wind",
+        "xValue": 0,
+        "yValue": 0,
+        "bValue1": true,
+        "delay": 2.2,
+        "description": "After 2.2s, sets GameState.windRot=0 (i.e. wind direction reset to angle 0); the bValue1/xValue/yValue are not consumed by the wind task."
+      },
+      {
+        "effectID": "weather",
+        "sValue": "rain",
+        "xValue": 0,
+        "yValue": 0,
+        "bValue1": true,
+        "delay": 2.2,
+        "description": "After 2.2s, sets GameState.currentWeather to WeatherType.rain."
+      },
+      {
+        "effectID": "setZoneDarkness",
+        "sValue": "108,108,157",
+        "xValue": 0,
+        "yValue": 0,
+        "delay": 2.2,
+        "description": "After 2.2s, sets the zone's darkness colour to (108,108,157) (a dusky blue) and marks the zone dark; bValue1=false so the camera-level darknessColor is not also overwritten."
+      },
+      {
+        "effectID": "maximizeWindowIfTrue",
+        "xValue": 0,
+        "yValue": 0,
+        "delay": 0.1,
+        "description": "After 0.1s, no-op (because bValue1 defaults false) - guarded path that would have called Game1.maximizeWindowSet(true) if bValue1 were true."
+      }
+    ]
+  },
+  {
+    "name": "tMainMenuFXReload",
+    "summary": "Lightweight main-menu reload sequence used when the player returns to the main menu (no FX chain, just loading the cinematic zone and applying the wind/rain/darkness settings).",
+    "whenFired": "No engine call site fires this directly; invoked from the main-menu reload flow.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "setMainMenuUIVisible",
+        "xValue": 0,
+        "yValue": 0,
+        "bValue1": true,
+        "description": "Calls InputManager.setMainMenuVisible(true), making the main-menu window visible."
+      },
+      {
+        "effectID": "loadSpecialZone_precision",
+        "sValue": "zScene1aDemo",
+        "fValue": 9999,
+        "xValue": 4600,
+        "yValue": 6390,
+        "description": "Loads the special zone 'zScene1aDemo' at sub-tile pixel position (46.00,63.90) with depthMod=9999."
+      },
+      {
+        "effectID": "moveSpecialZone_precision",
+        "fValue": 0.02,
+        "xValue": 4600,
+        "yValue": 6382,
+        "bValue2": true,
+        "delay": 0.1,
+        "description": "After 0.1s, slides the special zone toward sub-tile (46.00,63.82) at speed 0.02; bValue2=true sets up the yoyo so it oscillates."
+      },
+      {
+        "effectID": "spawn_actorPrefab_point_specialZone",
+        "xValue": 0,
+        "yValue": 2,
+        "delay": 0.01,
+        "description": "After 0.01s, spawns the first travel-point actor of point '0,2' into the special zone."
+      },
+      {
+        "effectID": "spawn_actorPrefab_point_specialZone",
+        "xValue": 1,
+        "yValue": 2,
+        "delay": 0.01,
+        "description": "After 0.01s, spawns the second travel-point actor of point '1,2' into the special zone."
+      },
+      {
+        "effectID": "wind",
+        "xValue": 0,
+        "yValue": 0,
+        "bValue1": true,
+        "delay": 2.2,
+        "description": "After 2.2s, sets GameState.windRot=0."
+      },
+      {
+        "effectID": "weather",
+        "sValue": "rain",
+        "xValue": 0,
+        "yValue": 0,
+        "bValue1": true,
+        "delay": 2.2,
+        "description": "After 2.2s, sets GameState.currentWeather to WeatherType.rain."
+      },
+      {
+        "effectID": "setZoneDarkness",
+        "sValue": "108,108,157",
+        "xValue": 0,
+        "yValue": 0,
+        "delay": 2.2,
+        "description": "After 2.2s, sets the zone's darkness colour to (108,108,157)."
+      }
+    ]
+  },
+  {
+    "name": "tMainMenuFX2",
+    "summary": "Renders the 'radcodex' studio logo over the top of the main-menu screen at the start of the intro.",
+    "whenFired": "No engine call site fires this directly; called from the studio-splash flow at game launch.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "fx",
+        "sValue": "radcodex_logo",
+        "xValue": 0,
+        "yValue": 0,
+        "bValue1": true,
+        "delay": 0.03,
+        "description": "After 0.03s, queues the 'radcodex_logo' camera FX screen-locked at (0,0) (bValue1=true switches to the lock-to-screen overload)."
+      },
+      {
+        "effectID": "fx",
+        "sValue": "blackenScreen_top_extend",
+        "xValue": 0,
+        "yValue": 0,
+        "bValue1": true,
+        "description": "Queues the 'blackenScreen_top_extend' camera FX screen-locked at (0,0)."
+      }
+    ]
+  },
+  {
+    "name": "tHandleDeaths",
+    "summary": "Drives the post-combat dying-actor cinematic queue: for each incapacitated, dying, party-controllable actor, schedules an actor-dying timer staggered by 7.8 seconds.",
+    "whenFired": "No engine call site fires this directly; called from combat-end and party-management flows to process pending deaths.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "handleDeaths",
+        "description": "If no 'actorDying' UIManager timer is already running, walks every actor in the zone and schedules the dying-actor sequence (removing the 'dying' AV effect and starting a 7.8s timer per controllable, unrevivable dying actor)."
+      }
+    ]
+  },
+  {
+    "name": "tCombatMusic",
+    "summary": "Switches the playing song to the zone's configured combat song.",
+    "whenFired": "No engine call site fires this directly; called from combat-start dialog or trigger flows.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "playSong",
+        "sValue": "combatSong",
+        "description": "Calls SoundManager.playSong with the current zone's combatSong/combatSongVolume/combatSongPitch and the zone's combatSongDelay as the start delay."
+      }
+    ]
+  },
+  {
+    "name": "tTravelMusic",
+    "summary": "Switches the playing song to the zone's configured travel song.",
+    "whenFired": "No engine call site fires this directly; called from travel-mode dialog or trigger flows.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "playSong",
+        "sValue": "travelSong",
+        "description": "Calls SoundManager.playSong with the current zone's travelSong/travelSongVolume/travelSongPitch (no extra start delay)."
+      }
+    ]
+  },
+  {
+    "name": "tTravelMusic@4",
+    "summary": "Switches the playing song to the zone's configured travel song after a 4 second delay.",
+    "whenFired": "No engine call site fires this directly; called from dialog or trigger flows that want the travel song to fade in after a delay (e.g. after a cinematic).",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "playSong",
+        "sValue": "travelSong",
+        "delay": 4,
+        "description": "After a 4s delay, calls SoundManager.playSong with the current zone's travelSong/travelSongVolume/travelSongPitch (no in-task start delay)."
+      }
+    ]
+  },
+  {
+    "name": "tNoMusic",
+    "summary": "Stops the currently playing song.",
+    "whenFired": "No engine call site fires this directly; called from dialog or trigger flows that want silence.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "playSong",
+        "yValue": -2,
+        "description": "Calls SoundManager.playSong with an empty song ID and 'songDelay' parameter -2 (a non-default value derived from yValue), stopping the currently playing song."
+      }
+    ]
+  },
+  {
+    "name": "tMusicDeepNoise",
+    "summary": "Plays the 'DeepNoise' song (low rumble used as ambient or transitional music).",
+    "whenFired": "No engine call site fires this directly; called from dialog or trigger flows.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "playSong",
+        "sValue": "DeepNoise",
+        "description": "Calls SoundManager.playSong with song ID 'DeepNoise' at default volume/pitch."
+      }
+    ]
+  },
+  {
+    "name": "tMusicGentlePiano2",
+    "summary": "Plays the 'PM-GentlePiano2' song.",
+    "whenFired": "No engine call site fires this directly; called from dialog or trigger flows.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "playSong",
+        "sValue": "PM-GentlePiano2",
+        "description": "Calls SoundManager.playSong with song ID 'PM-GentlePiano2' at default volume/pitch."
+      }
+    ],
+    "notes": "aliasID mismatch: the dictionary key is 'tMusicGentlePiano2' but the internal aliasID passed to the Trigger constructor is 'tTravelMusic'. Lookup goes by the dictionary key but debug logs / once-only flagging will report 'tTravelMusic'."
+  },
+  {
+    "name": "tRandomHire",
+    "summary": "Spawns the 'randomHire' spawn-group somewhere in the current zone at a strongly negative power level and increments the totalRecruits counter.",
+    "whenFired": "No engine call site fires this directly; called from dialog or trigger flows that recruit a random NPC (e.g. tavern hire flow).",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "spawn",
+        "sValue": "randomHire",
+        "fValue": -9999,
+        "description": "Spawns Data.spawnData['randomHire'] in the trigger's area at desiredPowerLevel = -9999 + party power level + global mods (the very low base power forces the cheapest variants of the hire group)."
+      },
+      {
+        "effectID": "setGlobalVar_math",
+        "sValue": "totalRecruits",
+        "sValue2": "g:totalRecruits + 1",
+        "description": "Increments the 'totalRecruits' global var by 1 (the integer overload, since bValue1 is not set)."
+      }
+    ]
+  },
+  {
+    "name": "tRemoveQuestItem",
+    "summary": "Removes one of the current tavern quest item, remembers the removed ID in 'tavern_questItem_previous', and sets 'askNewQuestItem' to prompt for a new one.",
+    "whenFired": "No engine call site fires this directly; called from quest turn-in dialogs.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "removeItem",
+        "sValue2": "tavern_questItem",
+        "fValue": 1,
+        "description": "Looks up the item ID stored in global var 'tavern_questItem' and removes 1 of that item from the actor's inventory (falling back to other party actors, then stash, then held items)."
+      },
+      {
+        "effectID": "setGlobalVar_toOtherGlobalVar",
+        "sValue": "tavern_questItem_previous",
+        "sValue2": "tavern_questItem",
+        "fValue": 10,
+        "bValue1": true,
+        "description": "Sets the 'tavern_questItem_previous' global var to whatever string 'tavern_questItem' currently holds."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "askNewQuestItem",
+        "description": "Clears (sets to 0) the 'askNewQuestItem' global var, used as a flag for the next quest-pickup prompt."
+      }
+    ]
+  },
+  {
+    "name": "tG_askNewQuestItem",
+    "summary": "Sets the 'askNewQuestItem' global var to 1 so the next quest dialog will offer a new quest item.",
+    "whenFired": "No engine call site fires this directly; called from dialog or trigger flows that want to mark the player as ready for a new quest.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "askNewQuestItem",
+        "fValue": 1,
+        "description": "Sets the 'askNewQuestItem' global var to 1."
+      }
+    ]
+  },
+  {
+    "name": "tSetRefreshGlobals",
+    "summary": "Mass-clears or sets all the per-day/per-visit refresh flags that gate town merchant restocks, NPC chats, generation counters, party-roster mirrors, mission flags, and reserves the party's money for the next run.",
+    "whenFired": "No engine call site fires this directly; called from the day-rollover or run-reset flows.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "refreshTown",
+        "description": "Clears (sets to 0) the 'refreshTown' global var."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "refreshMagi",
+        "fValue": 1,
+        "description": "Sets the 'refreshMagi' global var to 1 (magi merchant should restock on next visit)."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "refreshSmith",
+        "fValue": 1,
+        "description": "Sets the 'refreshSmith' global var to 1."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "refreshTrainer",
+        "fValue": 1,
+        "description": "Sets the 'refreshTrainer' global var to 1."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "refreshInn",
+        "fValue": 1,
+        "description": "Sets the 'refreshInn' global var to 1."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "castleGatesOpen",
+        "description": "Clears (sets to 0) the 'castleGatesOpen' global var."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "gen1",
+        "description": "Clears (sets to 0) the 'gen1' generation counter."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "gen2",
+        "description": "Clears (sets to 0) the 'gen2' generation counter."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "gen3",
+        "description": "Clears (sets to 0) the 'gen3' generation counter."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "gen4",
+        "description": "Clears (sets to 0) the 'gen4' generation counter."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "gen5",
+        "description": "Clears (sets to 0) the 'gen5' generation counter."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "trainer_chat",
+        "fValue": 1,
+        "description": "Sets the 'trainer_chat' global var to 1 (trainer has a fresh chat queued)."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "smith_chat",
+        "fValue": 1,
+        "description": "Sets the 'smith_chat' global var to 1."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "magi_chat",
+        "fValue": 1,
+        "description": "Sets the 'magi_chat' global var to 1."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "innkeeper_chat",
+        "fValue": 1,
+        "description": "Sets the 'innkeeper_chat' global var to 1."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "bartender_chat",
+        "fValue": 1,
+        "description": "Sets the 'bartender_chat' global var to 1."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "spawnedCorpse1",
+        "description": "Clears (sets to 0) the 'spawnedCorpse1' global var."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "spawnedCorpse2",
+        "description": "Clears (sets to 0) the 'spawnedCorpse2' global var."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "earnedXP",
+        "description": "Clears (sets to 0) the 'earnedXP' global var (per-run XP accumulator)."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "partyActor1",
+        "description": "Clears the 'partyActor1' global var (one of the persisted party-roster mirror slots)."
+      },
+      { "effectID": "setGlobalVar", "sValue": "partyActor2", "description": "Clears the 'partyActor2' global var." },
+      { "effectID": "setGlobalVar", "sValue": "partyActor3", "description": "Clears the 'partyActor3' global var." },
+      { "effectID": "setGlobalVar", "sValue": "partyActor4", "description": "Clears the 'partyActor4' global var." },
+      { "effectID": "setGlobalVar", "sValue": "partyActor5", "description": "Clears the 'partyActor5' global var." },
+      { "effectID": "setGlobalVar", "sValue": "partyActor6", "description": "Clears the 'partyActor6' global var." },
+      { "effectID": "setGlobalVar", "sValue": "onAMission", "description": "Clears the 'onAMission' global var." },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "alreadyUnlockedShortcutThisRun",
+        "description": "Clears the 'alreadyUnlockedShortcutThisRun' global var."
+      },
+      {
+        "effectID": "setGlobalVar_math",
+        "sValue": "moneyReserves",
+        "sValue2": "m:money + g:moneyReserves",
+        "description": "Adds the player's current money to the moneyReserves global var (uses the integer overload because bValue1 is false; the int cast happens inside the task)."
+      },
+      {
+        "effectID": "setMoney",
+        "sValue": " g:moneyReserves",
+        "description": "Sets the player's money to the integer value of the formula ' g:moneyReserves' (i.e. transfers all of moneyReserves into the player's purse)."
+      }
+    ],
+    "notes": "The order matters: the setGlobalVar_math effect accumulates money+reserves into 'moneyReserves', and the subsequent setMoney then loads that combined total back into money. The leading space in setMoney's sValue (' g:moneyReserves') is preserved exactly as written in Data.cs and is harmless to the formula parser."
+  },
+  {
+    "name": "tStartGame",
+    "summary": "Initialises per-run game-mode flags: enables enemy random-act timers, formation phase, hardcore override, no-flee combat, the starting pirate-favor floor, the starting ports-discovered count, and the initial trade-special goods.",
+    "whenFired": "No engine call site fires this directly; called from the new-game setup flow.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "enableEnemyRandomActTimers",
+        "fValue": 1,
+        "description": "Sets 'enableEnemyRandomActTimers' to 1, letting enemies use their random-act behaviour."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "enableFormationPhase",
+        "fValue": 1,
+        "description": "Sets 'enableFormationPhase' to 1, enabling the pre-combat formation-placement phase."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "ignoreHardcore",
+        "fValue": 1,
+        "description": "Sets 'ignoreHardcore' to 1, suppressing hardcore-mode penalties for the initial setup."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "cantFleeCombat",
+        "fValue": 1,
+        "description": "Sets 'cantFleeCombat' to 1, disabling combat fleeing during the start of the run."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "favor_pirate",
+        "fValue": -9999,
+        "description": "Sets 'favor_pirate' to -9999 (an effectively-permanent hostile floor for the pirate faction at game start)."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "portsDiscovered",
+        "fValue": 4,
+        "description": "Sets 'portsDiscovered' to 4 (the four starting ports the player begins the run knowing)."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "tradeSpecial_locID",
+        "sValue2": "port9",
+        "description": "Sets the global var 'tradeSpecial_locID' to the string 'port9' (the location offering the starting trade special)."
+      },
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "tradeSpecial_goodsID",
+        "sValue2": "cargo_grain",
+        "description": "Sets the global var 'tradeSpecial_goodsID' to the string 'cargo_grain' (the starting trade-special goods type)."
+      }
+    ]
+  },
+  {
+    "name": "tPostgameLoaded",
+    "summary": "Clears the 'dontAwardAfterCombat' flag when the post-game save is loaded, so combat XP/loot awards resume.",
+    "whenFired": "No engine call site fires this directly; called from the post-game load flow.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "dontAwardAfterCombat",
+        "description": "Clears (sets to 0) the 'dontAwardAfterCombat' global var."
+      }
+    ]
+  },
+  {
+    "name": "tMechNotch",
+    "summary": "Mech-notch puzzle update step: reacts adjacent matching mech-notch items together, propagating power/connector state across the puzzle.",
+    "whenFired": "No engine call site fires this directly; called by mech-notch item logic (typically via the 'trigger' task effect from item-reaction code) every time the puzzle state may need to be recomputed.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "reactOnMatchingItems",
+        "sValue": "mechNotch1",
+        "sValue2": "mechNotch_power",
+        "description": "For every 'mechNotch1' item in the zone, looks one tile in its facing direction for a 'mechNotch_power' item with the opposite rotation; if found, fires the 'matched' react on the neighbour and on the mechNotch1."
+      },
+      {
+        "effectID": "reactOnMatchingItems",
+        "sValue": "mechNotch_explode",
+        "fValue": 1,
+        "description": "For every 'mechNotch_explode' item in the zone, looks one tile in its facing direction for another 'mechNotch_explode' (because sValue2 is empty, it self-matches) and fires the 'matchedSelf' react on both."
+      },
+      {
+        "effectID": "reactOnMatchingItems",
+        "sValue": "mechNotch_power",
+        "sValue2": "mechNotch_connector_off",
+        "fValue": 1,
+        "description": "For every 'mechNotch_power' item in the zone, looks one tile in its facing direction for a 'mechNotch_connector_off' with the opposite rotation; if found, fires the 'matched' react on both."
+      },
+      {
+        "effectID": "reactOnMatchingItems",
+        "sValue": "mechNotch_connector_on",
+        "sValue2": "mechNotch_connector_off",
+        "fValue": 1,
+        "description": "As above but for 'mechNotch_connector_on' driving 'mechNotch_connector_off'."
+      },
+      {
+        "effectID": "reactOnMatchingItems",
+        "sValue": "mechNotch_connector_on",
+        "sValue2": "mechNotch1",
+        "fValue": 1,
+        "description": "As above but for 'mechNotch_connector_on' driving 'mechNotch1' (propagating power into the start tile)."
+      },
+      {
+        "effectID": "reactOnMatchingItems",
+        "sValue": "mechNotch_connector_poweringDown",
+        "sValue2": "mechNotch_connector_off",
+        "fValue": 1,
+        "description": "As above but for 'mechNotch_connector_poweringDown' driving 'mechNotch_connector_off' (propagating the power-down wave)."
+      },
+      {
+        "effectID": "reactOnMatchingItems",
+        "sValue": "mechNotch_connector_poweringDown",
+        "sValue2": "mechNotch1",
+        "fValue": 1,
+        "description": "As above but for 'mechNotch_connector_poweringDown' driving 'mechNotch1'."
+      }
+    ]
+  },
+  {
+    "name": "tGlowingKey",
+    "summary": "Walks the zone and, for every 'pedestal_keyhole' item, signals every party member with the 'nearKeyPedestal' element; also signals 'inCastleZone' or 'notInCastleZone' depending on the zone ID.",
+    "whenFired": "No engine call site fires this directly; called from key/item-reaction flows to refresh the glowing-key UI cue.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "specialKeyStatusUpdate",
+        "description": "For every 'pedestal_keyhole' item in the zone, fires the 'nearKeyPedestal' react on every party actor; then fires 'inCastleZone' on all party members if the current zone ID contains 'castle', else fires 'notInCastleZone'."
+      }
+    ]
+  },
+  {
+    "name": "tXPShare5",
+    "summary": "Sets the global var 'XPShare' to 5 (the party-XP-share rule that gives 5x XP to assist counts).",
+    "whenFired": "No engine call site fires this directly; called from settings/option dialogs.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "XPShare",
+        "fValue": 5,
+        "description": "Sets the 'XPShare' global var to 5."
+      }
+    ]
+  },
+  {
+    "name": "tXPShare10",
+    "summary": "Sets the global var 'XPShare' to 10 (a higher-tier party-XP-share rule).",
+    "whenFired": "No engine call site fires this directly; called from settings/option dialogs.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "setGlobalVar",
+        "sValue": "XPShare",
+        "fValue": 10,
+        "description": "Sets the 'XPShare' global var to 10."
+      }
+    ]
+  },
+  {
+    "name": "tExit",
+    "summary": "Closes any open conversation and announces the speaker walked off via the 'walk_exit' dialog node.",
+    "whenFired": "No engine call site fires this directly; called from dialog flows to terminate a conversation gracefully.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "talk",
+        "sValue2": "walk_exit",
+        "description": "Because sValue is empty (no actor target), calls InputManager.talkToNoOne with talkerID='', dialogNodeID='walk_exit' and the default popup position, showing the 'walk_exit' line as ambient dialog."
+      }
+    ]
+  },
+  {
+    "name": "tSalvagerBroken",
+    "summary": "Sequenced shutdown of the Salvager location: blocks input for 3 seconds, defers further actions, blackens the screen, then removes the 'cleever' faction's actors.",
+    "whenFired": "No engine call site fires this directly; called from the Salvager-broken dialog flow.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "preventInteraction",
+        "fValue": 3,
+        "description": "Sets InputManager.delay_preventInteraction to 3.0s, blocking player input for 3 seconds."
+      },
+      {
+        "effectID": "delayActions",
+        "fValue": 3,
+        "description": "Pushes ZoneManager.delayUntilNextAction up to at least 3.0s, postponing other queued actions."
+      },
+      {
+        "effectID": "fx",
+        "sValue": "blackenScreen",
+        "delay": 3,
+        "description": "After 3s, queues the 'blackenScreen' camera FX (full screen blackout)."
+      },
+      {
+        "effectID": "removeFaction",
+        "sValue": "cleever",
+        "delay": 3,
+        "description": "After 3s, removes every actor whose faction is 'cleever' from the current zone (and from the special zone if one is loaded)."
+      }
+    ]
+  },
+  {
+    "name": "tSpawnHagger",
+    "summary": "Spawns the named actor 'hagger' at tile (0,0), sets him to talk-when-near-player AI, and points his dialog at 'hagger_talk1a'.",
+    "whenFired": "No engine call site fires this directly; called from a Hagger-encounter dialog or trigger.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "spawn_actorPrefab_point",
+        "sValue": "hagger",
+        "xValue": 0,
+        "yValue": 0,
+        "bValue1": true,
+        "description": "Spawns the actorPrefab 'hagger' at travel-point (0,0). bValue1=true keeps the actor's ID exactly as 'hagger' rather than appending a unique suffix."
+      },
+      {
+        "effectID": "setActorAI",
+        "sValue": "hagger",
+        "sValue2": "talkWhenWithin3OfPlayer",
+        "delay": 0.1,
+        "description": "After 0.1s, switches actor 'hagger's AI script to 'talkWhenWithin3OfPlayer'."
+      },
+      {
+        "effectID": "setActorDialogNodeID",
+        "sValue": "hagger",
+        "sValue2": "hagger_talk1a",
+        "delay": 0.1,
+        "description": "After 0.1s, sets actor 'hagger's dialogNodeID to 'hagger_talk1a'."
+      }
+    ]
+  },
+  {
+    "name": "tHireHagger",
+    "summary": "Marks the actor 'hagger' as hired: sets his AI to 'idle' and re-points his dialog to the crew-hire continuation node.",
+    "whenFired": "No engine call site fires this directly; called from the Hagger-hire dialog flow when the player chooses to hire him.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "setActorAI",
+        "sValue": "hagger",
+        "sValue2": "idle",
+        "bValue1": true,
+        "description": "Sets actor 'hagger's AI script to 'idle' (and re-runs the script once via runScriptOnce because bValue1 is true)."
+      },
+      {
+        "effectID": "setActorDialogNodeID",
+        "sValue": "hagger",
+        "sValue2": "crew_hire_hagger1",
+        "delay": 0.1,
+        "description": "After 0.1s, sets actor 'hagger's dialogNodeID to 'crew_hire_hagger1'."
+      }
+    ]
+  },
+  {
+    "name": "tDontHireHagger",
+    "summary": "Handles the 'pass on Hagger' branch: idles him, blacks out the screen, teleports him to tile (0,3), and re-points his dialog to the crew-hire continuation node.",
+    "whenFired": "No engine call site fires this directly; called from the Hagger-hire dialog flow when the player declines.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "setActorAI",
+        "sValue": "hagger",
+        "sValue2": "idle",
+        "bValue1": true,
+        "description": "Sets actor 'hagger's AI script to 'idle' (and re-runs the script once via runScriptOnce because bValue1 is true)."
+      },
+      { "effectID": "fx", "sValue": "blackenScreen", "description": "Queues the 'blackenScreen' camera FX." },
+      {
+        "effectID": "moveActor_point",
+        "sValue": "hagger",
+        "xValue": 0,
+        "yValue": 3,
+        "delay": 0.1,
+        "description": "After 0.1s, moves actor 'hagger' to travel-point (0,3) and resets his facingRot to 0."
+      },
+      {
+        "effectID": "setActorDialogNodeID",
+        "sValue": "hagger",
+        "sValue2": "crew_hire_hagger1",
+        "delay": 0.1,
+        "description": "After 0.1s, sets actor 'hagger's dialogNodeID to 'crew_hire_hagger1'."
+      }
+    ]
+  },
+  {
+    "name": "tAddCafeFoodItem",
+    "summary": "Drops a stack of the player's most-recently-eaten item at tile (9,2), routing it through the travel-point lookup so the placement is exact.",
+    "whenFired": "No engine call site fires this directly; called from cafe/dining dialog flows.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "spawnItem",
+        "sValue": "lastFoodEaten",
+        "xValue": 9,
+        "yValue": 2,
+        "bValue1": true,
+        "bValue2": true,
+        "description": "Spawns the item whose ID is read from the 'lastFoodEaten' global var (fallback to itemTypes lookup) at the travel-point selected by tile (9,2) (because bValue2=true routes through ZoneManager.getTravelPoint). bValue1=true is the addItem 'forceFit' flag, ensuring placement even if the tile is already crowded."
+      }
+    ]
+  },
+  {
+    "name": "tRemoveCafeFoodItem",
+    "summary": "Removes the player's most-recently-eaten food item from the travel-point tile (9,2).",
+    "whenFired": "No engine call site fires this directly; called from cafe/dining dialog flows.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "removeItem",
+        "sValue2": "lastFoodEaten",
+        "xValue": 9,
+        "yValue": 2,
+        "bValue2": true,
+        "description": "Looks up the item ID stored in global var 'lastFoodEaten' and removes it from the travel-point at tile (9,2) (because bValue2=true routes the tile coord through ZoneManager.getTravelPoint instead of using it directly)."
+      }
+    ]
+  },
+  {
+    "name": "tCredits",
+    "summary": "End-credits cutscene: blocks all input for 226 seconds, blackens the screen, runs through the 21 'port-flyover' segments showing each port and its credits journal entry, then shows the final two credits pages and ends the game.",
+    "whenFired": "No engine call site fires this directly; called from the game-end credits flow.",
+    "firedBy": ["Dialog effects", "Other triggers via the 'trigger' task effect"],
+    "effects": [
+      {
+        "effectID": "preventInteraction",
+        "fValue": 226,
+        "description": "Sets InputManager.delay_preventInteraction to 226.0s, blocking player input for the entire credits run."
+      },
+      {
+        "effectID": "fx",
+        "sValue": "blackenScreen_longer",
+        "description": "Queues the 'blackenScreen_longer' camera FX (longer blackout)."
+      },
+      {
+        "effectID": "fx",
+        "sValue": "fadeToBlack_short",
+        "delay": 1,
+        "description": "After 1s (num - 2 with num=3), queues the 'fadeToBlack_short' camera FX."
+      },
+      {
+        "effectID": "unlockExtras",
+        "description": "Marks extraOptionsUnlocked and extraRacesUnlocked true, adds every playerUnlockable actor type to playerUsable_actorTypes, attempts the WIN_ANYDIFFICULTY achievement, and writes the config.ini settings file."
+      },
+      {
+        "effectID": "cutsceneMode",
+        "bValue1": true,
+        "description": "Sets ZoneManager.cutsceneMode=true and disables the speed-up-enemy-turn toggle so player input is fully ignored."
+      },
+      { "effectID": "disableUI", "description": "Hides the quickslots, charstats, and any open small tab windows." },
+      {
+        "effectID": "hideparty",
+        "description": "Sets every party actor invisible (invisibleTimer=99999, visible=false) so the credits scene is clean."
+      },
+      {
+        "effectID": "openJournal",
+        "bValue1": true,
+        "description": "Refreshes and shows the journal with hideAllBtns=true (the credit-style minimal frame)."
+      },
+      {
+        "effectID": "learnJournalEntry",
+        "sValue": "credits0",
+        "description": "Adds journal entry 'credits0' to the player's known list and refreshes the journal to land on it."
+      },
+      {
+        "effectID": "moveJournal",
+        "fValue": 360,
+        "xValue": 40,
+        "yValue": 120,
+        "delay": 3,
+        "description": "After 3s, tweens the journal window over 360 seconds to screen position (40,120)."
+      },
+      {
+        "effectID": "song",
+        "sValue": "PM-Breeze",
+        "bValue2": true,
+        "delay": 2,
+        "description": "After 2s (num - 1 with num=3), plays song 'PM-Breeze'; bValue2=true forces the song-overrides-travel-changes long-fade mode (num184=-99)."
+      },
+      {
+        "effectID": "_loop_1046_to_1063",
+        "description": "Procedurally-generated loop body (Data.cs lines 1046-1063) that runs 21 times for i=1..21, each iteration emitting five TriggerEffects: 'loadSpecialZone' for ('port'+i) at (26 + list[i].X, 30 + list[i].Y) with delay num; 'moveSpecialZone' for ('port'+i) sliding to ((26+list[i].X)+list2[i].X*10, (30+list[i].Y)+list2[i].Y*10) over fValue=0.6 with delay num; 'fx' 'fadeToBlack_short' with delay num + num2 - 2.5; 'learnJournalEntry' 'credits'+i with delay num - 0.5; 'moveJournal' to (40,120) over fValue=360 with bValue1 alternating per the flag/flag2 toggle and delay num - 0.5. After each iteration num increases by num2 (=8), so the 21 segments are spaced 8 seconds apart starting at num=3."
+      },
+      {
+        "effectID": "fx",
+        "sValue": "blackenScreen_superlonger",
+        "delay": 171,
+        "description": "At the credits end (delay = num after the loop = 3 + 21*8 = 171), queues 'blackenScreen_superlonger' camera FX."
+      },
+      {
+        "effectID": "loadSpecialZone",
+        "xValue": 0,
+        "yValue": 0,
+        "delay": 171,
+        "description": "At delay 171, loads an empty special zone (sValue='') at (0,0) - effectively unloading the previous credit-scene special zone."
+      },
+      {
+        "effectID": "moveJournal",
+        "fValue": 360,
+        "bValue2": true,
+        "delay": 170.5,
+        "description": "At delay 170.5, tweens the journal back to centred-on-screen (bValue2=true overrides the destination to screenCenter - half journal size) over 360s."
+      },
+      {
+        "effectID": "openJournal",
+        "bValue1": true,
+        "delay": 171,
+        "description": "At delay 171, re-shows the journal with hideAllBtns=true."
+      },
+      {
+        "effectID": "completeJournalGoal",
+        "sValue": "* Find the Admiral and bring him to justice.",
+        "bValue1": true,
+        "delay": 174,
+        "description": "At delay 174 (num+3), marks the journal goal '* Find the Admiral and bring him to justice.' as complete with bValue1=true."
+      },
+      {
+        "effectID": "song",
+        "bValue1": true,
+        "delay": 171.5,
+        "description": "At delay 171.5 (num+0.5), stops the current song (sValue='') with bValue1=true (overrides volume parameter to control fadeout)."
+      },
+      {
+        "effectID": "song",
+        "sValue": "PM-GentleMusicBox2",
+        "bValue2": true,
+        "delay": 179,
+        "description": "At delay 179 (num+8), plays song 'PM-GentleMusicBox2'; bValue2=true forces the song-overrides-travel-changes long-fade mode."
+      },
+      {
+        "effectID": "learnJournalEntry",
+        "sValue": "creditsEnd1",
+        "delay": 180,
+        "description": "At delay 180 (num+9), adds journal entry 'creditsEnd1'."
+      },
+      {
+        "effectID": "learnJournalEntry",
+        "sValue": "creditsEnd2",
+        "delay": 207,
+        "description": "At delay 207 (num+36), adds journal entry 'creditsEnd2'."
+      },
+      {
+        "effectID": "enableUI",
+        "delay": 222,
+        "description": "At delay 222 (num+51), restores quickslots/charstats and unhides the UI."
+      },
+      {
+        "effectID": "endGame",
+        "bValue1": true,
+        "delay": 222,
+        "description": "At delay 222 (num+51), returns the player to the main menu; if any extras were unlocked this session schedules a 1s 'unlockExtras' UI timer."
+      }
+    ],
+    "notes": "Effect list is partially procedurally generated: the loop placeholder at index 11 (sentinel effectID '_loop_1046_to_1063') stands for 21 iterations × 5 TriggerEffects (Data.cs lines 1046-1063). See errors.md for the loop expansion details. The post-loop delays are derived from num which has accumulated to 3 + 21*8 = 171 by the time the loop exits."
+  }
+]
