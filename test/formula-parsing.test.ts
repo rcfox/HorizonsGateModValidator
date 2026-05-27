@@ -5,7 +5,7 @@
  * This file tests SYNTAX validation - whether the formula text is structurally valid.
  *
  * BELONGS HERE (parser/syntax errors):
- * - Invalid formula structure: abs:(1-2), abs:-2, min:+5
+ * - Invalid formula structure: abs:(1-2), min:+5
  * - Bare words with parentheses where not function-style: distance(5)
  * - Invalid characters after colon: abs:&
  * - Spaces in wrong places: min: d:foo
@@ -445,10 +445,40 @@ describe('Formula Parsing', () => {
       },
     ]);
 
+    // Negative literal as a formula argument (game supports this)
+    checkValidFormulas([
+      {
+        formula: 'abs:-2',
+        expectedAST: {
+          type: 'function',
+          name: { type: 'functionName', value: 'abs' },
+          args: [],
+          body: {
+            type: 'unaryOp',
+            operator: '-',
+            operand: { type: 'literal', value: 2 },
+          },
+        },
+      },
+      {
+        formula: 'min:-1:c:HP',
+        expectedAST: {
+          type: 'function',
+          name: { type: 'functionName', value: 'min' },
+          args: [{ type: 'string', value: '-1' }],
+          body: {
+            type: 'function',
+            name: { type: 'functionName', value: 'c' },
+            args: [{ type: 'string', value: 'HP' }],
+            body: undefined,
+          },
+        },
+      },
+    ]);
+
     // Invalid function calls - colon syntax errors
     checkInvalidFormulas([
       { formula: 'abs:(1-2)', error: 'parentheses cannot appear' },
-      { formula: 'abs:-2', error: 'math operator cannot appear' },
       { formula: 'min:+5', error: 'math operator cannot appear' },
       { formula: 'min: d:foo', error: 'space cannot appear after colon' },
       { formula: 'abs:&', error: 'colon must be followed by a letter or digit' },

@@ -13,7 +13,7 @@
  * - Typos in operator names (suggestions provided)
  *
  * DOES NOT BELONG HERE (parser/syntax errors - use formula-parsing.test.ts instead):
- * - Invalid formula structure: abs:(1-2), abs:-2
+ * - Invalid formula structure: abs:(1-2), min:+5
  * - Bare words with parentheses: distance(5) where distance is not function-style
  * - Invalid characters: abs:&
  * - Unary + operator: 5*+2

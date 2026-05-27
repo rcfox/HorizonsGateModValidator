@@ -213,7 +213,13 @@ function tokenizeFormula(formula: string): {
     const nextCharIsDigit = i + 1 < formula.length && /\d/.test(formula[i + 1] ?? '');
     const isScientificSign = endsWithScientificE && (char === '+' || char === '-') && nextCharIsDigit;
 
-    if ('+-*/%'.includes(char) && parenDepth === 0 && !isScientificSign) {
+    // '-' immediately after a ':' (e.g., abs:-2, min:-1:c:HP) is the sign of the next
+    // operand's leading literal, not a binary operator. The game accepts negative literals
+    // as formula arguments. Append it to the current operand so parseFunctionCall splits
+    // arguments correctly via splitByDelimitersRespectingParens.
+    const isSignAfterColon = char === '-' && currentOperand.endsWith(':') && parenDepth === 0;
+
+    if ('+-*/%'.includes(char) && parenDepth === 0 && !isScientificSign && !isSignAfterColon) {
       // Save current operand if we have one
       if (currentOperand && currentOperandStart) {
         operands.push(currentOperand);
@@ -731,10 +737,10 @@ function buildOperationTree(
  */
 export function parseFormula(formula: string, basePos?: TextPosition): ASTNode {
   // Check for invalid characters immediately after colon
-  // Colons must be followed by a letter or digit (not underscore)
-  // Invalid: abs:(1-2), abs:-2, min:+5, min: d:foo (space after colon), c:_foo (underscore)
-  // Valid: c:HP, m:distance(32), d:gswordDmg
-  const invalidAfterColonPattern = /(\w+):([^a-zA-Z0-9])/;
+  // Colons must be followed by a letter, digit, or '-' (for negative literals like abs:-2)
+  // Invalid: abs:(1-2), min:+5, min: d:foo (space after colon), c:_foo (underscore)
+  // Valid: c:HP, m:distance(32), d:gswordDmg, abs:-2, min:-1:c:HP
+  const invalidAfterColonPattern = /(\w+):([^a-zA-Z0-9\-])/;
   const invalidMatch = formula.match(invalidAfterColonPattern);
   if (invalidMatch?.length === 3) {
     const [_, operatorName, invalidChar] = invalidMatch;
@@ -742,7 +748,7 @@ export function parseFormula(formula: string, basePos?: TextPosition): ASTNode {
     let errorMsg = `Invalid syntax: '${operatorName}:${invalidChar}' - `;
     if (invalidChar === '(') {
       errorMsg += `parentheses cannot appear immediately after colon.`;
-    } else if ('+-*/%'.includes(invalidChar ?? 'placeholder')) {
+    } else if ('+*/%'.includes(invalidChar ?? 'placeholder')) {
       errorMsg += `math operator cannot appear immediately after colon.`;
     } else if (invalidChar === ' ') {
       errorMsg += `space cannot appear after colon. Remove the space.`;

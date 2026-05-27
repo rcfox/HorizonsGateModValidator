@@ -13,7 +13,7 @@
  * - Context-specific validation: allowXParameter for FormulaGlobal.formula property
  *
  * NOT RESPONSIBILITIES (handled by formula-parser.ts):
- * - Syntax errors: abs:(1-2), abs:-2, min:+5
+ * - Syntax errors: abs:(1-2), min:+5
  * - Structural validation: parentheses placement, operator parsing
  * - AST creation: deciding if something is literal vs variable vs global
  *
