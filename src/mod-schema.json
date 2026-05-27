@@ -390,12 +390,6 @@
           "virtual": true
         },
         {
-          "name": "texture",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
           "name": "color",
           "type": "Color",
           "csType": "Color"
@@ -422,6 +416,11 @@
         },
         {
           "name": "palette",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "texture",
           "type": "string",
           "csType": "string"
         },
@@ -840,19 +839,7 @@
       "category": "nested",
       "fields": [
         {
-          "name": "actorValue",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
           "name": "ID",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
-          "name": "sourceAVAffecter",
           "type": "string",
           "csType": "string",
           "virtual": true
@@ -870,13 +857,22 @@
           "virtual": true
         },
         {
+          "name": "sourceAVAffecter",
+          "type": "string",
+          "csType": "string"
+        },
+        {
           "name": "sourceType",
           "type": "string",
-          "csType": "string",
-          "virtual": true
+          "csType": "string"
         },
         {
           "name": "iconText",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "actorValue",
           "type": "string",
           "csType": "string"
         },
@@ -1858,9 +1854,8 @@
       "fields": [
         {
           "name": "shape",
-          "type": "integer",
-          "csType": "string",
-          "virtual": true
+          "type": "AoEShapeType",
+          "csType": "AoEShapeType"
         },
         {
           "name": "minRange",
@@ -2114,9 +2109,8 @@
       "fields": [
         {
           "name": "itemCategory",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
+          "type": "ItemCategory",
+          "csType": "ItemCategory"
         },
         {
           "name": "special",
@@ -2766,12 +2760,6 @@
       "category": "instance",
       "fields": [
         {
-          "name": "ID",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
           "name": "q",
           "type": "integer",
           "csType": "int",
@@ -2884,6 +2872,11 @@
           "csType": "int"
         },
         {
+          "name": "ID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
           "name": "broken",
           "type": "boolean",
           "csType": "bool"
@@ -2934,15 +2927,14 @@
       "category": "definition",
       "fields": [
         {
-          "name": "category",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
           "name": "ID",
           "type": "string",
           "csType": "string"
+        },
+        {
+          "name": "category",
+          "type": "JournalCategory",
+          "csType": "JournalCategory"
         },
         {
           "name": "title",
@@ -3976,12 +3968,6 @@
       "category": "nested",
       "fields": [
         {
-          "name": "canOnlyContainItemsWithThisProperty",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
           "name": "capacity",
           "type": "integer",
           "csType": "int",
@@ -4186,6 +4172,12 @@
           "name": "canContainAnything",
           "type": "boolean",
           "csType": "bool"
+        },
+        {
+          "name": "canOnlyContainItemsWithThisProperty",
+          "type": "string",
+          "csType": "string",
+          "virtual": true
         },
         {
           "name": "cloneFrom",
@@ -4441,33 +4433,9 @@
       "category": "nested",
       "fields": [
         {
-          "name": "saveName",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
-          "name": "playerActorID",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
-          "name": "currentZoneName",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
           "name": "money",
           "type": "integer",
           "csType": "int",
-          "virtual": true
-        },
-        {
-          "name": "currentWeather",
-          "type": "string",
-          "csType": "string",
           "virtual": true
         },
         {
@@ -4591,6 +4559,21 @@
           "csType": "bool"
         },
         {
+          "name": "saveName",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "currentZoneName",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "playerActorID",
+          "type": "string",
+          "csType": "string"
+        },
+        {
           "name": "gameTime",
           "type": "float",
           "csType": "float"
@@ -4619,6 +4602,11 @@
           "name": "windRot",
           "type": "float",
           "csType": "float"
+        },
+        {
+          "name": "currentWeather",
+          "type": "WeatherType",
+          "csType": "WeatherType"
         },
         {
           "name": "crewMorale",
@@ -5080,25 +5068,7 @@
       "category": "nested",
       "fields": [
         {
-          "name": "effectID",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
-          "name": "sValue",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
           "name": "sValue1",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
-          "name": "sValue2",
           "type": "string",
           "csType": "string",
           "virtual": true
@@ -5140,21 +5110,34 @@
           "virtual": true
         },
         {
+          "name": "sValue",
+          "type": "string",
+          "csType": "string"
+        },
+        {
+          "name": "sValue2",
+          "type": "string",
+          "csType": "string"
+        },
+        {
           "name": "fReq",
           "type": "Formula",
-          "csType": "string",
-          "virtual": true
+          "csType": "string"
         },
         {
           "name": "taskString",
           "type": "string",
-          "csType": "string",
-          "virtual": true
+          "csType": "string"
         },
         {
           "name": "XYRefersToThisZone",
           "type": "boolean",
           "csType": "bool"
+        },
+        {
+          "name": "effectID",
+          "type": "string",
+          "csType": "string"
         },
         {
           "name": "ID",
@@ -5614,18 +5597,6 @@
       "category": "nested",
       "fields": [
         {
-          "name": "duration",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
-          "name": "chance",
-          "type": "string",
-          "csType": "string",
-          "virtual": true
-        },
-        {
           "name": "ID",
           "type": "string",
           "csType": "string"
@@ -5646,9 +5617,19 @@
           "csType": "Formula"
         },
         {
+          "name": "duration",
+          "type": "Formula",
+          "csType": "Formula"
+        },
+        {
           "name": "durationIsWorldtimeDays",
           "type": "boolean",
           "csType": "bool"
+        },
+        {
+          "name": "chance",
+          "type": "Formula",
+          "csType": "Formula"
         },
         {
           "name": "weaponAvAffecter",

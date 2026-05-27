@@ -326,39 +326,42 @@ function extractVirtualProperties(filePath, className) {
     patternKeys.add(baseKey);
   }
 
-  // Convert to virtual properties with inferred types
+  // Convert to virtual properties with inferred types.
+  // `inferredType` stays null when no parse pattern matches — the caller uses
+  // that signal to decide whether a real field of the same name should win.
   for (const key of foundKeys) {
-    // Try to infer type from usage
-    let type = 'string'; // default
+    let inferredType = null;
 
     // Check for Formula assignment (e.g., someFormula.formulaString = v["key"])
     const formulaAssignmentRegex = new RegExp(`\\w+\\.formulaString\\s*=\\s*${dictVarName}\\["${key}"\\]`);
     if (formulaAssignmentRegex.test(constructorBody)) {
-      type = 'Formula';
+      inferredType = 'Formula';
     }
     // Check for byte.Parse (like R, G, B)
     // Use regex to handle optional CultureInfo parameter
     else if (new RegExp(`byte\\.Parse\\(${dictVarName}\\["${key}"\\]`).test(constructorBody)) {
-      type = 'byte';
+      inferredType = 'byte';
     }
     // Check for int.Parse
     else if (new RegExp(`int\\.Parse\\(${dictVarName}\\["${key}"\\]`).test(constructorBody)) {
-      type = 'integer';
+      inferredType = 'integer';
     }
     // Check for float.Parse
     else if (new RegExp(`float\\.Parse\\(${dictVarName}\\["${key}"\\]`).test(constructorBody)) {
-      type = 'float';
+      inferredType = 'float';
     }
     // Check for bool.Parse
     else if (new RegExp(`bool\\.Parse\\(${dictVarName}\\["${key}"\\]`).test(constructorBody)) {
-      type = 'boolean';
+      inferredType = 'boolean';
     }
 
+    const type = inferredType ?? 'string';
     virtualProps.push({
       name: key,
       type: type,
       csType: schemaToCsTypeMap[type] || type,
-      virtual: true // Mark as virtual property
+      virtual: true,
+      inferred: inferredType !== null
     });
   }
 
@@ -366,7 +369,7 @@ function extractVirtualProperties(filePath, className) {
   for (const baseKey of patternKeys) {
     // These accept the base name with optional + suffixes (like topX, topX+, topX++, etc.)
     // We'll infer the type from how the value is used
-    let type = 'string';
+    let inferredType = null;
 
     // Look for how the value from the dictionary is parsed
     // Pattern: v[key] is used somewhere after the StartsWith check
@@ -377,21 +380,23 @@ function extractVirtualProperties(filePath, className) {
     const relevantBlock = blockAfterStartsWith.substring(0, nextBraceIdx);
 
     if (relevantBlock.includes(`int.Parse(${dictVarName}[key])`)) {
-      type = 'integer';
+      inferredType = 'integer';
     } else if (relevantBlock.includes(`float.Parse(${dictVarName}[key])`)) {
-      type = 'float';
+      inferredType = 'float';
     } else if (relevantBlock.includes(`byte.Parse(${dictVarName}[key])`)) {
-      type = 'byte';
+      inferredType = 'byte';
     } else if (relevantBlock.includes(`bool.Parse(${dictVarName}[key])`)) {
-      type = 'boolean';
+      inferredType = 'boolean';
     }
 
+    const type = inferredType ?? 'string';
     virtualProps.push({
       name: baseKey + '+',
       type: type,
       csType: schemaToCsTypeMap[type] || type,
       virtual: true,
-      pattern: true // Indicates this accepts + suffixes
+      pattern: true,
+      inferred: inferredType !== null
     });
   }
 
@@ -878,16 +883,27 @@ function extractSchema(tacticsDir) {
     }
 
     console.log(`Extracting ${className}...`);
-    // Extract virtual properties from constructor first (they have better type info)
     const virtualProps = extractVirtualProperties(filePath, className);
     const fields = extractFieldsFromClass(filePath, className, baseDir);
 
-    // Filter out fields that duplicate virtual properties (constructor takes precedence)
-    const virtualPropNames = new Set(virtualProps.map(vp => vp.name));
+    // Real field beats virtual prop unless the virtual prop's type was
+    // explicitly inferred from a parse pattern in the constructor. The
+    // `inferred` flag distinguishes "type came from evidence" from "type
+    // defaulted to string because no pattern matched."
+    const fieldsByName = new Map(fields.map(f => [f.name, f]));
+    const keptVirtualProps = virtualProps.filter(vp => {
+      const realField = fieldsByName.get(vp.name);
+      if (!realField) return true;
+      return vp.inferred === true;
+    });
+    // `inferred` is internal merge metadata — strip it before serialization.
+    for (const vp of keptVirtualProps) delete vp.inferred;
+
+    const virtualPropNames = new Set(keptVirtualProps.map(vp => vp.name));
     const uniqueFields = fields.filter(f => !virtualPropNames.has(f.name));
 
-    // Combine virtual properties and unique fields (virtual props first)
-    const allFields = [...virtualProps, ...uniqueFields];
+    // Combine kept virtual properties and unique fields (virtual props first)
+    const allFields = [...keptVirtualProps, ...uniqueFields];
 
     // Determine category
     const category = categorizeClass(className, dataManagerContent);
@@ -990,6 +1006,8 @@ function extractSchema(tacticsDir) {
     const zoneVirtualProps = extractVirtualProperties(zoneFilePath, 'Zone');
     const realFieldNames = new Set(zoneFields.map(f => f.name));
     const uniqueVirtualProps = zoneVirtualProps.filter(vp => !realFieldNames.has(vp.name));
+    // `inferred` is internal merge metadata — strip it before serialization.
+    for (const vp of uniqueVirtualProps) delete vp.inferred;
     schema['Zone'] = {
       category: 'special',
       fields: [...zoneFields, ...uniqueVirtualProps],
