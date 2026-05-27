@@ -64,6 +64,140 @@ describe('Mod Validator Integration', () => {
       expectValid(result);
     });
 
+    test('emits info (not error) when formula contains @G runtime global-var substitution', () => {
+      const modContent = `[FormulaGlobal] ID=usesGlobalVar;
+\tformula=@Gmyvar+5;`;
+
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      expect(result.errors).toHaveLength(0);
+      expectMessage(result, {
+        text: 'Formula contains @G runtime global-var substitution; cannot fully validate',
+        severity: 'info',
+      });
+    });
+
+    test('--#validator declare resolves @G; no info or error when fully substituted', () => {
+      const modContent = `-- #validator declare myvar = max:3
+[FormulaGlobal] ID=usesGlobalVar;
+\tformula=@Gmyvar:c:HP;`;
+
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      expectValid(result);
+    });
+
+    test('--#validator declare value runs to next -- on same line (trailing comment ignored)', () => {
+      const modContent = `-- #validator declare myvar = max:3 -- trailing human comment
+[FormulaGlobal] ID=usesGlobalVar;
+\tformula=@Gmyvar:c:HP;`;
+
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      expectValid(result);
+    });
+
+    test('declared substitution surfaces wrong-arg-count errors in the substituted formula', () => {
+      // bad expands to "abs:" → final formula "abs:" with no body. abs requires one
+      // formula argument, so the validator should emit a wrong-arg-count error.
+      const modContent = `-- #validator declare bad = abs:
+[FormulaGlobal] ID=usesGlobalVar;
+\tformula=@Gbad;`;
+
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      expectMessage(result, {
+        text: "Operator 'abs' does not have a use case with 0 argument(s)",
+        severity: 'error',
+      });
+    });
+
+    test('declarations later in source apply to earlier formula (file-scoped)', () => {
+      const modContent = `[FormulaGlobal] ID=usesGlobalVar;
+\tformula=@Gmyvar:c:HP;
+-- #validator declare myvar = max:3`;
+
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      expectValid(result);
+    });
+
+    test('duplicate declarations: last one wins, earlier ones get shadow warnings', () => {
+      const modContent = `-- #validator declare myvar = max:3
+-- #validator declare myvar = min:7
+[FormulaGlobal] ID=usesGlobalVar;
+\tformula=@Gmyvar:c:HP;`;
+
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      // Formula uses the winning value (line 2's min:7), so no errors
+      expect(result.errors).toHaveLength(0);
+      expectMessage(result, {
+        text: "Declaration of 'myvar' is shadowed by a later declaration on line 2",
+        severity: 'warning',
+      });
+      // Shadow warning is anchored at the shadowed (earlier) line
+      const shadowWarning = result.warnings.find(w =>
+        w.message.includes("Declaration of 'myvar'")
+      );
+      expect(shadowWarning?.line).toBe(1);
+    });
+
+    test('three duplicate declarations: both earlier ones get warnings pointing at the last', () => {
+      const modContent = `-- #validator declare v = max:3
+-- #validator declare v = max:5
+-- #validator declare v = max:7
+[FormulaGlobal] ID=u;
+\tformula=@Gv:c:HP;`;
+
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      const shadowWarnings = result.warnings.filter(w =>
+        w.message.includes("Declaration of 'v'")
+      );
+      expect(shadowWarnings.map(w => w.line).sort()).toEqual([1, 2]);
+      expect(shadowWarnings.every(w => w.message.includes('on line 3'))).toBe(true);
+    });
+
+    test('cyclic declarations: substitution hits recursion limit and errors', () => {
+      const modContent = `-- #validator declare a = @GcritChance
+-- #validator declare critChance = @Ga
+[FormulaGlobal] ID=usesGlobalVar;
+\tformula=@GcritChance+5;`;
+
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      expectMessage(result, {
+        text: '@G substitution recursion limit was reached while expanding formula',
+        severity: 'error',
+      });
+      // Recursion error short-circuits — no unresolved-@G info should also fire
+      expect(result.info.filter(m => m.message.includes('cannot fully validate'))).toHaveLength(0);
+    });
+
+    test('declaration nested inside an earlier -- comment is ignored', () => {
+      const modContent = `-- some unrelated comment -- #validator declare myvar = max:3
+[FormulaGlobal] ID=usesGlobalVar;
+\tformula=@Gmyvar+5;`;
+
+      const validator = new ModValidator();
+      const result = validator.validate(modContent, 'test.txt');
+
+      // Declaration ignored, so @G is unresolved → info message fires
+      expectMessage(result, {
+        text: 'Formula contains @G runtime global-var substitution; cannot fully validate',
+        severity: 'info',
+      });
+    });
+
     test('validates enum properties', () => {
       const modContent = `[ItemType] ID=testItem;
 \titemCategory=weapon;`;

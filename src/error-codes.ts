@@ -80,6 +80,9 @@ export const ValidationErrorCode = {
 
   // Formula validation
   FORMULA_PARSE_ERROR: 'FORMULA_PARSE_ERROR',
+  FORMULA_HAS_GLOBAL_VAR: 'FORMULA_HAS_GLOBAL_VAR',
+  FORMULA_AT_G_RECURSION: 'FORMULA_AT_G_RECURSION',
+  DECLARATION_SHADOWED: 'DECLARATION_SHADOWED',
   UNKNOWN_OPERATOR: 'UNKNOWN_OPERATOR',
   OPERATOR_WRONG_SYNTAX: 'OPERATOR_WRONG_SYNTAX',
   OPERATOR_WRONG_ARG_COUNT: 'OPERATOR_WRONG_ARG_COUNT',
@@ -179,6 +182,9 @@ export type ErrorContext =
 
   // ── Formula validation ─────────────────────────────────────────────────────
   | { errorCode: typeof C.FORMULA_PARSE_ERROR }
+  | { errorCode: typeof C.FORMULA_HAS_GLOBAL_VAR }
+  | { errorCode: typeof C.FORMULA_AT_G_RECURSION }
+  | { errorCode: typeof C.DECLARATION_SHADOWED; errorCodeContext: { varName: string; activeLine: number } }
   | { errorCode: typeof C.UNKNOWN_OPERATOR; errorCodeContext: { operatorName: string } }
   | { errorCode: typeof C.OPERATOR_WRONG_SYNTAX; errorCodeContext: { operatorName: string } }
   | { errorCode: typeof C.OPERATOR_WRONG_ARG_COUNT; errorCodeContext: { operatorName: string } }

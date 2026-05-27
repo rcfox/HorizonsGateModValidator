@@ -4,7 +4,13 @@
  */
 
 import { ValidationMessage, Correction, PropertyInfo, ValidationErrorCode } from './types.js';
-import { parseFormula, validateAST, type ValidationError } from './formula-parser.js';
+import {
+  parseFormula,
+  substituteAtG,
+  getActiveDeclarations,
+  validateAST,
+  type ValidationError,
+} from './formula-parser.js';
 
 /**
  * Validate a formula string using the AST parser and validator
@@ -22,22 +28,54 @@ export function validateFormula(
     return messages;
   }
 
+  // @G<name> is a runtime string substitution. If declarations are active (set by the
+  // orchestrator), substituteAtG resolves what it can. Anything unresolved means we can't
+  // fully validate the post-substitution form, so emit info. If substitution hit the
+  // iteration cap, the declarations likely cycle (e.g., a→b→a) — error and skip further
+  // validation since we can't produce a meaningful AST.
+  const declarations = getActiveDeclarations();
+  const { result: effectiveFormula, hadSubstitution, recursionLimitHit } = substituteAtG(formula, declarations);
+
+  if (recursionLimitHit) {
+    messages.push({
+      severity: 'error',
+      message: `@G substitution recursion limit was reached while expanding formula '${formula}'; check declared values for a cycle.`,
+      filePath: propInfo.filePath,
+      line: propInfo.valueStartLine,
+      errorCode: ValidationErrorCode.FORMULA_AT_G_RECURSION,
+    });
+    return messages;
+  }
+
+  const hasUnresolvedAtG = effectiveFormula.includes('@G');
+
+  if (hasUnresolvedAtG) {
+    messages.push({
+      severity: 'info',
+      message: `Formula contains @G runtime global-var substitution; cannot fully validate post-substitution form`,
+      filePath: propInfo.filePath,
+      line: propInfo.valueStartLine,
+      errorCode: ValidationErrorCode.FORMULA_HAS_GLOBAL_VAR,
+    });
+  }
+
   const allowXParameter = objectType === 'FormulaGlobal' && propertyName === 'formula';
 
   try {
-    const ast = parseFormula(formula);
+    const ast = parseFormula(effectiveFormula);
     const validationErrors = validateAST(ast, undefined, allowXParameter);
 
     // Convert AST validation errors to ValidationMessages
     for (const error of validationErrors) {
-      const corrections = createCorrections(formula, error, propInfo);
-
-      // Calculate actual line number for multi-line formulas
-      // Node positions are relative to formula start, so add to property value start line
-      const errorLine = propInfo.valueStartLine + error.node.startLine;
+      // After substitution, AST positions refer to the substituted string, not the source.
+      // Fall back to the property's value start so errors land on the right line.
+      const corrections = hadSubstitution ? [] : createCorrections(formula, error, propInfo);
+      const errorLine = hadSubstitution ? propInfo.valueStartLine : propInfo.valueStartLine + error.node.startLine;
+      const contextNote = hadSubstitution ? `After @G substitution: '${effectiveFormula}'` : error.context;
 
       messages.push({
         ...error, // FIXME: Look into unifying ValidationError and ValidationMessage
+        context: contextNote,
         severity: 'error',
         filePath: propInfo.filePath,
         line: errorLine,
@@ -48,9 +86,10 @@ export function validateFormula(
   } catch (e: unknown) {
     // Parse error
     const errorMessage = e instanceof Error ? e.message : String(e);
+    const suffix = hadSubstitution ? ` (after @G substitution to '${effectiveFormula}')` : '';
     messages.push({
       severity: 'error',
-      message: `Formula parse error: ${errorMessage}`,
+      message: `Formula parse error: ${errorMessage}${suffix}`,
       filePath: propInfo.filePath,
       line: propInfo.valueStartLine,
       errorCode: ValidationErrorCode.FORMULA_PARSE_ERROR,

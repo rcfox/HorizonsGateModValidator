@@ -476,6 +476,39 @@ describe('Formula Parsing', () => {
       },
     ]);
 
+    // @G<name> runtime global-var placeholder; parsed as an opaque global ref so the
+    // surrounding formula can still validate. Substitution happens at evaluation time
+    // (Tactics/Formula.cs:70-95).
+    checkValidFormulas([
+      {
+        formula: '@Gfoo',
+        expectedAST: { type: 'global', name: '@Gfoo', argument: undefined },
+      },
+      {
+        formula: '@Gfoo+5',
+        expectedAST: {
+          type: 'binaryOp',
+          operator: '+',
+          left: { type: 'global', name: '@Gfoo', argument: undefined },
+          right: { type: 'literal', value: 5 },
+        },
+      },
+      {
+        formula: 'min:@Gfoo:c:HP',
+        expectedAST: {
+          type: 'function',
+          name: { type: 'functionName', value: 'min' },
+          args: [{ type: 'string', value: '@Gfoo' }],
+          body: {
+            type: 'function',
+            name: { type: 'functionName', value: 'c' },
+            args: [{ type: 'string', value: 'HP' }],
+            body: undefined,
+          },
+        },
+      },
+    ]);
+
     // Invalid function calls - colon syntax errors
     checkInvalidFormulas([
       { formula: 'abs:(1-2)', error: 'parentheses cannot appear' },

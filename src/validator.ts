@@ -7,6 +7,8 @@ import { ValidationResult, ValidationMessage, ModSchema, ParsedObject, SchemaDat
 import { ModParser } from './parser.js';
 import { PropertyValidator } from './property-validator.js';
 import { findSimilar, MAX_EDIT_DISTANCE } from './string-similarity.js';
+import { scanDeclarations } from './declaration-scanner.js';
+import { setActiveDeclarations } from './formula-parser.js';
 import modSchemaData from './mod-schema.json' with { type: 'json' };
 
 export class ModValidator {
@@ -28,6 +30,12 @@ export class ModValidator {
   }
 
   validate(content: string, filePath: string): ValidationResult {
+    // Scan `-- #validator declare` directives and publish to formula-parser's substitution
+    // state so @G references can be resolved during parsing. File-scoped: reset each call.
+    // Shadowed-declaration warnings flow through with the rest of the validation output.
+    const declScan = scanDeclarations(content, filePath);
+    setActiveDeclarations(declScan.map);
+
     const parser = new ModParser(content, filePath);
 
     const { objects, errors: parseErrors } = parser.parse();
@@ -39,7 +47,7 @@ export class ModValidator {
     const structureMessages = this.validateActionStructures(objects);
     // NOTE: checkDuplicateIds now runs separately via getCrossFileValidationMessages()
 
-    const allMessages = [...parseErrors, ...objMessages, ...structureMessages];
+    const allMessages = [...parseErrors, ...declScan.messages, ...objMessages, ...structureMessages];
 
     const errors = allMessages.filter(m => m.severity === 'error');
     const warnings = allMessages.filter(m => m.severity === 'warning');

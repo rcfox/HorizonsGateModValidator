@@ -75,7 +75,9 @@ interface FileManager {
 const MAX_DIRECTORY_DEPTH = 32;
 
 // Sample mod code
-const SAMPLE_MOD = `[Action] ID=greatswordAttack;
+const SAMPLE_MOD = `-- #validator declare critChance = 50 -- substituted into any @GcritChance formula
+
+[Action] ID=greatswordAttack;
 	applyWeaponBuffs=tru;
 
 	casterAnimation=broadswing
@@ -89,7 +91,7 @@ const SAMPLE_MOD = `[Action] ID=greatswordAttack;
 	actorValue=HP;
 	magnitude= dat:gswordDmg;
 	durration=-2;
-	chance=test;
+	chance=@GcritChance + 50;
 	element=2;
 	element=physical;
 	element=slash;

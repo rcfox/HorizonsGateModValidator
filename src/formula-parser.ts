@@ -42,17 +42,93 @@ import {
 } from './formula-metadata.js';
 import type { PositionInfo, WithPosition } from './types.js';
 import { isValidFloat } from './value-validators.js';
-import {
-  type TextPosition,
-  createPositionInfo,
-  advancePosition,
-} from './position-utils.js';
+import { type TextPosition, createPositionInfo, advancePosition } from './position-utils.js';
 
 // Re-export validator for convenience
 export { validateAST, formatValidationErrors, type ValidationError } from './formula-ast-validator.js';
 
 // Re-export position types for backward compatibility
 export type { PositionInfo, WithPosition };
+
+// ─── @G runtime global-var substitution ──────────────────────────────────────
+//
+// `@G<name>` is a pre-evaluation string substitution in the game (Tactics/Formula.cs:70-95).
+// The substituted value can change the AST shape (e.g., @Gmyvar where myvar="max:3" turns
+// `@Gmyvar:c:HP` into `max:3:c:HP`), so it's a parse-step concern. Callers (validator)
+// invoke substituteAtG immediately before parseFormula to operate on the resolved text.
+//
+// Declarations come from `-- #validator declare <name> = <value>` directives in the source,
+// scanned once per file by validator.ts and set here via setActiveDeclarations. Module-level
+// state matches the existing pattern for formula.json (single-threaded validator).
+
+let activeDeclarations: ReadonlyMap<string, string> = new Map();
+
+export function setActiveDeclarations(decls: ReadonlyMap<string, string>): void {
+  activeDeclarations = decls;
+}
+
+export function getActiveDeclarations(): ReadonlyMap<string, string> {
+  return activeDeclarations;
+}
+
+// Terminator chars for @G var-name scanning, mirroring Tactics/Formula.cs:75.
+const AT_G_TERMINATORS = new Set(['@', ' ', ':', '-', '+', '/', '*', '%', '(', ')']);
+
+/**
+ * Substitute `@G<name>` occurrences using the supplied declarations, leaving undeclared
+ * references in place. Iterates up to maxIterations to resolve declared values that
+ * themselves contain @G (mirroring the C# runtime loop in Tactics/Formula.cs:70).
+ *
+ * If we still have changes pending after maxIterations passes, the declarations form a
+ * cycle (e.g., `a = @Gb`, `b = @Ga`). `recursionLimitHit` flags this so the caller can
+ * surface it as an error rather than silently returning a partially-expanded string.
+ */
+export function substituteAtG(
+  formula: string,
+  decls: ReadonlyMap<string, string>,
+  maxIterations = 1000
+): { result: string; hadSubstitution: boolean; recursionLimitHit: boolean } {
+  let text = formula;
+  let hadSubstitution = false;
+  let converged = false;
+  for (let iter = 0; iter < maxIterations; iter++) {
+    let next = '';
+    let changed = false;
+    let i = 0;
+    while (i < text.length) {
+      if (text[i] === '@' && text[i + 1] === 'G') {
+        const startName = i + 2;
+        let endName = text.length;
+        for (let j = startName; j < text.length; j++) {
+          if (AT_G_TERMINATORS.has(text[j]!)) {
+            endName = j;
+            break;
+          }
+        }
+        const varName = text.substring(startName, endName);
+        if (decls.has(varName)) {
+          next += decls.get(varName);
+          i = endName;
+          changed = true;
+          hadSubstitution = true;
+          continue;
+        }
+        // Undeclared @G: copy through as-is.
+        next += '@G';
+        i += 2;
+        continue;
+      }
+      next += text[i];
+      i++;
+    }
+    text = next;
+    if (!changed) {
+      converged = true;
+      break;
+    }
+  }
+  return { result: text, hadSubstitution, recursionLimitHit: !converged };
+}
 
 // Base node interfaces (internal - without positions)
 interface LiteralNodeBase {
@@ -334,8 +410,9 @@ function parseOperand(operand: string, startPos: TextPosition): ASTNode {
   }
 
   // If no special syntax, treat as a global formula reference
-  // Validate that the name only contains word characters (letters, digits, underscore)
-  if (!/^\w+$/.test(operand)) {
+  // Validate that the name only contains word characters (letters, digits, underscore),
+  // or is an @G<name> runtime global-var placeholder
+  if (!/^\w+$/.test(operand) && !/^@G\w*$/.test(operand)) {
     throw new Error(
       `Invalid identifier '${operand}': global formula names must only contain letters, digits, and underscores. Did you mean to use a function call with ':' (e.g., 'c:${operand}')?`
     );
@@ -737,10 +814,10 @@ function buildOperationTree(
  */
 export function parseFormula(formula: string, basePos?: TextPosition): ASTNode {
   // Check for invalid characters immediately after colon
-  // Colons must be followed by a letter, digit, or '-' (for negative literals like abs:-2)
+  // Colons must be followed by a letter, digit, '-' (for negative literals like abs:-2), or '@G'
   // Invalid: abs:(1-2), min:+5, min: d:foo (space after colon), c:_foo (underscore)
-  // Valid: c:HP, m:distance(32), d:gswordDmg, abs:-2, min:-1:c:HP
-  const invalidAfterColonPattern = /(\w+):([^a-zA-Z0-9\-])/;
+  // Valid: c:HP, m:distance(32), d:gswordDmg, abs:-2, min:-1:c:HP, min:@Gfoo:c:HP
+  const invalidAfterColonPattern = /(\w+):(?!@G)([^a-zA-Z0-9\-])/;
   const invalidMatch = formula.match(invalidAfterColonPattern);
   if (invalidMatch?.length === 3) {
     const [_, operatorName, invalidChar] = invalidMatch;
