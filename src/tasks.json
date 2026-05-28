@@ -5051,7 +5051,7 @@
       "officialDescription": "Creates SpawnData 'sValue' actors on items with 'sValue2' specialProperty. fValue = group power level mod. If bValue1, can spawn even if group is already extant. Actors look at XY if specified.",
       "uses": [
         {
-          "description": "Creates a group of actors using a named SpawnData and places each actor on a random tile whose items have a specified specialProperty. The desired power level for the group is the supplied modifier plus the party's power level (with zone/global mods). With bools[0] = true, the group is created even if a group with this name already exists. If a tile coordinate is supplied, each spawned actor faces it. The SpawnData's spawnFX (if any) is played on each spawn.",
+          "description": "Creates a group of actors using a named SpawnData and places each actor on a random tile whose items have a specified specialProperty. Currently, the group will always be named \"spawn\", which might be a bug. The desired power level for the group is the supplied modifier plus the party's power level (with zone/global mods). With bools[0] = true, the group is created even if a group with this name already exists. If a tile coordinate is supplied, each spawned actor faces it. The SpawnData's spawnFX (if any) is played on each spawn.",
           "required": [],
           "optional": [
             {
@@ -5068,7 +5068,7 @@
             },
             {
               "name": "bools[0]",
-              "description": "If true, the group is created even if a group with the same name already exists."
+              "description": "If true, the group is created even if a group with the same name already exists. Note: As of right now, all groups will be named \"spawn\", so this is required in order to work correctly if called more than once."
             },
             {
               "name": "tileCoords[0]",

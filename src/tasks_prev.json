@@ -3957,7 +3957,7 @@
       "name": "spawn_onItem",
       "uses": [
         {
-          "description": "Spawns actors from spawn data on tiles containing items with a specific special property. Creates actors at power level relative to the party, positions them on matching item tiles, and optionally makes them look at a target position. The actors are marked as giving XP and positioned randomly on matching items.",
+          "description": "Spawns actors from spawn data on tiles containing items with a specific special property. Creates actors at power level relative to the party, positions them on matching item tiles, and optionally makes them look at a target position. The actors are marked as giving XP and positioned randomly on matching items. Currently, the group will always be named \"spawn\", which might be a bug.",
           "required": [
             {
               "name": "strings[0]",
@@ -3969,7 +3969,7 @@
             },
             {
               "name": "bools[0]",
-              "description": "Whether to prevent group duplication. When true, does not spawn if a group with this ID already exists."
+              "description": "Whether to prevent group duplication. When true, spawns even if a group with this ID already exists. Note: As of right now, all groups will be named \"spawn\", so this is required in order to work correctly if called more than once."
             },
             {
               "name": "floats[0]",
