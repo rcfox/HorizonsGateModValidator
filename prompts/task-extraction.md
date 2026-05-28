@@ -5,7 +5,6 @@ In ./Tactics/Task.cs, in the executeTask function, there is a switch statement o
 For each of these tasks, I want to capture:
 
 * The name of the task.
-* The official description.
 * For each of the task's use cases:
   * What the task use case does.
     * Not just "executes the foo task", but actually try to describe in game terms what it does.
@@ -48,19 +47,7 @@ Prefer richer, more accurate descriptions over brevity.
 
 Descriptions should describe behaviour, not implementation. The audience is game modders who do not have access to the source code.
 
-Official descriptions can be found in Data.cs by looking for `taskDescriptions.Add(Task.TaskType.{taskName}, "...")`. Copy them verbatim to the `officialDescription` field for the task.
-
-Alternatively, an official description may be found in a `consoleCommandDescriptions.Add("{taskName}", "...")` line. Copy this as the `officialDescription` and set `"consoleCommand": true`.
-
-Sequencing: extract every `uses[].description` and input description from the code **before** reading the official description for the task. Once the official text has been read, do not edit or re-word any `uses[].description` based on it. The official descriptions use a different vocabulary (`sValue`, `fValue`, `b1`) and will contaminate your input naming if mirrored.
-
-Alias handling: for an entry whose canonical name has a `taskDescriptions.Add` entry, use that text. If the canonical has no entry, fall back to the first alias (in `aliases` array order) that does, and record the fallback in `errors.md`. Ignore the entries of other aliases.
-
-Missing entries: if no `taskDescriptions.Add` or `consoleCommandDescriptions.Add` exists for the canonical or any alias, set `"officialDescription": null` and record this in `errors.md`.
-
-Verbatim copy: "verbatim" means the resolved string value, not a byte-for-byte source copy. Decode C# escape sequences (`\"`, `\n`, `\\`, etc.) into their actual characters, then re-encode as a valid JSON string (escaping `"` and `\` per JSON rules). If the source uses string concatenation (`"..." + "..."`) across one or more lines, concatenate the parts into a single value before copying.
-
-Do not create a new entry for each alias. If two names execute the same code path with no conditional behaviour on the `type` variable, treat them as aliases. Similar or overlapping behavior is not sufficient. Keep the longest name as the canonical name, and add the others to the entry's "aliases" array. In the event of a tie in length, prefer a name with no underscores; among those, prefer a name that uses camelCase; if still tied, choose the lexicographically first. If there are no aliases, set `"aliases": []` for that entry. Order the `aliases` array alphabetically.
+Do not create a new entry for each alias. If two names execute the same code path with no conditional behaviour on the `type` variable, treat them as aliases. If there is even minor behavioural deviation based on `type`, do not treat them as aliases. Keep the longest name as the canonical name, and add the others to the entry's "aliases" array. In the event of a tie in length, prefer a name with no underscores; among those, prefer a name that uses camelCase; if still tied, choose the lexicographically first. If there are no aliases, set `"aliases": []` for that entry. Order the `aliases` array lexicographically.
 
 Aliases are case statements that fall through to share code with no intervening logic.
 
@@ -91,8 +78,6 @@ The task extraction output must go into ./mod-validator/src/tasks.jsonl as JSONL
 ```
 {
   "name": "exampleTask",
-  "officialDescription": "Gives an item stored in the global variable to all actors identified.",
-  "consoleCommand": false,
   "uses": [
     {
       "description": "...",
@@ -146,7 +131,7 @@ The task extraction output must go into ./mod-validator/src/tasks.jsonl as JSONL
 
 **IMPORTANT**: This JSONL is presented across multiple lines for ease of viewing. Write the actual individual JSON objects on a single line each.
 
-Never overwrite or recreate ./mod-validator/src/tasks.jsonl. Append new entries. Do not use `Write`, since it overwrites the file. Only `Read` the file when resuming (to locate the last entry) or when modifying an existing line.
+Never overwrite or recreate ./mod-validator/src/tasks.jsonl. Append new entries by writing to a temp file and then concatenating the temp file to the end of the `tasks.jsonl` file. Do not use `Write`, since it overwrites the file.
 
 Do not write progress markers, sentinels, comments, or "TODO continue from X" entries into `tasks.jsonl`. The file contains only valid task JSON objects, one per line.
 
