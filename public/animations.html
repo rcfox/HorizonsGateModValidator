@@ -175,7 +175,7 @@
 </div>
 
 <h2 id="anatomy-key">The <code>Keyframe</code> object</h2>
-<p>A keyframe is a <em>target pose reached at a moment in time</em>. The most important idea: a keyframe says "by time <code>endTime</code>, this part should be at this <code>offset</code> / rotation, showing sprite <code>frame</code>." The engine interpolates the offsets and rotations from the previous keyframe's pose to this one over the intervening time. The sprite <code>frame</code> itself is <strong>not</strong> interpolated — it snaps to the new value the instant the keyframe begins.</p>
+<p>A keyframe is a <em>target pose reached at a moment in time</em>. The most important idea: a keyframe says "by time <code>endTime</code>, this part should be at this <code>offset</code> / rotation, showing sprite <code>frame</code>." The engine <em>tweens</em> the offsets and rotations from the previous keyframe's pose to this one over the intervening time. The sprite <code>frame</code> itself is <strong>not</strong> tweened — it snaps to the new value the instant the keyframe begins.</p>
 
 <ul>
   <li><code>frame</code> — which cell of the sprite sheet to draw. Snaps (no tweening).</li>
@@ -186,12 +186,17 @@
   <li><code>fx</code> — names a visual effect spawned when this keyframe begins (blood, sparks, etc.).</li>
 </ul>
 
+<div class="callout note">
+  <p><span class="label">What "tween" means</span></p>
+  <p>To <em>tween</em> (short for "in-between") is to generate the intermediate values between two keyframes automatically, so motion is smooth instead of jumping from pose to pose. You only specify the endpoints — a keyframe at <code>offset=0,0</code> and the next at <code>offset=0,-6</code> — and the engine fills in every step in between (<code>0,-1</code>, <code>0,-2</code>, …) based on how far <code>time</code> has progressed between them. It's a straight linear blend: at the halfway point in time, you're at the halfway value. (If you've met the term elsewhere, this is exactly <em>interpolation</em> — the same idea by its formal name.) This guide uses "tween" throughout: <strong>offsets and rotations are tweened; the sprite <code>frame</code> is not</strong> — it snaps.</p>
+</div>
+
 <h2 id="playback">How playback works</h2>
 <p>The animator keeps a running <code>time</code> that increases each tick (scaled by the playback <code>speed</code>). <strong><code>endTime</code> is cumulative and absolute within the animation</strong>, not a per-frame duration. So a three-keyframe animation might use <code>endTime</code> of <code>0</code>, <code>0.1</code>, <code>0.3</code> — meaning the first pose is held at the start, the second is reached 0.1s in, and the third 0.3s in (and <code>duration</code> becomes <code>0.3</code>).</p>
 
 <ol>
   <li>The first keyframe usually has <code>endTime=0</code> — it's the starting pose, reached instantly.</li>
-  <li>For each later keyframe, the engine linearly interpolates <code>offset</code>, <code>directionalOffset</code>, <code>facingRotOffset</code>, and <code>targetOffsetMult</code> from the previous keyframe's values to this keyframe's values, across the gap <code>(this.endTime − previous.endTime)</code>.</li>
+  <li>For each later keyframe, the engine linearly tweens <code>offset</code>, <code>directionalOffset</code>, <code>facingRotOffset</code>, and <code>targetOffsetMult</code> from the previous keyframe's values to this keyframe's values, across the gap <code>(this.endTime − previous.endTime)</code>.</li>
   <li>The <code>frame</code> sprite snaps when the keyframe is entered.</li>
 </ol>
 
@@ -236,11 +241,11 @@
 
 <div class="callout warn">
   <p><span class="label">A keyframe with endTime 0 is a snap, not a hold</span></p>
-  <p>If a keyframe's <code>endTime</code> equals the previous keyframe's <code>endTime</code> (a zero-length slice), there's nothing to interpolate over and the engine moves straight through it. To <em>hold</em> a pose, give the next keyframe a later <code>endTime</code>. To guarantee a keyframe is actually drawn even if the clock overshoots it in one tick, set <code>holdForAtLeastOneFrame=true</code>.</p>
+  <p>If a keyframe's <code>endTime</code> equals the previous keyframe's <code>endTime</code> (a zero-length slice), there's nothing to tween over and the engine moves straight through it. To <em>hold</em> a pose, give the next keyframe a later <code>endTime</code>. To guarantee a keyframe is actually drawn even if the clock overshoots it in one tick, set <code>holdForAtLeastOneFrame=true</code>.</p>
 </div>
 
 <h3 id="frame-reuse">Reusing a frame number</h3>
-<p>You'll often see the same <code>frame</code> value repeated on several consecutive keyframes. That's deliberate, and it follows directly from the rule that <strong>offsets interpolate but the sprite snaps</strong>. Holding one sprite still while changing the offsets around it produces <em>motion of a fixed pose</em>. The common reasons:</p>
+<p>You'll often see the same <code>frame</code> value repeated on several consecutive keyframes. That's deliberate, and it follows directly from the rule that <strong>offsets tween but the sprite snaps</strong>. Holding one sprite still while changing the offsets around it produces <em>motion of a fixed pose</em>. The common reasons:</p>
 
 <ul>
   <li><strong>Slide a pose around without redrawing it.</strong> A lunge is typically three keyframes all using the <em>same</em> <code>frame</code>: rest → pushed forward (big <code>offset</code> / <code>targetOffsetMult</code>) → back to rest. The character never changes sprite; only the offset moves, so it reads as a smooth thrust and recoil. If you incremented <code>frame</code> instead, you'd get a flipbook, not a glide.</li>
@@ -324,7 +329,7 @@ animate(self, <span class="tok-key">"idle_breathe"</span>, 1, 0, true, false, -1
 
 <pre><code><span class="tok-tag">[Animation]</span>
     <span class="tok-key">ID</span>=lunge_simple;
-    <span class="tok-key">applyFrameToAllParts</span>=true;   <span class="tok-com">-- draw frame 0 on the whole sprite</span>
+    <span class="tok-key">applyFrameToAllParts</span>=true;   <span class="tok-com">-- every part uses the base-track frame</span>
 
 <span class="tok-tag">[Keyframe]</span>
     <span class="tok-key">ID</span>=lunge_simple;
@@ -563,7 +568,7 @@ animate(self, <span class="tok-key">"idle_breathe"</span>, 1, 0, true, false, -1
     <span class="tok-key">fx</span>=fire_burst;
     <span class="tok-key">endTime</span>=0.3;</code></pre>
 
-<p>The <code>frame</code> numbers now index cells of <code>hero_ablaze</code>, not the actor's normal sheet. <code>applyFrameToAllParts</code> means the actor is drawn from that single override frame rather than as assembled limbs — usually what you want when the override sprite is a complete, pre-drawn pose. The width/height overrides tell the engine the override sheet's cell size, and <code>spriteOffset</code> compensates for the difference in alignment.</p>
+<p>The <code>frame</code> numbers now index cells of <code>hero_ablaze</code>, not the actor's normal sheet. <code>applyFrameToAllParts</code> makes every body part advance to the base keyframe's <code>frame</code> together — instead of each limb following its own per-part track — so the whole rig steps through the override sheet's frames in lockstep. That's what you want when each frame of the override sheet is a complete, pre-drawn pose. The width/height overrides tell the engine the override sheet's cell size, and <code>spriteOffset</code> compensates for the difference in alignment.</p>
 
 <hr>
 
@@ -574,7 +579,7 @@ animate(self, <span class="tok-key">"idle_breathe"</span>, 1, 0, true, false, -1
   <tr><td><code>cloneFrom</code></td><td>string</td><td>—</td><td>Start as a copy of an existing animation (its keyframes and settings), then apply the fields below.</td></tr>
   <tr><td><code>flipArms</code></td><td>bool</td><td><code>false</code></td><td>Only with <code>cloneFrom</code>: mirror the clone by swapping the <code>armL</code>↔<code>armR</code> and <code>item0</code>↔<code>item1</code> tracks.</td></tr>
   <tr><td><code>attackKeyframe</code></td><td>int</td><td><code>0</code></td><td>The base-track index at which the "hit" registers. The action's effect lands once playback reaches this keyframe.</td></tr>
-  <tr><td><code>applyFrameToAllParts</code></td><td>bool</td><td><code>false</code></td><td>Draw the base track's <code>frame</code> on every body part (for sprites that aren't rigged into separate limbs).</td></tr>
+  <tr><td><code>applyFrameToAllParts</code></td><td>bool</td><td><code>false</code></td><td>Every body part uses the base track's <code>frame</code> index instead of reading its own per-<code>bodyPart</code> keyframe, so all parts step through their sprite frames in lockstep. (The limbs are still drawn as separate parts — only the frame number is shared.)</td></tr>
   <tr><td><code>speedMod_rand</code></td><td>float</td><td><code>0</code></td><td>Randomizes playback speed by up to this fraction, so identical actors don't animate in lockstep.</td></tr>
   <tr><td><code>flicker</code></td><td>bool</td><td><code>false</code></td><td>Make the actor flicker while this animation plays.</td></tr>
   <tr><td><code>drawShadow</code></td><td>bool</td><td><code>true</code></td><td>Whether to draw the ground shadow during the animation.</td></tr>
@@ -597,12 +602,12 @@ animate(self, <span class="tok-key">"idle_breathe"</span>, 1, 0, true, false, -1
 <p>Pose &amp; behavior fields:</p>
 <table>
   <tr><th>Key</th><th>Type</th><th>Default</th><th>Purpose</th></tr>
-  <tr><td><code>frame</code></td><td>int</td><td><code>0</code></td><td>Sprite-sheet cell to draw. Snaps (not interpolated).</td></tr>
+  <tr><td><code>frame</code></td><td>int</td><td><code>0</code></td><td>Sprite-sheet cell to draw. Snaps (not tweened).</td></tr>
   <tr><td><code>endTime</code></td><td>float</td><td><code>0</code></td><td>Cumulative time at which this pose is reached. Monotonically increasing along the track.</td></tr>
-  <tr><td><code>offset</code></td><td>Vector2</td><td><code>0,0</code></td><td>Screen-space pixel offset, interpolated toward over the keyframe's time slice.</td></tr>
-  <tr><td><code>directionalOffset</code></td><td>Vector2</td><td><code>0,0</code></td><td>Offset rotated by the actor's facing (forward-relative). Interpolated.</td></tr>
-  <tr><td><code>targetOffsetMult</code></td><td>Vector2</td><td><code>0,0</code></td><td>Multiplied by the vector toward the action's target — lunge toward the target. Interpolated.</td></tr>
-  <tr><td><code>facingRotOffset</code></td><td>float</td><td><code>0</code></td><td>Degrees added to facing rotation. Interpolated.</td></tr>
+  <tr><td><code>offset</code></td><td>Vector2</td><td><code>0,0</code></td><td>Screen-space pixel offset, tweened toward over the keyframe's time slice.</td></tr>
+  <tr><td><code>directionalOffset</code></td><td>Vector2</td><td><code>0,0</code></td><td>Offset rotated by the actor's facing (forward-relative). Tweened.</td></tr>
+  <tr><td><code>targetOffsetMult</code></td><td>Vector2</td><td><code>0,0</code></td><td>Multiplied by the vector toward the action's target — lunge toward the target. Tweened.</td></tr>
+  <tr><td><code>facingRotOffset</code></td><td>float</td><td><code>0</code></td><td>Degrees added to facing rotation. Tweened.</td></tr>
   <tr><td><code>facingRotOverride</code></td><td>bool</td><td><code>false</code></td><td>(Body parts) set the facing rotation absolutely rather than additively.</td></tr>
   <tr><td><code>rotOffset</code></td><td>float</td><td><code>0</code></td><td>(Body parts) extra rotation applied to the part.</td></tr>
   <tr><td><code>jostleMult</code></td><td>float</td><td><code>0</code></td><td>Couples the offset to the global screen-shake, so the part jostles with impacts.</td></tr>
@@ -636,7 +641,7 @@ animate(self, <span class="tok-key">"idle_breathe"</span>, 1, 0, true, false, -1
 <h2 id="appendix">Appendix: Niche Details</h2>
 <p>Edge cases you can ignore until you need them.</p>
 
-<h3>Overridable built-in combat-entry animations</h3>
+<h3>Built-in combat-entry animations</h3>
 <p>When an actor draws its weapons on entering combat, the engine plays one of three fixed-name built-in animations depending on how many hands are armed:</p>
 <table>
   <tr><th>Animation ID</th><th>Played when</th></tr>
@@ -644,7 +649,7 @@ animate(self, <span class="tok-key">"idle_breathe"</span>, 1, 0, true, false, -1
   <tr><td><code>unsheathe0</code></td><td>only the main hand is armed</td></tr>
   <tr><td><code>unsheathe1</code></td><td>only the off hand is armed</td></tr>
 </table>
-<p>These are referenced by literal name, so you override them simply by defining <code>[Animation] ID=unsheathe01;</code> (etc.) in your mod — the same way you'd override any other built-in animation (<code>punch</code>, <code>use</code>, …) by redefining its ID.</p>
+<p>These are referenced by literal name, so you can customize them the way you'd customize any built-in animation: define an <code>[Animation]</code> with the same <code>ID</code> (<code>unsheathe01</code>, or <code>punch</code>, <code>use</code>, …), which <em>replaces</em> the existing definition — for a given <code>ID</code>, the last one loaded wins. (This is replacing the whole animation, distinct from the per-actor animation overrides like <code>idleAnimOverride</code>.)</p>
 
 <h3>Keyword resolution fine print</h3>
 <p>A few keywords (see <a href="#consume">Animation keywords</a>) don't map one-to-one to a single slot:</p>
