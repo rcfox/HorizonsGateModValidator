@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Horizon's Gate Modding — Animations</title>
+<style>
+  :root {
+    --bg: #1c1f24;
+    --panel: #24282f;
+    --panel-2: #2b3038;
+    --text: #d7dce2;
+    --muted: #9aa4b1;
+    --accent: #6fb3ff;
+    --accent-2: #ffc56f;
+    --green: #8fd98f;
+    --code-bg: #15171b;
+    --border: #3a414b;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { display: flex; max-width: 1200px; margin: 0 auto; }
+  nav {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    width: 240px;
+    min-width: 240px;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 28px 18px;
+    border-right: 1px solid var(--border);
+    font-size: 14px;
+  }
+  nav h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 18px 0 8px; }
+  nav a { display: block; color: var(--text); text-decoration: none; padding: 3px 0; border-left: 2px solid transparent; padding-left: 10px; }
+  nav a:hover { color: var(--accent); border-left-color: var(--accent); }
+  main { flex: 1; min-width: 0; padding: 36px 44px 120px; }
+  main a { color: var(--accent); text-decoration: none; }
+  main a:hover { text-decoration: underline; }
+  h1 { font-size: 30px; margin: 0 0 6px; }
+  h2 { font-size: 23px; margin: 44px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 18px; margin: 28px 0 8px; color: var(--accent-2); }
+  p, li { color: var(--text); }
+  .lede { color: var(--muted); font-size: 17px; max-width: 70ch; }
+  code { font-family: "SF Mono", "JetBrains Mono", Consolas, monospace; font-size: .9em; background: var(--code-bg); padding: 1px 6px; border-radius: 4px; color: var(--accent-2); }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    line-height: 1.5;
+  }
+  pre code { background: none; padding: 0; color: var(--text); font-size: 13.5px; }
+  .tok-tag { color: var(--accent); font-weight: 600; }
+  .tok-key { color: var(--accent-2); }
+  .tok-com { color: var(--green); font-style: italic; }
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 14.5px; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; background: var(--panel-2); }
+  td code { white-space: nowrap; }
+  .callout { border-left: 4px solid var(--accent); background: var(--panel); border-radius: 0 8px 8px 0; padding: 12px 18px; margin: 18px 0; }
+  .callout.warn { border-left-color: var(--accent-2); }
+  .callout.note { border-left-color: var(--green); }
+  .callout p:first-child { margin-top: 0; }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout .label { font-weight: 700; text-transform: uppercase; letter-spacing: .06em; font-size: 12px; color: var(--accent); }
+  .callout.warn .label { color: var(--accent-2); }
+  .callout.note .label { color: var(--green); }
+  .pill { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 20px; background: var(--panel-2); color: var(--muted); border: 1px solid var(--border); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .small { font-size: 13.5px; color: var(--muted); }
+  figure.diagram { margin: 22px 0; padding: 16px 18px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; }
+  figure.diagram svg { display: block; width: 100%; height: auto; max-width: 620px; margin: 0 auto; }
+  figure.diagram figcaption { margin-top: 10px; max-width: 70ch; }
+  figure.diagram figcaption code { font-size: .85em; }
+  @media (max-width: 880px) {
+    nav { display: none; }
+    main { padding: 24px 20px 100px; }
+    .grid2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <strong>Animations</strong>
+  <h2>Concepts</h2>
+  <a href="#intro">Overview</a>
+  <a href="#ingest">How data is ingested</a>
+  <a href="#anatomy-anim">The Animation object</a>
+  <a href="#anatomy-key">The Keyframe object</a>
+  <a href="#playback">How playback works</a>
+  <a href="#frame-reuse">Reusing a frame number</a>
+  <a href="#consume">Triggering an animation</a>
+  <h2>Examples</h2>
+  <a href="#ex1">1 · A simple lunge</a>
+  <a href="#ex2">2 · Rigged limbs, FX &amp; the hit</a>
+  <a href="#ex3">3 · Cloning, mirroring &amp; facing</a>
+  <a href="#ex4">4 · Looping &amp; idle animations</a>
+  <a href="#ex5">5 · Sprite &amp; palette overrides</a>
+  <h2>Reference</h2>
+  <a href="#ref-anim">[Animation] fields</a>
+  <a href="#ref-key">[Keyframe] fields</a>
+  <a href="#gotchas">Gotchas</a>
+  <a href="#appendix">Appendix: Niche Details</a>
+  <a href="#appendix-slots">Appendix: Actor-Type Animation Slots</a>
+  <a href="#bodyparts">Appendix: Body-Part Names</a>
+  <a href="#appendix-keywords">Appendix: Animation Keywords</a>
+  <a href="#references">References</a>
+</nav>
+
+<main>
+<h1 id="intro">Horizon's Gate Modding — Animations</h1>
+<p class="lede">How to define, play, and reuse sprite animations through mod data files. This guide assumes you already know how to write a mod and load data into the game; it only covers the animation system.</p>
+
+<div class="callout warn">
+  <p><span class="label">Disclaimer</span></p>
+  <p>This article was written by an LLM by reading the decompiled code of Horizon's Gate <strong>version 1.6.04</strong>, not from official documentation or hands-on testing. It may contain mistakes — field behaviors, defaults, and edge cases especially — and details may differ in other versions. Treat it as a starting point and verify anything important against the game itself.</p>
+</div>
+
+<div class="callout note">
+  <p><span class="label">Where animations live</span></p>
+  <p>The base game's animations (<code>punch</code>, <code>use</code>, idle poses, weapon swings, and the default <code>""</code> animation) are defined in compiled code, not in data files — so you won't find example <code>[Animation]</code> blocks shipped in <code>SystemData</code>. But the data pipeline fully supports authoring and overriding animations, and the base game's data <em>references</em> them everywhere (e.g. an action with <code>casterAnimation=punch;</code>). This guide reconstructs the system from the engine code so you can build your own.</p>
+</div>
+
+<h2 id="ingest">How data is ingested</h2>
+<p>All mod data — animations included — flows through the same parser. A data file is a flat stream of bracketed <em>type tags</em>, each followed by <code>key=value;</code> pairs. Newlines are ignored; the semicolon terminates each field. The parser reads a tag, collects its fields into a dictionary, and hands them to the engine to construct the matching object.</p>
+
+<p>Two type tags matter here:</p>
+<ul>
+  <li><code>[Animation]</code> — creates (or clones) a named animation and stores it under its <code>ID</code>.</li>
+  <li><code>[Keyframe]</code> — creates a single keyframe and <strong>appends it to the animation whose <code>ID</code> it names</strong>. Keyframes are matched to their animation purely by <code>ID</code>, so the <code>[Animation]</code> block must appear <em>before</em> its <code>[Keyframe]</code> blocks.</li>
+</ul>
+
+<pre><code><span class="tok-com">-- The shape of every animation definition</span>
+<span class="tok-tag">[Animation]</span>
+    <span class="tok-key">ID</span>=myAnim;        <span class="tok-com">-- the name other data references</span>
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=myAnim;        <span class="tok-com">-- links this frame to myAnim</span>
+    <span class="tok-key">frame</span>=0;
+    <span class="tok-key">endTime</span>=0;
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=myAnim;        <span class="tok-com">-- next frame of the same animation</span>
+    <span class="tok-key">frame</span>=1;
+    <span class="tok-key">endTime</span>=0.12;</code></pre>
+
+<p>Values are parsed by reflection against the object's fields, so the value syntax depends on the field's type:</p>
+<table>
+  <tr><th>Field type</th><th>Syntax</th><th>Example</th></tr>
+  <tr><td>float / int</td><td>plain number (invariant culture — always <code>.</code> for decimals)</td><td><code>endTime=0.25</code></td></tr>
+  <tr><td>bool</td><td><code>true</code> / <code>false</code></td><td><code>flip=true</code></td></tr>
+  <tr><td>string</td><td>raw text</td><td><code>fx=slash</code></td></tr>
+  <tr><td>Vector2</td><td><code>x,y</code> (comma-separated)</td><td><code>offset=0,-6</code></td></tr>
+</table>
+
+<h2 id="anatomy-anim">The <code>Animation</code> object</h2>
+<p>An animation is a container for keyframes plus some playback-wide settings. It holds <strong>two parallel sets of tracks</strong>:</p>
+<ul>
+  <li><strong>The base track</strong> — a single ordered list of keyframes. This drives the animation's <em>timing</em>: its total <code>duration</code>, when the "attack" lands, when FX fire, and the whole-body offset/rotation. For simple (un-rigged) sprites, the base track's <code>frame</code> is also the sprite that's drawn.</li>
+  <li><strong>Per-body-part tracks</strong> — an optional separate keyframe list <em>per limb</em> (e.g. <code>armR</code>, <code>head</code>). Used to animate the individual pieces of a rigged humanoid independently of the body as a whole.</li>
+</ul>
+
+<div class="callout">
+  <p><span class="label">Invariant</span></p>
+  <p>Every animation <strong>must have at least one base keyframe</strong>. The base track defines the timeline; body-part tracks ride along on that same clock. <code>duration</code> is set automatically to the <code>endTime</code> of the last base keyframe you append, so you normally never set <code>duration</code> by hand — you let the base track define it. Body-part keyframes do <em>not</em> extend <code>duration</code>.</p>
+</div>
+
+<h2 id="anatomy-key">The <code>Keyframe</code> object</h2>
+<p>A keyframe is a <em>target pose reached at a moment in time</em>. The most important idea: a keyframe says "by time <code>endTime</code>, this part should be at this <code>offset</code> / rotation, showing sprite <code>frame</code>." The engine interpolates the offsets and rotations from the previous keyframe's pose to this one over the intervening time. The sprite <code>frame</code> itself is <strong>not</strong> interpolated — it snaps to the new value the instant the keyframe begins.</p>
+
+<ul>
+  <li><code>frame</code> — which cell of the sprite sheet to draw. Snaps (no tweening).</li>
+  <li><code>offset</code> — a pixel offset in screen space, tweened. Moves the sprite around (a bob, a lunge, a recoil).</li>
+  <li><code>directionalOffset</code> — like <code>offset</code>, but rotated by the actor's facing, so positive X is always "forward" regardless of which way the actor looks. Use this for "step toward where I'm facing."</li>
+  <li><code>targetOffsetMult</code> — multiplied by the vector pointing at the action's <em>target</em>. Set this to lunge toward whatever you're attacking.</li>
+  <li><code>endTime</code> — the cumulative time within the animation at which this pose is reached (see below).</li>
+  <li><code>fx</code> — names a visual effect spawned when this keyframe begins (blood, sparks, etc.).</li>
+</ul>
+
+<h2 id="playback">How playback works</h2>
+<p>The animator keeps a running <code>time</code> that increases each tick (scaled by the playback <code>speed</code>). <strong><code>endTime</code> is cumulative and absolute within the animation</strong>, not a per-frame duration. So a three-keyframe animation might use <code>endTime</code> of <code>0</code>, <code>0.1</code>, <code>0.3</code> — meaning the first pose is held at the start, the second is reached 0.1s in, and the third 0.3s in (and <code>duration</code> becomes <code>0.3</code>).</p>
+
+<ol>
+  <li>The first keyframe usually has <code>endTime=0</code> — it's the starting pose, reached instantly.</li>
+  <li>For each later keyframe, the engine linearly interpolates <code>offset</code>, <code>directionalOffset</code>, <code>facingRotOffset</code>, and <code>targetOffsetMult</code> from the previous keyframe's values to this keyframe's values, across the gap <code>(this.endTime − previous.endTime)</code>.</li>
+  <li>The <code>frame</code> sprite snaps when the keyframe is entered.</li>
+</ol>
+
+<figure class="diagram">
+<svg viewBox="0 0 560 240" role="img" aria-label="Timeline showing three keyframes at endTime 0, 0.1 and 0.3. The offset value glides linearly between keyframes, while the sprite frame jumps at each keyframe and holds.">
+  <!-- keyframe guide lines -->
+  <g stroke="#3a414b" stroke-dasharray="3 4">
+    <line x1="110" y1="28" x2="110" y2="196"/>
+    <line x1="247" y1="28" x2="247" y2="196"/>
+    <line x1="520" y1="28" x2="520" y2="196"/>
+  </g>
+  <!-- keyframe headers -->
+  <g fill="#9aa4b1" font-family="monospace" font-size="12" text-anchor="middle">
+    <text x="110" y="22">KF0</text>
+    <text x="247" y="22">KF1</text>
+    <text x="520" y="22">KF2</text>
+  </g>
+  <!-- offset track: tweened -->
+  <text x="96" y="74" fill="#6fb3ff" font-family="sans-serif" font-size="12.5" text-anchor="end">offset</text>
+  <text x="96" y="90" fill="#9aa4b1" font-family="sans-serif" font-size="11" text-anchor="end">(tweened)</text>
+  <polyline points="110,92 247,44 520,92" fill="none" stroke="#6fb3ff" stroke-width="2.5"/>
+  <g fill="#6fb3ff"><circle cx="110" cy="92" r="4"/><circle cx="247" cy="44" r="4"/><circle cx="520" cy="92" r="4"/></g>
+  <text x="178" y="64" fill="#6fb3ff" font-family="sans-serif" font-size="11" text-anchor="middle">linear glide ↗</text>
+  <!-- frame track: snaps -->
+  <text x="96" y="150" fill="#ffc56f" font-family="sans-serif" font-size="12.5" text-anchor="end">frame</text>
+  <text x="96" y="166" fill="#9aa4b1" font-family="sans-serif" font-size="11" text-anchor="end">(snaps)</text>
+  <path d="M110,160 H247 V134 H520" fill="none" stroke="#ffc56f" stroke-width="2.5"/>
+  <g fill="#ffc56f"><circle cx="110" cy="160" r="4"/><circle cx="247" cy="134" r="4"/><circle cx="520" cy="134" r="4"/></g>
+  <text x="320" y="128" fill="#ffc56f" font-family="sans-serif" font-size="11" text-anchor="middle">jumps &amp; holds</text>
+  <!-- time axis -->
+  <line x1="100" y1="196" x2="540" y2="196" stroke="#9aa4b1" stroke-width="1.5"/>
+  <polygon points="540,196 532,192 532,200" fill="#9aa4b1"/>
+  <g fill="#d7dce2" font-family="monospace" font-size="12" text-anchor="middle">
+    <text x="110" y="214">0</text>
+    <text x="247" y="214">0.1</text>
+    <text x="520" y="214">0.3</text>
+  </g>
+  <text x="540" y="214" fill="#9aa4b1" font-family="sans-serif" font-size="11" text-anchor="end">endTime (s) →</text>
+</svg>
+<figcaption class="small">Same three keyframes, two behaviors on one clock: the <code>offset</code> slides smoothly between each keyframe's value, while the sprite <code>frame</code> jumps at each keyframe and holds until the next. <code>endTime</code> is the absolute time each keyframe is reached, so the <code>0→0.1</code> slice is fast and the <code>0.1→0.3</code> slice is slower.</figcaption>
+</figure>
+
+<div class="callout warn">
+  <p><span class="label">A keyframe with endTime 0 is a snap, not a hold</span></p>
+  <p>If a keyframe's <code>endTime</code> equals the previous keyframe's <code>endTime</code> (a zero-length slice), there's nothing to interpolate over and the engine moves straight through it. To <em>hold</em> a pose, give the next keyframe a later <code>endTime</code>. To guarantee a keyframe is actually drawn even if the clock overshoots it in one tick, set <code>holdForAtLeastOneFrame=true</code>.</p>
+</div>
+
+<h3 id="frame-reuse">Reusing a frame number</h3>
+<p>You'll often see the same <code>frame</code> value repeated on several consecutive keyframes. That's deliberate, and it follows directly from the rule that <strong>offsets interpolate but the sprite snaps</strong>. Holding one sprite still while changing the offsets around it produces <em>motion of a fixed pose</em>. The common reasons:</p>
+
+<ul>
+  <li><strong>Slide a pose around without redrawing it.</strong> A lunge is typically three keyframes all using the <em>same</em> <code>frame</code>: rest → pushed forward (big <code>offset</code> / <code>targetOffsetMult</code>) → back to rest. The character never changes sprite; only the offset moves, so it reads as a smooth thrust and recoil. If you incremented <code>frame</code> instead, you'd get a flipbook, not a glide.</li>
+  <li><strong>Hold an image for a beat.</strong> Repeat the same <code>frame</code> with a later <code>endTime</code> to pause on a pose (e.g. wind-up before a swing).</li>
+  <li><strong>Animate timing/FX without changing art.</strong> Because the base track also carries <code>fx</code> and the attack timing, you sometimes add keyframes that only exist to place an <code>fx</code> or to mark the attack moment, leaving <code>frame</code> unchanged.</li>
+</ul>
+
+<p>The contrast: a classic flipbook animation (a flag waving, a torch flickering) <em>increments</em> <code>frame</code> on each keyframe and barely touches the offsets. Most combat animations mix both — some keyframes swap the sprite, others reuse it to glide.</p>
+
+<p>A second, unrelated kind of "reuse" is reusing a keyframe <em>index</em> when editing a cloned animation — covered in <a href="#ex3">Example 3</a>.</p>
+
+<h2 id="consume">Triggering an animation</h2>
+<p>Animations are referenced by name (their <code>ID</code>) from several places. The two you'll reach for most are actions and actor-type slots; beyond those, scripts, world triggers, and status effects can all start an animation too.</p>
+
+<h3>Actions</h3>
+<p>An <code>[Action]</code> plays an animation on its caster via <code>casterAnimation</code>:</p>
+<pre><code><span class="tok-tag">[Action]</span>
+    <span class="tok-key">ID</span>=mySlash;
+    <span class="tok-key">casterAnimation</span>=mySlash_anim;
+    <span class="tok-key">casterAnimationSpeed</span>=1;     <span class="tok-com">-- scales playback; duration is divided by this</span>
+    <span class="tok-key">casterAnimationLoops</span>=0;</code></pre>
+<p>Related action fields:</p>
+<table>
+  <tr><th>Field</th><th>Meaning</th></tr>
+  <tr><td><code>casterAnimation</code></td><td>The animation <code>ID</code> to play. The special values <code>weapon</code> / <code>weapon2</code> resolve to the equipped weapon's own animation.</td></tr>
+  <tr><td><code>casterAnimationSpeed</code></td><td>Playback multiplier. The effective length is <code>duration / casterAnimationSpeed</code>, so values &gt; 1 are faster.</td></tr>
+  <tr><td><code>casterAnimationLoops</code></td><td>Number of <em>extra</em> repeats; the clip plays <code>casterAnimationLoops + 1</code> times total (default <code>0</code> = plays once). The caster stays busy for <code>duration × (loops + 1) / speed</code>.</td></tr>
+  <tr><td><code>casterAnimationDependsOnWeaponHand</code></td><td>Appends the wielding hand index (<code>0</code> or <code>1</code>) to the name — see Example 3.</td></tr>
+  <tr><td><code>casterAnimationDependsOnFacingRot</code></td><td>Appends the actor's facing to the name — see Example 3.</td></tr>
+</table>
+
+<h3>Actor types</h3>
+<p>An <code>[ActorType]</code> has a slot for each situational animation; set any of them to an animation <code>ID</code>. The full list is in <a href="#appendix-slots">Appendix: Actor-Type Animation Slots</a>.</p>
+<p>These aren't just spawn-time configuration — <strong>the engine fires them automatically in response to gameplay events</strong>. You fill the slots; the engine decides when each plays:</p>
+<ul>
+  <li>taking damage → <code>painAnim</code>; dying → <code>deadAnim</code></li>
+  <li>blocking or dodging an attack → <code>blockAnim</code> / <code>dodgeAnim</code></li>
+  <li>the stun / frozen / drown / sleep states → their matching slots</li>
+  <li>moving and terrain interactions → <code>walkAnim</code> / <code>climbAnim</code> / <code>jumpAnim</code></li>
+  <li>using an action → <code>chargeAnim</code> / <code>castAnim</code> / <code>spellcastAnim</code> / <code>swingAnim</code></li>
+  <li>any non-looping animation finishing → falls back to the idle slot on its own</li>
+</ul>
+<p class="small">An actor also carries a runtime <code>idleAnimOverride</code> that, when set (typically from a script or trigger), replaces the looping idle without editing the <code>[ActorType]</code>.</p>
+
+<h3>Animation keywords (shorthand for the slots)</h3>
+<p>Where you name an animation for a specific actor, you can use a <strong>keyword</strong> that resolves to that actor's matching <code>[ActorType]</code> slot instead of a literal ID. So <code>casterAnimation=pain</code> plays whatever the caster's <code>painAnim</code> is — not a global animation literally named <code>pain</code>. The keywords mirror the slot list and are enumerated in <a href="#appendix-keywords">Appendix: Animation Keywords</a>. Any string that <em>isn't</em> a keyword is used as a literal animation ID, so keywords and explicit IDs coexist freely.</p>
+<p>Keyword resolution applies to an action's <code>casterAnimation</code>, Lua <code>animate()</code>, and an actor value's <code>animationOnHarmful</code>. It does <strong>not</strong> apply to the <code>animate</code> trigger effect (below), which takes a literal animation ID only.</p>
+<div class="callout warn">
+  <p><span class="label">Keywords don't mix with hand/facing suffixes</span></p>
+  <p>If an action pairs a keyword with <code>casterAnimationDependsOnWeaponHand</code> or <code>casterAnimationDependsOnFacingRot</code>, the suffix is tacked onto the name (e.g. <code>pain</code> → <code>pain0</code> / <code>pain90</code>). Unless a matching variant actually exists, the lookup finds nothing and the animation silently fails to play. Use suffixes with your own per-hand/per-facing IDs, not with keywords.</p>
+</div>
+
+<h3>Lua scripts</h3>
+<p>Behavior and cutscene scripts can drive an animation directly. <code>LuaManager</code> registers an <code>animate</code> function that exposes the full animator entry point, so scripts get control that the data-only paths don't — arbitrary looping, a non-zero start keyframe, and tween-from-previous:</p>
+<pre><code><span class="tok-com">-- animate(actor, animationName, speed, startKeyframe,</span>
+<span class="tok-com">--         interruptIfSameA, tweenFromPrev, loops, resumeIdleOnFinish)</span>
+animate(self, <span class="tok-key">"ignite"</span>)                       <span class="tok-com">-- only actor + name are required</span>
+animate(self, <span class="tok-key">"idle_breathe"</span>, 1, 0, true, false, -1)  <span class="tok-com">-- loops = -1 → forever</span></code></pre>
+<p>Defaults: <code>speed=1</code>, <code>startKeyframe=0</code>, <code>interruptIfSameA=false</code>, <code>tweenFromPrev=false</code>, <code>loops=-1</code> (infinite), <code>resumeIdleOnFinish=true</code>. This is the path AI scripts use to pose actors.</p>
+
+<h3>World triggers</h3>
+<p>A trigger effect can play an animation on an actor as part of a scripted or zone event. Attach a <code>[TriggerEffect]</code> to a zone trigger (matched by <code>numID</code>) or a <code>[GlobalTriggerEffect]</code> to a global trigger (matched by <code>ID</code>), with <code>effectID=animate</code>:</p>
+<pre><code><span class="tok-tag">[GlobalTriggerEffect]</span>
+    <span class="tok-key">ID</span>=smithStartsWork;
+    <span class="tok-key">effectID</span>=animate;
+    <span class="tok-key">sValue</span>=hammer_swing;    <span class="tok-com">-- the animation ID to play</span>
+    <span class="tok-key">sValue2</span>=npc_smith;       <span class="tok-com">-- which actor (omit to use the trigger's own actor)</span>
+    <span class="tok-key">fValue</span>=0.5;              <span class="tok-com">-- optional: lock the actor "busy" this many seconds (also clears stun)</span></code></pre>
+
+<h3>Status effects (actor values)</h3>
+<p>An <code>[ActorValue]</code> — the definition behind a status or element — can name an animation the <em>target</em> plays when a harmful effect of that actor value lands on it, via <code>animationOnHarmful</code>:</p>
+<pre><code><span class="tok-tag">[ActorValue]</span>
+    <span class="tok-key">ID</span>=searing;
+    <span class="tok-key">animationOnHarmful</span>=flinch_burn;</code></pre>
+<p>It only fires if the target's <em>currently playing</em> animation has <code>interruptibleByDamage=true</code> (and the target isn't drowning) — the same flag listed in the <a href="#ref-anim">Animation fields</a> reference. This is the hook for custom "got hit by X" reactions.</p>
+
+<hr>
+
+<h2 id="ex1">Example 1 — A simple lunge</h2>
+<p>The "hello world" of combat animations: the attacker glides toward its target and snaps back. There's no rigging here — one base track, and the <em>same</em> sprite <code>frame</code> on every keyframe (we're moving a pose, not swapping art). <code>targetOffsetMult</code> does the work of aiming the lunge at whatever's being hit.</p>
+
+<pre><code><span class="tok-tag">[Animation]</span>
+    <span class="tok-key">ID</span>=lunge_simple;
+    <span class="tok-key">applyFrameToAllParts</span>=true;   <span class="tok-com">-- draw frame 0 on the whole sprite</span>
+
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=lunge_simple;
+    <span class="tok-key">frame</span>=0;
+    <span class="tok-key">endTime</span>=0;               <span class="tok-com">-- resting pose, at time 0</span>
+
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=lunge_simple;
+    <span class="tok-key">frame</span>=0;               <span class="tok-com">-- SAME frame — we glide, not flipbook</span>
+    <span class="tok-key">targetOffsetMult</span>=0.5,0.5; <span class="tok-com">-- lunge halfway toward the target</span>
+    <span class="tok-key">endTime</span>=0.1;             <span class="tok-com">-- reached 0.1s in (fast push-out)</span>
+
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=lunge_simple;
+    <span class="tok-key">frame</span>=0;
+    <span class="tok-key">targetOffsetMult</span>=0,0;     <span class="tok-com">-- settle back to rest</span>
+    <span class="tok-key">endTime</span>=0.3;             <span class="tok-com">-- slower recoil — duration is now 0.3</span>
+
+<span class="tok-com">-- Hook it up to an action:</span>
+<span class="tok-tag">[Action]</span>
+    <span class="tok-key">ID</span>=jab;
+    <span class="tok-key">casterAnimation</span>=lunge_simple;</code></pre>
+
+<p>Read it as three poses on one clock: rest at 0s, fully lunged at 0.1s, back to rest at 0.3s.</p>
+
+<h2 id="ex2">Example 2 — Rigged limbs, FX &amp; the hit</h2>
+<p>Now a humanoid sword swing. The body's lunge stays on the base track, while individual limbs get their own tracks via <code>bodyPart=</code> — you can have as many as you need, each an independent keyframe list. Here the sword arm (<code>armR</code>) winds up and chops, and the head (<code>head</code>) adds a small follow-through. We place a slash <code>fx</code> on the contact keyframe and use <code>attackKeyframe</code> so the damage lands exactly when the blade connects, rather than at the start of the animation.</p>
+
+<pre><code><span class="tok-tag">[Animation]</span>
+    <span class="tok-key">ID</span>=sword_chop;
+    <span class="tok-key">attackKeyframe</span>=2;          <span class="tok-com">-- base-track index where the hit registers</span>
+
+<span class="tok-com">-- BASE TRACK: whole-body motion + the attack timing</span>
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=sword_chop;
+    <span class="tok-key">endTime</span>=0;                 <span class="tok-com">-- index 0: rest</span>
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=sword_chop;
+    <span class="tok-key">directionalOffset</span>=-2,0;    <span class="tok-com">-- index 1: lean back (wind-up)</span>
+    <span class="tok-key">endTime</span>=0.15;
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=sword_chop;
+    <span class="tok-key">directionalOffset</span>=4,0;     <span class="tok-com">-- index 2: drive forward — THE HIT</span>
+    <span class="tok-key">targetOffsetMult</span>=0.3,0.3;
+    <span class="tok-key">fx</span>=slash;                  <span class="tok-com">-- spawn the slash effect on contact</span>
+    <span class="tok-key">endTime</span>=0.22;
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=sword_chop;
+    <span class="tok-key">directionalOffset</span>=0,0;     <span class="tok-com">-- index 3: recover</span>
+    <span class="tok-key">endTime</span>=0.45;
+
+<span class="tok-com">-- ARM TRACK: the sword arm swings on its own sub-clock</span>
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=sword_chop;
+    <span class="tok-key">bodyPart</span>=armR;
+    <span class="tok-key">rotOffset</span>=-40;             <span class="tok-com">-- raised behind the head</span>
+    <span class="tok-key">endTime</span>=0.15;
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=sword_chop;
+    <span class="tok-key">bodyPart</span>=armR;
+    <span class="tok-key">rotOffset</span>=70;              <span class="tok-com">-- chopped down through the target</span>
+    <span class="tok-key">depthMod</span>=1;                <span class="tok-com">-- bring the arm in front of the torso</span>
+    <span class="tok-key">endTime</span>=0.22;
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=sword_chop;
+    <span class="tok-key">bodyPart</span>=armR;
+    <span class="tok-key">rotOffset</span>=0;               <span class="tok-com">-- back to neutral</span>
+    <span class="tok-key">endTime</span>=0.45;
+
+<span class="tok-com">-- HEAD TRACK: a second, independent limb track on the same clock</span>
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=sword_chop;
+    <span class="tok-key">bodyPart</span>=head;
+    <span class="tok-key">rotOffset</span>=-8;             <span class="tok-com">-- tips back during the wind-up</span>
+    <span class="tok-key">endTime</span>=0.15;
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=sword_chop;
+    <span class="tok-key">bodyPart</span>=head;
+    <span class="tok-key">rotOffset</span>=10;             <span class="tok-com">-- snaps forward with the chop</span>
+    <span class="tok-key">endTime</span>=0.22;
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=sword_chop;
+    <span class="tok-key">bodyPart</span>=head;
+    <span class="tok-key">rotOffset</span>=0;               <span class="tok-com">-- settles back</span>
+    <span class="tok-key">endTime</span>=0.45;
+
+<span class="tok-tag">[Action]</span>
+    <span class="tok-key">ID</span>=chop;
+    <span class="tok-key">casterAnimation</span>=sword_chop;</code></pre>
+
+<div class="callout note">
+  <p><span class="label">Many tracks, one timeline</span></p>
+  <p>The base track and every limb track (<code>armR</code>, <code>head</code>, …) share the same <code>time</code>. Lining up their <code>endTime</code> values (here, all three have a keyframe at <code>0.22</code>) is how you sync the body's forward drive, the arm's downward chop, the head's snap, and the slash FX — all landing on the attack keyframe. Add as many limb tracks as the rig has parts; each advances on the shared clock but holds its own poses.</p>
+</div>
+
+<div class="callout">
+  <p><span class="label">Three ways to rotate a part</span></p>
+  <p>A body-part keyframe has three rotation knobs. <code>rotOffset</code> (used above) spins the part's own sprite. <code>facingRotOffset</code> <em>adds</em> to the part's facing rotation. Setting <code>facingRotOverride=true</code> makes <code>facingRotOffset</code> set the facing rotation <em>absolutely</em> instead of adding to it — reach for it when a part must point a fixed direction regardless of which way the actor is facing.</p>
+</div>
+
+<div class="callout warn">
+  <p><span class="label">attackKeyframe timing — engine bug</span></p>
+  <p><code>attackKeyframe</code> reliably gates <em>when the hit lands</em> by keyframe index. It also feeds a secondary value — the pause after the attack before the next action or turn resolves in turn-based combat — but <strong>this part is buggy as of v1.6.04</strong>. That pause is computed and cached the instant <code>attackKeyframe</code> is assigned, and it is never recomputed when keyframes are added afterward. Because an <code>[Animation]</code> block is parsed <em>before</em> its <code>[Keyframe]</code> lines, setting <code>attackKeyframe</code> on the <code>[Animation]</code> line measures it against an empty keyframe list, so the pause comes out as 0 and the next action follows immediately.</p>
+  <p>Workaround: assign <code>attackKeyframe</code> <em>after</em> the keyframes exist, by re-declaring the animation as a clone of itself (<code>cloneFrom</code>, introduced in <a href="#ex3">Example 3</a>). The clone copies the keyframes before applying <code>attackKeyframe</code>, so the value is measured correctly:</p>
+  <pre><code><span class="tok-com">-- after all keyframes are added:</span>
+<span class="tok-tag">[Animation]</span>
+    <span class="tok-key">ID</span>=sword_chop;
+    <span class="tok-key">cloneFrom</span>=sword_chop;   <span class="tok-com">-- keyframes now exist on the clone source</span>
+    <span class="tok-key">attackKeyframe</span>=2;       <span class="tok-com">-- now measured against real keyframe times</span></code></pre>
+</div>
+
+<h2 id="ex3">Example 3 — Cloning, mirroring &amp; facing</h2>
+<p>Three reuse techniques that production animations lean on heavily.</p>
+
+<h3>Clone and tweak with <code>cloneFrom</code></h3>
+<p>Start from an existing animation and override just what differs — far less error-prone than retyping every keyframe. To edit a specific frame of the clone, target its slot with <code>replaceIndex</code> (overwrite) or build on it with <code>cloneFromIndex</code> (copy-then-tweak). This is the <em>index reuse</em> mentioned earlier: you're naming an existing keyframe's position to modify it in place.</p>
+
+<pre><code><span class="tok-tag">[Animation]</span>
+    <span class="tok-key">ID</span>=sword_chop_fast;
+    <span class="tok-key">cloneFrom</span>=sword_chop;     <span class="tok-com">-- inherit all keyframes + settings</span>
+
+<span class="tok-com">-- Overwrite the contact frame to hit harder/sooner:</span>
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=sword_chop_fast;
+    <span class="tok-key">replaceIndex</span>=2;           <span class="tok-com">-- replace base keyframe #2 outright</span>
+    <span class="tok-key">directionalOffset</span>=6,0;
+    <span class="tok-key">fx</span>=slash_big;
+    <span class="tok-key">endTime</span>=0.18;
+
+<span class="tok-com">-- Or: keep frame #1's pose but just add an FX, via copy-then-tweak:</span>
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=sword_chop_fast;
+    <span class="tok-key">cloneFromIndex</span>=1;         <span class="tok-com">-- copy existing keyframe #1...</span>
+    <span class="tok-key">replaceIndex</span>=1;           <span class="tok-com">-- ...and write it back to slot #1</span>
+    <span class="tok-key">fx</span>=windup_dust;            <span class="tok-com">-- the only change</span></code></pre>
+
+<h3>Mirror with <code>flipArms</code></h3>
+<p>The off-hand version of a swing is just the same animation with the arm and held-item tracks swapped, and <code>flipArms</code> does exactly that on a clone — no need to author a mirror by hand. Its most common use is to build the pair of variants that <code>casterAnimationDependsOnWeaponHand</code> selects between. That flag (see <a href="#consume">Triggering an animation</a>) appends the hand index (<code>0</code> or <code>1</code>) directly to the name, so the variants must be named <code>sword_chop0</code> and <code>sword_chop1</code> — flip the first to make the second:</p>
+<pre><code><span class="tok-tag">[Animation]</span>
+    <span class="tok-key">ID</span>=sword_chop0;          <span class="tok-com">-- main-hand swing (clone of the Example 2 animation)</span>
+    <span class="tok-key">cloneFrom</span>=sword_chop;
+
+<span class="tok-tag">[Animation]</span>
+    <span class="tok-key">ID</span>=sword_chop1;          <span class="tok-com">-- off-hand: a mirror of the main-hand swing</span>
+    <span class="tok-key">cloneFrom</span>=sword_chop0;
+    <span class="tok-key">flipArms</span>=true;            <span class="tok-com">-- swaps armL↔armR and item0↔item1</span></code></pre>
+<p class="small">The <code>0</code>/<code>1</code> suffix only matters when you want <code>casterAnimationDependsOnWeaponHand</code> to pick the variant automatically. If you reference an animation directly by name instead, you can call it anything you like.</p>
+
+<h3>Per-facing variants with <code>casterAnimationDependsOnFacingRot</code></h3>
+<p>Characters face four directions, and a swing often needs to look different depending on which way the actor is turned. Rather than branch inside one animation, the engine picks a <em>different animation by name</em> based on facing. When an action sets <code>casterAnimationDependsOnFacingRot=true</code>, the engine snaps the actor's facing to the nearest 90° and <strong>appends that number (<code>0</code>, <code>90</code>, <code>180</code>, or <code>270</code>) to <code>casterAnimation</code></strong>, then looks up that name. So you author one animation per facing:</p>
+
+<pre><code><span class="tok-tag">[Action]</span>
+    <span class="tok-key">ID</span>=cast;
+    <span class="tok-key">casterAnimation</span>=cast;
+    <span class="tok-key">casterAnimationDependsOnFacingRot</span>=true;
+<span class="tok-com">-- At play time the engine looks up cast0 / cast90 / cast180 / cast270:</span>
+
+<span class="tok-tag">[Animation]</span>
+    <span class="tok-key">ID</span>=cast0;     <span class="tok-com">-- facing one cardinal direction</span>
+<span class="tok-com">-- ... keyframes for cast0 ...</span>
+<span class="tok-tag">[Animation]</span>
+    <span class="tok-key">ID</span>=cast90;    <span class="tok-com">-- facing the next, etc.</span>
+<span class="tok-tag">[Animation]</span>
+    <span class="tok-key">ID</span>=cast180;
+<span class="tok-tag">[Animation]</span>
+    <span class="tok-key">ID</span>=cast270;</code></pre>
+
+<div class="callout">
+  <p><span class="label">Composing the suffixes</span></p>
+  <p>If you also set <code>casterAnimationDependsOnWeaponHand=true</code>, the hand index is appended <em>first</em>, then the facing — so the lookups become e.g. <code>cast0_90</code> (hand 0, facing 90°) and <code>cast1_270</code>. With both flags on, you'd author one animation for each hand × facing combination. <code>flipArms</code> pairs naturally with the per-hand variants, since the two hands are mirror images.</p>
+  <p class="small">There's also a conditional cousin, <code>appendToCasterAnimation</code> (with an accompanying formula), which tacks on a suffix only when a condition holds — letting one action choose between animation variants based on game state. Use it when facing/hand aren't enough to pick the right clip.</p>
+</div>
+
+<hr>
+
+<h2 id="ex4">Example 4 — Looping &amp; idle animations</h2>
+<p>The examples so far have been one-shot combat animations. Ambient ones — idle, walk, and the like — instead loop continuously, which raises a new concern: when the actor needs to do something else, the engine shouldn't cut the loop off mid-motion, it should finish to a natural rest pose first. That's what <code>canStopHere</code> marks. When asked to stop, the engine keeps playing until the loop reaches the nearest <code>canStopHere</code> keyframe, then exits cleanly.</p>
+
+<pre><code><span class="tok-tag">[Animation]</span>
+    <span class="tok-key">ID</span>=idle_breathe;
+    <span class="tok-key">applyFrameToAllParts</span>=true;
+
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=idle_breathe;
+    <span class="tok-key">frame</span>=0;
+    <span class="tok-key">endTime</span>=0;
+    <span class="tok-key">canStopHere</span>=true;       <span class="tok-com">-- the rest pose — safe to halt here</span>
+
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=idle_breathe;
+    <span class="tok-key">frame</span>=0;
+    <span class="tok-key">offset</span>=0,-1;            <span class="tok-com">-- chest rises (same frame, glides up)</span>
+    <span class="tok-key">endTime</span>=0.8;
+
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=idle_breathe;
+    <span class="tok-key">frame</span>=0;
+    <span class="tok-key">offset</span>=0,0;             <span class="tok-com">-- settles; loops back to the top</span>
+    <span class="tok-key">endTime</span>=1.6;
+
+<span class="tok-com">-- Use it as an actor's resting animation:</span>
+<span class="tok-tag">[ActorType]</span>
+    <span class="tok-key">ID</span>=townsperson;
+    <span class="tok-key">idleAnim</span>=idle_breathe;</code></pre>
+
+<p>Because only the rest frame is marked <code>canStopHere</code>, an actor interrupted mid-breath glides back down to neutral before switching to its next animation, instead of snapping. Mark more keyframes <code>canStopHere</code> if several poses are acceptable exit points.</p>
+
+<div class="callout note">
+  <p><span class="label">Looping an action animation</span></p>
+  <p>To repeat an <em>action's</em> animation — a flurry of blows, say — set <code>casterAnimationLoops</code> on the action rather than looping the animation itself (see the <a href="#consume">action fields</a> for its exact repeat-count semantics).</p>
+</div>
+
+<h2 id="ex5">Example 5 — Sprite &amp; palette overrides</h2>
+<p>Sometimes an animation needs to draw from an entirely different sprite sheet — a transformation, a special pose that doesn't exist on the normal rig, a creature that briefly becomes something else. The <code>spriteOverride</code> family swaps the art for the duration of the animation, reverting automatically when it ends.</p>
+
+<pre><code><span class="tok-tag">[Animation]</span>
+    <span class="tok-key">ID</span>=ignite;
+    <span class="tok-key">spriteOverride</span>=hero_ablaze;   <span class="tok-com">-- draw from a different sheet</span>
+    <span class="tok-key">paletteOverride</span>=fire;          <span class="tok-com">-- recolor for the duration</span>
+    <span class="tok-key">spriteWidthOverride</span>=48;        <span class="tok-com">-- that sheet uses larger cells...</span>
+    <span class="tok-key">spriteHeightOverride</span>=48;
+    <span class="tok-key">spriteOffset</span>=0,-8;             <span class="tok-com">-- ...so nudge it up to keep the feet planted</span>
+    <span class="tok-key">applyFrameToAllParts</span>=true;
+
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=ignite;
+    <span class="tok-key">frame</span>=0;
+    <span class="tok-key">endTime</span>=0;
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=ignite;
+    <span class="tok-key">frame</span>=1;
+    <span class="tok-key">endTime</span>=0.15;
+<span class="tok-tag">[Keyframe]</span>
+    <span class="tok-key">ID</span>=ignite;
+    <span class="tok-key">frame</span>=2;
+    <span class="tok-key">fx</span>=fire_burst;
+    <span class="tok-key">endTime</span>=0.3;</code></pre>
+
+<p>The <code>frame</code> numbers now index cells of <code>hero_ablaze</code>, not the actor's normal sheet. <code>applyFrameToAllParts</code> means the actor is drawn from that single override frame rather than as assembled limbs — usually what you want when the override sprite is a complete, pre-drawn pose. The width/height overrides tell the engine the override sheet's cell size, and <code>spriteOffset</code> compensates for the difference in alignment.</p>
+
+<hr>
+
+<h2 id="ref-anim"><code>[Animation]</code> fields</h2>
+<table>
+  <tr><th>Key</th><th>Type</th><th>Default</th><th>Purpose</th></tr>
+  <tr><td><code>ID</code></td><td>string</td><td>required</td><td>The animation's name. Keyframes and consumers reference this.</td></tr>
+  <tr><td><code>cloneFrom</code></td><td>string</td><td>—</td><td>Start as a copy of an existing animation (its keyframes and settings), then apply the fields below.</td></tr>
+  <tr><td><code>flipArms</code></td><td>bool</td><td><code>false</code></td><td>Only with <code>cloneFrom</code>: mirror the clone by swapping the <code>armL</code>↔<code>armR</code> and <code>item0</code>↔<code>item1</code> tracks.</td></tr>
+  <tr><td><code>attackKeyframe</code></td><td>int</td><td><code>0</code></td><td>The base-track index at which the "hit" registers. The action's effect lands once playback reaches this keyframe.</td></tr>
+  <tr><td><code>applyFrameToAllParts</code></td><td>bool</td><td><code>false</code></td><td>Draw the base track's <code>frame</code> on every body part (for sprites that aren't rigged into separate limbs).</td></tr>
+  <tr><td><code>speedMod_rand</code></td><td>float</td><td><code>0</code></td><td>Randomizes playback speed by up to this fraction, so identical actors don't animate in lockstep.</td></tr>
+  <tr><td><code>flicker</code></td><td>bool</td><td><code>false</code></td><td>Make the actor flicker while this animation plays.</td></tr>
+  <tr><td><code>drawShadow</code></td><td>bool</td><td><code>true</code></td><td>Whether to draw the ground shadow during the animation.</td></tr>
+  <tr><td><code>interruptibleByDamage</code></td><td>bool</td><td><code>true</code></td><td>Whether taking damage can interrupt this animation.</td></tr>
+  <tr><td><code>spriteOverride</code></td><td>string</td><td><code>""</code></td><td>Swap to a different sprite sheet for the duration of the animation.</td></tr>
+  <tr><td><code>paletteOverride</code></td><td>string</td><td><code>""</code></td><td>Swap the palette for the duration.</td></tr>
+  <tr><td><code>spriteWidthOverride</code>, <code>spriteHeightOverride</code></td><td>int</td><td><code>0</code></td><td>Override the sprite cell dimensions (for an oversized override sheet). <code>0</code> means "use the normal size."</td></tr>
+  <tr><td><code>spriteOffset</code></td><td>Vector2</td><td><code>0,0</code></td><td>Static offset applied while the override sprite is shown.</td></tr>
+  <tr><td><code>duration</code></td><td>float</td><td><code>0</code></td><td>Total length. Normally auto-derived from the last base keyframe; rarely set by hand.</td></tr>
+</table>
+<h2 id="ref-key"><code>[Keyframe]</code> fields</h2>
+<p>Routing keys (consumed by the loader to place the keyframe; not stored on the keyframe itself):</p>
+<table>
+  <tr><th>Key</th><th>Type</th><th>Default</th><th>Purpose</th></tr>
+  <tr><td><code>ID</code></td><td>string</td><td>required</td><td>Which animation to append this keyframe to.</td></tr>
+  <tr><td><code>bodyPart</code></td><td>string</td><td>—</td><td>Route this keyframe to a body-part track (e.g. <code>armR</code>) instead of the base track.</td></tr>
+  <tr><td><code>replaceIndex</code></td><td>int</td><td>—</td><td>Overwrite the existing keyframe at this index instead of appending.</td></tr>
+  <tr><td><code>cloneFromIndex</code></td><td>int</td><td>—</td><td>Initialize this keyframe from a copy of an existing keyframe at this index, then apply overrides.</td></tr>
+</table>
+<p>Pose &amp; behavior fields:</p>
+<table>
+  <tr><th>Key</th><th>Type</th><th>Default</th><th>Purpose</th></tr>
+  <tr><td><code>frame</code></td><td>int</td><td><code>0</code></td><td>Sprite-sheet cell to draw. Snaps (not interpolated).</td></tr>
+  <tr><td><code>endTime</code></td><td>float</td><td><code>0</code></td><td>Cumulative time at which this pose is reached. Monotonically increasing along the track.</td></tr>
+  <tr><td><code>offset</code></td><td>Vector2</td><td><code>0,0</code></td><td>Screen-space pixel offset, interpolated toward over the keyframe's time slice.</td></tr>
+  <tr><td><code>directionalOffset</code></td><td>Vector2</td><td><code>0,0</code></td><td>Offset rotated by the actor's facing (forward-relative). Interpolated.</td></tr>
+  <tr><td><code>targetOffsetMult</code></td><td>Vector2</td><td><code>0,0</code></td><td>Multiplied by the vector toward the action's target — lunge toward the target. Interpolated.</td></tr>
+  <tr><td><code>facingRotOffset</code></td><td>float</td><td><code>0</code></td><td>Degrees added to facing rotation. Interpolated.</td></tr>
+  <tr><td><code>facingRotOverride</code></td><td>bool</td><td><code>false</code></td><td>(Body parts) set the facing rotation absolutely rather than additively.</td></tr>
+  <tr><td><code>rotOffset</code></td><td>float</td><td><code>0</code></td><td>(Body parts) extra rotation applied to the part.</td></tr>
+  <tr><td><code>jostleMult</code></td><td>float</td><td><code>0</code></td><td>Couples the offset to the global screen-shake, so the part jostles with impacts.</td></tr>
+  <tr><td><code>depthMod</code></td><td>int</td><td><code>0</code></td><td>(Body parts) nudges draw order, e.g. to bring an arm in front of the torso.</td></tr>
+  <tr><td><code>flip</code></td><td>bool</td><td><code>false</code></td><td>Horizontally flip the sprite / part.</td></tr>
+  <tr><td><code>fx</code></td><td>string</td><td><code>""</code></td><td>Visual effect spawned when this keyframe begins.</td></tr>
+  <tr><td><code>canStopHere</code></td><td>bool</td><td><code>false</code></td><td>The animation is allowed to stop on this keyframe when asked to stop (e.g. a loop's natural rest pose).</td></tr>
+  <tr><td><code>holdForAtLeastOneFrame</code></td><td>bool</td><td><code>false</code></td><td>Guarantee this keyframe is rendered even if the clock would otherwise skip past it.</td></tr>
+  <tr><td><code>ignoreSpeed</code></td><td>bool</td><td><code>false</code></td><td>Advance this keyframe by real elapsed time, ignoring the playback speed multiplier.</td></tr>
+  <tr><td><code>sheatheWeapon</code></td><td>bool</td><td><code>false</code></td><td>Sheathe the held weapon as of this keyframe.</td></tr>
+  <tr><td><code>retractIntoTail</code></td><td>bool</td><td><code>false</code></td><td>For multi-segment actors (boats, serpents): pull the body segments toward the tail-end tile as of this keyframe.</td></tr>
+  <tr><td><code>retractTail</code></td><td>bool</td><td><code>false</code></td><td>For multi-segment actors: bring the trailing segments inward toward the actor's main (head) tile.</td></tr>
+</table>
+
+<hr>
+
+<h2 id="gotchas">Gotchas</h2>
+<ul>
+  <li><strong>Order matters.</strong> The <code>[Animation]</code> block must be parsed before its <code>[Keyframe]</code> blocks, and before any <code>cloneFrom</code> that references it.</li>
+  <li><strong>Always include a base track.</strong> At least one base keyframe is required; it defines <code>duration</code> and the attack timeline. Body-part keyframes alone won't play.</li>
+  <li><strong>Offsets tween, sprites snap.</strong> Reuse a <code>frame</code> to glide a pose; increment <code>frame</code> to flipbook. (See <a href="#frame-reuse">Reusing a frame number</a>.)</li>
+  <li><strong><code>endTime</code> is cumulative.</strong> Values must increase along a track. A zero-length slice is skipped, not held.</li>
+  <li><strong>Decimals use a dot.</strong> Numbers parse under invariant culture; never use a comma as a decimal separator (commas separate Vector2 components).</li>
+  <li><strong>Speed divides duration.</strong> <code>casterAnimationSpeed=2</code> makes the clip play in half the time.</li>
+  <li><strong>Per-facing animations are separate objects.</strong> With <code>casterAnimationDependsOnFacingRot</code>, define every <code>name0/90/180/270</code> variant or the lookup will fail for the missing facing.</li>
+  <li><strong>Never play the empty (<code>""</code>) animation.</strong> The built-in blank animation is a single keyframe roughly 1000 seconds long, so an actor that lands on it looks softlocked indefinitely. (A <em>misspelled</em> name is safer — it's logged and ignored, leaving the current animation running — but anything that resolves to <code>""</code> will hang.)</li>
+</ul>
+
+<hr>
+
+<h2 id="appendix">Appendix: Niche Details</h2>
+<p>Edge cases you can ignore until you need them.</p>
+
+<h3>Overridable built-in combat-entry animations</h3>
+<p>When an actor draws its weapons on entering combat, the engine plays one of three fixed-name built-in animations depending on how many hands are armed:</p>
+<table>
+  <tr><th>Animation ID</th><th>Played when</th></tr>
+  <tr><td><code>unsheathe01</code></td><td>both hands are armed</td></tr>
+  <tr><td><code>unsheathe0</code></td><td>only the main hand is armed</td></tr>
+  <tr><td><code>unsheathe1</code></td><td>only the off hand is armed</td></tr>
+</table>
+<p>These are referenced by literal name, so you override them simply by defining <code>[Animation] ID=unsheathe01;</code> (etc.) in your mod — the same way you'd override any other built-in animation (<code>punch</code>, <code>use</code>, …) by redefining its ID.</p>
+
+<h3>Keyword resolution fine print</h3>
+<p>A few keywords (see <a href="#consume">Animation keywords</a>) don't map one-to-one to a single slot:</p>
+<ul>
+  <li><code>stun</code> falls back to <code>painAnim</code> when the actor type's <code>stunAnim</code> is empty.</li>
+  <li><code>swing</code> / <code>spellcast</code> (and their hand-suffixed <code>swing0</code>/<code>swing1</code>/<code>spellcast0</code>/<code>spellcast1</code> forms) resolve to <code>swingAnim</code> / <code>spellcastAnim</code>; if that slot is empty, the keyword is left as a literal name instead. This is why these two keywords survive the weapon-hand suffix where most others don't.</li>
+  <li><code>jump</code> resolves to a built-in <code>jump_gate</code> animation (instead of <code>jumpAnim</code>) for actors that have the <code>gateleap</code> support ability.</li>
+</ul>
+
+<h3>Per-actor-type animation namespacing (<code>specialAnim_prefix</code>)</h3>
+<p>An <code>[ActorType]</code> can set <code>specialAnim_prefix</code>. When a non-keyword name is requested for that actor, the engine first checks for an animation called <code>&lt;prefix&gt;_&lt;name&gt;</code> and uses it if it exists. So with <code>specialAnim_prefix=goblin</code>, a script asking for <code>taunt</code> plays <code>goblin_taunt</code> if you've defined it — letting one shared script resolve to actor-type-specific animations without hardcoding IDs.</p>
+
+<hr>
+
+<h2 id="appendix-slots">Appendix: Actor-Type Animation Slots</h2>
+<p>The slots an <code>[ActorType]</code> exposes, each set to an animation <code>ID</code> the engine plays on the matching event (see <a href="#consume">Triggering an animation</a>).</p>
+<p><strong>Gameplay-state slots:</strong></p>
+<p class="small"><code>idleAnim</code>, <code>walkAnim</code>, <code>jumpAnim</code>, <code>climbAnim</code>, <code>painAnim</code>, <code>dodgeAnim</code>, <code>blockAnim</code>, <code>chargeAnim</code>, <code>castAnim</code>, <code>spellcastAnim</code>, <code>swingAnim</code>, <code>sleepAnim</code>, <code>stunAnim</code>, <code>frozenAnim</code>, <code>drownAnim</code>, <code>criticalAnim</code>, <code>deadAnim</code>, <code>mountedForceAnim</code>.</p>
+<p><strong>Encounter-negotiation reactions</strong> — played as the actor reacts when approached to fight, make peace, or be bribed. They follow the pattern <code>anim_try{Combat|Peace|Bribe}_&lt;mood&gt;_&lt;outcome&gt;</code> (mood: <code>overconfident</code> / <code>confident</code> / <code>uneasy</code> / <code>scared</code>; outcome: <code>fight</code> / <code>peace</code> / <code>flee</code> / <code>bribe</code>). Not every combination exists — only these are defined:</p>
+<p class="small"><code>anim_tryCombat_overconfident_fight</code>, <code>anim_tryCombat_overconfident_peace</code>, <code>anim_tryCombat_confident_fight</code>, <code>anim_tryCombat_confident_peace</code>, <code>anim_tryCombat_uneasy_fight</code>, <code>anim_tryCombat_uneasy_flee</code>, <code>anim_tryCombat_scared_flee</code>.</p>
+<p class="small"><code>anim_tryPeace_overconfident_fight</code>, <code>anim_tryPeace_overconfident_peace</code>, <code>anim_tryPeace_confident_fight</code>, <code>anim_tryPeace_confident_peace</code>, <code>anim_tryPeace_uneasy_fight</code>, <code>anim_tryPeace_uneasy_peace</code>, <code>anim_tryPeace_scared_peace</code>, <code>anim_tryPeace_scared_flee</code>.</p>
+<p class="small"><code>anim_tryBribe_overconfident_fight</code>, <code>anim_tryBribe_overconfident_peace</code>, <code>anim_tryBribe_overconfident_bribe</code>, <code>anim_tryBribe_confident_peace</code>, <code>anim_tryBribe_confident_bribe</code>, <code>anim_tryBribe_uneasy_bribe</code>, <code>anim_tryBribe_scared_bribe</code>.</p>
+
+<hr>
+
+<h2 id="bodyparts">Appendix: Body-Part Names</h2>
+<p>When routing a keyframe with <code>bodyPart=</code>, use the rig's part names. The commonly animated ones:</p>
+<p class="small"><code>head</code> · <code>torso</code> · <code>legs</code> · <code>armL</code> · <code>armR</code> · <code>item0</code> (item/weapon in hand 0) · <code>item1</code> (item/weapon in hand 1) · <code>tail</code>. Also present on the rig: <code>face</code> · <code>shoulderL</code> · <code>shoulderR</code> · <code>back</code>.</p>
+
+<hr>
+
+<h2 id="appendix-keywords">Appendix: Animation Keywords</h2>
+<p>Keywords you can pass instead of a literal animation <code>ID</code>; each resolves to the actor's matching <code>[ActorType]</code> slot (see <a href="#consume">Animation keywords</a> for how and where they apply):</p>
+<p class="small"><code>idle</code>, <code>walk</code>/<code>move</code>, <code>jump</code>, <code>climb</code>, <code>pain</code>, <code>dodge</code>, <code>block</code>, <code>charge</code>, <code>cast</code>, <code>spellcast</code>, <code>swing</code>, <code>sleep</code>, <code>stun</code>, <code>frozen</code>, <code>drown</code>, <code>critical</code>, <code>dead</code>.</p>
+
+<hr>
+
+<h2 id="references">References</h2>
+<p>This guide describes the engine's full animation capabilities, independent of any validator rules. It was reconstructed by reading the <strong>decompiled C# code of Horizon's Gate v1.6.04</strong> — chiefly the <code>Animation</code>, <code>Keyframe</code>, <code>Animator</code>, <code>Actor</code>, <code>ActorType</code>, and <code>Action</code> classes together with the Lua, trigger, and data-loading code. That decompiled source is the primary source for every field name and behavior here (subject to the disclaimer at the top of the page).</p>
+<p>It was also cross-checked against the community Horizon's Gate modding reference at <a href="https://furdabip.com/hg/" target="_blank" rel="noopener noreferrer">furdabip.com/hg</a> — in particular these pages:</p>
+<ul>
+  <li><a href="https://furdabip.com/hg/hgmr/def/Animation%20Properties.txt" target="_blank" rel="noopener noreferrer">Animation Properties</a></li>
+  <li><a href="https://furdabip.com/hg/hgmr/def/Keyframe%20Properties.txt" target="_blank" rel="noopener noreferrer">Keyframe Properties</a></li>
+  <li><a href="https://furdabip.com/hg/hgmr/notes/Animation%20Keywords.txt" target="_blank" rel="noopener noreferrer">Animation Keywords</a></li>
+</ul>
+
+</main>
+</div>
+</body>
+</html>
