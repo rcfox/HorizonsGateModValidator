@@ -381,20 +381,20 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Evaluates the sub-formula using a specific actor (looked up by ID in the current zone) as the caster instead of the original caster. Useful for querying values from a known actor regardless of who is actually performing the action.",
+          "description": "Evaluates the sub-formula using a specific actor (looked up by ID in the current zone or fleets) as the caster instead of the original caster. Useful for querying values from a known actor regardless of who is actually performing the action or dialog.",
           "returns": "float",
           "example": "swapCasterID:partyMember0:c:HP",
           "arguments": [
             {
               "name": "actorId",
               "type": "string",
-              "description": "Identifier of the actor in the current zone to substitute as caster. Looked up via ZoneManager.",
+              "description": "ID of the actor to substitute as caster. Looked up in the current zone, then in fleets (boats then crews).",
               "optional": false
             },
             {
               "name": "formula",
               "type": "formula",
-              "description": "Sub-formula to evaluate with the substituted caster. Consumes the remainder of the operand string after the actor ID.",
+              "description": "Sub-formula to evaluate with the substituted caster.",
               "optional": false
             }
           ],
@@ -1152,14 +1152,14 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Counts how many non-incapacitated allies of the caster are standing within the named area of effect centered on the target's tile. Allies are determined by sharing the caster's hostile flag.",
+          "description": "Counts how many non-incapacitated allies of the caster (caster included) are standing within the named area of effect centered on the target's tile. Allies are determined by sharing the caster's hostile flag.",
           "returns": "float",
           "example": "numAlliesNearTargetWithinAoE:smallCircle",
           "arguments": [
             {
               "name": "aoeId",
               "type": "string",
-              "description": "Identifier of an AreaOfEffect data entry that defines the region around the target's tile to search for allies.",
+              "description": "ID of an AreaOfEffect that defines the region around the target's tile to search for allies.",
               "optional": false
             }
           ],
@@ -8836,14 +8836,14 @@
       "isFunctionStyle": true,
       "uses": [
         {
-          "description": "Counts how many non-incapacitated actors share both the caster's hostile flag AND the caster's faction, within the parenthesized tile radius. A stricter ally count than m:numAlliesWithin.",
+          "description": "Counts how many non-incapacitated actors share both the caster's hostile flag AND the caster's faction (caster itself included), within the parenthesized tile radius. A stricter ally count than m:numAlliesWithin.",
           "returns": "float",
           "example": "m:numFactionAlliesWithin(3)",
           "arguments": [
             {
               "name": "radius",
               "type": "float",
-              "description": "Tile radius supplied via a parenthesized argument; the search around the caster is performed within this radius. Can also be a sub-formula evaluated in the same way.",
+              "description": "Tile radius supplied in parentheses; the search around the caster is performed within this radius. Can also be a sub-formula evaluated in the same way.",
               "optional": false
             }
           ],
@@ -8857,14 +8857,14 @@
       "isFunctionStyle": true,
       "uses": [
         {
-          "description": "Counts how many non-incapacitated actors share the caster's hostile flag within the parenthesized tile radius. Used for measuring local allied density.",
+          "description": "Counts how many non-incapacitated actors share the caster's hostile flag within the parenthesized tile radius (caster included).",
           "returns": "float",
           "example": "m:numAlliesWithin(3)",
           "arguments": [
             {
               "name": "radius",
               "type": "float",
-              "description": "Tile radius supplied via a parenthesized argument; the search around the caster is performed within this radius. Can also be a sub-formula evaluated in the same way.",
+              "description": "Tile radius supplied in parentheses; the search around the caster is performed within this radius. Can also be a sub-formula evaluated in the same way.",
               "optional": false
             }
           ],
@@ -8878,14 +8878,14 @@
       "isFunctionStyle": true,
       "uses": [
         {
-          "description": "Counts how many non-incapacitated actors share the caster's hostile flag within the parenthesized tile radius of the target's tile (or targetTC if no target actor is set).",
+          "description": "Counts how many non-incapacitated actors share the caster's hostile flag (caster included) within the parenthesized tile radius of the target's tile (or targetTC if no target actor is set).",
           "returns": "float",
           "example": "m:numAlliesNearTargetWithin(3)",
           "arguments": [
             {
               "name": "radius",
               "type": "float",
-              "description": "Tile radius supplied via a parenthesized argument; the search around the target is performed within this radius.",
+              "description": "Tile radius supplied in parentheses; the search around the target is performed within this radius.",
               "optional": false
             }
           ],
@@ -8906,7 +8906,7 @@
             {
               "name": "radius",
               "type": "float",
-              "description": "Tile radius supplied via a parenthesized argument; the search around the target is performed within this radius.",
+              "description": "Tile radius supplied in parentheses; the search around the target is performed within this radius.",
               "optional": false
             }
           ],
@@ -8920,14 +8920,14 @@
       "isFunctionStyle": true,
       "uses": [
         {
-          "description": "Counts how many non-incapacitated allies of the caster (sharing hostile flag) within the parenthesized tile radius of the target's tile are positioned on the same row or column as the target.",
+          "description": "Counts how many non-incapacitated allies of the caster (sharing hostile flag, caster itself included) within the parenthesized tile radius of the target's tile are positioned on the same row or column as the target.",
           "returns": "float",
           "example": "m:numAlliesInLineNearTargetWithin(3)",
           "arguments": [
             {
               "name": "radius",
               "type": "float",
-              "description": "Tile radius supplied via a parenthesized argument; the search around the target is performed within this radius.",
+              "description": "Tile radius supplied in parentheses; the search around the target is performed within this radius.",
               "optional": false
             }
           ],
@@ -8941,14 +8941,14 @@
       "isFunctionStyle": true,
       "uses": [
         {
-          "description": "Counts how many non-incapacitated allies of the caster within the parenthesized tile radius of the target's tile both meet melee weapon-element requirements AND can reach the target with their weapon. Used for measuring how surrounded a target is by melee threats.",
+          "description": "Counts how many non-incapacitated allies of the caster (caster included) within the parenthesized tile radius of the target's tile both meet melee weapon-element requirements AND can reach the target with their weapon.",
           "returns": "float",
           "example": "m:numAlliesThatCanMeleeAttackTargetWithin(3)",
           "arguments": [
             {
               "name": "radius",
               "type": "float",
-              "description": "Tile radius supplied via a parenthesized argument; the search around the target is performed within this radius.",
+              "description": "Tile radius supplied in parentheses; the search around the target is performed within this radius.",
               "optional": false
             }
           ],
@@ -8969,7 +8969,7 @@
             {
               "name": "radius",
               "type": "float",
-              "description": "Tile radius supplied via a parenthesized argument; the search around the target is performed within this radius.",
+              "description": "Tile radius supplied in parentheses; the search around the target is performed within this radius.",
               "optional": false
             }
           ],
@@ -8983,14 +8983,14 @@
       "isFunctionStyle": true,
       "uses": [
         {
-          "description": "Counts how many non-incapacitated allies of the caster within the parenthesized tile radius of the target's tile both meet ranged weapon-element requirements AND can reach the target with their weapon.",
+          "description": "Counts how many non-incapacitated allies of the caster (caster included) within the parenthesized tile radius of the target's tile both meet ranged weapon-element requirements AND can reach the target with their weapon.",
           "returns": "float",
           "example": "m:numAlliesThatCanRangedAttackTargetWithin(5)",
           "arguments": [
             {
               "name": "radius",
               "type": "float",
-              "description": "Tile radius supplied via a parenthesized argument; the search around the target is performed within this radius.",
+              "description": "Tile radius supplied in parentheses; the search around the target is performed within this radius.",
               "optional": false
             }
           ],
@@ -9011,7 +9011,7 @@
             {
               "name": "radius",
               "type": "float",
-              "description": "Tile radius supplied via a parenthesized argument; the search around the target is performed within this radius.",
+              "description": "Tile radius supplied in parentheses; the search around the target is performed within this radius.",
               "optional": false
             }
           ],
@@ -9032,7 +9032,7 @@
             {
               "name": "radius",
               "type": "float",
-              "description": "Tile radius supplied via a parenthesized argument; the search around the target is performed within this radius.",
+              "description": "Tile radius supplied in parentheses; the search around the target is performed within this radius.",
               "optional": false
             }
           ],
