@@ -3715,7 +3715,7 @@
       "officialDescription": "Awards between 54 and 84 XP in all classes to every actor in the zone, if they have less than 54 XP.",
       "uses": [
         {
-          "description": "Iterates every actor in the current zone and awards them their 'base XP', which grants them a small random amount of XP in every class (between 54 and 84) provided they currently have less than 54 XP in that class. Useful for ensuring NPCs aren't completely unleveled when entering a scripted scene.",
+          "description": "Iterates every actor in the current zone and awards them their 'base XP', which grants them a small random amount of XP in every class (between 54 and 84) provided they currently have less than 54 XP in that class. If optional globalVar 'XPShare' (0 by default) is > 0, additionally grants XPShare % of each class's XP globalVar afterwards.",
           "required": [],
           "optional": []
         }
@@ -6641,7 +6641,7 @@
     },
     {
       "name": "grantXPShare_5percent",
-      "officialDescription": "DO NOT USE. Gives 5% of each class's XP globalVar to every current partyActor if globalVar 'XPShare' is set to 1.",
+      "officialDescription": "DO NOT USE. Gives 5% of each class's XP globalVar to every current partyActor if globalVar 'XPShare' is > 0.",
       "uses": [
         {
           "description": "For every party actor (and every barracks actor), awards 5% of each class's stored XP global variable as XP in that class. Active-party shares are gated on the 'XPShare' globalVar being > 0 (and on each class having more than 100 XP); barracks shares run whenever XPShare > 0 with no minimum check. Marked DO NOT USE by the official description.",
@@ -11401,7 +11401,7 @@
       "officialDescription": "Adds 'fValue' faction_favor for 'sValue' faction ID to a port location. 'sValue2' is the ID of the location. If ID is not set, uses current location instead. If b1, resets every faction's favor to 0 before adding fValue to sValue (will unset ever-loyal ports). If b2, sets the port to be ever-loyal to sValue faction instead.",
       "uses": [
         {
-          "description": "Modifies the faction-favor map of a port Location. If bools[0] = true, all faction favors at the port are reset to 0 first (unsetting any 'ever-loyal' status). If bools[1] = true, the port is then marked ever-loyal to strings[0]. Otherwise, if the port can change faction, floats[0] is added to its favor for strings[0] (clamped to [-50, 50]). Has no effect outside a port location or with an unknown faction.",
+          "description": "Modifies the faction-favor map of a port Location. If bools[0] = true, all faction favors at the port are reset to 0 first (unsetting any 'ever-loyal' status). If bools[1] = true, the port is then marked ever-loyal to strings[0]. Otherwise, if the port can change faction, floats[0] is added to its favor for strings[0] (clamped to [-50, 50]). If strings[1] is not specified, has no effect outside a port location. Has no effect with an unknown faction.",
           "required": [
             {
               "name": "strings[0]",
