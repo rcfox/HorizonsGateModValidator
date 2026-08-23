@@ -509,11 +509,11 @@
     },
     {
       "name": "actor",
-      "description": "Displays an actor sprite at normal size. Supports party index or actor ID. Uses default sprite with palettes. Wraps to next line if doesn't fit.",
+      "description": "Displays an actor sprite at normal size. Supports actor type ID, actor ID or party index. Uses default sprite with palettes. Wraps to next line if doesn't fit.",
       "required": [
         {
           "name": "Argument 1",
-          "description": "Actor ID or party index (integer). If integer, retrieves from partyActors"
+          "description": "Actor type ID, actor ID or party index (integer). Actor type ID takes priority, then actor ID in zone, fleets, or prefabs. If integer, retrieves from partyActors."
         }
       ],
       "optional": [
