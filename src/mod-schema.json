@@ -4576,17 +4576,17 @@
         {
           "name": "gameTime",
           "type": "float",
-          "csType": "float"
+          "csType": "double"
         },
         {
           "name": "worldTime",
           "type": "float",
-          "csType": "float"
+          "csType": "double"
         },
         {
           "name": "worldTime_daytimer",
           "type": "float",
-          "csType": "float"
+          "csType": "double"
         },
         {
           "name": "worldTime_days",
@@ -4701,7 +4701,7 @@
         {
           "name": "globalVars_worldTimeAssigned",
           "type": "Dictionary<string, float>",
-          "csType": "Dictionary<string, float>"
+          "csType": "Dictionary<string, double>"
         },
         {
           "name": "triggersFlaggedAsDone",
@@ -4711,7 +4711,7 @@
         {
           "name": "zonesVisited_lastWorldTime",
           "type": "Dictionary<string, float>",
-          "csType": "Dictionary<string, float>"
+          "csType": "Dictionary<string, double>"
         },
         {
           "name": "killsOfActorType",

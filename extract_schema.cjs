@@ -13,6 +13,7 @@ const typeMap = {
   'bool': 'boolean',
   'int': 'integer',
   'float': 'float',
+  'double': 'float',
   'byte': 'byte',
   'string': 'string',
   'Vector2': 'Vector2',
@@ -25,6 +26,7 @@ const typeMap = {
   'List<string>': 'List<string>',
   'List<int>': 'List<integer>',
   'List<float>': 'List<float>',
+  'List<double>': 'List<float>',
   'List<Vector2>': 'List<Vector2>',
   'List<TileCoord>': 'List<TileCoord>',
   'List<Formula>': 'List<Formula>',
@@ -32,6 +34,7 @@ const typeMap = {
   'Dictionary<string, string>': 'Dictionary<string, string>',
   'Dictionary<string, int>': 'Dictionary<string, integer>',
   'Dictionary<string, float>': 'Dictionary<string, float>',
+  'Dictionary<string, double>': 'Dictionary<string, float>',
 };
 
 // Reverse mapping: our schema types to C# types
