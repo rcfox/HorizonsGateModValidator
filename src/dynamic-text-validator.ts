@@ -12,9 +12,11 @@
  */
 
 import type {
+  DynamicTextArgument,
   DynamicTextData,
   DynamicTextTag,
   DynamicTextCommand,
+  DynamicTextUseCase,
   ParsedDynamicTextTag,
   ParsedDynamicTextArgument,
   PropertyInfo,
@@ -60,6 +62,19 @@ if (tags.size === 0) {
   throw new Error('Failed to load dynamic text metadata from dynamic-text.json');
 }
 
+// Every entry must describe at least one use case; the arity checks below have
+// no meaningful answer for an entry with none.
+for (const [name, tag] of tags) {
+  if (tag.uses.length === 0) {
+    throw new Error(`Dynamic text tag '${name}' has no use cases in dynamic-text.json`);
+  }
+}
+for (const [name, command] of commands) {
+  if (command.uses.length === 0) {
+    throw new Error(`Dynamic text command '${name}' has no use cases in dynamic-text.json`);
+  }
+}
+
 /**
  * Check if a string looks like a formula (contains arithmetic operators or colon-prefixed operators)
  */
@@ -86,6 +101,59 @@ function getArgumentCountForTooManyCheck(args: ParsedDynamicTextArgument[]): num
  */
 function getArgumentCountForMissingCheck(args: ParsedDynamicTextArgument[]): number {
   return args.length;
+}
+
+/**
+ * A tag or command may accept several distinct argument shapes, one per use case.
+ * A count is only wrong when no use case can accept it, so the bounds are taken
+ * across all uses rather than from any single one.
+ */
+type ArityProblem =
+  | { kind: 'missing'; argument: DynamicTextArgument }
+  | { kind: 'tooMany'; maxAccepted: number; provided: number };
+
+/**
+ * The use case demanding the fewest required arguments. Its argument names are
+ * what a modder who supplied too few arguments is most likely reaching for.
+ */
+function leastDemandingUse(uses: DynamicTextUseCase[]): DynamicTextUseCase {
+  const [first, ...rest] = uses;
+  if (!first) {
+    throw new Error('Dynamic text entry has no use cases');
+  }
+  return rest.reduce((fewest, use) => (use.required.length < fewest.required.length ? use : fewest), first);
+}
+
+/**
+ * The largest number of arguments any use case will consume.
+ */
+function maxAcceptedArgumentCount(uses: DynamicTextUseCase[]): number {
+  return uses.reduce((max, use) => Math.max(max, use.required.length + use.optional.length), 0);
+}
+
+/**
+ * Check a written argument list against every use case of a tag or command.
+ */
+function checkArgumentCounts(uses: DynamicTextUseCase[], args: ParsedDynamicTextArgument[]): ArityProblem[] {
+  const problems: ArityProblem[] = [];
+  const mostPermissive = leastDemandingUse(uses);
+  const providedForMissing = getArgumentCountForMissingCheck(args);
+  const providedForTooMany = getArgumentCountForTooManyCheck(args);
+
+  if (providedForMissing < mostPermissive.required.length) {
+    const missing = mostPermissive.required[providedForMissing];
+    if (!missing) {
+      throw new Error('Missing argument index is out of range for the use case that reported it');
+    }
+    problems.push({ kind: 'missing', argument: missing });
+  }
+
+  const maxAccepted = maxAcceptedArgumentCount(uses);
+  if (providedForTooMany > maxAccepted) {
+    problems.push({ kind: 'tooMany', maxAccepted, provided: providedForTooMany });
+  }
+
+  return problems;
 }
 
 /**
@@ -229,35 +297,29 @@ function validateCommandTag(tag: ParsedDynamicTextTag, propInfo: PropertyInfo): 
     return messages;
   }
 
-  // Validate command argument counts
-  const requiredCount = cmdMetadata.required.length;
-  const optionalCount = cmdMetadata.optional.length;
-  const providedForMissing = getArgumentCountForMissingCheck(commandArgs);
-  const providedForTooMany = getArgumentCountForTooManyCheck(commandArgs);
-
-  if (providedForMissing < requiredCount) {
-    const missingArg = cmdMetadata.required[providedForMissing];
-    messages.push({
-      severity: 'error',
-      message: `Command '${commandName}' is missing required ${missingArg?.name ?? 'argument'}`,
-      filePath: propInfo.filePath,
-      line: absoluteTagPos.startLine,
-      context: missingArg?.description,
-      errorCode: ValidationErrorCode.COMMAND_MISSING_ARG,
-      errorCodeContext: { commandName, argName: missingArg?.name ?? 'argument' },
-    });
-  }
-
-  if (providedForTooMany > requiredCount + optionalCount) {
-    messages.push({
-      severity: 'warning',
-      message: `Command '${commandName}' has too many arguments`,
-      filePath: propInfo.filePath,
-      line: absoluteTagPos.startLine,
-      context: `Expected at most ${requiredCount + optionalCount} argument(s), got ${providedForTooMany}`,
-      errorCode: ValidationErrorCode.COMMAND_TOO_MANY_ARGS,
-      errorCodeContext: { commandName },
-    });
+  // Validate command argument counts against every use case
+  for (const problem of checkArgumentCounts(cmdMetadata.uses, commandArgs)) {
+    if (problem.kind === 'missing') {
+      messages.push({
+        severity: 'error',
+        message: `Command '${commandName}' is missing required ${problem.argument.name}`,
+        filePath: propInfo.filePath,
+        line: absoluteTagPos.startLine,
+        context: problem.argument.description,
+        errorCode: ValidationErrorCode.COMMAND_MISSING_ARG,
+        errorCodeContext: { commandName, argName: problem.argument.name },
+      });
+    } else {
+      messages.push({
+        severity: 'warning',
+        message: `Command '${commandName}' has too many arguments`,
+        filePath: propInfo.filePath,
+        line: absoluteTagPos.startLine,
+        context: `Expected at most ${problem.maxAccepted} argument(s), got ${problem.provided}`,
+        errorCode: ValidationErrorCode.COMMAND_TOO_MANY_ARGS,
+        errorCodeContext: { commandName },
+      });
+    }
   }
 
   // Check for nested brackets in command arguments
@@ -318,7 +380,7 @@ function validateUnknownCommand(commandArg: ParsedDynamicTextArgument, propInfo:
 }
 
 /**
- * Validate argument counts against tag metadata
+ * Validate argument counts against every use case in the tag metadata
  */
 function validateArgumentCounts(
   tag: ParsedDynamicTextTag,
@@ -327,36 +389,30 @@ function validateArgumentCounts(
 ): ValidationMessage[] {
   const messages: ValidationMessage[] = [];
 
-  const requiredCount = tagMetadata.required.length;
-  const optionalCount = tagMetadata.optional.length;
-  const providedForMissing = getArgumentCountForMissingCheck(tag.arguments);
-  const providedForTooMany = getArgumentCountForTooManyCheck(tag.arguments);
-
   const absoluteTagPos = toAbsolutePosition(tag.position, propInfo.valueStartLine, propInfo.valueStartColumn);
 
-  if (providedForMissing < requiredCount) {
-    const missingArg = tagMetadata.required[providedForMissing];
-    messages.push({
-      severity: 'error',
-      message: `Tag '${tag.tagName}' is missing required ${missingArg?.name ?? 'argument'}`,
-      filePath: propInfo.filePath,
-      line: absoluteTagPos.startLine,
-      context: missingArg?.description,
-      errorCode: ValidationErrorCode.TAG_MISSING_ARG,
-      errorCodeContext: { tagName: tag.tagName, argName: missingArg?.name ?? 'argument' },
-    });
-  }
-
-  if (providedForTooMany > requiredCount + optionalCount) {
-    messages.push({
-      severity: 'warning',
-      message: `Tag '${tag.tagName}' has too many arguments`,
-      filePath: propInfo.filePath,
-      line: absoluteTagPos.startLine,
-      context: `Expected at most ${requiredCount + optionalCount} argument(s), got ${providedForTooMany}`,
-      errorCode: ValidationErrorCode.TAG_TOO_MANY_ARGS,
-      errorCodeContext: { tagName: tag.tagName },
-    });
+  for (const problem of checkArgumentCounts(tagMetadata.uses, tag.arguments)) {
+    if (problem.kind === 'missing') {
+      messages.push({
+        severity: 'error',
+        message: `Tag '${tag.tagName}' is missing required ${problem.argument.name}`,
+        filePath: propInfo.filePath,
+        line: absoluteTagPos.startLine,
+        context: problem.argument.description,
+        errorCode: ValidationErrorCode.TAG_MISSING_ARG,
+        errorCodeContext: { tagName: tag.tagName, argName: problem.argument.name },
+      });
+    } else {
+      messages.push({
+        severity: 'warning',
+        message: `Tag '${tag.tagName}' has too many arguments`,
+        filePath: propInfo.filePath,
+        line: absoluteTagPos.startLine,
+        context: `Expected at most ${problem.maxAccepted} argument(s), got ${problem.provided}`,
+        errorCode: ValidationErrorCode.TAG_TOO_MANY_ARGS,
+        errorCodeContext: { tagName: tag.tagName },
+      });
+    }
   }
 
   return messages;

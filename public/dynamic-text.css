@@ -39,10 +39,72 @@
   background: rgba(24, 144, 255, 0.03);
 }
 
+/* The description now lives in the use-case body, so the copy buttons need
+   something to push them to the right of the header row. */
+.tag-header-spacer {
+  flex: 1;
+}
+
+/* Use case descriptions are written as multiple paragraphs separated by blank
+   lines, so preserve the line breaks. The one-line summary is unaffected. */
+.tag-description,
+.subcommand-description {
+  white-space: pre-line;
+}
+
+/* Use case counter, shown only for tags/subcommands with more than one use */
+.use-case-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--code-bg);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+  cursor: help;
+}
+
+/* Argument name and type sit on one line above the description */
+.argument-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
 .argument-name {
   background: var(--code-bg);
   display: inline-block;
-  align-self: flex-start;
+}
+
+.argument-type {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+  border: 1px solid currentColor;
+  background: var(--surface-color);
+  white-space: nowrap;
+  cursor: help;
+}
+
+/* Parsed or used as-is: string, float, integer, formula */
+.argument-type.type-primitive {
+  color: var(--success-color);
+}
+
+/* Named built-in game resource: texture, font, color, globalVar */
+.argument-type.type-resource {
+  color: var(--warning-color);
+}
+
+/* ID of a mod-defined object, or a namespaced enum value */
+.argument-type.type-reference {
+  color: var(--primary-color);
 }
 
 /* Aliases section (similar to formulas) */
