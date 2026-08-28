@@ -323,34 +323,68 @@ export interface FormulaToken {
 }
 
 /**
+ * Argument types that are parsed or consumed directly, with no name lookup.
+ */
+export const DYNAMIC_TEXT_PRIMITIVE_TYPES = ['string', 'float', 'integer', 'formula'] as const;
+export type DynamicTextPrimitiveType = (typeof DYNAMIC_TEXT_PRIMITIVE_TYPES)[number];
+
+/**
+ * Argument types naming a built-in game resource rather than a mod-defined object.
+ */
+export const DYNAMIC_TEXT_RESOURCE_TYPES = ['texture', 'font', 'color', 'globalVar'] as const;
+export type DynamicTextResourceType = (typeof DYNAMIC_TEXT_RESOURCE_TYPES)[number];
+
+/**
+ * The ID of a mod-defined object, or a namespaced enum value. Written using the
+ * canonical name from mod-schema.json, e.g. 'Action', 'ActorType',
+ * 'ItemType.ItemCategory'. Open-ended, since it follows the extracted schema.
+ */
+export type DynamicTextSchemaType = string & Record<never, never>;
+
+/**
+ * What kind of value a modder must supply for a dynamic text tag argument.
+ */
+export type DynamicTextArgumentType = DynamicTextPrimitiveType | DynamicTextResourceType | DynamicTextSchemaType;
+
+/**
  * Dynamic text tag argument metadata from dynamic-text.json
  */
 export interface DynamicTextArgument {
   name: string; // e.g., "Argument 1", "Argument 2"
+  type: DynamicTextArgumentType;
   description: string;
+}
+
+/**
+ * One distinct behaviour of a tag or command, with the argument shape it accepts.
+ * A tag with mutually exclusive argument shapes has one use case per shape.
+ */
+export interface DynamicTextUseCase {
+  description: string;
+  required: DynamicTextArgument[];
+  optional: DynamicTextArgument[];
+}
+
+/**
+ * A named entry in dynamic-text.json: either a tag or a subcommand of the
+ * <command=> tag. Both share the same shape.
+ */
+export interface DynamicTextEntry {
+  name: string;
+  uses: DynamicTextUseCase[];
+  aliases: string[];
 }
 
 /**
  * Dynamic text command metadata (for <cmd=> tag)
  */
-export interface DynamicTextCommand {
-  name: string;
-  description: string;
-  required: DynamicTextArgument[];
-  optional: DynamicTextArgument[];
-  aliases: string[];
-}
+export type DynamicTextCommand = DynamicTextEntry;
 
 /**
  * Dynamic text tag metadata from dynamic-text.json
  */
-export interface DynamicTextTag {
-  name: string;
-  description: string;
-  required: DynamicTextArgument[];
-  optional: DynamicTextArgument[];
-  aliases: string[];
-  commands?: DynamicTextCommand[]; // Only for <cmd=> tag
+export interface DynamicTextTag extends DynamicTextEntry {
+  commands?: DynamicTextCommand[]; // Only present on the <cmd=> tag
 }
 
 /**
