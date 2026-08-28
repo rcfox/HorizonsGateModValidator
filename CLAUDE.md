@@ -145,6 +145,7 @@ Browser application code (compiled to `public/app.bundle.js`):
 ### Build Tools
 - **extract_schema.cjs** - Extracts schema from C# source code in `/home/rcfox/code/hg/Tactics/`
 - **build-bundle.js** - Creates browser bundles using esbuild (validator.bundle.js and app.bundle.js)
+- **check-evidence.cjs** - Verifies `src/dynamic-text.jsonl` against the citation sidecar `out/dynamic-text.evidence.jsonl`: every cited line must exist and contain its snippet verbatim; every description, input, input type and alias must have a supporting record; and every argument `type` must be a known primitive, named resource, or class/enum from `mod-schema.json`. Run after a dynamic-text extraction run.
 
 ## Key Features
 
@@ -253,6 +254,7 @@ interface Correction {
 - `npm run build:cli` - Build CLI tool (same as `build`, but semantic)
 - `npm run build:bundle` - Build + create browser bundle
 - `node extract_schema.cjs` - Re-extract schema from C# source
+- `npm run check:evidence` - Verify dynamic-text extraction citations (see check-evidence.cjs)
 
 ## Development Notes
 
