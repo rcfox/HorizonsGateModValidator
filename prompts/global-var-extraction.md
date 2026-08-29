@@ -1,180 +1,266 @@
 # Job Description
 
-Global variables are stored in ./Tactics/GameState.cs in the globalVars dictionary. Throughout the decompiled C# code, global variables are used to track internal game state for various things.
+Global variables are the game's own persistent key/value store, held in the
+`globalVars` dictionary in `./Tactics/GameState.cs`. The engine uses them to
+track state of every kind, and mods read and write the same store.
 
-Some global variables' names are composed from multiple parts, like "D_{dialogNodeId}" indicates if a dialogNode has been seen before.
+They are usually set via `setGlobalVar` and read via `getGlobalVar` or
+`getGlobalVar_string`, but they are also modified in place, cleared, read for
+their assignment time, and occasionally manipulated through the dictionary
+directly. Some names are composed at runtime from several parts — `D_{dialogNodeID}`
+records whether a dialog node has been seen — and those are documented as one
+templated family rather than one entry per possible name.
 
-Global variables are often set via the `setGlobalVar` function and accessed via `getGlobalVar` or related functions. They might also be set by direct dictionary manipulation.
+For each global variable or templated family, capture:
 
-For every instance of a global variable being set or read, I want to record:
-
-* Its name (literal) or a templated name with placeholders for composed names.
-* What the variable represents in game terms.
-* Its value shape (flag, counter, modifier, id, enum, coord, cash, text, timestamp, composite).
-* Its lifetime (how long the value persists).
-* Where and how it gets set, and where it gets read.
+* Its literal name, or a template with placeholders for the composed parts.
+* What it represents in game terms.
+* Its value shape, its lifetime, and its category.
+* Where it is set, and where it is read.
 * Cross-links to related variables.
 
-## Descriptions
-Each description should be self-contained. Don't describe a global variable in terms of another variable unless they are meant to be used together (in which case, link them via `related`).
+# Shared rules
 
-Prefer richer, more accurate descriptions over brevity. Aim for 1-3 sentences.
+Read these before starting. The rules in them apply in full.
 
-Descriptions should describe behaviour, not implementation. The audience is game modders who do not have access to the source code.
+* `./mod-validator/prompts/shared/descriptions.md`
+* `./mod-validator/prompts/shared/evidence.md`
+* `./mod-validator/prompts/shared/investigation.md`
+* `./mod-validator/prompts/shared/review-log.md`
+* `./mod-validator/prompts/shared/execution.md`
 
-If more information is needed about how code is executed, look under one of the Tactics subdirectories of this directory. If information cannot be determined conclusively from the inspected code, record the uncertainty explicitly in `notes` and in ./mod-validator/out/errors.md, then continue.
+This job has no `uses` array, no inputs and no aliases, so `use-cases.md`,
+`inputs.md`, `input-types.md` and `aliases.md` do not apply.
 
-# Outputs
+## Bindings
 
-Record any errors or uncertainties to ./mod-validator/out/errors.md and continue with the rest of the variables.
+| Placeholder | Value |
+|---|---|
+| `{ENTITY}` / `{ENTITY_PLURAL}` | global variable / global variables |
+| `{DATA_FILE}` | `./mod-validator/src/globalvars.jsonl` |
+| `{EVIDENCE_FILE}` | `./mod-validator/out/globalvars.evidence.jsonl` |
+| `{ENTITY_KEY_NOTE}` | The entry's `name`, including the `{placeholder}` segments for a templated family. |
+| `{USE_FIELD_REQUIRED}` | never — entries have no `uses` array, so omit the field |
+| `{ENUMERATION_ORDER}` | the order of the worklist file described below |
+| `{RESUME_RULE}` | the worklist: find the last recorded entry's name in the worklist, and continue from the next worklist name that is not already covered by an entry |
+| `{COMPLETENESS_CHECK}` | Every worklist name is covered — by an entry of its own, by a templated entry whose pattern it matches, or by a review-log note explaining why it is out of scope. |
 
-The extraction output must go into ./mod-validator/src/globalvars.jsonl as JSONL. Each line is one JSON object describing a single global variable (or a templated family).
+Unlike the other extraction jobs, this one has no switch statement to walk. The
+worklist below takes its place, and it is what makes the run resumable.
 
-Never overwrite or recreate ./mod-validator/src/globalvars.jsonl. Always read it before writing. Only append or modify existing content.
+# Phase 1: build the worklist
 
-## Entry Schema
+Do this once, before extracting anything. If
+`./mod-validator/out/globalvars.worklist.md` already exists, the worklist has
+already been built: use it as-is and go straight to phase 2. Never rebuild or
+reorder an existing worklist — the run's resume point depends on it staying
+fixed.
 
-```jsonc
-{
-  "name": "playerFaction",                  // literal name, OR template like "favor_{factionID}"
-  "isTemplate": true,                       // OMIT when false; required true if name contains {placeholder}
-  "params": [                               // required when isTemplate=true; one entry per placeholder
-    {"name": "factionID", "type": "Faction.ID", "note": "plus the special 'pirate' value"}
-  ],
-  "description": "1-3 sentences in game terms.",
-  "valueShape": "id",                       // see Value Shapes below
-  "idType": "Faction.ID",                   // required when valueShape=id
-  "enumValues": ["letter", "cargo", ""],    // required when valueShape=enum
-  "baseValue": 0.25,                        // required when valueShape=modifier
-  "modKind": "additive",                    // required when valueShape=modifier
-  "lifetime": "persistent",                 // see Lifetimes below
-  "category": "economy",                    // see Categories below
-  "setBy": [
-    {"where": "GameState.refreshTradeSpecial", "op": "set", "note": "monthly rollover"}
-  ],
-  "readBy": [
-    {"where": "GameState.generateGossip", "note": "gossip about local demand"}
-  ],
-  "related": ["next_tradeSpecial_locID", "tradeSpecial_goodsID"],  // optional
-  "notes": "Free-text caveat about edge cases or unverified claims."  // optional
-}
+Gather candidate names from all of these:
+
+```
+# names given as string literals to an accessor
+grep -rhoE '(get|set|mod|clear|has)GlobalVar[A-Za-z_]*\("[^"]+"' ./Tactics/ ./Tactics.UI/ ./Tactics.Dialog/ | sed -E 's/.*\("//; s/"$//' | sort -u
+
+# names built by concatenation - these become templated families
+grep -rnE '(get|set|mod|clear|has)GlobalVar[A-Za-z_]*\("[^"]*" *\+' ./Tactics/ ./Tactics.UI/ ./Tactics.Dialog/
+grep -rnE '(get|set|mod|clear|has)GlobalVar[A-Za-z_]*\([^)]*\+ *"' ./Tactics/ ./Tactics.UI/ ./Tactics.Dialog/
+
+# direct manipulation of the dictionary
+grep -rnE 'globalVars\[' ./Tactics/ ./Tactics.UI/ ./Tactics.Dialog/
+
+# variables written by the engine's own triggers
+grep -rnE 'TriggerEffect\("(set|mod|clear)GlobalVar' ./Tactics/Data.cs
+
+# names used by the shipped game data, including ones no C# literal mentions
+grep -rhoE '\bg:[A-Za-z0-9_]+' ./Data/ --include=*.txt | sed 's/^g://' | sort -u
 ```
 
-**IMPORTANT**: The example above is presented across multiple lines for ease of viewing. Write the actual individual JSON objects on a single line each, with no comments.
+Merge the results into `./mod-validator/out/globalvars.worklist.md`, one name per
+line, sorted lexicographically, in this format:
 
-### Field requirements summary
+```
+# globalvars worklist
+# built <date>; do not reorder or rebuild
 
-| Field | Required | Notes |
-|---|---|---|
-| `name` | always | Literal or template string. Templates contain `{placeholder}` segments. |
-| `isTemplate` | when template | Omit (or set false) for literal names. Set `true` when `name` contains `{...}`. |
-| `params` | when `isTemplate=true` | One object per placeholder. |
-| `description` | always | 1-3 sentences. |
-| `valueShape` | always | One of the values from "Value Shapes" below. |
-| `idType` | when `valueShape=id` | The ID space the value points into. |
-| `enumValues` | when `valueShape=enum` | Closed set of observed string values. Include `""` if empty is meaningful. |
-| `baseValue` | when `valueShape=modifier` | The default the modifier is applied to (number). |
-| `modKind` | when `valueShape=modifier` | `additive` or `multiplicative`. |
-| `lifetime` | always | One of the values from "Lifetimes" below. |
-| `category` | always | One of the values from "Categories" below. |
-| `setBy` | always | Array of `{where, op, note?}`; empty array `[]` only when the var is genuinely never set in code. |
-| `readBy` | always | Array of `{where, note?}`; empty array `[]` for write-only output channels. |
-| `related` | optional | List of other entries' `name` values that are logically grouped with this one. Templated names match by exact template string. |
-| `notes` | optional | Caveats, inferred semantics, or anything the validator should flag. |
+favor_{factionID}    <- concatenation in GameState.modFavor
+mapCompleted         <- literal
+questLog             <- literal, also g: in Data/SystemData
+```
 
-### Value Shapes
+Rules for the worklist:
 
-Choose the single shape that best matches how the variable is **used by readers**, not how it is stored (everything is stored as a string under the hood).
+* A name built by concatenation goes in once, as its template, not once per
+  observed value.
+* A name whose first segment is already covered by a template goes in only if it
+  is a genuine special case worth its own entry — otherwise leave it out and let
+  the template cover it.
+* A name that a modder supplies at runtime (the accessor is handed a value from a
+  task or dialog argument rather than a literal) is not a global variable of the
+  game's own; do not list it.
+* When in doubt, include the name. A name that turns out to be out of scope is
+  cheap: record why in the review log during phase 2.
+
+Write the worklist once, with `Write`, and then leave it alone. It is the only
+file in these jobs that is not append-only, because it is written exactly once.
+
+# Phase 2: extract
+
+Work the worklist top to bottom, one name at a time, under
+`shared/execution.md`. For each name:
+
+1. Find every site that writes it and every site that reads it. Grep for the
+   literal name, and for a template, for its fixed prefix.
+2. Read enough of each site to say what the value means and when it changes.
+3. Decide its value shape, lifetime and category from the vocabularies below.
+4. Write the entry and its evidence records.
+
+When a worklist name turns out to be covered by a family you have already
+recorded, do not write a second entry. Record the decision in the review log,
+naming both the worklist name and the covering template, so the completeness
+check can account for it.
+
+# Value shapes
+
+Choose the single shape that best matches how the variable is **used by
+readers**, not how it is stored — everything is a string underneath.
 
 | Shape | Meaning | Example |
 |---|---|---|
 | `flag` | 0 or 1, used as a boolean | `mapCompleted`, `ignoreHardcore` |
-| `counter` | Cumulative integer (possibly with min/max bounds noted in description) | `grovesDiscovered`, `playerRank`, `fame_explore` |
-| `modifier` | Tuning knob added/multiplied to a built-in base | `partySizeMod`, `marketRateMaxMod` |
-| `id` | Identifier of a tracked entity in another data space | `playerFaction` → Faction.ID |
-| `enum` | One of a fixed set of strings | `royalQuestType` → letter/cargo/defeat/... |
-| `coord` | Tile coordinate (single axis) | `playerX`, `treasureTCY` |
-| `cash` | Money amount in player currency | `moneyReserves`, `gpCollect_{locationID}` |
-| `text` | Human-readable display string | `questLog`, `investigatorAnswer_{actorID}` |
-| `timestamp` | Set primarily so readers can query worldTime via `getGlobalVarWorldTime` / `getGlobalVarWorldTimeSinceAssigned` | `questComplete_clearden`, `tracking_30d_{itemTypeID}` |
-| `composite` | Packed / free-form data not covered by the above (comma-separated lists, format depending on a sibling enum, etc.) | `fledFrom`, `royalQuestGoal` |
+| `counter` | Cumulative integer, bounds noted in the description | `grovesDiscovered`, `playerRank` |
+| `modifier` | Tuning knob added to or multiplied with a built-in base | `partySizeMod`, `marketRateMaxMod` |
+| `id` | Identifier of something in another data space | `playerFaction` |
+| `enum` | One of a fixed set of strings | `royalQuestType` |
+| `coord` | A single tile coordinate axis | `playerX`, `treasureTCY` |
+| `cash` | Money in player currency | `moneyReserves`, `gpCollect_{locationID}` |
+| `text` | Human-readable display string | `questLog` |
+| `timestamp` | Set so readers can ask how long ago it was assigned | `questComplete_clearden` |
+| `composite` | Packed or free-form data none of the above covers | `fledFrom`, `royalQuestGoal` |
 
-### Lifetimes
+# Lifetimes
 
 | Lifetime | Meaning |
 |---|---|
 | `persistent` | Survives across mission runs and save/load. |
-| `perRun` | Cleared at the start or end of a mission run (typically by `tSetRefreshGlobals` or the scoreScreen flow). |
+| `perRun` | Cleared at the start or end of a mission run. |
 | `perCombat` | Reset at combat start or combat end. |
 | `perZone` | Reset on zone transition. |
 | `perDay` | Refreshed on the new-day rollover. |
-| `perDialog` | Short-lived within a dialog/UI session. |
+| `perDialog` | Short-lived within a dialog or UI session. |
 
-### `setBy.op` vocabulary
+A lifetime other than `persistent` needs a clearing site to back it. If you
+cannot find one, the variable is `persistent` — say so, and note in the review
+log if that reading surprises you.
+
+# Categories
+
+Reuse one of: `achievement`, `combat`, `dialog`, `difficulty`, `economy`,
+`experience`, `exploration`, `faction`, `fame`, `items`, `journal`, `player`,
+`quest`, `statistics`, `ui`, `world_state`, `uncertain`. Use `uncertain` only
+when no other category fits and the variable's purpose is genuinely unclear.
+
+The three vocabularies above — shapes, lifetimes and categories — are
+documentation choices rather than anything the game declares, so a version update
+does not change them. `check-evidence.cjs` holds its own copy of each; if you
+change one here, change it there too.
+
+# Where it is set and read
+
+`setBy` and `readBy` are structured code-location fields, not prose, and are the
+one exception to the rule in `shared/descriptions.md` against naming code. Their
+`note` fields are prose and follow the usual rules.
+
+`op` vocabulary for `setBy`:
 
 | Op | Meaning |
 |---|---|
-| `set` | Direct assignment via `setGlobalVar(...)`. |
-| `clear` | Removed via `clearGlobalVar(...)` or assigned an "empty" value (`0`, `""`). |
-| `inc` | `modGlobalVar(..., +x)` with x > 0. |
-| `dec` | `modGlobalVar(..., -x)` with x > 0. |
-| `mod` | `modGlobalVar(...)` where the sign varies at runtime. |
-| `init` | Seeded once at game start (typically `tStartGame`). |
-| `appendString` | String concatenation via `setGlobalVar(..., getGlobalVar_string(...) + ...)`. |
-| `snapshot` | One-shot capture of another value at a specific event (e.g., entering combat). |
+| `set` | Direct assignment. |
+| `clear` | Removed, or assigned an empty value (`0`, `""`). |
+| `inc` / `dec` | Modified by a fixed positive / negative amount. |
+| `mod` | Modified by an amount whose sign varies at runtime. |
+| `init` | Seeded once at game start. |
+| `appendString` | Concatenated onto the existing value. |
+| `snapshot` | One-shot capture of another value at a specific event. |
 
-When the operation is genuinely unknown, omit `op`; the `where` and `note` fields are still useful on their own.
+Omit `op` when the operation is genuinely unknown; `where` and `note` still carry
+their weight.
 
-### `setBy.where` / `readBy.where` conventions
+`where` conventions:
 
-* Concrete code locations: `"File.Method"` (e.g., `"GameState.refreshTradeSpecial"`).
-* Trigger-based setters from `Data.cs`: `"<triggerID> trigger"` (e.g., `"tStartGame trigger"`).
-* Dialog-data setters that live in `.txt` content files outside the decompiled C#: `"dialog specialEffect"` or `"<topic> dialog flow"` (e.g., `"trainer dialog flow"`).
-* Modder-tunable knobs with no built-in setter: `"mod-defined"`.
+* Code locations: `"File.Method"`, for example `"GameState.refreshTradeSpecial"`.
+* Engine triggers from `Data.cs`: `"<triggerID> trigger"`.
+* Setters that live in the shipped `.txt` content rather than the C#:
+  `"dialog specialEffect"` or `"<topic> dialog flow"`.
+* A knob with no built-in setter, meant for mods to set: `"mod-defined"`.
 
-### Categories
+# Outputs
 
-Reuse one of: `achievement`, `combat`, `dialog`, `difficulty`, `economy`, `experience`, `exploration`, `faction`, `fame`, `items`, `journal`, `player`, `quest`, `statistics`, `ui`, `world_state`, `uncertain`. Use `uncertain` only when no other category fits and the var's purpose is genuinely unclear.
+## Global variable data
 
-### Worked examples
+Entries go into `./mod-validator/src/globalvars.jsonl`:
 
-Literal flag (combat lifetime):
 ```
-{"name":"turnNumber","description":"Index of the current combat turn, incremented at the start of each new turn.","valueShape":"counter","lifetime":"perCombat","category":"combat","setBy":[{"where":"ZoneManager.startNewTurn","op":"inc"}],"readBy":[{"where":"Actor","note":"records lastHPDamageTaken_turnNumber"}]}
+{
+  "name": "favor_{factionID}",
+  "isTemplate": true,
+  "params": [{"name": "factionID", "type": "Faction", "note": "plus the special 'pirate' value"}],
+  "description": "The player's standing with one faction. Clamped between -99 and the current maximum favor.",
+  "valueShape": "counter",
+  "lifetime": "persistent",
+  "category": "faction",
+  "setBy": [
+    {"where": "GameState.modFavor", "op": "mod", "note": "clamped"},
+    {"where": "tStartGame trigger", "op": "set", "note": "seeds pirate favor to -9999"}
+  ],
+  "readBy": [
+    {"where": "FleetManager", "note": "hostile engagement at -30 or below"},
+    {"where": "ItemType.getBuyPrice", "note": "favor-based discount"}
+  ],
+  "related": ["playerFaction"],
+  "notes": "..."
+}
 ```
 
-Modifier:
-```
-{"name":"partySizeMod","description":"Additive modifier to the maximum landing party size. Default base is 5.","valueShape":"modifier","baseValue":5,"modKind":"additive","lifetime":"persistent","category":"player","setBy":[{"where":"mod-defined","op":"set"}],"readBy":[{"where":"GameState.getMaxPartySize"}]}
-```
+| Field | Required | Notes |
+|---|---|---|
+| `name` | always | Literal name, or a template containing `{placeholder}` segments. |
+| `isTemplate` | when template | `true` when `name` contains `{...}`. Omit otherwise. |
+| `params` | when `isTemplate` | One object per placeholder: `name`, `type`, optional `note`. |
+| `description` | always | 1-3 sentences in game terms. |
+| `valueShape` | always | One name from the Value shapes table. |
+| `idType` | when `valueShape` is `id` | The ID space the value points into, as a canonical name from `mod-schema.json`. |
+| `enumValues` | when `valueShape` is `enum` | The closed set of observed values. Include `""` when empty is meaningful. |
+| `baseValue` | when `valueShape` is `modifier` | The number the modifier applies to. |
+| `modKind` | when `valueShape` is `modifier` | `additive` or `multiplicative`. |
+| `lifetime` | always | One name from the Lifetimes table. |
+| `category` | always | One name from the Categories list. |
+| `setBy` | always | Array of `{where, op?, note?}`. Empty only when genuinely never set in code. |
+| `readBy` | always | Array of `{where, note?}`. Empty only for a write-only output channel. |
+| `related` | optional | Names of other entries logically grouped with this one. Templates are referenced by their exact template string. |
+| `notes` | optional | Caveats, inferred semantics, anything the validator should flag. |
 
-Templated id family:
-```
-{"name":"favor_{factionID}","isTemplate":true,"params":[{"name":"factionID","type":"Faction.ID","note":"plus the special 'pirate' value"}],"description":"Player's favor score with a specific faction. Clamped between -99 and getMaxFavor.","valueShape":"counter","lifetime":"persistent","category":"faction","setBy":[{"where":"GameState.modFavor","op":"mod","note":"clamped"},{"where":"tStartGame trigger","op":"set","note":"seeds favor_pirate to -9999"}],"readBy":[{"where":"FleetManager","note":"hostile engagement at <= -30"},{"where":"ItemType.getBuyPrice","note":"favor-based discount"}]}
-```
+`params[].type` should name a canonical class or enum from
+`./mod-validator/src/mod-schema.json`, or a primitive (`int`, `string`). Every
+name in `related` should resolve to another entry in the file.
 
-Enum:
-```
-{"name":"royalQuestType","description":"Type of the player's active royal quest. Empty or '0' if no royal quest is active.","valueShape":"enum","enumValues":["letter","cargo","defeat","defeatbattle","defeatelite","alliance","item","grove",""],"lifetime":"persistent","category":"quest","setBy":[{"where":"GameState.refreshRoyalQuest","op":"set"}],"readBy":[{"where":"GameState.refreshRoyalQuest"}],"related":["royalQuestGoal","royalQuestFaction","questType"]}
-```
+## Evidence claims
 
-### Schema invariants (validator-checkable)
+Entries have no `uses` array, so evidence records for this job omit the `use`
+field. The claim vocabulary for `{EVIDENCE_FILE}`:
 
-* If `name` contains a `{` segment, then `isTemplate` must be `true` and `params` must include one entry per placeholder.
-* `params[].type` should reference a known ID space (`Faction.ID`, `Location.ID`, `Actor.ID`, `ItemType.ID`, `ActorClass.ID`, `ActorValue.ID`, `Action.ID`, `ActorValueAffecter.ID`, `Zone.ID`, `DialogNode.ID`, `Sprite.ID`, `SetPiece.ID`) or a primitive (`int`, `string`).
-* `valueShape=id` requires `idType`.
-* `valueShape=enum` requires `enumValues`.
-* `valueShape=modifier` requires `baseValue` and `modKind`.
-* Entries named in `related` should themselves exist in the file (cross-links must resolve to other entries' `name` values).
+| Claim | Supports | Required |
+|---|---|---|
+| `description` | what the variable represents | one per entry |
+| `valueShape` | the recorded shape; cite a line showing how a reader uses the value | one per entry |
+| `lifetime` | the recorded lifetime; cite the clearing site, or the setter when `persistent` | one per entry |
+| `param:<name>` | that placeholder existing and its type; cite the line that composes the name | one per entry in `params` |
+| `setBy:<index>` | that write site | one per `setBy` entry |
+| `readBy:<index>` | that read site | one per `readBy` entry |
 
-# Execution Methodology
+`category`, `related` and `notes` need no evidence records — they are
+organisational judgement, not claims about the source.
 
-This is a long-running, unattended extraction process. Do not request user input, confirmations or additional permissions. Proceed autonomously using the provided tools and instructions. Do not stop to report progress.
-
-Do not invent scripts to automate the population of any data.
-
-Do not attempt to estimate total effort or validate global correctness.
-
-Do not summarize, explain, or restate the extracted information in the message buffer.
-
-Do not emit parsed data to the message buffer.
+A `setBy` or `readBy` entry whose `where` points at shipped `.txt` content rather
+than C# cites that data file: the same file/line/snippet rules apply, and
+`./Data/` paths are valid citations.

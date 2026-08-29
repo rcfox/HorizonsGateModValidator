@@ -1,79 +1,139 @@
 # Job Description
 
-In ./Tactics/Task.cs, in the executeTask function, there is a switch statement over the TaskType enum. Each enum name is the name of a task.
+In `./Tactics/Task.cs`, in the `executeTask` function, there is a switch
+statement over the `TaskType` enum. Each enum name is the name of a task.
 
-For each of these tasks, I want to capture:
+For each of these tasks, capture:
 
 * The name of the task.
-* For each of the task's use cases:
-  * What the task use case does.
-    * Not just "executes the foo task", but actually try to describe in game terms what it does.
-    * If there are multiple things it might do, make sure to capture them as distinct use cases.
-    * Aim for 2-4 sentences per distinct use case, in distinct paragraphs.
-  * What each input does.
-    * Be descriptive with 2-4 sentences for each input.
-    * Some inputs might have multiple use cases depending on other inputs, be sure to capture them all.
-  * Which inputs are required.
-  * Which inputs are optional.
+* For each of the task's use cases: what it does, what each input does, the type
+  of each input, which inputs are required or optional, and which contextual
+  values the use case depends on.
 * Any aliases found.
 
-Valid inputs are indexes into the following arrays: `strings`, `floats`, `bools` and `tileCoords`. Do not invent other input types. Do not invent input indexes not actually accessed in the code. Do not collapse multiple indexes into one conceptual input. If a variable aliases an index access of one of these arrays, it does not count as a separate input.
+# Shared rules
 
-If a task includes a dynamic number of accesses over an input array, treat this as a single input indexed by the lower bound, with a plus sign (+) appended. For example: `strings[2+]`. This indicates a variable number of arguments can be accepted. See `addJournalGoal` as an example of this.
+Read these before starting. The rules in them apply in full.
 
-To determine if an input is required, check for unconditional array index access. An array access is UNCONDITIONAL if the array element is accessed directly without first verifying the array's size/count. A check like `if (floats[0] > 0)` does NOT make the input optional - it still crashes if `floats[0]` doesn't exist. Only checks on the array's Count/Length before accessing make an input optional.
+* `./mod-validator/prompts/shared/descriptions.md`
+* `./mod-validator/prompts/shared/use-cases.md`
+* `./mod-validator/prompts/shared/inputs.md`
+* `./mod-validator/prompts/shared/input-types.md`
+* `./mod-validator/prompts/shared/aliases.md`
+* `./mod-validator/prompts/shared/deferred-behaviour.md`
+* `./mod-validator/prompts/shared/evidence.md`
+* `./mod-validator/prompts/shared/investigation.md`
+* `./mod-validator/prompts/shared/review-log.md`
+* `./mod-validator/prompts/shared/execution.md`
 
-If an input is not accessed in a given use case, do not list it under that use case at all — neither as required nor as optional. The `optional` array is only for inputs whose access is conditionally guarded; inputs that are absent from the branch entirely are simply omitted from that use case.
+## Bindings
 
-Exception: the implicit-required rule below (later-indexed input requires earlier ones) takes precedence over this omission rule. If `strings[1]` is accessed but `strings[0]` is not, `strings[0]` is still required (the array must have size ≥ 2 for `strings[1]` to be readable). In that case, describe `strings[0]` using its description from another use case where it is accessed; if no such use case exists, describe it as "Unused in this branch but must be provided as a placeholder."
+| Placeholder | Value |
+|---|---|
+| `{ENTITY}` / `{ENTITY_PLURAL}` | task / tasks |
+| `{DATA_FILE}` | `./mod-validator/src/tasks.jsonl` |
+| `{EVIDENCE_FILE}` | `./mod-validator/out/tasks.evidence.jsonl` |
+| `{INPUT_LABEL}` | `strings[N]`, `floats[N]`, `bools[N]`, `tileCoords[N]` |
+| `{INPUT_CONTAINER}` | the `strings`, `floats`, `bools` and `tileCoords` arrays |
+| `{VARIADIC_LABEL}` | `strings[1+]` |
+| `{OPTIONALITY_ENCODING}` | membership in the use's `required` or `optional` array |
+| `{CONTEXT_INPUT_RULE}` | See Contextual values below — `actorID` and the values derived from it are never inputs. |
+| `{INPUT_ORDER}` | `strings`, then `floats`, then `bools`, then `tileCoords`; ascending index within each |
+| `{ALIAS_SELECTOR}` | the `type` variable holding the `TaskType` |
+| `{ALIAS_EXCEPTIONS}` | None. |
+| `{EXTRA_TYPES}` | `taskString` — a whole comma-separated task written as one value, run as a nested task. |
+| `{ENTITY_KEY_NOTE}` | The canonical task name. |
+| `{USE_FIELD_REQUIRED}` | always |
+| `{ENUMERATION_ORDER}` | the order the case labels appear in the `executeTask` switch |
+| `{RESUME_RULE}` | the switch statement: locate **every** case label (canonical name plus all aliases listed in the entry) belonging to the last recorded task, and start with the next case label following the last of those occurrences in source order |
+| `{COMPLETENESS_CHECK}` | Every `TaskType` case label in `executeTask` is covered by an entry. |
+| `{DEFERRED_EXAMPLE}` | Tasks that schedule work on a timer, queue an actor action, or hand a follow-up task to the tasker fall under this rule; describe when the effect actually lands, not just that it was queued. |
 
-If there are cases of mutually exclusive use of inputs, treat these as different use cases. For example: setGlobalVar has two use cases: one has a required `strings[1]` and the other has a required `floats[0]`. In the first case, `floats[0]` should not be listed as an input. In the second case, the `strings[1]` should not be listed as an input. In both cases, `strings[0]` is required.
+# How a task is supplied
 
-Create separate use cases when inputs are mutually exclusive OR when the behavior differs in any observable way. When uncertain whether two behaviors are distinct, assume they are distinct and create separate use cases.
+A task can be supplied two ways, which affects how values are provided:
 
-When different code paths with similar inputs call different functions or methods:
+* As a **taskString** — one comma-separated string (`taskName,arg0,arg1,…`).
+  Commas delimit arguments, so a single value cannot contain a comma; there is no
+  limit on the number of arguments.
+* As a **trigger effect** — `strings[0]` and `strings[1]` come from distinct
+  object properties (so those values may contain commas), and the form provides
+  at most 2 `strings`, 2 `floats`, 2 `bools`, and one X and one Y (a single
+  `tileCoords[0]`).
 
- * Briefly investigate the called functions to understand behavioral differences (e.g., read function signatures, comments, or nearby code)
- * If the behavioral difference is clear or evident from names (e.g., "castAction" suggests actor-initiated vs "executeAction" suggests direct execution), reflect this in the use case descriptions
- * Make descriptions distinct enough that modders can understand when each code path applies, even if the exact implementation difference is unclear
+This is why some tasks accept a combined `"a,b"` value (to pack two values into
+one slot), and why inputs beyond `strings[1]` / `floats[1]` / `bools[1]`, or
+beyond a single tile coordinate, can only be provided via the taskString form.
 
-When in doubt, prefer splitting behavior into separate uses rather than combining them. It is acceptable to create redundant or overlapping use cases; it is not acceptable to merge distinct behaviors into one.
+Where a task's inputs push past what the trigger-effect form can carry, say so in
+the relevant input's description — a modder writing a trigger effect needs to
+know the value cannot reach the task that way.
 
-If a later-indexed input for a type is required, the earlier inputs of the same type are also required. For example: if `strings[1]` is required, then `strings[0]` is also required.
+# Contextual values
 
-Each description should be self-contained. Don't describe a task in terms of another task, unless they are meant to be used together, in which case, you should note that requirement.
+`actorID`, and the `actor` variable derived from it via `getActor(actorID)`, are
+the task's *contextual actor* — the actor the task runs on, provided by the
+trigger or dialog context rather than as a mod-supplied argument. It is not an
+input: never list it. Tasks described as acting on "the contextual actor" use
+this when no explicit actor-ID input is given.
 
-Prefer richer, more accurate descriptions over brevity.
+Record the contextual values a use case actually reads in a `context` array on
+that use. Use only these names:
 
-Descriptions should describe behaviour, not implementation. The audience is game modders who do not have access to the source code.
+| Context | Meaning |
+|---|---|
+| `actor` | The contextual actor the task runs on. |
+| `player` | The player actor or the player's party. |
+| `zone` | The zone the task runs in, or its contents. |
+| `dialogNode` | The dialog node the task was invoked from. |
+| `triggerArea` | The tile bounds handed to the task by the trigger that fired it. |
 
-Do not create a new entry for each alias. If two names execute the same code path with no conditional behaviour on the `type` variable, treat them as aliases. If there is even minor behavioural deviation based on `type`, do not treat them as aliases. Keep the longest name as the canonical name, and add the others to the entry's "aliases" array. In the event of a tie in length, prefer a name with no underscores; among those, prefer a name that uses camelCase; if still tied, choose the lexicographically first. If there are no aliases, set `"aliases": []` for that entry. Order the `aliases` array lexicographically.
+Only include a context value when the code actually reads it. Set `"context": []`
+when none is read. If a use case depends on some other ambient state that
+materially changes what a modder gets, record that in the review log rather than
+inventing a context name.
 
-Aliases are case statements that fall through to share code with no intervening logic.
+# The tileCoords padding exception
 
-Some of the tasks' case statements are clustered together, sharing common code with small branches off depending on the `type` variable. Make sure to consider each one individually. Assume these are not aliases until you verify by checking the code nested under the case statement.
+The task constructor always pads `tileCoords` to at least one element,
+defaulting to `(-1,-1)`, so `tileCoords[0]` can never throw. This overrides the
+required-vs-optional rules in `shared/inputs.md` for `tileCoords[0]` only:
 
-Tasks must be recorded in the same order which they appear in the switch statement. When an entry has aliases, its position is governed by the first occurrence of any of its case statements (canonical or alias), not by the position of the canonical name. Inputs must be ordered in the following order: `strings`, `floats`, `bools` then `tileCoords`. Uses must be ordered by descending number of required inputs, falling back to input order as a tie-breaker.
+* Treat `tileCoords[0]` as **optional by default**. A direct access with no gate
+  stays optional, because it cannot crash — say in its description what the
+  off-map default means for the behaviour.
+* Treat it as **required** only for a use case gated on a real tile being
+  present: a branch guarded by `num != -1` or
+  `tileCoord != TileCoord.NegativeOne`, where `num`, `num2` and `tileCoord` alias
+  `tileCoords[0].X` / `.Y`.
 
-If a case body is empty, falls through to a no-op, or has no observable game effect, still record an entry for it: emit one use with empty `required` and `optional` arrays, and describe it as a no-op (e.g., "Reserved task with no observable behaviour"). Also record the situation in `errors.md` so it can be reviewed.
+`tileCoords[1]` and higher follow the normal rules.
 
-If more information is needed about how code is executed, grep across `./Tactics/` and `./Tactics.Dialog/` for the relevant class or method name. If information cannot be determined conclusively from the inspected code, record the uncertainty explicitly instead of continuing to search.
+# Worked examples of the rules
 
-This is a documentation extraction task, not a formal static analysis. Apply the rules consistently, but do not attempt to prove completeness or soundness.
+These name real tasks, and are the intended reading of the shared rules:
+
+* **Splitting on input shape.** `setGlobalVar` stores a text value via
+  `strings[0]` + `strings[1]`, or a number via `strings[0]` + `floats[0]` — two
+  use cases, and in each one the other input is not listed at all. `strings[0]`
+  is required in both.
+* **Not splitting on a value.** `playSong` (`strings[0]` of `"travel"` /
+  `"combat"` plays the zone's configured music, anything else names a song),
+  `talk` (a valid versus empty `strings[0]` talks to an actor versus to no one),
+  and `setZonePalettes` (an inner switch on `strings[0]` picks which palette to
+  set) are each **one** use case, with the variants explained in that input's
+  description.
+* **Gate-the-use-case guard.** `setGlobalVar`'s branch-gated `strings[1]` is
+  required for its use case, not optional, even though it sits behind a count
+  check — the check decides which behaviour runs, it does not supply a default.
+* **A variadic run.** `addJournalGoal` joins `strings[0]` and every following
+  string into one value, so its input is `strings[0+]`.
 
 # Outputs
 
-Record any errors or uncertainty to ./mod-validator/out/errors.md and continue with the rest of the tasks. Use the following structure, one section per task:
+## Task data
 
-```
-## <taskName>
-- <one-line description of the issue or uncertainty>
-- <additional notes if needed>
-```
-
-Append new sections to the bottom of the file; never overwrite existing entries.
-
-The task extraction output must go into ./mod-validator/src/tasks.jsonl as JSONL with this structure:
+Entries go into `./mod-validator/src/tasks.jsonl`:
 
 ```
 {
@@ -81,13 +141,16 @@ The task extraction output must go into ./mod-validator/src/tasks.jsonl as JSONL
   "uses": [
     {
       "description": "...",
+      "context": ["actor"],
       "required": [
         {
           "name": "strings[0]",
-          "description": "The name of the global variable."
+          "type": "globalVar",
+          "description": "The name of the global variable to write."
         },
         {
           "name": "strings[1]",
+          "type": "Actor",
           "description": "The ID of the actor to use."
         }
       ],
@@ -95,29 +158,23 @@ The task extraction output must go into ./mod-validator/src/tasks.jsonl as JSONL
     },
     {
       "description": "...",
+      "context": [],
       "required": [
         {
           "name": "strings[0]",
-          "description": "The name of the global variable."
+          "type": "globalVar",
+          "description": "The name of the global variable to write."
         },
         {
           "name": "floats[0]",
+          "type": "integer",
           "description": "The number of actors to choose."
-        }
-      ],
-      "optional": []
-    },
-    {
-      "description": "...",
-      "required": [
-        {
-          "name": "strings[0]",
-          "description": "The name of the global variable."
         }
       ],
       "optional": [
         {
           "name": "bools[0]",
+          "type": "boolean",
           "description": "If true, chooses all actors. Otherwise, none are chosen."
         }
       ]
@@ -129,35 +186,49 @@ The task extraction output must go into ./mod-validator/src/tasks.jsonl as JSONL
 }
 ```
 
-**IMPORTANT**: This JSONL is presented across multiple lines for ease of viewing. Write the actual individual JSON objects on a single line each.
+| Field | Required | Notes |
+|---|---|---|
+| `name` | always | Canonical task name, as spelled in the `TaskType` enum. |
+| `uses` | always | At least one, ordered per `shared/use-cases.md`. |
+| `uses[].description` | always | 2-4 sentences, in game terms. |
+| `uses[].context` | always | Array, possibly empty. Names from the Contextual values table. |
+| `uses[].required` | always | Array, possibly empty. Ordered per `{INPUT_ORDER}`. |
+| `uses[].optional` | always | Array, possibly empty. Ordered per `{INPUT_ORDER}`. |
+| `uses[].*[].name` | always | `strings[0]`, `floats[1]`, `strings[2+]`, and so on. |
+| `uses[].*[].type` | always | One name from `shared/input-types.md`, or `taskString`. |
+| `uses[].*[].description` | always | 1-2 sentences saying what the input controls. |
+| `aliases` | always | Array, possibly empty, ordered lexicographically. |
 
-Never overwrite or recreate ./mod-validator/src/tasks.jsonl. Append new entries by writing to a temp file and then concatenating the temp file to the end of the `tasks.jsonl` file. Do not use `Write`, since it overwrites the file.
+Do not add an `officialDescription` field. The game's own task documentation is
+merged in as a separate step after this extraction, and a value written here
+would be overwritten or duplicated.
 
-Do not write progress markers, sentinels, comments, or "TODO continue from X" entries into `tasks.jsonl`. The file contains only valid task JSON objects, one per line.
+## Typing a task input
 
+The array an input lives in constrains its type but does not decide it. A
+`floats[N]` input is not automatically `float`: it may be an `integer` count, or
+an index into an enum. A `strings[N]` input is `string` only when the value is
+used as literal text — if it is looked up in a table, parsed as an enum, read as
+a global variable name, evaluated as a formula, or run as a nested task, type it
+accordingly.
 
-# Execution Methodology
+`bools[N]` inputs are `boolean`. `tileCoords[N]` inputs carry no useful narrower
+type; record them as `string` and let the description carry the meaning, since
+the modder writes them as a coordinate pair the task form defines.
 
-This is a long-running, unattended extraction process. Do not request user input, confirmations or additional permissions. Proceed autonomously using the provided tools and instructions. Do not stop to report progress.
+Cite the line that determines the type, per `shared/evidence.md` — for a task
+that means the lookup, parse or evaluation the value is fed into, which is very
+often in a helper rather than the case body itself.
 
-In the order of appearance in the switch case, process tasks **one-by-one**.
+## Evidence claims
 
-After processing each task, append its output to ./mod-validator/src/tasks.jsonl.
+The claim vocabulary for `{EVIDENCE_FILE}`:
 
-Do not wait to finish all tasks before writing output.
-
-It is expected that the process of extracting all task data will be interrupted because it does not fit within the token budget of one window. Do not adjust your behaviour according to the remaining token budget. 
-
-If processing is interrupted, on the next run read ./mod-validator/src/tasks.jsonl, identify the last task recorded, and resume from the switch statement. To find the resume point, locate **every** case statement (canonical name plus all aliases listed in the entry) belonging to the last recorded task, and start with the next case statement that follows the last of those occurrences in source order. Do not reprocess completed tasks.
-
-If the last task entry appears incomplete or malformed, delete that line from ./mod-validator/src/tasks.jsonl and reprocess that task.
-
-Do not invent scripts to automate the population of any data.
-
-Do not attempt to estimate total effort or validate global correctness.
-
-Do not summarize, explain, or restate the extracted information in the message buffer.
-
-Do not emit parsed data to the message buffer.
-
-Never claim completion unless all enum cases have been processed. If processing stops early, stop silently. Do not write a partial completion summary, a "stopped at X" note, or any wrap-up message.
+| Claim | Supports | Required |
+|---|---|---|
+| `behaviour` | the use's `description` | one per use |
+| `required:<name>` | that input's presence, required classification and description | one per required input |
+| `optional:<name>` | that input's presence, optional classification and description | one per optional input |
+| `type:<name>` | that input's `type` | one per input, required or optional |
+| `context:<name>` | the use reading that contextual value | one per entry in `context` |
+| `alias:<name>` | treating `<name>` as an alias; cite the fall-through case label | one per alias, recorded against use 0 |

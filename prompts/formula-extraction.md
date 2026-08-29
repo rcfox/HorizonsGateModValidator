@@ -1,92 +1,170 @@
 # Job Description
 
-In ./Tactics/Formula.cs, in the `calculate` function, there is a `switch (array[0])` statement. Each case represents a formula operator. Additionally, the `evaluateMath` function contains a second switch statement with operators that are invoked via the `m:` prefix (e.g., `m:evasionFacing`).
+In `./Tactics/Formula.cs`, in the `calculate` function, there is a
+`switch (array[0])` statement. Each case is a formula operator. The
+`evaluateMath` function in the same file contains a second switch, holding the
+operators invoked via the `m:` prefix (for example `m:evasionFacing`).
 
-For each of these operators, I want to capture:
+For each of these operators, capture:
 
-* The name of the operator.
-* What the operator does.
-  * Not just "evaluates the foo operator", but actually try to describe in game terms what it does.
-  * If there are multiple things it might do, make sure to list all of them as separate use cases.
-  * Aim for 1-3 sentences per distinct functionality.
-* What each argument does.
-  * Arguments are the colon-separated segments after the operator name (i.e., `array[1]`, `array[2]`, etc.).
-  * Be descriptive with 1-2 sentences for each argument.
-  * Some arguments might have multiple uses depending on other arguments; be sure to capture them all.
-* The type of each argument. Valid types are: `float`, `formula`, `string`, `Element`, `ActorValue`, or other enum/type names found in the code.
-* Whether the operator returns a float or a boolean (0/1).
-* Which arguments are required and which are optional.
-* A representative example of usage. Invent valid values for the arguments, based on the arguments' types. This is a low-impact piece of documentation, not structural data.
-* Which context parameters the operator reads (e.g., `caster`, `target`, `rank`, `targetTC`). Only include these if the code actually uses them (null-checks, direct access). Record these in a `"context"` array. If no context is referenced, create an empty `"context"` array.
-* Any aliases found.
-* Whether the operator is "function-style" or not.
+* The name of the operator, and whether it is function-style.
+* For each of the operator's use cases: what it does, whether it returns a
+  number or a 0/1 flag, what each argument does and what type it is, which
+  arguments are optional, which context values it reads, and a representative
+  example of usage.
+* Any aliases found, and any delegation to another operator family.
 
-## Operator syntax
+# Shared rules
 
-Formulas are strings like `c:HP+5*t:STR` where operands are split by arithmetic operators (`+`, `-`, `*`, `/`, `%`). Each operand is then split by `:` into an array. `array[0]` is the operator name, and subsequent elements are its arguments.
+Read these before starting. The rules in them apply in full.
 
-Some operators consume the entire remainder of the operand string as a sub-formula rather than using individual colon-separated arguments. For example, `lessThan:50:c:HP` has `array[0]="lessThan"`, `array[1]="50"`, but then the code constructs a sub-formula from the remaining text (`c:HP`). In these cases, the sub-formula argument should have type `"formula"`.
+* `./mod-validator/prompts/shared/descriptions.md`
+* `./mod-validator/prompts/shared/use-cases.md`
+* `./mod-validator/prompts/shared/inputs.md`
+* `./mod-validator/prompts/shared/input-types.md`
+* `./mod-validator/prompts/shared/aliases.md`
+* `./mod-validator/prompts/shared/evidence.md`
+* `./mod-validator/prompts/shared/investigation.md`
+* `./mod-validator/prompts/shared/review-log.md`
+* `./mod-validator/prompts/shared/execution.md`
+
+## Bindings
+
+| Placeholder | Value |
+|---|---|
+| `{ENTITY}` / `{ENTITY_PLURAL}` | operator / operators |
+| `{DATA_FILE}` | `./mod-validator/src/formula.jsonl` |
+| `{EVIDENCE_FILE}` | `./mod-validator/out/formula.evidence.jsonl` |
+| `{INPUT_LABEL}` | a short lowerCamelCase name describing the value — arguments are listed in the order they are written after the operator name, so the first entry is `array[1]`, the second `array[2]`, and so on |
+| `{INPUT_CONTAINER}` | the `:`-separated segments after the operator name |
+| `{VARIADIC_LABEL}` | the argument's name with a `+` appended |
+| `{OPTIONALITY_ENCODING}` | the `optional` boolean on the argument object — `true` for optional, `false` for required |
+| `{CONTEXT_INPUT_RULE}` | The values passed into the formula (caster, target, rank, and the rest) are context, not inputs — see Context values below. |
+| `{INPUT_ORDER}` | the order the arguments are written in the operand, left to right |
+| `{ALIAS_SELECTOR}` | the operator name — `array[0]` |
+| `{ALIAS_EXCEPTIONS}` | See The `d` and `m` families below. |
+| `{EXTRA_TYPES}` | `mathOperator` — the name of an operator in the `m:` family, supplied as a value. Global formula IDs use the canonical schema name `FormulaGlobal`, not `GlobalFormula`. |
+| `{ENTITY_KEY_NOTE}` | The canonical operator name, including the `m:` prefix for `evaluateMath` operators. |
+| `{USE_FIELD_REQUIRED}` | always |
+| `{ENUMERATION_ORDER}` | the order the case labels appear in `calculate`'s switch, then the order they appear in `evaluateMath`'s switch |
+| `{RESUME_RULE}` | the switch statements: locate **every** case label (canonical name plus all aliases listed in the entry) belonging to the last recorded operator, and start with the next case label following the last of those occurrences in source order, continuing into `evaluateMath` once `calculate` is exhausted |
+| `{COMPLETENESS_CHECK}` | Every case label in `calculate` and in `evaluateMath` is covered by an entry, except the `m` / `M` / `Math` / `math` dispatch labels, which are recorded as the `m` operator itself. |
+
+# Operator syntax
+
+Formulas are strings like `c:HP+5*t:STR`, where operands are split by the
+arithmetic operators `+`, `-`, `*`, `/` and `%`. Each operand is then split by
+`:` into an array. `array[0]` is the operator name; the elements after it are its
+arguments.
+
+Some operators consume the entire remainder of the operand string as a
+sub-formula rather than reading individual `:`-separated arguments. For example
+`lessThan:50:c:HP` has `array[0] = "lessThan"` and `array[1] = "50"`, and then
+constructs a sub-formula from the remaining text (`c:HP`). Give that argument the
+type `formula`, and say in its description that it swallows everything to the end
+of the operand.
 
 ## Function-style vs operator-style
 
-An operator is "function-style" (`"isFunctionStyle": true`) if it takes no colon-separated arguments — the entire operand is just the operator name (e.g., `m:evasionFacing`, `rank`, `x`). An operator is not function-style if it requires at least one colon-separated argument (e.g., `lessThan:50:c:HP`, `c:HP`, `geo:fire`).
+An operator is function-style (`"isFunctionStyle": true`) when it takes no
+`:`-separated arguments — the whole operand is just the operator name, as in
+`m:evasionFacing`, `rank` or `x`. An operator that requires at least one argument
+is not function-style: `lessThan:50:c:HP`, `c:HP`, `geo:fire`.
 
-Operators invoked via `evaluateMath` should be recorded with the `m:` prefix in their name (e.g., `m:evasionFacing`). The `m`, `M`, `Math`, `math` case labels are the dispatch mechanism and should not be recorded as separate operators. However, `mIs0` and `mMin0` (and their aliases) should be recorded as separate operators since they apply additional logic around the evaluateMath call.
+An operator with only optional arguments is not function-style; the field
+describes what the operator accepts, not what a particular call supplied.
+
+## The `m:` prefix
+
+Operators reached through `evaluateMath` are recorded with the `m:` prefix in
+their name, for example `m:evasionFacing`. The `m`, `M`, `Math` and `math` case
+labels in `calculate` are the dispatch mechanism into that switch and are
+recorded as the single `m` operator, not as separate entries.
+
+`mIs0` and `mMin0` (and their aliases) **are** recorded as separate operators,
+because they apply their own logic around the `evaluateMath` call.
+
+# Context values
+
+Record the context a use case actually reads in a `context` array. Only these
+names are valid:
+
+| Context | Meaning |
+|---|---|
+| `caster` | The actor the formula is being evaluated for. |
+| `target` | The actor the formula is being evaluated against. |
+| `rank` | The rank of the action or ability the formula belongs to. |
+| `x` | The parameter value passed into the formula by its caller. |
+| `targetTC` | The tile being targeted. |
+| `usingOffhandParams` | Whether the formula is being evaluated for the off-hand weapon. |
+| `floorResult` | Whether the caller wants the result rounded down to a whole number. |
+
+These are the values handed to a formula when it is evaluated. If the version
+you are reading passes something this table does not list, record it under the
+name the code gives it and note the addition in the review log — the checker
+takes this vocabulary from the evaluation entry point itself, so a new parameter
+is accepted automatically.
+
+Include a context value only when the code actually reads it — a null-check or a
+direct access. An operator that merely forwards its context onward to a
+sub-formula it evaluates is reading nothing itself; the sub-formula's own
+operators record what they read. Set `"context": []` when nothing is read.
+
+# The `d` and `m` families
+
+## Canonical naming
+
+These families invert the usual longest-name rule from `shared/aliases.md`: the
+**shorter** spelling is canonical, with the longer spellings as aliases. Prefer
+`d` over `data`, `m` over `math`, `mMin0` over `mathMin0`, and likewise for every
+wrapper around `evaluateGlobalFormula` / `evaluateMath`. The validator's parser
+hardcodes the short forms when recognising the dispatch family.
 
 ## Delegation
 
-Some operators are thin wrappers around `evaluateGlobalFormula` or `evaluateMath`: they pass `array[1]` straight through to one of those functions, usually applying a clamp or comparison to the result. Capture this relationship with a top-level `"delegatesTo"` field on the operator entry (alongside `name`, `isFunctionStyle`, `uses`, `aliases`):
+Some operators are thin wrappers around `evaluateGlobalFormula` or
+`evaluateMath`: they pass their first argument straight through, usually applying
+a clamp or comparison to the result. Record this with a top-level `delegatesTo`
+field:
 
-- If the case body calls `evaluateGlobalFormula(array[1], ...)`, set `"delegatesTo": "d"`.
-- If the case body calls `evaluateMath(array[1], ...)`, set `"delegatesTo": "m"`.
+* A case body calling `evaluateGlobalFormula(array[1], ...)` → `"delegatesTo": "d"`.
+* A case body calling `evaluateMath(array[1], ...)` → `"delegatesTo": "m"`.
 
-The dispatch roots `d` and `m` themselves do NOT get a `delegatesTo` field — they are the delegation targets, not delegators. Operators that do not delegate to either should omit the field entirely.
+The dispatch roots `d` and `m` themselves do **not** get a `delegatesTo` field —
+they are the targets, not delegators. Operators that delegate to neither omit the
+field entirely.
 
-## Aliases
+## The parameterized form
 
-Do not create a new entry for each alias. If two case labels fall through to share code with no conditional behavior on the operator name, treat them as aliases.
+Inside `evaluateGlobalFormula` and `evaluateMath`, the body checks whether the
+argument contains `(` and parses a parenthesized parameter: an integer literal,
+the identifier `x`, or a sub-formula. This is a distinct input shape from the
+bare form and is recorded as a **separate use case** on `d` and on `m` — one use
+with just the ID argument, and a second with that argument followed by the
+parameter.
 
-Keep the longest name as the canonical name, and add the others to the entry's `"aliases"` array. In the event of a tie, choose one that uses camelcasing, and failing that, just find the lexicographical first.
+Delegators inherit the parameterized form through their `delegatesTo` link, so do
+not give them duplicate parameterized use cases of their own.
 
-**Exception for the `d` and `m` dispatch families.** Operators in these families use the shorter spelling as canonical, with the longer spellings as aliases: prefer `d` over `data`, `m` over `math`, `mMin0` over `mathMin0`, and so on for any wrappers around `evaluateGlobalFormula` / `evaluateMath`. The validator's parser hardcodes the short forms when recognizing the dispatch family.
+# Examples
 
-If there are no aliases, set `"aliases": []`.
+Each use carries an `example`: a representative operand a modder could write,
+with plausible values invented for the arguments based on their types. This is
+low-impact documentation, not structural data — it does not need to be a string
+found anywhere in the game's own files, but it must parse as a valid operand for
+that use case, with the right number of arguments in the right order.
 
-Aliases are case statements that fall through to share code with no intervening logic.
+Real usage is worth a look when you are unsure what a plausible value is:
 
-Some of the operators' case statements are clustered together, sharing common code with small branches depending on `array[0]`. Make sure to consider each one individually. Assume these are not aliases until you verify by checking the code nested under the case statement.
-
-## Multiple uses
-
-If an operator has multiple distinct behaviors depending on its arguments or context, create separate use entries. When different code paths produce meaningfully different results, split them into separate uses.
-
-When in doubt, prefer splitting behavior into separate uses rather than combining them. It is acceptable to create redundant or overlapping uses; it is not acceptable to merge distinct behaviors into one.
-
-**Parameterized form for `d` and `m`.** Inside `evaluateGlobalFormula` and `evaluateMath`, the body checks `if (s.Contains('('))` and parses a parenthesized parameter on `array[1]` (an int literal, the identifier `x`, or a sub-formula). This is a distinct behavior from the bare form and must be recorded as a separate use case on `d` and `m` — one with just `[formulaId]` / `[mathOperator]`, and a second with that argument followed by a `float`-typed parameter. Delegators (`dMin0`, `mathMin0`, etc.) inherit the parameterized form through their `delegatesTo` link, so do NOT give them duplicate parameterized use cases of their own.
-
-## Required vs optional arguments
-
-An argument is required if it is accessed unconditionally (e.g., `array[1]` without a prior length check on `array`). An argument is optional if the code checks `array.Length` before accessing it.
-
-If a later-indexed argument is required, earlier arguments of the same array are also required.
-
-
-## Descriptions
-Each description should be self-contained. Don't describe an operator in terms of another operator, unless they are meant to be used together.
-
-Prefer richer, more accurate descriptions over brevity.
-
-Descriptions should describe behaviour, not implementation. The audience is game modders who do not have access to the source code.
-
-If more information is needed about how code is executed, look under one of the Tactics subdirectories of this directory. If information cannot be determined conclusively from the inspected code, record the uncertainty explicitly instead of continuing to search.
-
-Operators must be recorded in the same order in which they appear in the switch statement(s). Process `calculate`'s switch first, then `evaluateMath`'s switch.
+```
+grep -rhoE "(magnitude|formula|fReq|reqFormula)=[^;]*" ./Data/SystemData/ --include=*.txt | sort -u
+```
 
 # Outputs
 
-Record any errors or uncertainties to ./mod-validator/out/errors.md and continue with the rest of the operators.
+## Operator data
 
-The extraction output must go into ./mod-validator/src/formula.jsonl as JSONL with this structure:
+Entries go into `./mod-validator/src/formula.jsonl`:
 
 ```
 {
@@ -94,20 +172,20 @@ The extraction output must go into ./mod-validator/src/formula.jsonl as JSONL wi
   "isFunctionStyle": false,
   "uses": [
     {
-      "description": "Returns 1 if a formula result is less than a threshold value, otherwise 0",
+      "description": "Returns 1 if a formula result is less than a threshold value, otherwise 0.",
       "returns": "boolean",
       "example": "lessThan:50:c:HP",
       "arguments": [
         {
           "name": "threshold",
           "type": "float",
-          "description": "Value to compare against",
+          "description": "Value to compare against.",
           "optional": false
         },
         {
           "name": "formula",
           "type": "formula",
-          "description": "Formula to evaluate",
+          "description": "Formula to evaluate. Consumes the rest of the operand.",
           "optional": false
         }
       ],
@@ -121,7 +199,7 @@ The extraction output must go into ./mod-validator/src/formula.jsonl as JSONL wi
   "isFunctionStyle": true,
   "uses": [
     {
-      "description": "Returns evasion multiplier based on the facing angle between caster and target (0.1 to 1.0)",
+      "description": "Returns an evasion multiplier based on the facing angle between caster and target, from 0.1 to 1.0.",
       "returns": "float",
       "example": "m:evasionFacing",
       "arguments": [],
@@ -131,32 +209,38 @@ The extraction output must go into ./mod-validator/src/formula.jsonl as JSONL wi
   "aliases": ["m:evaFacing", "m:evafacing", "m:evasionfacing"]
 }
 ```
-**IMPORTANT**: This JSONL is presented across multiple lines for ease of viewing. Write the actual individual JSON objects on a single line each.
 
-Never overwrite or recreate ./mod-validator/src/formula.jsonl. Always read it before writing. Only append or modify existing content.
+| Field | Required | Notes |
+|---|---|---|
+| `name` | always | Canonical operator name, `m:`-prefixed for `evaluateMath` operators. |
+| `isFunctionStyle` | always | `true` when the operator takes no `:`-separated arguments. |
+| `delegatesTo` | when delegating | `"d"` or `"m"`. Omit otherwise. |
+| `uses` | always | At least one, ordered per `shared/use-cases.md`. |
+| `uses[].description` | always | 1-3 sentences, in game terms. |
+| `uses[].returns` | always | `"float"` or `"boolean"`. Use `"boolean"` only when the result is always 0 or 1. |
+| `uses[].example` | always | A valid operand for this use case. |
+| `uses[].arguments` | always | Array, possibly empty, in written order. |
+| `uses[].arguments[].name` | always | Short lowerCamelCase name describing the value. |
+| `uses[].arguments[].type` | always | One name from `shared/input-types.md`, or `mathOperator`. |
+| `uses[].arguments[].description` | always | 1-2 sentences saying what the argument controls. |
+| `uses[].arguments[].optional` | always | Boolean, per the guard classification in `shared/inputs.md`. |
+| `uses[].context` | always | Array, possibly empty. Names from the Context values table. |
+| `aliases` | always | Array, possibly empty, ordered lexicographically. |
 
-# Execution Methodology
+## Evidence claims
 
-This is a long-running, unattended extraction process. Do not request user input, confirmations or additional permissions. Proceed autonomously using the provided tools and instructions. Do not stop to report progress.
+The claim vocabulary for `{EVIDENCE_FILE}`:
 
-In the order of appearance in the switch cases, process operators **one-by-one**.
+| Claim | Supports | Required |
+|---|---|---|
+| `behaviour` | the use's `description` | one per use |
+| `returns` | the use's `returns` value | one per use |
+| `argument:<name>` | that argument's presence, its `optional` classification and its description | one per argument |
+| `type:<name>` | that argument's `type` | one per argument |
+| `context:<name>` | the use reading that context value | one per entry in `context` |
+| `functionStyle` | the `isFunctionStyle` value | one per entry, recorded against use 0 |
+| `delegatesTo` | the delegation target | one per entry carrying `delegatesTo`, recorded against use 0 |
+| `alias:<name>` | treating `<name>` as an alias; cite the fall-through case label | one per alias, recorded against use 0 |
 
-After processing each operator, append its output to ./mod-validator/src/formula.jsonl.
-
-Do not wait to finish all operators before writing output.
-
-It is expected that the process of extracting all operator data will be interrupted because it does not fit within the token budget of one window. Do not adjust your behaviour according to the remaining token budget.
-
-If processing is interrupted, on the next run read ./mod-validator/src/formula.jsonl, identify the last operator recorded, and resume with the next operator from the switch statement. Do not reprocess completed operators.
-
-If the last entry is malformed, delete it and reprocess that operator.
-
-Do not invent scripts to automate the population of any data.
-
-Do not attempt to estimate total effort or validate global correctness.
-
-Do not summarize, explain, or restate the extracted information in the message buffer.
-
-Do not emit parsed data to the message buffer.
-
-Never claim completion unless all switch cases have been processed. If processing stops early, stop without a completion statement.
+`example` needs no evidence record; it is invented documentation, not a claim
+about the source.

@@ -145,7 +145,12 @@ Browser application code (compiled to `public/app.bundle.js`):
 ### Build Tools
 - **extract_schema.cjs** - Extracts schema from C# source code in `/home/rcfox/code/hg/Tactics/`
 - **build-bundle.js** - Creates browser bundles using esbuild (validator.bundle.js and app.bundle.js)
-- **check-evidence.cjs** - Verifies `src/dynamic-text.jsonl` against the citation sidecar `out/dynamic-text.evidence.jsonl`: every cited line must exist and contain its snippet verbatim; every description, input, input type and alias must have a supporting record; and every argument `type` must be a known primitive, named resource, or class/enum from `mod-schema.json`. Run after a dynamic-text extraction run.
+- **check-evidence.cjs** - Verifies each extraction job's `src/*.jsonl` against its citation sidecar `out/*.evidence.jsonl`: every cited line must exist and contain its snippet verbatim; every claim the job's schema requires must have a supporting record; no record may support a claim that does not exist; and every input `type` must be a known primitive, named resource, job-specific type, or class/enum from `mod-schema.json`. Jobs with no data file are skipped. Run after an extraction run.
+  - `node check-evidence.cjs` - every job that has output
+  - `node check-evidence.cjs tasks formula` - named jobs only
+  - `node check-evidence.cjs --complete` - also run the end-of-run checks (globalvars worklist coverage, `related` cross-links), which only hold once a run has finished
+  - `node check-evidence.cjs --vocabulary` - print the vocabularies the run derived, to see what a schema re-extraction changed
+  - Trigger flags, trigger effect fields, element values and ID spaces are derived from `mod-schema.json`, and the formula context vocabulary from `Formula.calculate`'s signature, so they follow a game version update. The primitive/resource type names and the globalvars shape, lifetime and category taxonomies are fixed in the script and mirror tables in `prompts/` - edit both together.
 
 ## Key Features
 
@@ -254,7 +259,7 @@ interface Correction {
 - `npm run build:cli` - Build CLI tool (same as `build`, but semantic)
 - `npm run build:bundle` - Build + create browser bundle
 - `node extract_schema.cjs` - Re-extract schema from C# source
-- `npm run check:evidence` - Verify dynamic-text extraction citations (see check-evidence.cjs)
+- `npm run check:evidence` - Verify extraction citations for every job with output (see check-evidence.cjs)
 
 ## Development Notes
 
