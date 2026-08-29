@@ -439,9 +439,9 @@ describe('Task String Validation', () => {
 
   describe('Implicit float 0 in DialogNode/DialogOption.specialEffect', () => {
     test('accepts task without float when implicit float satisfies requirement', () => {
-      // 'delayDialog' requires floats[0], but DialogNode.specialEffect provides implicit 0
+      // 'hideParty' requires floats[0], but DialogNode.specialEffect provides implicit 0
       const modContent = `[DialogNode] ID=testNode;
-        specialEffect=delayDialog;`;
+        specialEffect=hideParty;`;
 
       const result = validator.validate(modContent, 'test.txt');
       expect(result.errors).toHaveLength(0);
@@ -451,7 +451,7 @@ describe('Task String Validation', () => {
     test('works with DialogOption as well', () => {
       // Test that DialogOption also gets implicit float 0
       const modContent = `[DialogOption] ID=testOption;
-        specialEffect=delayDialog;`;
+        specialEffect=hideParty;`;
 
       const result = validator.validate(modContent, 'test.txt');
 
@@ -463,7 +463,7 @@ describe('Task String Validation', () => {
     test('works with DialogNodeOverride as well', () => {
       // Test that DialogNodeOverride also gets implicit float 0
       const modContent = `[DialogNodeOverride] ID=testOverride;
-        specialEffect=delayDialog;`;
+        specialEffect=hideParty;`;
 
       const result = validator.validate(modContent, 'test.txt');
 
@@ -486,11 +486,11 @@ describe('Task String Validation', () => {
       // ActorValueAffecter.magnitude should NOT get implicit float
       const modContent = `[ActorValueAffecter] ID=test;
         actorValue=task;
-        magnitude=delayDialog;`;
+        magnitude=hideParty;`;
 
       const result = validator.validate(modContent, 'test.txt');
 
-      // Should error because delayDialog requires a float and no implicit one is provided
+      // Should error because hideParty requires a float and no implicit one is provided
       expectMessage(result, { text: "is missing required parameter floats[0]", severity: 'error' });
     });
 

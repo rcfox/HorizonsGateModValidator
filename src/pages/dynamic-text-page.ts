@@ -78,11 +78,9 @@ export function initDynamicTextApp(): void {
   renderTags(filteredTags, search.highlightMatch);
   updateCount(filteredTags.length, sortedTags.length);
 
-  // Display game version - dynamic-text.json doesn't have gameVersion, so we'll skip this
-  // or you could add it to the JSON file if needed
   const gameVersionElement = document.getElementById('gameVersion');
   if (gameVersionElement) {
-    gameVersionElement.textContent = 'Dynamic Text Tags';
+    gameVersionElement.textContent = `Up to date for v${dynamicTextData.gameVersion}`;
   }
 
   // Handle deep linking

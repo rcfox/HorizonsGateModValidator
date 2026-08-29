@@ -50,7 +50,13 @@ interface GlobalVar {
   notes?: string;
 }
 
-const globalvarsData = rawGlobalvarsData as GlobalVar[];
+interface GlobalVarsData {
+  gameVersion: string;
+  globalVars: GlobalVar[];
+}
+
+const globalvarsFile = rawGlobalvarsData as GlobalVarsData;
+const globalvarsData = globalvarsFile.globalVars;
 
 export function initGlobalvarsApp(): void {
   // Check if we're on the globalvars page
@@ -124,10 +130,9 @@ export function initGlobalvarsApp(): void {
   renderGlobalvars(filteredVars, search.highlightMatch);
   updateCount(filteredVars.length, sortedVars.length);
 
-  // No gameVersion in globalvars.json; hide or label the element if present
   const gameVersionElement = document.getElementById('gameVersion');
   if (gameVersionElement) {
-    gameVersionElement.textContent = `${sortedVars.length} variables documented`;
+    gameVersionElement.textContent = `Up to date for v${globalvarsFile.gameVersion}`;
   }
 
   // Handle deep linking via ?var=...

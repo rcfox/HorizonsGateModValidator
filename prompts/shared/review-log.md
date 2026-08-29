@@ -26,6 +26,11 @@ Append new sections to the bottom of the file; never overwrite existing entries.
 The file is shared by every extraction job, so do not reorganise or prune what
 another job wrote.
 
+`errors.md` is raw intake. Its notes are triaged into `./mod-validator/out/review/`
+by category afterwards, as a separate manual step — never as part of a run. The
+file opens with an index of what has already been triaged and ends with a
+`# New notes below this line` marker; append below that and ignore the rest.
+
 Things that always belong here:
 
 * An {ENTITY} whose behaviour you could not determine conclusively.

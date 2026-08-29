@@ -1,0 +1,2624 @@
+{
+  "gameVersion": "1.6.06",
+  "taskDescriptions": [
+    {
+      "name": "abil",
+      "officialDescription": "learn all abilities (up to rank #)",
+      "consoleCommand": true
+    },
+    {
+      "name": "action",
+      "officialDescription": "Executes 'sValue' action at X,Y (or triggering actor if unspecified). Uses 'sValue2' as caster if specified."
+    },
+    {
+      "name": "actionOnPartyNumActor",
+      "officialDescription": "Executes 'sValue' action on the current landing party actor in slot 'fValue' (starting at 0)."
+    },
+    {
+      "name": "add50gp",
+      "officialDescription": "Gives 50 gold to the player."
+    },
+    {
+      "name": "addgp",
+      "officialDescription": "Gives 'fValue' gold to the player. If 'sValue' is set, it should be a formula, with the result of that formula being the amount to give."
+    },
+    {
+      "name": "addIconToCurrentLocation",
+      "officialDescription": "Alias of addIconToLocationID. Use it instead (this is functionally identical, however)."
+    },
+    {
+      "name": "addItem",
+      "officialDescription": "Adds 'fValue' num of item 'sValue' ID to X,Y (or sValue2 actor or triggering actor inventory if unspecified). If bValue1, force item to fit."
+    },
+    {
+      "name": "addItemToContainer",
+      "officialDescription": "Adds 'fValue' quantity of 'sValue' itemType ID to the first container at X,Y that the item can fit into. If 'sValue2' is specified, that is the itemType ID the container must be. If fValue is 0, it acts as 1."
+    },
+    {
+      "name": "addItemToFleetCargo",
+      "officialDescription": "Adds 'fValue' quantity of 'sValue' itemType ID to the cargo of the fleet identified by 'sValue2'. sValue2 can be the ID of the commodore of the fleet, or the ID of a ship within the fleet, or the key word 'enemyFleet' or 'assistFleet' for fleets the player is currently in combat with. If fValue is 0, it acts as 1."
+    },
+    {
+      "name": "addItemToLocationID",
+      "officialDescription": "Adds 'sValue' as the ID of an itemType or actorType to the stash, cargo or shipwright of a location that has been visited by the player at least once. fValue is the quantity to add, defaulting to 1. If fValue is -2, removes all non-infinite versions of the item before adding an infinite one. 'sValue2' is the ID of the location. If ID is not set, uses current location instead."
+    },
+    {
+      "name": "addJournalGoal",
+      "officialDescription": "Adds 'sValue' as a journal goal to the first available 'goal' gVar, then opens the journal and plays a new goal FX on the goal text. If b1, journal isn't opened and the new goal FX doesn't play."
+    },
+    {
+      "name": "addLocationItemToZone",
+      "officialDescription": "Adds a new locationItem for a location to the current zone, if it is the location's zoneThisLocationIsIn. 'sValue' is the ID of the location and 'sValue2' is the itemType ID to add. X,Y specifies the locationItemOffset to use. If sValue2 is not set, or is blank, a default itemType of port_bighouses3 for ports or location_natural1 for non-ports will be used"
+    },
+    {
+      "name": "addLocationTag",
+      "officialDescription": "Adds the 'sValue' tag to a location's tags list, if it doesn't already exist. 'sValue2' is the ID of the location. If ID is not set, uses current location instead."
+    },
+    {
+      "name": "addLocationUnlockable",
+      "officialDescription": "Adds an unlockable to the current Location of ID sValue, quantity fValue, and fReq sValue2. Use addUnlockableItemToLocationID to add an unlockable to a specific location instead."
+    },
+    {
+      "name": "addSpawnDataToLocationID",
+      "officialDescription": "Adds 'sValue' actorPrefab to the auto_spawnDataID list of a location. 'sValue2' is the ID of the location. If ID is not set, uses current location instead."
+    },
+    {
+      "name": "addTalkerToParty",
+      "officialDescription": "Adds the currentActorTalkingTo (or current task actor if not in dialog) to the player's crew. Also adds to the landing party and makes their ID unique if their ID starts with 'hire_'. If b1, adds to the landing party regardless of actor ID."
+    },
+    {
+      "name": "addTalkerToParty_temp",
+      "officialDescription": "Adds the currentActorTalkingTo (or current task actor if not in dialog) to the player's landing party as a temporary party actor. Does not add the actor to the player's crew. Can be removed using the 'removeTempPartyActors' task."
+    },
+    {
+      "name": "addToFleet",
+      "officialDescription": "Adds the currentActorTalkingTo (or current task actor if not in dialog) to the player's fleet. If the actor is iAmABoat, they are added to the player's fleet ships, otherwise they are added to the player's crew and landing party if there is room."
+    },
+    {
+      "name": "addToFleet_andSwapWithFleet_slot",
+      "officialDescription": "Swaps the ship in slot 'fValue' of the player's fleet with the currentActorTalkingTo (or current task actor if not in dialog), if they are iAmABoat. Any crew on the swapped out ship will be transferred to the currentActorTalkingTo ship. The swapped out ship actor will try to be placed within the 9 tiles surrounding travel_point9 and be given the 'boat_unmoor' dialogNodeID."
+    },
+    {
+      "name": "addToLandingParty",
+      "officialDescription": "Adds the player crew actor with the ID of 'sValue' to the player's landing party if they can fit, and to the current Zone. If b1, don't add them to the current Zone. If b2, adds them to the landing party even if they can't fit."
+    },
+    {
+      "name": "addToParty",
+      "officialDescription": "Adds actor ID 'sValue' to the party."
+    },
+    {
+      "name": "addTreasuresToZone",
+      "officialDescription": "Adds a buried location_shipwreck item, with loot added to it, to the current zone at the X,Y set in gVar 'treasureTCX' and 'treasureTCY'. Fails if the gVars aren't set."
+    },
+    {
+      "name": "addTrigger",
+      "officialDescription": "Adds global trigger 'sValue' to the current zone. Only usable if delay is not 0 (otherwise it crashes)."
+    },
+    {
+      "name": "addUnlockableItemToLocationID",
+      "officialDescription": "Adds an itemType or actorType to a location's itemType_quantity_unlockable list with a formula, set in sValue as 'ID, formula'. fValue is the quantity of the unlockable, defaulting to 1, with -2 being infinite. 'sValue2' is the ID of the location. If ID is not set, uses current location instead."
+    },
+    {
+      "name": "addZoneBackgroundTex",
+      "officialDescription": "Adds texture 'sValue' to the list of background textures for the current Zone, if it doesn't already exist."
+    },
+    {
+      "name": "addZoneFX",
+      "officialDescription": "Adds a recurring FX 'sValue' to the zone at XY that recurs every 'fValue' indefinitely. If bValue1, then only add FX if it isn't already in the zone."
+    },
+    {
+      "name": "adjustFleetAlliegances",
+      "officialDescription": "If the player is in a fleet battle, this turns all actors in the zone that are the same faction as the enemy fleet hostile, clears the playerEscort gVar and plays FX on the changed actors."
+    },
+    {
+      "name": "advanceTimers",
+      "officialDescription": "Advance all actTimers by fValue."
+    },
+    {
+      "name": "allclass",
+      "officialDescription": "unlocks all classes",
+      "consoleCommand": true
+    },
+    {
+      "name": "allxp",
+      "officialDescription": "add # XP in all classes",
+      "consoleCommand": true
+    },
+    {
+      "name": "anim",
+      "officialDescription": "makes the player perform the specified animation (ex: anim crouch)",
+      "consoleCommand": true
+    },
+    {
+      "name": "animate",
+      "officialDescription": "Animates triggering actor (or actor 'sValue2') with animation 'sValue'. Sets busyTimer to fValue if specified."
+    },
+    {
+      "name": "appendToGlobalVar_locID",
+      "officialDescription": "Appends the ID of the current location to the end of globalVar 'sValue'."
+    },
+    {
+      "name": "appendToGlobalVar_math",
+      "officialDescription": "Appends the result of Formula 'sValue2' to the end of globalVar 'sValue'."
+    },
+    {
+      "name": "appendToGlobalVar_string",
+      "officialDescription": "Appends 'sValue2' to the end of globalVar 'sValue'."
+    },
+    {
+      "name": "appendToGlobalVar_zoneID",
+      "officialDescription": "Appends the ID of the current zone to the end of globalVar 'sValue'."
+    },
+    {
+      "name": "applyElement",
+      "officialDescription": "Applies 'sValue' element at X,Y."
+    },
+    {
+      "name": "applyElementToArea",
+      "officialDescription": "Applies 'sValue' element to a rectangle starting at XY with width/height set by sValue2 (X,Y). fValue adds an incremental delay between tiles."
+    },
+    {
+      "name": "applyElementToZone",
+      "officialDescription": "Applies 'sValue' element to entire zone. If bValue1, also applies to Actors in the zone."
+    },
+    {
+      "name": "applyTerrainReplacersAndItemRemovers",
+      "officialDescription": "Item and terrain replacer items in the zone are calculated and apply their results. sValue specifies the levelData to use for replacing terrain. If b1, don't update tile sprites."
+    },
+    {
+      "name": "askForNewPortName",
+      "officialDescription": "Brings up a text entry box for the player to rename the current location."
+    },
+    {
+      "name": "attractAttention",
+      "officialDescription": "All actors (within fValue if specified) turn to face X,Y. If bValue1, works on all actors."
+    },
+    {
+      "name": "attractAttentionToPlayer",
+      "officialDescription": "All actors (within fValue if specified) turn to face the player. If bValue1, works on all actors."
+    },
+    {
+      "name": "autobuy_food",
+      "officialDescription": "Forces the player to buy as much food as will fit into their cargo, or that they can afford, whichever is lower."
+    },
+    {
+      "name": "autosaveASAP",
+      "officialDescription": "Creates an autosave if the player is able to save."
+    },
+    {
+      "name": "barracksLineup",
+      "officialDescription": "DO NOT USE."
+    },
+    {
+      "name": "bezoar_setupportselect",
+      "officialDescription": "Must be used as a taskString. Sets the fast travel dialogOptions the Ruluorn Bezoar uses, for the dialogNode set in strings[0]. floats[0] and floats[1] specify which quadrant to select ports from (-1,-1 specifies northwest, through to 1,1 specifying southeast)."
+    },
+    {
+      "name": "bighead",
+      "officialDescription": "reveals the true self",
+      "consoleCommand": true
+    },
+    {
+      "name": "boardActor",
+      "officialDescription": "sValue = target to board. sValue2 = boarder"
+    },
+    {
+      "name": "breakAllStashItems",
+      "officialDescription": "Sets broken = true for every item in the player's stash inventory that can be broken."
+    },
+    {
+      "name": "build",
+      "officialDescription": "force build mode (such as during combat)",
+      "consoleCommand": true
+    },
+    {
+      "name": "buryAllItemsOfType",
+      "officialDescription": "buries all items of type sValue. if bValue1, unburies them. sValue2 = itemType.specialProperty to (un)bury, if specified."
+    },
+    {
+      "name": "buryGlobalVarItems",
+      "officialDescription": "buries or unburies items that convert to globals, depending on if their globalVar is set."
+    },
+    {
+      "name": "buryLocations",
+      "officialDescription": "buries undiscovered locations."
+    },
+    {
+      "name": "buyFood",
+      "officialDescription": "Adds 'fValue' food to the player's cargo, if they can afford it, and subtracts the cost from their gold."
+    },
+    {
+      "name": "buyFood_fillCargo",
+      "officialDescription": "Adds as much food as the player can hold to their cargo, if they can afford it, and subtracts the cost from their gold."
+    },
+    {
+      "name": "buyGoods",
+      "officialDescription": "Adds 'fValue' of the current location's tradeGood_itemTypeID to the player's cargo, if they can afford it, and subtracts the cost from their gold."
+    },
+    {
+      "name": "buyGoods_confirmWindow",
+      "officialDescription": "DO NOT USE."
+    },
+    {
+      "name": "buyItem_confirmWindow",
+      "officialDescription": "DO NOT USE."
+    },
+    {
+      "name": "buyLocationFood",
+      "officialDescription": "Goes through the process of buying and applying the effects of the current location's cafeFood_itemTypeID to the player's crew."
+    },
+    {
+      "name": "buyShip",
+      "officialDescription": "Adds the ship actor with the ID of 'sValue' to the player's fleet and subtracts the cost of it from their gold."
+    },
+    {
+      "name": "bz",
+      "officialDescription": "show list of all saved zones that start with 'bz'.",
+      "consoleCommand": true
+    },
+    {
+      "name": "calc",
+      "officialDescription": "prints result of specified formula (ex: calc c:PhysAtk)",
+      "consoleCommand": true
+    },
+    {
+      "name": "cameraAtPlayer",
+      "officialDescription": "Points the camera at the tile the current player actor is on."
+    },
+    {
+      "name": "cameraAtPoint",
+      "officialDescription": "Must be used as a taskString. Points the camera at travel point #floats[0], set floats[1]."
+    },
+    {
+      "name": "cameraAtPointLock",
+      "officialDescription": "Must be used as a taskString. Points the camera at travel point #floats[0], set floats[1], and locks it there until the camera is pointed at something else with the 'pointCameraAt' task."
+    },
+    {
+      "name": "cameraAtTalker",
+      "officialDescription": "Points the camera at the currentActorTalkingTo (or current task actor if not in dialog)."
+    },
+    {
+      "name": "cancelIf",
+      "officialDescription": "Cancels further effects if sValue calculates true (> 0). If bValue, cancels when sValue calcs as false (less or = 0)"
+    },
+    {
+      "name": "cancelIfEnemiesNotPresent",
+      "officialDescription": "Cancels further effects if no non-incapped hostiles are within 'fValue' of triggering actor or X,Y. If fValue=0, distance is infinite."
+    },
+    {
+      "name": "cancelIfEnemiesPresent",
+      "officialDescription": "Cancels further effects if any non-incapped hostiles are within 'fValue' of triggering actor or X,Y. If fValue=0, distance is infinite. If sValue1 specified, only checks actors with that actorTypeID."
+    },
+    {
+      "name": "cancelIfItemNotPresent",
+      "officialDescription": "Cancels further effects if item 'sValue' is not found at X,Y. If X = -1, checks trigger area for the item."
+    },
+    {
+      "name": "cancelIfItemPresent",
+      "officialDescription": "Cancels further effects if item 'sValue' is found at X,Y. If X = -1, checks trigger area for the item."
+    },
+    {
+      "name": "cancelQuest",
+      "officialDescription": "Resets all quest-related globalVars and hides all overworld locations with a 'monsterden' tag."
+    },
+    {
+      "name": "cancelRoyalQuest",
+      "officialDescription": "Resets all quest-related globalVars and hides all overworld locations with a 'monsterden' tag, if globalVar 'questRoyal' is > 0."
+    },
+    {
+      "name": "captureShipNum",
+      "officialDescription": "DO NOT USE. Adds the ship actor in slot 'fValue' of the ships captured during fleet combat to the player's fleet, if there are any available slots."
+    },
+    {
+      "name": "captureShips_afterCombat",
+      "officialDescription": "DO NOT USE. Sets up the dialogOptions for the 'sValue' dialogNode with all the ships captured during fleet combat."
+    },
+    {
+      "name": "cartographer_report",
+      "officialDescription": "Sets up the 'sValue' dialogNode to be used with a cartographer's report. Also sets the 'mapPercentPaid globalVar to the currently explored overworld percentage."
+    },
+    {
+      "name": "changeCafeFood",
+      "officialDescription": "Changes a location's cafeFood_itemTypeID to 'sValue'. If sValue is the ID of another location, it will use the cafeFood_itemTypeID of that location instead and also change the location's auto_spawnDataID to match it. 'sValue2' is the ID of the location to change. If ID is not set, uses current location instead."
+    },
+    {
+      "name": "changeFaction",
+      "officialDescription": "Changes all actors of 'sValue' faction to 'sValue2' faction."
+    },
+    {
+      "name": "changePlayerActor",
+      "officialDescription": "Changes the current player party leader to actor ID 'sValue'."
+    },
+    {
+      "name": "changeScreenResolution2",
+      "officialDescription": "DO NOT USE."
+    },
+    {
+      "name": "changeTradeGood",
+      "officialDescription": "Changes a location's tradeGood_itemTypeID to 'sValue'. If sValue is the ID of another location, it will use the tradeGood_itemTypeID of that location instead. 'sValue2' is the ID of the location to change. If ID is not set, uses current location instead."
+    },
+    {
+      "name": "changeZoneDarkColor",
+      "officialDescription": "Changes zone darkness color to sValue (given as 'R, G, B'). If bValue1, sets color immediately instead of easing."
+    },
+    {
+      "name": "cleanUpQuest",
+      "officialDescription": "Resets all quest-related globalVars and hides all overworld locations with a 'monsterden' tag."
+    },
+    {
+      "name": "clear",
+      "officialDescription": "Clears all text from the console window."
+    },
+    {
+      "name": "clearactors",
+      "officialDescription": "Removes all non-party actors from the current zone. If sValue is set, it should be an fReq that will get checked for each actor.",
+      "consoleCommand": true
+    },
+    {
+      "name": "clearDialogNode",
+      "officialDescription": "Clears the dialogNode of the currentActorTalkingTo (or current task actor if not in dialog)."
+    },
+    {
+      "name": "clearfog",
+      "officialDescription": "sets entire zone's fog of war to known",
+      "consoleCommand": true
+    },
+    {
+      "name": "clearGlobalVar",
+      "officialDescription": "Removes the globalVar 'sValue' from the list of globalVars."
+    },
+    {
+      "name": "clearjournal",
+      "officialDescription": "remove all journal entries",
+      "consoleCommand": true
+    },
+    {
+      "name": "clearLocationItemsFromZone",
+      "officialDescription": "Removes all of a location's set locationItems from the zone, if the current zone is the location's zoneThisLocationIsIn. 'sValue' is the ID of the location. If 'sValue2' is set, it should be the ID of an itemType that will be the new locationItem, placed at offset 0,0."
+    },
+    {
+      "name": "clearPartyPath",
+      "officialDescription": "Makes party actors temporarily able to move freely, without following the currently selected party leader."
+    },
+    {
+      "name": "clearroofs",
+      "officialDescription": "removes all roof items",
+      "consoleCommand": true
+    },
+    {
+      "name": "closeCharEdit",
+      "officialDescription": "Closes the actor name/appearance editor window, if it is open."
+    },
+    {
+      "name": "closeFleetWindow",
+      "officialDescription": "Closes the fleet information window, if it is open and the player isn't holding an actor."
+    },
+    {
+      "name": "closeJournal",
+      "officialDescription": "Closes the journal window, if it is open."
+    },
+    {
+      "name": "completeJournalGoal",
+      "officialDescription": "Completes the journal goal found with the same text as set in 'sValue'. This will open the journal, put a line through the goal, play FX and award 50 XP to all player crew. If b1, hides all interactive buttons (used for credits). If b2, doesn't give XP, open journal or play completion FX. The journal goal gVars will be stripped of spaces and special chars when checked against sValue. The check will be done in a case-insensitive manner."
+    },
+    {
+      "name": "consolecommand",
+      "officialDescription": "Executes consolecommand sValue."
+    },
+    {
+      "name": "convertPlayerPortsToFaction",
+      "officialDescription": "Sets all ports with a 'sport' tag (usually player established) to be ever-loyal to faction ID 'sValue'."
+    },
+    {
+      "name": "convertRGB",
+      "officialDescription": "loads (param).png from desktop and palettizes it (removes excess RGB so all pixels are only R, G, or B) then saves to desktop",
+      "consoleCommand": true
+    },
+    {
+      "name": "crash",
+      "officialDescription": "DO NOT USE. Crashes the game with a missing dictionary index error."
+    },
+    {
+      "name": "createMonsterDenNearby",
+      "officialDescription": "Sets up an overworld monster den that is closest to the current location using levelData 'sValue'."
+    },
+    {
+      "name": "createTreasureMap",
+      "officialDescription": "Must be used as a taskString. Creates the texture 'treasureMap' for use with salvage quests. The texture is created for overworld X,Y set in floats[0], floats[1]."
+    },
+    {
+      "name": "createZoneSpecialFX",
+      "officialDescription": "Creates FX based on zone_tintMap, or if bValue1, deepWater. sValue = pattern texture override. XY * 0.1 = veloc. fValue = -alpha offset. If bValue2, saves textures to the desktop."
+    },
+    {
+      "name": "crewMorale",
+      "officialDescription": "Increases (or decreases) player crew morale by fValue."
+    },
+    {
+      "name": "crewxp",
+      "officialDescription": "Gives 'fValue' XP to all of the player's crew members."
+    },
+    {
+      "name": "csave",
+      "officialDescription": "DO NOT USE. Forces a save to be made named 'sValue', or 'consoleSave' if not specified."
+    },
+    {
+      "name": "cutsceneMode",
+      "officialDescription": "cutsceneMode allows actors to keep moving/etc regardless of turn. If bValue1, cutsceneMode = true. Otherwise false."
+    },
+    {
+      "name": "damageNumber",
+      "officialDescription": "Displays 'sValue' text above actor 'sValue2's head for 2 + fValue seconds. If sValue2 is blank, uses current player actor. Can set text color using 'actorID,color'. If X,Y is set, displays the text at that TC instead. If b1, text doesn't bounce. If b2, 'sValue' should be a gVar and its value is used as the text instead."
+    },
+    {
+      "name": "damageNumber_worldTime",
+      "officialDescription": "Displays the current time above actor 'sValue's head for 2 + fValue seconds. If sValue is blank, uses current player actor. Can set text color in sValue2. If X,Y is set, displays the text at that TC instead. If b1, text doesn't bounce."
+    },
+    {
+      "name": "debug",
+      "officialDescription": "Toggles debugMode on/off."
+    },
+    {
+      "name": "debug_drawStrings",
+      "officialDescription": "Displays a debug message using 'sValue' as the type and 'sValue2' as the message."
+    },
+    {
+      "name": "debugMessage",
+      "officialDescription": "Displays a debug message using 'sValue' as the type and 'sValue2' as the message."
+    },
+    {
+      "name": "delayActions",
+      "officialDescription": "Disables actors and actions for fValue."
+    },
+    {
+      "name": "delayDialog",
+      "officialDescription": "If in dialog mode, delays showing the current dialogNode for fValue seconds."
+    },
+    {
+      "name": "deleteZone",
+      "officialDescription": "permanently deletes original zone data. Do not use.",
+      "consoleCommand": true
+    },
+    {
+      "name": "destination",
+      "officialDescription": "Sets destination of actor of ID 'sValue' (or triggerActor if unspecifed) to X,Y. fValue permanently sets movementSpeed if specified."
+    },
+    {
+      "name": "dialogEffect",
+      "officialDescription": "Must be used as a taskString. Executes strings[0] as a dialog specialEffect string after a delay of floats[1] seconds."
+    },
+    {
+      "name": "die",
+      "officialDescription": "Kills the currentActorTalkingTo (or current task actor if not in dialog), even if they have unkillable set."
+    },
+    {
+      "name": "disableFog",
+      "officialDescription": "Disables fog for this zone."
+    },
+    {
+      "name": "disableHelpGem",
+      "officialDescription": "DO NOT USE. Disables use of the Help Gem."
+    },
+    {
+      "name": "disableTrigger",
+      "officialDescription": "Disables trigger of IDnum fValue or alias sValue."
+    },
+    {
+      "name": "disableUI",
+      "officialDescription": "Hides the quickslots and character stats windows. Show them again with 'enableUI' task."
+    },
+    {
+      "name": "discoverFog",
+      "officialDescription": "Reveals a small fogOfWar area at X,Y."
+    },
+    {
+      "name": "dominateworld",
+      "officialDescription": "Sets wealth to 100 for all overworld ports and converts them to the player's current faction."
+    },
+    {
+      "name": "donate",
+      "officialDescription": "Acts as if the player had donated 'fValue' gold to the current location, which increases its favor and gives trade fame."
+    },
+    {
+      "name": "dropItem",
+      "officialDescription": "Drops item 'sValue2' from actor 'sValue'."
+    },
+    {
+      "name": "editmod",
+      "officialDescription": "DO NOT USE. Uploads mod changes for the mod currently being edited, using mod folder 'sValue'."
+    },
+    {
+      "name": "editmodtags",
+      "officialDescription": "DO NOT USE. Changes the tags for the mod currently being edited to each strings[] set."
+    },
+    {
+      "name": "enableHelpGem",
+      "officialDescription": "DO NOT USE. Enables use of the Help Gem (if recharged)."
+    },
+    {
+      "name": "enableTrigger",
+      "officialDescription": "Re-enables trigger of IDnum fValue or alias sValue."
+    },
+    {
+      "name": "enableUI",
+      "officialDescription": "Shows the quickslots and character stats windows if they had been previously hidden with 'disableUI'."
+    },
+    {
+      "name": "endBoarding",
+      "officialDescription": "calls ZoneManager.I.returnFromBoardingZone()"
+    },
+    {
+      "name": "endGame",
+      "officialDescription": "Sends the player to the main menu."
+    },
+    {
+      "name": "enemyFlee",
+      "officialDescription": "All actors in the combat area that are the same faction as the currentActorTalkingTo (or current task actor if not in dialog) are removed from the zone, then the playerParty is awarded XP."
+    },
+    {
+      "name": "enemyInitiateCombat",
+      "officialDescription": "Causes the currentActorTalkingTo (or current task actor if not in dialog) to initiate combat with the player."
+    },
+    {
+      "name": "enemyMoraleDown",
+      "officialDescription": "Lowers the morale by 1 stage for actors within the combat area that are the same faction as the currentActorTalkingTo (or current task actor if not in dialog)."
+    },
+    {
+      "name": "enemyMoraleUp",
+      "officialDescription": "Increases the morale by 1 stage for actors within the combat area that are the same faction as the currentActorTalkingTo (or current task actor if not in dialog)."
+    },
+    {
+      "name": "enterBuyMode",
+      "officialDescription": "Enters buy/sell mode with the currentActorTalkingTo (or current task actor if not in dialog)."
+    },
+    {
+      "name": "enterBuyMode_fleet",
+      "officialDescription": "Enters buy/sell mode with the fleet currentActorTalkingTo (or current task actor if not in dialog) belongs to."
+    },
+    {
+      "name": "enterBuyMode_location",
+      "officialDescription": "Enters buy/sell mode for the current location's cargo inventory."
+    },
+    {
+      "name": "enterBuyMode_locationItems",
+      "officialDescription": "Enters buy/sell mode for the current location's stash inventory."
+    },
+    {
+      "name": "enterCombat",
+      "officialDescription": "Enter combat at X,Y with radius 'fValue' (or default radius if unspecified). 'sValue' is which actor intiated combat, if any."
+    },
+    {
+      "name": "enterCombat_timer",
+      "officialDescription": "Enters combat at X,Y, with a radius of 999 and sets action 'sValue' to be executed at X,Y after 'fValue' actTime."
+    },
+    {
+      "name": "enterFleetBattle",
+      "officialDescription": "sets gVars playerX & playerY to player pos. Enters new fleetBattle zone, bringing Player, sValue, and sValue2 Actors' fleets with them. Puts fleets on travel_point A,B,C respectively."
+    },
+    {
+      "name": "enterFleetBattle_player",
+      "officialDescription": "sets gVars playerX & playerY to player pos. Enters new fleetBattle zone, bringing Player, sValue, and sValue2 Actors' fleets with them. Puts fleets on travel_point A,B,C respectively. Sets the fleet battle as having been initiated by the player."
+    },
+    {
+      "name": "enterLocation",
+      "officialDescription": "Forces the player to enter the closest non-port location that is in the current zone, within 4 tiles of them."
+    },
+    {
+      "name": "enterPort",
+      "officialDescription": "Forces the player to enter the closest port location that is in the current zone, within 4 tiles of them."
+    },
+    {
+      "name": "enterSellMode",
+      "officialDescription": "DO NOT USE. Opens player actor inventories and sets tradeMode=true."
+    },
+    {
+      "name": "enterSellMode_cargo",
+      "officialDescription": "DO NOT USE. Opens player cargo inventory and sets tradeMode=true."
+    },
+    {
+      "name": "enterSellMode_stash",
+      "officialDescription": "DO NOT USE. Opens player stash inventory and sets tradeMode=true."
+    },
+    {
+      "name": "errors",
+      "officialDescription": "Toggles crash error reporting on/off."
+    },
+    {
+      "name": "escapeGate",
+      "officialDescription": "Executes action 'escapeGate_act' on the currentActorTalkingTo (or current task actor if not in dialog), which removes them from the zone."
+    },
+    {
+      "name": "executeActionMovement",
+      "officialDescription": "Must be used as a taskString. Executes actor-movement and actor-swap effects for the action strings[0] using tileCoords[] as the targeted tiles."
+    },
+    {
+      "name": "executeDialogEffect",
+      "officialDescription": "Executes special dialog effect 'sValue', using 'sValue2' dialogNode (optional), and passing in fValue (optional)."
+    },
+    {
+      "name": "exitCombat",
+      "officialDescription": "Exits combat"
+    },
+    {
+      "name": "exitDialog",
+      "officialDescription": "Exits dialog mode."
+    },
+    {
+      "name": "facingRot",
+      "officialDescription": "Sets triggering actor (or actor 'sValue' if specified) to fValue rot."
+    },
+    {
+      "name": "facingRot0",
+      "officialDescription": "Sets currentActorTalkingTo (or current task actor if not in dialog) to 0 facingRot."
+    },
+    {
+      "name": "facingRot180",
+      "officialDescription": "Sets currentActorTalkingTo (or current task actor if not in dialog) to 180 facingRot."
+    },
+    {
+      "name": "facingRot270",
+      "officialDescription": "Sets currentActorTalkingTo (or current task actor if not in dialog) to 270 facingRot."
+    },
+    {
+      "name": "facingRot90",
+      "officialDescription": "Sets currentActorTalkingTo (or current task actor if not in dialog) to 90 facingRot."
+    },
+    {
+      "name": "facingRotParty",
+      "officialDescription": "Sets party actors to fValue rot."
+    },
+    {
+      "name": "facingRotPrev",
+      "officialDescription": "Sets currentActorTalkingTo (or current task actor if not in dialog) to talkerPreviousFacingRot rot."
+    },
+    {
+      "name": "filljournal",
+      "officialDescription": "add all journal entries",
+      "consoleCommand": true
+    },
+    {
+      "name": "flee",
+      "officialDescription": "The currentActorTalkingTo (or current task actor if not in dialog) is removed from the zone."
+    },
+    {
+      "name": "forget",
+      "officialDescription": "clears saved memory of specified zone.",
+      "consoleCommand": true
+    },
+    {
+      "name": "formulas",
+      "officialDescription": "lists out all globalFormulas",
+      "consoleCommand": true
+    },
+    {
+      "name": "fullheal",
+      "officialDescription": "Fully heals playerParty, including HPMax lost from being KO'd."
+    },
+    {
+      "name": "fullrestore",
+      "officialDescription": "Fully heals playerParty, including HPMax lost from being KO'd."
+    },
+    {
+      "name": "fx",
+      "officialDescription": "Plays fx 'sValue' at X,Y. 'sValue2' uses that actor's position instead. If nothing specified, plays fx at camera position. If b1, X,Y is screen position. If used in a task, string 3 sets fx color and a second TC specifies fx target."
+    },
+    {
+      "name": "fxOnParty",
+      "officialDescription": "Plays fx 'sValue' at the X,Y of each partyActor."
+    },
+    {
+      "name": "fxOnPlayerRank",
+      "officialDescription": "Plays fx 'sValue' at the screen position where the player's rank is on the escMenu."
+    },
+    {
+      "name": "fxOnTalker",
+      "officialDescription": "Plays fx 'sValue' at the X,Y of the currentActorTalkingTo."
+    },
+    {
+      "name": "gameOver",
+      "officialDescription": "Ends the game for the player and returns them to the main menu. If the zone has cantGameOver=true, reacts all triggers in the zone with Element.gameOver."
+    },
+    {
+      "name": "gc",
+      "officialDescription": "DO NOT USE. Forces program garbage collection."
+    },
+    {
+      "name": "get",
+      "officialDescription": "prints value of global variable - or prints flagged triggers of given zoneName (ex: get zTown1)",
+      "consoleCommand": true
+    },
+    {
+      "name": "getBribeAmount",
+      "officialDescription": "DO NOT USE. Sets the currentDialogNode's statements[0] to reflect a bribe amount used for auto dialog."
+    },
+    {
+      "name": "getItemsFromZone",
+      "officialDescription": "removes all items that can be picked up from sValue zone and places them at XY"
+    },
+    {
+      "name": "getmod",
+      "officialDescription": "DO NOT USE. Sets mod ID 'sValue' as the mod currently being edited, for use with other mod tasks."
+    },
+    {
+      "name": "getResponse_bribe",
+      "officialDescription": "DO NOT USE. Sets the currentDialogNode's nextNodeID to the response for being bribed. Used in auto dialog."
+    },
+    {
+      "name": "getResponse_combat",
+      "officialDescription": "DO NOT USE. Sets the currentDialogNode's nextNodeID to the response for combat. Used in auto dialog."
+    },
+    {
+      "name": "getResponse_peace",
+      "officialDescription": "DO NOT USE. Sets the currentDialogNode's nextNodeID to the response for wanting peace. Used in auto dialog."
+    },
+    {
+      "name": "giveActorsBaseXP",
+      "officialDescription": "Awards between 54 and 84 XP in all classes to every actor in the zone, if they have less than 54 XP."
+    },
+    {
+      "name": "giveFood",
+      "officialDescription": "Adds 'fValue' food to the player's cargo, if it can fit."
+    },
+    {
+      "name": "giveGlobalVarGP",
+      "officialDescription": "Adds the value set in 'sValue' globalVar of gold to the player."
+    },
+    {
+      "name": "giveItem",
+      "officialDescription": "Adds 'fValue' quantity of item ID 'sValue' to the player's cargo or stash inventory, depending on the item. If can't fit, added to held items. fValue 0 gives 1, -1 is default quantity, -2 is infinite, -11 through -19 is % chance to keep."
+    },
+    {
+      "name": "giveMathXPToActorWithDialogNodeID",
+      "officialDescription": "Gives formula 'sValue2' amount of XP to every actor in the current zone with 'sValue' dialogNodeID. Won't exceed player's total XP."
+    },
+    {
+      "name": "giveQuestItemReward",
+      "officialDescription": "DO NOT USE. Gives gold equal to the value of the item ID set in globalVar 'tavern_questItem'."
+    },
+    {
+      "name": "giveShip",
+      "officialDescription": "Adds ship actorType ID 'sValue' to the player's fleet, if it can fit. Uses ID 'sValue2' for the ship actor if specified."
+    },
+    {
+      "name": "go",
+      "officialDescription": "transitions to specified zone (ex: go zoneName)",
+      "consoleCommand": true
+    },
+    {
+      "name": "gob",
+      "officialDescription": "transitions to specified zone and enters build mode (ex: gob zoneName)",
+      "consoleCommand": true
+    },
+    {
+      "name": "godmode",
+      "officialDescription": "Maxes out the player's HP/MP and other stats and learns all actions from every selectable class.",
+      "consoleCommand": true
+    },
+    {
+      "name": "gotoNodeDelay",
+      "officialDescription": "Tries to go to dialogNode 'sValue' after 'fValue' seconds. Uses the currentActorTalkingTo (or current task actor if not in dialog) as the talker."
+    },
+    {
+      "name": "goToNodeID_plus_GlobalVar",
+      "officialDescription": "Must be used in dialog. Tries to go to the dialogNode with the ID of the current dialogNode, plus the string set in the globalVar with the same ID as the dialogNode ID."
+    },
+    {
+      "name": "gotoNodeIf",
+      "officialDescription": "Must be used in dialog. Tries to go to dialogNode 'sValue' if formula 'sValue2' passes."
+    },
+    {
+      "name": "gp",
+      "officialDescription": "adds # GP (or gives 500 if unspecified)",
+      "consoleCommand": true
+    },
+    {
+      "name": "grantXPShare_5percent",
+      "officialDescription": "DO NOT USE. Gives 5% of each class's XP globalVar to every current partyActor if globalVar 'XPShare' is set to 1."
+    },
+    {
+      "name": "handleDeaths",
+      "officialDescription": "DO NOT USE. Updates 'dying' and 'dead' AVs for each actor in the current zone."
+    },
+    {
+      "name": "handleTiredStates",
+      "officialDescription": "DO NOT USE. Makes party tired, and makes barracks actors rested."
+    },
+    {
+      "name": "heal",
+      "officialDescription": "Heals triggering actor, or actor 'sValue', by fValue.",
+      "consoleCommand": true
+    },
+    {
+      "name": "healfaction",
+      "officialDescription": "Heals all actors in the current zone with the faction 'sValue'. Does not restore HPMax lost from being KO'd."
+    },
+    {
+      "name": "healparty",
+      "officialDescription": "Heals playerParty, without restoring HPMax lost from being KO'd."
+    },
+    {
+      "name": "help",
+      "officialDescription": "prints a description of the command (ex: help revive)",
+      "consoleCommand": true
+    },
+    {
+      "name": "hideEscWindows",
+      "officialDescription": "Hides all windows used for the escMenu."
+    },
+    {
+      "name": "hidemapicons",
+      "officialDescription": "If the player is currently in the overworld zone, sets all locations to discovered = false."
+    },
+    {
+      "name": "hideparty",
+      "officialDescription": "hides the party forever",
+      "consoleCommand": true
+    },
+    {
+      "name": "hideParty",
+      "officialDescription": "Turns party invisible for 'fValue' time."
+    },
+    {
+      "name": "hideQuickslots",
+      "officialDescription": "Hides character stats and quickslots window."
+    },
+    {
+      "name": "hostile",
+      "officialDescription": "Sets the current task actor to hostile = true."
+    },
+    {
+      "name": "howmany",
+      "officialDescription": "Displays a debug message with how many items are in the current zone. Only counts items with ID 'sValue' if set."
+    },
+    {
+      "name": "howmanyitems",
+      "officialDescription": "counts items in the zone. Counts all items if ID not specified.",
+      "consoleCommand": true
+    },
+    {
+      "name": "howmanyWorld",
+      "officialDescription": "Displays a debug message with how many times 'sValue' appears in each zone file in the ZoneData folder. If mouse is pointing at an item or actor, checks for that ID."
+    },
+    {
+      "name": "incDefaultNode",
+      "officialDescription": "Increases the number at the end of the dialogNodeID of the task actor by 1."
+    },
+    {
+      "name": "incOnNewDay",
+      "officialDescription": "Increases the number at the end of the dialogNodeID of the task actor by 1 if at least 1 day has passed since this task was called for the task actor."
+    },
+    {
+      "name": "initWaypoints",
+      "officialDescription": "refreshes waypoint data of the current zone"
+    },
+    {
+      "name": "invest",
+      "officialDescription": "Acts as if the player had invested 'fValue' gold into the current location."
+    },
+    {
+      "name": "investigator_fleetpos",
+      "officialDescription": "Sets the currentActorTalkingTo investigator's response and task to perform for when tracking faction ID 'sValue's fleets."
+    },
+    {
+      "name": "investigator_nearestLoc",
+      "officialDescription": "Sets the currentActorTalkingTo investigator's response for when finding the nearest undiscovered location."
+    },
+    {
+      "name": "investigator_setupfleetposselect",
+      "officialDescription": "Sets up the dialogNode ID 'sValue' dialogOptions for selecting which faction's fleets to track for use with an investigator."
+    },
+    {
+      "name": "investigator_setupportselect",
+      "officialDescription": "Must be used as a taskString. Sets the port selection dialogOptions the investigator uses for investment information, for the dialogNode set in strings[0]. floats[0] and floats[1] specify which quadrant to select ports from (-1,-1 specifies northwest, through to 1,1 specifying southeast)."
+    },
+    {
+      "name": "investigator_slainenemy",
+      "officialDescription": "Sets the currentActorTalkingTo investigator's response and task to perform for when checking for unexamined monsters."
+    },
+    {
+      "name": "investigator_tradespecial",
+      "officialDescription": "Sets the currentActorTalkingTo investigator's response for when finding out next month's trade special."
+    },
+    {
+      "name": "jobDialogOptions",
+      "officialDescription": "Sets up the dialogNode ID 'sValue' dialogOptions for the current location's set questTypes."
+    },
+    {
+      "name": "k",
+      "officialDescription": "show kills",
+      "consoleCommand": true
+    },
+    {
+      "name": "kill",
+      "officialDescription": "kill everything but the party",
+      "consoleCommand": true
+    },
+    {
+      "name": "killall",
+      "officialDescription": "Incaps all non-controllable actors in the zone that don't have the 'invincible' AV."
+    },
+    {
+      "name": "killcrew",
+      "officialDescription": "kill all crew on non-player ships",
+      "consoleCommand": true
+    },
+    {
+      "name": "killFaction",
+      "officialDescription": "Incaps all actors of 'sValue' faction."
+    },
+    {
+      "name": "learnJournalEntry",
+      "officialDescription": "Adds the journalEntry ID in sValue to the known journals list. If b1, play a sound. If b2, don't open journal to show the entry."
+    },
+    {
+      "name": "learnJournalEntry_silent",
+      "officialDescription": "Adds the journalEntry ID in sValue to the known journals list without opening the journal or playing any FX. If b1, also adds it to the reported journals list without giving any reward."
+    },
+    {
+      "name": "listav",
+      "officialDescription": "lists all ActorValues. (scroll using mousewheel) Specify an ActorValue to view its data.",
+      "consoleCommand": true
+    },
+    {
+      "name": "listfx",
+      "officialDescription": "lists all FX. (scroll using mousewheel) Specify an FX to view its data.",
+      "consoleCommand": true
+    },
+    {
+      "name": "loadItOnUpYo",
+      "officialDescription": "DO NOT USE. Moves the player to zone strings[0] at position tileCoords[0], facing floats[0] with floats[1] as the fadeSpeed."
+    },
+    {
+      "name": "loadModPageInBrowser",
+      "officialDescription": "DO NOT USE. Opens the modding reference guide URL (located on Steam) in the player's default browser."
+    },
+    {
+      "name": "loads",
+      "officialDescription": "DO NOT USE."
+    },
+    {
+      "name": "loadSpecialZone",
+      "officialDescription": "Loads in zone 'sValue' as a non-interactive overlay at X,Y. fValue = depthMod. sValue2 = scale, if specified (default to 1). If bValue1, only draws zone if roofs are drawn."
+    },
+    {
+      "name": "loadSpecialZone_playerFlagship",
+      "officialDescription": "As 'loadSpecialZone', but disregards 'sValue' and loads the player's flagship bz instead."
+    },
+    {
+      "name": "loadSpecialZone_playerFlagship_precision",
+      "officialDescription": "Same as 'loadSpecialZone_playerFlagship' task, but X,Y is divided by 100 to get a precise tile position."
+    },
+    {
+      "name": "loadSpecialZone_precision",
+      "officialDescription": "Same as 'loadSpecialZone' task, but X,Y is divided by 100 to get a precise tile position."
+    },
+    {
+      "name": "location_tryUnlockItems",
+      "officialDescription": "Checks for any unlockable items in the current location and displays a message if anything was unlocked."
+    },
+    {
+      "name": "lockCameraAt",
+      "officialDescription": "Points camera at X,Y, or actor.ID if X,Y is unspecified. fValue alters speed if specified. Locks camera indefinitely. If bValue1, camera goes under roofs."
+    },
+    {
+      "name": "lookAtPlayer",
+      "officialDescription": "Makes the currentActorTalkingTo (or current task actor if not in dialog) look in the direction of the current player actor."
+    },
+    {
+      "name": "lookAtTalker",
+      "officialDescription": "Makes the player look at the currentActorTalkingTo (or current task actor if not in dialog)."
+    },
+    {
+      "name": "lootFleet_afterCombat",
+      "officialDescription": "Opens the enemyFleet cargo inventory so the player can loot it."
+    },
+    {
+      "name": "lose10Food",
+      "officialDescription": "Removes 10 food from the player's cargo inventory."
+    },
+    {
+      "name": "markDojoLocDone",
+      "officialDescription": "Changes the 'sign_icon_muscle' icon to 'sign_icon_muscle_done' in the current location's tooltipIcons, if it exists."
+    },
+    {
+      "name": "markTrainerLocDone",
+      "officialDescription": "Changes the 'sign_icon_book' or 'sign_icon_2book' icon to its '_done' or '_done_done' version in the current location's tooltipIcons, if they exist."
+    },
+    {
+      "name": "maximizeWindowIfTrue",
+      "officialDescription": "DO NOT USE. Maximizes the game window if bValue1 is true."
+    },
+    {
+      "name": "maximizeWindowSet",
+      "officialDescription": "DO NOT USE. Maximizes the game window if bValue1 is true."
+    },
+    {
+      "name": "mergeSpecialZone",
+      "officialDescription": "Overwrites area with specialZone (excluding transparent/BG terrain). Sets specialZone at X,Y if specified. If b1, doesn't overwrite existing items."
+    },
+    {
+      "name": "modFame",
+      "officialDescription": "Adds 'fValue' to globalVar 'fame_' + 'sValue', displays its associated icon and plays a sound."
+    },
+    {
+      "name": "modGlobalVar",
+      "officialDescription": "Adds 'fValue' to globalVar 'sValue'."
+    },
+    {
+      "name": "modLocationIDFactionIDFavor",
+      "officialDescription": "Adds 'fValue' faction_favor for 'sValue' faction ID to a port location. 'sValue2' is the ID of the location. If ID is not set, uses current location instead. If b1, resets every faction's favor to 0 before adding fValue to sValue (will unset ever-loyal ports). If b2, sets the port to be ever-loyal to sValue faction instead."
+    },
+    {
+      "name": "modLocFavor",
+      "officialDescription": "Adds 'fValue' to the player's 'favor_' faction globalVar for the current location's favored faction. Also shows associated favor icons and sounds."
+    },
+    {
+      "name": "modLocWealthLevel",
+      "officialDescription": "Adds 'fValue' to the current location's wealthLevel, which won't go below 0 or above 100. If sValue is set, adds to that location's wealthLevel instead."
+    },
+    {
+      "name": "modNodeIDGlobalVar_1",
+      "officialDescription": "Must be used in dialog. Adds 1 to the globalVar with the same ID as the currentDialogNodeID."
+    },
+    {
+      "name": "modNodeIDGlobalVar_999",
+      "officialDescription": "Must be used in dialog. Adds 999 to the globalVar with the same ID as the currentDialogNodeID."
+    },
+    {
+      "name": "modPlayerFactionFavor",
+      "officialDescription": "Adds 'fValue' or the result of the formula set in sValue to the player's 'favor_' + 'playerFaction' globalVar, if the 'playerFaction' gVar is set."
+    },
+    {
+      "name": "modTalkerFactionFavor",
+      "officialDescription": "Must be used in dialog. Adds 'fValue' to the player's 'favor_' faction ID globalVar matching the currentActorTalkingTo's set faction."
+    },
+    {
+      "name": "modTalkerFavor",
+      "officialDescription": "Adds 'fValue' to the player's 'favor_' faction ID globalVar matching the currentActorTalkingTo's set faction (or current task actor if not in dialog)."
+    },
+    {
+      "name": "moveActor",
+      "officialDescription": "Moves actor 'sValue' to X,Y and sets facingRot to 'fValue'."
+    },
+    {
+      "name": "moveActor_point",
+      "officialDescription": "Moves actor 'sValue' to #X, set Y (A=0, B=1...) travel point."
+    },
+    {
+      "name": "moveAllActorsBy",
+      "officialDescription": "Moves all actors and camera by X,Y. If fValue != 0, sets actors' facingRot to fValue."
+    },
+    {
+      "name": "moveCamXY",
+      "officialDescription": "Must be used as a taskString. Adds floats[0], floats[1] to the camera's current X,Y position."
+    },
+    {
+      "name": "moveItems",
+      "officialDescription": "Moves items from topLeft of trigger area to X,Y."
+    },
+    {
+      "name": "moveItemsToActor",
+      "officialDescription": "Moves items from X,Y to actor 'sValue'."
+    },
+    {
+      "name": "moveJournal",
+      "officialDescription": "Moves the journalWindow to screen position X,Y at speed 'fValue'. If b1, X position is offset from screen center. If b2, moves journalWindow to screen center."
+    },
+    {
+      "name": "movement",
+      "officialDescription": "Sets movement of actor of ID 'sValue' (or triggerActor if unspecifed) to go to X,Y. (If X or Y are unspecified, only moves along the specified axis.) If bValue1, actor uses pain animation. fValue permanently sets movementSpeed if specified."
+    },
+    {
+      "name": "movePartyBy",
+      "officialDescription": "Moves entire party and camera by X,Y. If fValue != 0, sets actors' facingRot to fValue."
+    },
+    {
+      "name": "movePartyTo",
+      "officialDescription": "Moves entire party and camera by X,Y - triggerActor.position. If fValue != 0, sets actors' facingRot to fValue."
+    },
+    {
+      "name": "movePartyTo_point",
+      "officialDescription": "Moves entire party and camera to travel point #X, set Y (A=0, B=1...) If bValue1, doesn't use X - just puts party on the set. If b2, brings out boats from player fleet."
+    },
+    {
+      "name": "moveSpecialZone",
+      "officialDescription": "Moves specialZone to X,Y at fValue speed. Eases if bValue1."
+    },
+    {
+      "name": "moveSpecialZone_precision",
+      "officialDescription": "Same as 'moveSpecialZone' task, but X,Y is divided by 100 to get a precise tile position."
+    },
+    {
+      "name": "moveToNewZone",
+      "officialDescription": "Cutscene & scripting use. Transfers party to 'sValue' zone at X,Y. fValue, if specified, sets the fade to black speed."
+    },
+    {
+      "name": "moveX1",
+      "officialDescription": "Moves the currentActorTalkingTo (or current task actor if not in dialog) to the right 1 tile, with no restrictions."
+    },
+    {
+      "name": "moveXNeg1",
+      "officialDescription": "Moves the currentActorTalkingTo (or current task actor if not in dialog) to the left 1 tile, with no restrictions."
+    },
+    {
+      "name": "moveXY",
+      "officialDescription": "Must be used as a taskString. Moves the currentActorTalkingTo (or current task actor if not in dialog) by floats[0] X and floats[1] Y, with no restrictions."
+    },
+    {
+      "name": "moveY1",
+      "officialDescription": "Moves the currentActorTalkingTo (or current task actor if not in dialog) down 1 tile, with no restrictions."
+    },
+    {
+      "name": "moveYNeg1",
+      "officialDescription": "Moves the currentActorTalkingTo (or current task actor if not in dialog) up 1 tile, with no restrictions."
+    },
+    {
+      "name": "mpos",
+      "officialDescription": "toggle show mouse screen (not world) coordinates.",
+      "consoleCommand": true
+    },
+    {
+      "name": "nextDialogNode_hideWindow",
+      "officialDescription": "Sets nextDialogNode_hideWindow to true, which hides the next dialog window."
+    },
+    {
+      "name": "noSpeechFXLookOrAnim",
+      "officialDescription": "Must be used as a dialog specialEffect. The current dialogNode won't show its text reveal FX or play any set animations. The currentActorTalkingTo also won't look at the player."
+    },
+    {
+      "name": "offerRest",
+      "officialDescription": "Opens dialog box allowing player to rest and heal party, if nothing threatening is nearby."
+    },
+    {
+      "name": "openCargo",
+      "officialDescription": "Shows the player's cargo inventory window."
+    },
+    {
+      "name": "openFleetWindow",
+      "officialDescription": "Shows the player's fleet information window."
+    },
+    {
+      "name": "openFleetWindow_delay",
+      "officialDescription": "Shows the player's fleet information window after a 0.1s delay."
+    },
+    {
+      "name": "openFleetWindow_talker",
+      "officialDescription": "Shows the fleet information window for the fleet the currentActorTalkingTo (or current task actor if not in dialog) is part of."
+    },
+    {
+      "name": "openJournal",
+      "officialDescription": "Opens the journal and flips to entry number 'fValue'. If b1, hides the journal's arrows and close buttons."
+    },
+    {
+      "name": "openJournal_interactive",
+      "officialDescription": "Opens the journal and flips to entry number 'fValue'."
+    },
+    {
+      "name": "overseer",
+      "officialDescription": "Forces overseerMode on."
+    },
+    {
+      "name": "p",
+      "officialDescription": "Creates an example procedurally generated zone using 'sValue' levelData, then transfers the player to it at TC 10,10. If b1, acts as if entering via console."
+    },
+    {
+      "name": "path",
+      "officialDescription": "Sets path of actor of ID 'sValue' (or triggerActor if unspecifed) to X,Y. If bValue is true, uses waypoints. fValue permanently sets movementSpeed if specified."
+    },
+    {
+      "name": "pathParty",
+      "officialDescription": "Sets path of all party actors to X,Y."
+    },
+    {
+      "name": "peace",
+      "officialDescription": "Ends combat with any actors within the combat area that have the same faction as the currentActorTalkingTo (or current task actor if not in dialog), sets their hostile to false and awards the playerParty with XP."
+    },
+    {
+      "name": "peaceXPrewardOnly",
+      "officialDescription": "Gives the XP to the playerParty that would be rewarded with the 'peace' task, but doesn't change any actors."
+    },
+    {
+      "name": "placeActorFromBoardedShip",
+      "officialDescription": "Places actors from currently boarded ship of actorType string0 at travelpoint specified by XY (point# X, set# Y)"
+    },
+    {
+      "name": "playerAnim",
+      "officialDescription": "Makes the current player actor play animation 'sValue'."
+    },
+    {
+      "name": "playerFacingRot",
+      "officialDescription": "Sets the current player actor's facingRot to 'fValue'."
+    },
+    {
+      "name": "playerFlee",
+      "officialDescription": "Ends combat with any actors within the combat area that have the same faction as the currentActorTalkingTo (or current task actor if not in dialog), then gives 'invisible' AV to playerParty."
+    },
+    {
+      "name": "playerInitiateCombat",
+      "officialDescription": "Causes the player to initiate combat with the currentActorTalkingTo (or current task actor if not in dialog)."
+    },
+    {
+      "name": "playerMoraleUp",
+      "officialDescription": "Increases the morale stage by 1 for all partyActors."
+    },
+    {
+      "name": "playNearestLocationSong",
+      "officialDescription": "Plays the externalSong of the location in the current zone that is closest to the player."
+    },
+    {
+      "name": "playSong",
+      "officialDescription": "Plays 'sValue' song at 'fValue' pitch. If sValue = 'travelSong' or 'combatSong', uses Zone defaults instead. If X is set, volume = X/100. If Y set, delay = Y. bValue1 prevents the song from being changed to travelSong. To stop music immediately, set volume to 0. If bValue2, song starts at full volume instead of fading in."
+    },
+    {
+      "name": "pointCameraAt",
+      "officialDescription": "Points camera at X,Y, or actor.ID if X,Y is unspecified. fValue alters speed if specified. bValue1 sets cameraCantBeChangedTimer to delay_preventInteraction. If bValue2, camera goes under roofs."
+    },
+    {
+      "name": "preventInteraction",
+      "officialDescription": "Disables player input for fValue."
+    },
+    {
+      "name": "quietsave",
+      "officialDescription": "Saves to Globals.AUTOSAVE_NAME, with no notification."
+    },
+    {
+      "name": "rankstyle",
+      "officialDescription": "Toggles class action rank's notch style on/off. Does not get saved."
+    },
+    {
+      "name": "reactOnMatchingItems",
+      "officialDescription": "Finds all 'sValue' items in the zone that are adjacent & facing eachother, and applies Element.matched. If sValue2 is specified, matches sValue & sValue2 items."
+    },
+    {
+      "name": "readdVendorToParty",
+      "officialDescription": "Adds the actor on travelPoint 'fValue' to the player's party if their dialogNodeID equals 'sValue'."
+    },
+    {
+      "name": "realtime",
+      "officialDescription": "toggles realtime mode (probably very buggy)",
+      "consoleCommand": true
+    },
+    {
+      "name": "reassignQuestItem",
+      "officialDescription": "DO NOT USE. Sets globalVar 'tavern_questItem' to a random ID from the 'loot_quest' item's toMake list."
+    },
+    {
+      "name": "recoverOverboardPartyActors",
+      "officialDescription": "Removes any dead ship actors from the player's fleet and moves their crew to the flagship."
+    },
+    {
+      "name": "refreshloc",
+      "officialDescription": "Loads any missing locations and adds their locationItems to the zoneThisLocationIsIn."
+    },
+    {
+      "name": "refreshLocQuests",
+      "officialDescription": "Randomizes the available questTypes for the current location, if it is a port and has 'sign_icon_letter' in its tooltipIcons."
+    },
+    {
+      "name": "refreshRoyalQuests",
+      "officialDescription": "Randomizes the current royal quest, if one isn't already set."
+    },
+    {
+      "name": "refreshRoyalTitle",
+      "officialDescription": "Sets globalVar 'playerTitle' to an empty string."
+    },
+    {
+      "name": "refreshStatModifiers",
+      "officialDescription": "Resets all enemy stat multipliers, player stat modifiers, boat mods and day bonuses for every actor in the current zone."
+    },
+    {
+      "name": "refreshStatMods",
+      "officialDescription": "Resets all enemy stat multipliers, player stat modifiers, boat mods and day bonuses for every actor in the current zone."
+    },
+    {
+      "name": "refreshUndamagedShipZones",
+      "officialDescription": "Deletes all saved boat zones from the current save file for every ship actor in the player's fleet."
+    },
+    {
+      "name": "relocateActors",
+      "officialDescription": "Puts all actors within fValue of XY to the nearest occupiable tile within fValue+3. If b1, animate pain. If sValue1 specified, move only actors of that faction."
+    },
+    {
+      "name": "relocateActors_point",
+      "officialDescription": "Puts all actors within fValue of XY onto travel point set # sValue2. If sValue1 specified, move only actors of that faction. If b1, only use unoccupied tiles. If b2, randomize tiles."
+    },
+    {
+      "name": "removeActor",
+      "officialDescription": "Removes actor 'sValue', or actor at X,Y if specified. If bValue1, adds actor_flee fx. If bValue2, puts their items in your stash."
+    },
+    {
+      "name": "removeActorItem",
+      "officialDescription": "Removes item 'sValue2' from actor 'sValue'."
+    },
+    {
+      "name": "removeActors_despawnable",
+      "officialDescription": "Remove all actors with canDespawn=true. If bValue1, adds actor_flee fx. If bValue2, only affects incapped actors."
+    },
+    {
+      "name": "removeActorType",
+      "officialDescription": "Remove all actors of type 'sValue'. If bValue1, adds actor_flee fx."
+    },
+    {
+      "name": "removeAllItems",
+      "officialDescription": "Deletes 'sValue' item from zone. Uses gVar if 'sValue2' specified. Can also remove all at XY if no sValue given."
+    },
+    {
+      "name": "removeAllItemsOfValue",
+      "officialDescription": "Deletes items from zone of value fValue or greater."
+    },
+    {
+      "name": "removeCargo",
+      "officialDescription": "Removes 'fValue' quantity of item ID 'sValue' from the player's cargo inventory."
+    },
+    {
+      "name": "removeCargo_g",
+      "officialDescription": "Removes 'fValue' quantity of the item ID set in globalVar 'sValue' from the player's cargo inventory."
+    },
+    {
+      "name": "removeEmptyItem",
+      "officialDescription": "Removes all containers from the current zone that have the ID of 'sValue' and have no items inside of them."
+    },
+    {
+      "name": "removeExcessLandingPartyActors",
+      "officialDescription": "Removes any actors from the player's partyActors that aren't in their landingParty."
+    },
+    {
+      "name": "removeFaction",
+      "officialDescription": "Removes all actors of 'sValue' faction."
+    },
+    {
+      "name": "removeFromFleet_slot",
+      "officialDescription": "Removes the ship actor in slot 'fValue' of the player's fleet and places it around travelPoint 9 in the current zone, if it can fit."
+    },
+    {
+      "name": "removeFromLandingParty",
+      "officialDescription": "Removes the player crew actor with the ID of 'sValue' from the player's landing party, if they are currently in it, and the current Zone. If b1, don't remove them from the current Zone."
+    },
+    {
+      "name": "removeFromParty",
+      "officialDescription": "Removes actor ID 'sValue' from the party. If bValue1, removes from fleet as well (if applicable)."
+    },
+    {
+      "name": "removeFromParty_slot",
+      "officialDescription": "Removes the actor in slot 'fValue' of the player's current partyActors and adds them to the first unoccupied travelPoint set D item. Also changes their dialogNodeID to 'crew_rehire'."
+    },
+    {
+      "name": "removeHeldItems",
+      "officialDescription": "Deletes all held items."
+    },
+    {
+      "name": "removeIconFromLocationID",
+      "officialDescription": "Removes 'sValue' icon from a location's tooltipIcons list, if it exists. 'sValue2' is the ID of the location. If ID is not set, uses current location instead."
+    },
+    {
+      "name": "removeItem",
+      "officialDescription": "Deletes 'sValue' item at X,Y. If unspecified, removes 'fValue' num of the item from triggering actor's inventory. if sValue2 is used, remove itemID of globalVar[sValue2]. If bValue2, XY specifies a travelpoint."
+    },
+    {
+      "name": "removeItem_g",
+      "officialDescription": "Removes 'fValue' quantity of the item ID set in globalVar 'sValue' from the player's available inventory. Tries to remove from the stash, cargo, and any crew inventories until the quantity is fully removed."
+    },
+    {
+      "name": "removeItemFromFleetCargo",
+      "officialDescription": "Remove 'fValue' quantity of 'sValue' itemType ID from the cargo of the fleet identified by 'sValue2'. sValue2 can be the ID of the commodore of the fleet, or the ID of a ship within the fleet, or the key word 'enemyFleet' or 'assistFleet' for fleets the player is currently in combat with. If fValue is 0, will remove 1. If fValue is -1 or less, removes all of sValue itemType. If sValue isn't set or is blank, 'fValue' quantity of all items are removed."
+    },
+    {
+      "name": "removeItemFromLocationID",
+      "officialDescription": "Removes 'sValue' as the ID of an itemType or actorType from the stash, cargo or shipwright of a location. fValue is the quantity to remove, defaulting to 1. If fValue is negative, removes all. 'sValue2' is the ID of the location. If ID is not set, uses current location instead. 'sValue' can be a key word to remove everything of a type: removeAllStash, removeAllCargo, removeAllShips"
+    },
+    {
+      "name": "removeItemFromParty",
+      "officialDescription": "Removes 'fValue' quantity of item ID 'sValue' from the player's available inventory. Tries to remove from the stash, cargo, and any crew inventories until the quantity is fully removed."
+    },
+    {
+      "name": "removeItemOfValue",
+      "officialDescription": "Deletes items at X,Y of value fValue or greater."
+    },
+    {
+      "name": "removeitems",
+      "officialDescription": "removes all items (or all items of the ID specified in sValue) from the zone.",
+      "consoleCommand": true
+    },
+    {
+      "name": "removeItemsNearPlayerActor",
+      "officialDescription": "Deletes items of type sValue1 within fValue tiles of player Actor."
+    },
+    {
+      "name": "removeJournalGoal",
+      "officialDescription": "Removes the first journal goal that matches the string in 'sValue' from the list of journal 'goal' gvars, then reassigns all 'goal' gVars to be in order with no gaps. If sValue is blank, just reassigns journal goals. The journal goal gVars will be stripped of spaces and special chars when checked against sValue. The check will be done in a case-insensitive manner."
+    },
+    {
+      "name": "removeLocationTag",
+      "officialDescription": "Removes the 'sValue' tag from a location's tags list. 'sValue2' is the ID of the location. If ID is not set, uses current location instead. If sValue is not set, or is blank, all tags will be removed."
+    },
+    {
+      "name": "removeSpawnDataFromLocationID",
+      "officialDescription": "Removes all entries from a location's auto_spawnDataID list that match 'sValue'. If sValue isn't set, or is blank, every entry is removed. 'sValue2' is the ID of the location. If ID is not set, uses current location instead."
+    },
+    {
+      "name": "removeTalker",
+      "officialDescription": "Removes the currentActorTalkingTo (or current task actor if not in dialog) from the zone."
+    },
+    {
+      "name": "removeTempPartyActors",
+      "officialDescription": "Removes all actors from the zone that are in the player's current partyActors and have canControlFullyIfControllable = false."
+    },
+    {
+      "name": "removeTrigger",
+      "officialDescription": "Removes trigger of aliasID 'sValue' from the current zone."
+    },
+    {
+      "name": "removeUnlockableItemFromLocationID",
+      "officialDescription": "Removes an item from a location's itemType_quantity_unlockable list that matches an ID, formula and quantity, set in sValue as 'ID, formula' and fValue as quantity. 'sValue2' is the ID of the location. If ID is not set, uses current location instead. If any property to check isn't set, it will match all of that property (eg, fValue = 0 will match any quantity)."
+    },
+    {
+      "name": "removeZoneBackgroundTex",
+      "officialDescription": "Removes texture 'sValue' from the list of background textures for the current zone, if it exists. If b1, removes all background textures."
+    },
+    {
+      "name": "removeZoneFX",
+      "officialDescription": "Removes recurring FX 'sValue' from the zone. If bValue1, removes all instances of that FX."
+    },
+    {
+      "name": "renameShip",
+      "officialDescription": "Shows the charEdit window for the last ship in the player's fleet."
+    },
+    {
+      "name": "repairAllStashItems",
+      "officialDescription": "Sets broken = false for every item in the player's stash inventory."
+    },
+    {
+      "name": "repairFleet_free",
+      "officialDescription": "Repairs all ships in the player's fleet, for free."
+    },
+    {
+      "name": "repairFleet_pay",
+      "officialDescription": "Repairs all ships in the player's fleet and removes the repair cost from their gold."
+    },
+    {
+      "name": "replaceEquipment",
+      "officialDescription": "Equips item 'sValue2' to actor 'sValue'. If fValue is specified, replaces that slot. Otherwise replaces the 1st relevant slot (0 for wpns, etc.)"
+    },
+    {
+      "name": "replaceTriggerWithZoneSeries",
+      "officialDescription": "Replaces this trigger with a zone loaded from sValue ID + the value of sValue gVar. sValue2 specifies the levelData to use for replacing terrain when applying terrain replacer items."
+    },
+    {
+      "name": "res",
+      "officialDescription": "Changes the game window's size to 1920x959, which is the highest resolution before the screen scale changes."
+    },
+    {
+      "name": "research_report",
+      "officialDescription": "Sets 'sValue' dialogNode's statements based on journalEntries that have yet to be sold to a researcher."
+    },
+    {
+      "name": "researchFromFleet_slot",
+      "officialDescription": "Removes the ship in slot 'fValue' of the player's fleet and adds it as an unlockable ship for the current location. Also removes the ship actorType's value from the player's gold."
+    },
+    {
+      "name": "resetachievements",
+      "officialDescription": "Resets all Horizon's Gate achievements for the current player's Steam account."
+    },
+    {
+      "name": "resetAllTileReactTimers",
+      "officialDescription": "Sets the lastTimeReacted and delayTime to 0 for every tile in the current zone."
+    },
+    {
+      "name": "resetFleetAI",
+      "officialDescription": "Resets the current travel path for every AI fleet."
+    },
+    {
+      "name": "resetfog",
+      "officialDescription": "sets entire zone's fog of war to unknown",
+      "consoleCommand": true
+    },
+    {
+      "name": "resetlocation",
+      "officialDescription": "Resets location ID 'sValue' or all ports/locations to their default data if not specified.",
+      "consoleCommand": true
+    },
+    {
+      "name": "resetlocations",
+      "officialDescription": "Resets all ports/locations to their default data."
+    },
+    {
+      "name": "resetLocations",
+      "officialDescription": "clears all data about the specified Location and reloads them from defaultLocations.txt (ex: resetloc port1)"
+    },
+    {
+      "name": "resetPCDialogWindowSizeY",
+      "officialDescription": "Sets the player's dialog window height to default (200)."
+    },
+    {
+      "name": "resetprocgen",
+      "officialDescription": "Recreates all procedurally generated groves in the overworld."
+    },
+    {
+      "name": "resetwaypoints",
+      "officialDescription": "re-initializes waypoints for the current zone.",
+      "consoleCommand": true
+    },
+    {
+      "name": "resize",
+      "officialDescription": "Must be used as a taskString. Changes the game window's size to floats[0] pixels by floats[1] pixels."
+    },
+    {
+      "name": "retro",
+      "officialDescription": "toggles Retro Visuals mode",
+      "consoleCommand": true
+    },
+    {
+      "name": "returnMissingPartyMembers",
+      "officialDescription": "Adds any partyActors that fell off of a cliff or drowned back to the player's current party."
+    },
+    {
+      "name": "returnPath",
+      "officialDescription": "Travel trigger that is set by 'travel_setReturnPath'."
+    },
+    {
+      "name": "revive",
+      "officialDescription": "Revives triggering actor, or actor 'sValue', by fValue.",
+      "consoleCommand": true
+    },
+    {
+      "name": "reviveall",
+      "officialDescription": "Revives all incapacitated actors in the current zone except any actors whose ID is set in strings[], then fully heals them."
+    },
+    {
+      "name": "royalJobDialogOptions",
+      "officialDescription": "Sets up the dialogNode ID 'sValue' and its dialogOptions for the current royal quest, set in globalVar 'royalQuestType'."
+    },
+    {
+      "name": "safe",
+      "officialDescription": "When in this trigger, ZoneManager.I.safe is true. Safe is used by the AI."
+    },
+    {
+      "name": "sanitizecheck",
+      "officialDescription": "shows what the provided string would look like when formatted for formula checks.",
+      "consoleCommand": true
+    },
+    {
+      "name": "sanitizeGlobalVar",
+      "officialDescription": "Removes all characters that appear in sValue2 from the gVar set in sValue. If b1, only KEEPS characters that appear in sValue2 instead. Comparisons are case-insensitive. If sValue2 is blank or unset, runs the standard sanitize on it (spaces, periods, commas, math operators and colons), which also sets it to all lower case."
+    },
+    {
+      "name": "save",
+      "officialDescription": "Saves to Globals.AUTOSAVE_NAME, and notifies player. Saves to slot sValue if specified (or unused variant if save sValue already exists)."
+    },
+    {
+      "name": "scaleCameraTo",
+      "officialDescription": "Sets camera target scale to fValue, scaling at speed X/10. If speed=0 or less, sets scale instantly."
+    },
+    {
+      "name": "scaleSpecialZone",
+      "officialDescription": "Scale specialZone to sValue scale at fValue speed."
+    },
+    {
+      "name": "scoreScreen",
+      "officialDescription": "Brings up score screen, converts consumables into cash."
+    },
+    {
+      "name": "scoreScreenResponse",
+      "officialDescription": "DO NOT USE."
+    },
+    {
+      "name": "screenDarkWaveEffect",
+      "officialDescription": "Sets zone's darkness wave frequency to fValue."
+    },
+    {
+      "name": "screenpic",
+      "officialDescription": "displays screenshot forever. Can be given X Y to specify TC to screenshot at. Can be given a palette to paletteOverride the result. (ex: screenpic 20 20 p62)",
+      "consoleCommand": true
+    },
+    {
+      "name": "screenscale",
+      "officialDescription": "Sets the forcedScreenScale game option to 'fValue'. Set it to -1 to disable it."
+    },
+    {
+      "name": "screenshot",
+      "officialDescription": "saves a .png on desktop of the screen. Can be given X Y to specify TC to screenshot at. Can be given a palette to paletteOverride the result. (ex: screenshot 20 20 p62)",
+      "consoleCommand": true
+    },
+    {
+      "name": "screenWaveEffect",
+      "officialDescription": "Sets zone wave frequency to fValue."
+    },
+    {
+      "name": "script",
+      "officialDescription": "Executes sValue.lua."
+    },
+    {
+      "name": "sendAISignal",
+      "officialDescription": "Sends signal 'sValue' to all actors within 'fValue' of X,Y (or triggering actor pos, or camera)."
+    },
+    {
+      "name": "set",
+      "officialDescription": "sets a global variable to # (ex: set rescuedShroom 1)",
+      "consoleCommand": true
+    },
+    {
+      "name": "setActor_partSpritesThatTakePriorityOverClass",
+      "officialDescription": "Sets actor 'sValue's partSpritesThatTakePriorityOverClass to 'sValue2' (ex: 'torso, armR, shoulderR')"
+    },
+    {
+      "name": "setActorAI",
+      "officialDescription": "Sets actor 'sValue's lua ai script to 'sValue2'. If bValue1, run the ai script once."
+    },
+    {
+      "name": "setActorAIActions",
+      "officialDescription": "Sets actor 'sValue's queuedAiActions to 'sValue2' (ex: action1, action2, ...)."
+    },
+    {
+      "name": "setActorArmorPalette",
+      "officialDescription": "Sets actor 'sValue's armorPalette to 'sValue2'. If sValue2 is set to 'defaultPalette', actorType.armorPalette is used. If sValue2 is 'currentArmorPalette', the equipped armor palette is used."
+    },
+    {
+      "name": "setActorBodyPartSprite",
+      "officialDescription": "Sets the sprite for actor 'sValue's bodyPart set in 'sValue2'. sValue2 needs to be in the format 'bodyPartID, spriteSheet'. If the 'spriteSheet' part of sValue2 is 'defaultSprite', actorType.defaultBodyPartSprites for the bodyPart is used. If it is 'randomSprite', a random sprite for the bodyPart from actorType.bodyPartSprites is used."
+    },
+    {
+      "name": "setActorBool",
+      "officialDescription": "Sets actor 'sValue's bool property 'sValue2' to bValue1."
+    },
+    {
+      "name": "setActorClothPalette",
+      "officialDescription": "Sets actor 'sValue's clothPalette to 'sValue2'. If sValue2 is 'defaultPalette', actorType.clothPalette is used. If sValue2 is 'randomPalette', a random selectable player palette is chosen. If sValue2 is 'playerPalette', the player's current clothPalette is used."
+    },
+    {
+      "name": "setActorCombatLabel",
+      "officialDescription": "Sets actor 'sValue's combatLabel to 'sValue2'."
+    },
+    {
+      "name": "setActorCombatLabel_color",
+      "officialDescription": "Sets actor 'sValue's combatLabel_color to 'sValue2'. If sValue2 is 'enemyFleet', 'playerFleet', 'assistFleet' or 'assistFleet_hostile', that set global Color is used."
+    },
+    {
+      "name": "setActorCombatMusicOverride",
+      "officialDescription": "Sets actor 'sValue's combatMusicOverride to 'sValue2'."
+    },
+    {
+      "name": "setActorCombatTeam",
+      "officialDescription": "Sets actor 'sValue's combatTeam to 'sValue2'. If 'sValue2' is 'defaultCombatTeam', actorType.defaultCombatTeam is used."
+    },
+    {
+      "name": "setActorDialogNodeID",
+      "officialDescription": "Sets actor 'sValue's dialogNodeID to  'sValue2'."
+    },
+    {
+      "name": "setActorFaction",
+      "officialDescription": "Sets actor 'sValue's faction to 'sValue2'. If 'sValue2' is 'defaultFaction', actorType.defaultFaction is used. Can't change to/from 'player' faction."
+    },
+    {
+      "name": "setActorFloat",
+      "officialDescription": "Sets actor 'sValue's float property 'sValue2' to 'fValue'."
+    },
+    {
+      "name": "setActorID",
+      "officialDescription": "Sets actor 'sValue's ID to 'sValue2'. If bValue1 is true, forces a unique ID based on sValue2. Cant change an ID to/from 'player'."
+    },
+    {
+      "name": "setActorIdleAnimOverride",
+      "officialDescription": "Sets actor 'sValue's idleAnimOverride to  'sValue2'."
+    },
+    {
+      "name": "setActorMovementType",
+      "officialDescription": "Sets actor 'sValue's movementType to 'sValue2'. If sValue2 is set to 'defaultMovementType', actorType.movementType is used."
+    },
+    {
+      "name": "setActorName",
+      "officialDescription": "Sets actor 'sValue's name to 'sValue2'."
+    },
+    {
+      "name": "setActorPalettes",
+      "officialDescription": "Sets actor 'sValue's palettes to 'sValue2'."
+    },
+    {
+      "name": "setActorSkinPalette",
+      "officialDescription": "Sets actor 'sValue's skinPalette to 'sValue2'. If sValue2 is 'defaultPalette', actorType.skinPalette is used. If sValue2 is 'randomPalette', a random palette from actorType.skinPalettes is used."
+    },
+    {
+      "name": "setActorSprite",
+      "officialDescription": "Sets actor 'sValue's sprite to 'sValue2'. If 'sValue2' is 'defaultSprite', actorType.defaultSprite is used."
+    },
+    {
+      "name": "setActorUnarmoredPalette",
+      "officialDescription": "Sets actor 'sValue's unarmoredPalette to 'sValue2'. Updates armorPalette if no armor is equipped."
+    },
+    {
+      "name": "setAI_idle",
+      "officialDescription": "Sets the ai_lua script for the currentActorTalkingTo (or current task actor if not in dialog) to 'idle'."
+    },
+    {
+      "name": "setAI_idle_flag",
+      "officialDescription": "Sets the ai_lua script for the currentActorTalkingTo (or current task actor if not in dialog) to 'idle_flag'."
+    },
+    {
+      "name": "setAsDialogNode",
+      "officialDescription": "Sets the dialogNodeID for the currentActorTalkingTo (or current task actor if not in dialog) to 'sValue', or the currentDialogNode if unset."
+    },
+    {
+      "name": "setBP",
+      "officialDescription": "set [BodyStructure]'s [BodyPart] origin position to [X][Y]. (ex: setBP human armL 3 4",
+      "consoleCommand": true
+    },
+    {
+      "name": "setBPC",
+      "officialDescription": "set [BodyStructure]'s [BodyPart] connection position, of the player actor's facingRot, to [X][Y]. (ex: setBPC human armL 3 4",
+      "consoleCommand": true
+    },
+    {
+      "name": "setBuyPriceMult",
+      "officialDescription": "Sets Globals.buyPriceMult to 'fValue'. Item prices are multiplied by this. Reset to 1 before and after dialog mode."
+    },
+    {
+      "name": "setCombatUIVisible",
+      "officialDescription": "Sets the turn order window and combat commands window visibility to bValue1. Also hides quickslots and character stats windows if bValue1 is false."
+    },
+    {
+      "name": "setCurrentActor_partSpritesThatTakePriorityOverClass",
+      "officialDescription": "Sets 'partSpritesThatTakePriorityOverClass' of the current player leader to sValue1 (ex: 'torso, armR, shoulderR')"
+    },
+    {
+      "name": "setDefaultNodeIf",
+      "officialDescription": "Sets the dialogNodeID for the currentActorTalkingTo (or current task actor if not in dialog) to 'sValue' if the formula in 'svalue2' passes."
+    },
+    {
+      "name": "setDialogSpeed",
+      "officialDescription": "Sets the dialogSpeedMult game option to 'fValue'."
+    },
+    {
+      "name": "setDialogWindowSizeYAuto",
+      "officialDescription": "Sets the dialog window height based on the text in the current dialogNode statements text if it overflows the default height."
+    },
+    {
+      "name": "setFaceSprite",
+      "officialDescription": "Sets the 'face' bodyPart sprite for the currentActorTalkingTo (or current task actor if not in dialog) to 'sValue'."
+    },
+    {
+      "name": "setFactionAI",
+      "officialDescription": "Sets AI script of all actors of 'sValue' faction to 'sValue2'."
+    },
+    {
+      "name": "setFactionHostile",
+      "officialDescription": "Sets all actors of 'sValue' faction to hostile if fValue =1+. Otherwise sets faction nonhostile. If xValue != -1, clears dialogNode."
+    },
+    {
+      "name": "setFog",
+      "officialDescription": "Sets the fogOfWar known state of all tiles in a square radius of 'fValue' from X,Y to bValue1."
+    },
+    {
+      "name": "setGlobalVar",
+      "officialDescription": "Sets globalVar sValue to fValue (or sValue2 if specified)."
+    },
+    {
+      "name": "setGlobalVar_math",
+      "officialDescription": "Sets globalVar sValue to Formula in sValue2. Decimals will be truncated. If b1, decimals won't be truncated."
+    },
+    {
+      "name": "setGlobalVar_toActorAugmentItemTypeInArmor",
+      "officialDescription": "Sets gVar 'sValue' to the itemType ID of the augmented item in slot 'fValue' of the armor of the actor whose ID is 'sValue2'. If sValue2 is unset, tries to use the actorID of the current task. The gVar will be blank if no item is found in the armor augment slot."
+    },
+    {
+      "name": "setGlobalVar_toActorAugmentItemTypeInMainWeapon",
+      "officialDescription": "Sets gVar 'sValue' to the itemType ID of the augmented item in slot 'fValue' of the main hand weapon of the actor whose ID is 'sValue2'. If sValue2 is unset, tries to use the actorID of the current task. The gVar will be blank if no item is found in the main hand weapon augment slot."
+    },
+    {
+      "name": "setGlobalVar_toActorAugmentItemTypeInOffhandWeapon",
+      "officialDescription": "Sets gVar 'sValue' to the itemType ID of the augmented item in slot 'fValue' of the offhand weapon of the actor whose ID is 'sValue2'. If sValue2 is unset, tries to use the actorID of the current task. The gVar will be blank if no item is found in the offhand weapon augment slot."
+    },
+    {
+      "name": "setGlobalVar_toActorClassID",
+      "officialDescription": "Sets gVar 'sValue' to the actorClass ID in slot 'fValue' (0 = primary, 1 = secondary, 2 = third, 3 = fourth) of the actor whose ID is 'sValue2'. If sValue2 is blank or not set, will try to use the current Task actorID."
+    },
+    {
+      "name": "setGlobalVar_toActorID",
+      "officialDescription": "Sets globalVar sValue to ID of the Actor that executed the trigger."
+    },
+    {
+      "name": "setGlobalVar_toActorItemTypeInSlot",
+      "officialDescription": "Sets gVar 'sValue' to the itemType ID of the item in slot 'fValue' of the inventory of the actor whose ID is 'sValue2'. If sValue2 is unset, tries to use the actorID of the current task. The gVar will be blank if no item is found in the slot."
+    },
+    {
+      "name": "setGlobalVar_toActorMostUsedActionID",
+      "officialDescription": "Sets the gVar in sValue to the action ID of the 'fValue'-th most-used action of the player actor whose ID is 'sValue2'. fValue = 0 would be most used, 1 would be second most used, etc. If b1, only selects actions that are part of an actor class. If b2, only selects actions NOT part of an actor class."
+    },
+    {
+      "name": "setGlobalVar_toActorSupportAbilityID",
+      "officialDescription": "Sets gVar 'sValue' to the currently equipped supportAbility ID in slot 'fValue' (0, 1 or 2) of the actor whose ID is 'sValue2'. If sValue2 is blank or not set, will try to use the current Task actorID."
+    },
+    {
+      "name": "setGlobalVar_toActorTypeID",
+      "officialDescription": "Sets gVar 'sValue' to the actorTypeID of the actor whose ID is 'sValue2'. If sValue2 is blank or not set, will try to use the current Task actorID."
+    },
+    {
+      "name": "setGlobalVar_toClassIDThatHasActionID",
+      "officialDescription": "Sets gVar 'sValue' to the 'fValue'-th (starting at 0) actorClass ID that has an action whose ID is 'sValue2' in its actions list."
+    },
+    {
+      "name": "setGlobalVar_toClassIDThatHasSupportAbilityID",
+      "officialDescription": "Sets gVar 'sValue' to the 'fValue'-th (starting at 0) actorClass ID that has a supportAbility whose ID is 'sValue2' in its supportAbilities list."
+    },
+    {
+      "name": "setGlobalVar_toCrewActorID",
+      "officialDescription": "Sets gVar 'sValue' to the ID of the crew Actor in the 'fValue'-th slot (starting at 0) of the ship Actor specified in 'sValue2'."
+    },
+    {
+      "name": "setGlobalVar_toFleetCargoItemIDSlot",
+      "officialDescription": "Sets gVar 'sValue' to the itemType ID of the item in slot 'fValue' of the cargo belonging to the fleet identified by 'sValue2'. sValue2 can be the ID of the commodore of the fleet, or the ID of a ship within the fleet, or the key word 'enemyFleet' or 'assistFleet' for fleets the player is currently in combat with."
+    },
+    {
+      "name": "setGlobalVar_toFleetCommodoreID",
+      "officialDescription": "Sets gVar 'sValue' to the ID of the commodore of the fleet identified by 'sValue2'. sValue2 should be the ID of a ship within the fleet, or the key word 'enemyFleet' or 'assistFleet' for fleets the player is currently in combat with. If the fleet doesn't have a commodore, the gVar is set to a blank string."
+    },
+    {
+      "name": "setGlobalVar_toFleetShipID",
+      "officialDescription": "Sets gVar 'sValue' to the ship actor ID in slot 'fValue' of the fleet identified by 'sValue2'. sValue2 can be the ID of the commodore of the fleet, or the ID of a ship within the fleet, or the key word 'enemyFleet' or 'assistFleet' for fleets the player is currently in combat with."
+    },
+    {
+      "name": "setGlobalVar_toItemTypeIDAtTile",
+      "officialDescription": "Sets gVar 'sValue' to the itemType ID of the first non-invisible item found at tile X,Y with a quantity more than or equal to 'fValue' (defaults to 1 if 0). If 'sValue2' is set, it should be a 'property,value' that the item's itemType property needs to also match. If b1, 'property,value' needs to NOT match. If b2, will only match invisible itemTypes instead."
+    },
+    {
+      "name": "setGlobalVar_toItemTypeIDAtTileWithSpecialProp",
+      "officialDescription": "Sets gVar 'sValue' to the itemType ID of the first item found at tile X,Y with a quantity more than or equal to 'fValue' (defaults to 1 if 0) that has all specialPropertys set in 'sValue2' as a 'comma,separated,list'. An example sValue2 would be 'sprite2xWidth,cannotBePickedUp,animated'. If b1, sValue2 is the list of specialPropertys the itemType must NOT have any of."
+    },
+    {
+      "name": "setGlobalVar_toJournalGoalVar",
+      "officialDescription": "Sets gVar 'sValue' to the gVar name for the first journal 'goal#' gVar that matches 'sValue2', or a blank string if that journal goal doesn't exist. If b1, will set the gVar in sValue to the 'goal#Done' gVar name instead. The journal goal gVars will be stripped of spaces and special chars when checked against sValue2. The check will be done in a case-insensitive manner."
+    },
+    {
+      "name": "setGlobalVar_toJournalNote",
+      "officialDescription": "Sets gVar 'sValue' to the 'fValue'-th (starting at 0) journal Notes entry string."
+    },
+    {
+      "name": "setGlobalVar_toLocationCargoItemIDSlot",
+      "officialDescription": "Sets gVar 'sValue' to the itemType ID of a cargo item in slot 'fValue' of a location's cargo inventory. 'sValue2' is the ID of the location. If ID is not set, uses current location instead. If there is no item in the slot specified or the location hasn't been visited yet, an empty string is set."
+    },
+    {
+      "name": "setGlobalVar_toLocationFactionID",
+      "officialDescription": "Sets gVar 'sValue' to the currently favored faction ID of a location. 'sValue2' is the ID of the location. If ID is not set, uses current location instead. Sets an empty string if the location is neutral or not a port."
+    },
+    {
+      "name": "setGlobalVar_toLocationShipIDSlot",
+      "officialDescription": "Sets gVar 'sValue' to the actorType ID of a ship in slot 'fValue' of a location's shipwright_boatTypes list. 'sValue2' is the ID of the location. If ID is not set, uses current location instead. If there is no item in the slot specified, an empty string is set."
+    },
+    {
+      "name": "setGlobalVar_toLocationStashItemIDSlot",
+      "officialDescription": "Sets gVar 'sValue' to the itemType ID of a stash item in slot 'fValue' of a location's item inventory. 'sValue2' is the ID of the location. If ID is not set, uses current location instead. If there is no item in the slot specified or the location hasn't been visited yet, an empty string is set."
+    },
+    {
+      "name": "setGlobalVar_toNearestLocID",
+      "officialDescription": "Sets the nearest discoverable non-port location's ID within fValue radius of X,Y in the overworld zone set in sValue2 (defaults to eral if not set) to the gVar set in sValue. If X,Y is unset, will use player's X,Y. You can specify tags the location needs to contain in comma,separated,values after the overworld in sValue2 (eg, sValue2 = eral,grove). If b1, will also check locations that can't be discovered. If b2, locations must NOT have any of the tags set."
+    },
+    {
+      "name": "setGlobalVar_toNearestPortID",
+      "officialDescription": "Sets the nearest discoverable port location's ID within fValue radius of X,Y in the overworld zone set in sValue2 (defaults to eral if not set) to the gVar set in sValue. If X,Y is unset, will use player's X,Y. You can specify tags the location needs to contain in comma,separated,values after the overworld in sValue2 (eg, sValue2 = eral,hidden). If b1, will also check locations that can't be discovered. If b2, locations must NOT have any of the tags set."
+    },
+    {
+      "name": "setGlobalVar_toNearestRandomLocID",
+      "officialDescription": "Sets a random discoverable non-port location's ID that is within fValue radius of X,Y and in the overworld zone set in sValue2 (defaults to eral if not set) to the gVar set in sValue. If X,Y is unset, will use player's X,Y. You can specify tags the location needs to contain in comma,separated,values after the overworld in sValue2 (eg, sValue2 = eral,grove). If b1, will also check locations that can't be discovered. If b2, locations must NOT have any of the tags set."
+    },
+    {
+      "name": "setGlobalVar_toNearestRandomPortID",
+      "officialDescription": "Sets a random discoverable port location's ID that is within fValue radius of X,Y and in the overworld zone set in sValue2 (defaults to eral if not set) to the gVar set in sValue. If X,Y is unset, will use player's X,Y. You can specify tags the location needs to contain in comma,separated,values after the overworld in sValue2 (eg, sValue2 = eral,hidden). If b1, will also check locations that can't be discovered. If b2, locations must NOT have any of the tags set."
+    },
+    {
+      "name": "setGlobalVar_toOtherGlobalVar",
+      "officialDescription": "Sets globalVar sValue to globalVar sValue2."
+    },
+    {
+      "name": "setGlobalVar_toPartyActorID",
+      "officialDescription": "Sets globalVar sValue to ID of partyActor[fValue]."
+    },
+    {
+      "name": "setGlobalVar_toPartyActorTypeID",
+      "officialDescription": "Sets gVar 'sValue' to the actorTypeID of the current player party actor in slot 'fValue'."
+    },
+    {
+      "name": "setGlobalVar_toRandomActorTypeName",
+      "officialDescription": "Sets gVar 'sValue' to a random name from the randomNames property of the actorType with the ID set in 'sValue2'. If sValue2 is blank or not set, will try to use the current Task actorID's actorTypeID."
+    },
+    {
+      "name": "setGlobalVar_toTriggerAliasID",
+      "officialDescription": "Sets gVar 'sValue' to the aliasID of the trigger in the current zone that has 'fValue' as its numID. If fValue is negative, sets gVar to the currently executing trigger aliasID, if there is one. Sets a blank string if the trigger doesn't have an aliasID set or isn't found."
+    },
+    {
+      "name": "setGlobalVar_toTriggerNumID",
+      "officialDescription": "Sets gVar 'sValue' to the numID of the trigger in the current zone that has an aliasID matching 'sValue2'. If fValue is negative or sValue2 is blank, sets gVar to the currently executing trigger numID, if there is one. Result is -1 if no triggers found."
+    },
+    {
+      "name": "setGlobalVar_toTriggerNumIDSearch",
+      "officialDescription": "Sets gVar 'sValue' to the numID of the 'fValue'-th (starting at 0) active trigger at X,Y, or the entire current zone if X,Y is not set, that matches a check set in 'sValue2'. If b1 is false, the check is for if the fReq of the trigger matches sValue2. If b1 is true, the check is for if the effectID in sValue2 is used in any trigger effect. If b2, only checks disabled triggers. Result is -1 if no triggers found."
+    },
+    {
+      "name": "setGlobalVarPlusLocID",
+      "officialDescription": "Sets the globalVar with the ID of 'sValue' + the current location's ID to 'fValue'."
+    },
+    {
+      "name": "setGlobalVarPlusLocID_math",
+      "officialDescription": "Sets the globalVar with the ID of 'sValue' + the current location's ID to the result of the formula set in sValue2."
+    },
+    {
+      "name": "setGlobalVarPlusZoneID",
+      "officialDescription": "Sets the globalVar with the ID of 'sValue' + the current zone's ID to 'fValue'."
+    },
+    {
+      "name": "setGlobalVarTo_mouseOverWindow",
+      "officialDescription": "Sets gVar 'sValue' to the ID of the window the mouse is currently hovering over, or a blank string if hovering over none."
+    },
+    {
+      "name": "setGlobalVarTo_mousePointingAt",
+      "officialDescription": "Sets gVar 'sValue' to the itemTypeID of the item the player currently has their mouse over in the current zone. If b1, sets it to the Actor ID currently hovering over, if any. If b2, sets it to the terrainTypeID being hovered over. If b1 and b2, b1 takes priority. Sets a blank string if hovering over nothing."
+    },
+    {
+      "name": "setGlobalVarTo0",
+      "officialDescription": "Sets globalVar 'sValue' to 0."
+    },
+    {
+      "name": "setGlobalVarToActionProperty",
+      "officialDescription": "Sets gVar 'sValue' to a loaded acton's property, set in sValue2 as 'actionID,property'."
+    },
+    {
+      "name": "setGlobalVarToActorClassProperty",
+      "officialDescription": "Sets gVar 'sValue' to a loaded actorClass property, set in sValue2 as 'actorClassID,property'."
+    },
+    {
+      "name": "setGlobalVarToActorProperty",
+      "officialDescription": "Sets gVar 'sValue' to an actor's property, set in sValue2 as 'actorID,property'."
+    },
+    {
+      "name": "setGlobalVarToActorTypeProperty",
+      "officialDescription": "Sets gVar 'sValue' to a loaded actorType property, set in sValue2 as 'actorTypeID,property'. If 'actorTypeID' is the ID of an actor in the zone, their actorTypeID is used."
+    },
+    {
+      "name": "setGlobalVarToFactionProperty",
+      "officialDescription": "Sets gVar 'sValue' to a loaded faction's property, set in sValue2 as 'factionID,property'."
+    },
+    {
+      "name": "setGlobalVarToItemTypeProperty",
+      "officialDescription": "Sets gVar 'sValue' to a loaded itemType property, set in sValue2 as 'itemTypeID,property'."
+    },
+    {
+      "name": "setGlobalVarToLocationProperty",
+      "officialDescription": "Sets gVar 'sValue' to a loaded location property, set in sValue2 as 'locationID,property'."
+    },
+    {
+      "name": "setGlobalVarToLocID",
+      "officialDescription": "Sets globalVar 'sValue' to the ID of the current location. Doesn't get set if not in a location."
+    },
+    {
+      "name": "setGlobalVarToPartyActorNum",
+      "officialDescription": "Sets globalVar 'sValue' to 'fValue'."
+    },
+    {
+      "name": "setGlobalVarToPlayerFleetShipProperty",
+      "officialDescription": "Sets the gVar in sValue to the actor property specified in sValue2, of the player fleet's ship actor in slot fValue. If b1, the property is pulled from the actor's actorType instead of the actor."
+    },
+    {
+      "name": "setGlobalVarToSupportAbilityProperty",
+      "officialDescription": "Sets gVar 'sValue' to a loaded supportAbility property, set in sValue2 as 'supportAbilityID,property'."
+    },
+    {
+      "name": "setGlobalVarToTalkerID",
+      "officialDescription": "Must be used as a dialog specialEffect. Sets the globalVar 'strings[0]' to the currentActorTalkingTo's ID."
+    },
+    {
+      "name": "setGlobalVarToTerrainTypeProperty",
+      "officialDescription": "Sets gVar 'sValue' to a loaded terrainType property, set in sValue2 as 'terrainTypeID,property'."
+    },
+    {
+      "name": "setGlobalVarToTriggerProperty",
+      "officialDescription": "Sets gVar 'sValue' to the property 'sValue2' of a trigger in the current zone whose numID is 'fValue'. If sValue2 is 'aliasID,property', then it will instead set the property from the global trigger whose 'aliasID' matches, even if fValue is set. If fValue is negative, gets the property from the currently executing trigger, if it exists. Result is an empty string if no trigger was found."
+    },
+    {
+      "name": "setGlobalVarToZoneProperty",
+      "officialDescription": "Sets globalVar 'sValue' to the string representation of the current zone's property, set in sValue2."
+    },
+    {
+      "name": "setGlobalVarWithCommas",
+      "officialDescription": "Sets globalVar strings[0] to the remaining combined strings[] values, joined with commas between each."
+    },
+    {
+      "name": "setGlobalVarWithTalkerID",
+      "officialDescription": "Must be used as a dialog specialEffect. Sets globalVar 'sValue' + the currentActorTalkingTo's ID to the string set in sValue2, or 'fValue' if not set."
+    },
+    {
+      "name": "setJournalNote",
+      "officialDescription": "Sets journal Notes entry 'fValue' (starting at 0) to 'sValue' string."
+    },
+    {
+      "name": "setk",
+      "officialDescription": "sets kill count to # (ex: set antiair 1)",
+      "consoleCommand": true
+    },
+    {
+      "name": "setLocationLocation",
+      "officialDescription": "Sets a location's zoneThisLocationIsIn to 'sValue' if specified. If X/Y aren't -1, sets the location's xy to them. 'sValue2' is the ID of the location. If ID is not set, uses current location instead. If sValue is blank, zoneThisLocationIsIn isn't changed. If X/Y are -1, xy isn't changed. Any locationItems will be moved to the new location with their same offsets."
+    },
+    {
+      "name": "setLocDiscoverable",
+      "officialDescription": "Sets a location's discoverable bool to true. 'sValue' is the ID of the location. If ID is not set, uses current location instead. If 'sValue2' is set, it will be the new formula for the location's discoverable_fReq. If b1 is set and the player is in zoneThisLocationIsIn, will set discovered to true and unbury the location."
+    },
+    {
+      "name": "setLocEnterable",
+      "officialDescription": "Sets a location's enterable bool to b1. 'sValue' is the ID of the location. If ID is not set, uses current location instead."
+    },
+    {
+      "name": "setLocMinimapIcon",
+      "officialDescription": "Sets the minimapIcon of a location to 'sValue'. If a location's minimapIcon is not set, or is blank, and the location is a port, the icon of the faction controlling the port is used. 'sValue2' is the ID of the location. If ID is not set, uses current location instead."
+    },
+    {
+      "name": "setLocName",
+      "officialDescription": "Sets a location's name to 'sValue'. 'sValue2' is the ID of the location. If ID is not set, uses current location instead."
+    },
+    {
+      "name": "setLocPort",
+      "officialDescription": "Sets a location's port bool to b1. 'sValue' is the ID of the location. If ID is not set, uses current location instead."
+    },
+    {
+      "name": "setLocTravelPoint",
+      "officialDescription": "Sets a location's enterOnTravelPointNum to fValue. Defaults to 0 if negative. 'sValue' is the ID of the location. If ID is not set, uses current location instead."
+    },
+    {
+      "name": "setLocUndiscoverable",
+      "officialDescription": "Sets a location's discovered and discoverable bool to false. 'sValue' is the ID of the location. If ID is not set, uses current location instead. If b1 is set, will set the location's discoverable_fReq formula to '1' (which is default)."
+    },
+    {
+      "name": "setLocZoneID",
+      "officialDescription": "Sets a location's zoneID to 'sValue'. 'sValue2' is the ID of the location. If ID is not set, uses current location instead. Keep in mind that changing a location's zoneID while the player is in it might make it unable to be left, if unaccounted for."
+    },
+    {
+      "name": "setMainMenuUIVisible",
+      "officialDescription": "DO NOT USE. Sets the main menu visibility to b1. If b2, force-draws main menu BG and UIManager windows."
+    },
+    {
+      "name": "setMoney",
+      "officialDescription": "Sets current money to fValue, or formula sValue."
+    },
+    {
+      "name": "setNodeIDGlobalVar_1",
+      "officialDescription": "Must be used in dialog. Sets the globalVar with the same ID as the currentDialogNodeID to 1."
+    },
+    {
+      "name": "setOnlyNPCDialogWindowSizeY",
+      "officialDescription": "Sets the dialog window height to 'fValue'. If unset in a dialog specialEffect, or set to 0, sets the size to default (200)."
+    },
+    {
+      "name": "setPartyActorAsVendor",
+      "officialDescription": "Must be used as a taskString. Removes the party actor in slot floats[0] and places them on travelPoint floats[1], then switches their dialogNodeID to strings[0]."
+    },
+    {
+      "name": "setPCDialogWindowSizeY",
+      "officialDescription": "Sets the dialog options window height to 'fValue'. If unset in a dialog specialEffect, or set to 0, sets the size to default (200)."
+    },
+    {
+      "name": "setPrevFacingRot",
+      "officialDescription": "Sets the talkerPreviousFacingRot to the current rotation of the currentActorTalkingTo (or current task actor if not in dialog). If sValue is set, it should be the rotation to set it to instead. If sValue isn't set, but fValue is > 0, it will be set to that rotation instead (360 == 0). The talkerPreviousFacingRot is the rotation the currentActorTalkingTo will be set to once dialog finishes."
+    },
+    {
+      "name": "setRoofDrawNoMatterWhat",
+      "officialDescription": "Sets camera.drawRoofsNoMatterWhat to bValue1."
+    },
+    {
+      "name": "setSpecialInfoTC",
+      "officialDescription": "Sets the specialInfoTC of any valid items that have the ID of 'sValue' (or all items if none set) at tile X,Y to a new specialInfoTC set in 'sValue2' as 'X,Y'. If b1, the specialInfoTC is offset by the X,Y rather than set to it. If b2, 'sValue' is a specialProperty to check for instead of ID."
+    },
+    {
+      "name": "setTerrainType_spriteOffsetModulo",
+      "officialDescription": "Sets the spriteXOffsetModulo and spriteYOffsetModulo of terrainType 'sValue' to X and Y."
+    },
+    {
+      "name": "setTerrainType_spriteOffsetMult",
+      "officialDescription": "Sets the spriteXOffsetMult and spriteYOffsetMult of terrainType 'sValue' to X and Y."
+    },
+    {
+      "name": "setTerrainTypes_spriteOffsetModulo",
+      "officialDescription": "Sets the spriteXOffsetModulo and spriteYOffsetModulo of any terrainTypes whose ID starts with 'sValue', to X and Y."
+    },
+    {
+      "name": "setTileTerrain",
+      "officialDescription": "Sets tile at X,Y to 'sValue' terrainTypeID. If bValue1, shows terrain change FX."
+    },
+    {
+      "name": "setTileTerrainArea",
+      "officialDescription": "Sets tiles in a rectangle to 'sValue' terrainTypeID, starting at the top left of X,Y through to the bottom right set in sValue2 as 'X,Y'. fValue adds a delay between each tile change. If bValue1, shows terrain change FX. If bValue2, reverses order of tiles changed."
+    },
+    {
+      "name": "setupBuyShipDialog",
+      "officialDescription": "Sets up the dialogOptions for dialogNode 'sValue' for purchasing ships from the current location, based on its set shipwright_boatTypes list."
+    },
+    {
+      "name": "setupCafeFoodDialogOptionsWealth100",
+      "officialDescription": "Sets up the dialogOptions for dialogNode 'sValue' used to set the current supply port's cafe food."
+    },
+    {
+      "name": "setupFleetLooting",
+      "officialDescription": "Sets up the current enemyFleet's cargo inventory to also contain any assist fleet cargo and any items left on player ships, for use with 'lootFleet_afterCombat' task after fleet combat."
+    },
+    {
+      "name": "setupGraveyard",
+      "officialDescription": "DO NOT USE."
+    },
+    {
+      "name": "setupLocationAsPlayerPort",
+      "officialDescription": "Sets the current location as a player-owned port. This also adds ships, items, and spawnData to the location's lists."
+    },
+    {
+      "name": "setupPartyFromGVars",
+      "officialDescription": "Must be used as a taskString. Sets the player's current party to consist of actors with IDs specified in each strings[] entry as a globalVar, which could also be the slot number of the the actor in the current partyActors list. An example: setupPartyFromGVars,gVar1,gVar2,gVar3,aFourthGVar,andSoOn"
+    },
+    {
+      "name": "setZoneBG",
+      "officialDescription": "Set zone BG; sValue = terrainType."
+    },
+    {
+      "name": "setZoneBGFX",
+      "officialDescription": "Sets zone bgFXID to 'sValue'."
+    },
+    {
+      "name": "setZoneBoolProperty",
+      "officialDescription": "Sets the bool-type property of the current zone, specified in 'sValue', to the bool set by 'b1'."
+    },
+    {
+      "name": "setZoneDarknessToWorldDarkness",
+      "officialDescription": "Sets the current zone's darknessColor based on the time of day. If b1, also change camera's darknessColor."
+    },
+    {
+      "name": "setZoneFloatProperty",
+      "officialDescription": "Sets the float-type property of the current zone, specified in 'sValue', to the float set in 'fValue'."
+    },
+    {
+      "name": "setZonePalettes",
+      "officialDescription": "Sets 'sValue' zone palette to 'sValue2'. If 'sValue' is blank, sets all palettes."
+    },
+    {
+      "name": "setZonePeaceful",
+      "officialDescription": "Set zone.peaceful true if bValue1. False otherwise."
+    },
+    {
+      "name": "setZoneRollingPinStyle",
+      "officialDescription": "Sets the current zone's rollingPinStyle to bValue1."
+    },
+    {
+      "name": "setZoneSongs",
+      "officialDescription": "Sets zone travel song to 'sValue' &combat song to sValue2 at 'fValue' pitch. If X is set, volume = X/100. Y = combatSongDelay. If bValue1, force assign travelSong even if blank. Same for bValue2 & combat."
+    },
+    {
+      "name": "setZoneStringProperty",
+      "officialDescription": "Sets the string-type property of the current zone, specified in 'sValue', to the string set in 'sValue2'."
+    },
+    {
+      "name": "sfx",
+      "officialDescription": "Play unlooped sound FX 'sValue' at volume 1, pitch 0."
+    },
+    {
+      "name": "showCharstats",
+      "officialDescription": "Unhides the character stats window, if it was hidden."
+    },
+    {
+      "name": "showEscFactionWindow",
+      "officialDescription": "Shows just the faction part of the escMenu and sets nextDialogNode_hideWindow = true."
+    },
+    {
+      "name": "showFleetInfo",
+      "officialDescription": "Sets up the dialogOptions for dialogNode 'sValue' for selecting ships to inspect when inspecting the fleet the currentActorTalkingTo belongs to."
+    },
+    {
+      "name": "showQuickslots",
+      "officialDescription": "Unhides character stats and quickslots."
+    },
+    {
+      "name": "sp",
+      "officialDescription": "show list of all saved setPieces. Returns results that start w/ given param. (ex: sp puzzle)",
+      "consoleCommand": true
+    },
+    {
+      "name": "spawn",
+      "officialDescription": "Creates SpawnData 'sValue'. (Executes 'spawn_actorPrefab' instead if sValue matches an actorPrefab ID.) 'sValue2' is the groupID. Groups won't spawn if actors of groupID already exist. NOTE: group spawns in random spots IN TRIGGER AREA, unless X,Y specified. fValue = group power level mod. bValue1 = group face toward trigger area center."
+    },
+    {
+      "name": "spawn_actorPrefab",
+      "officialDescription": "Creates actorPrefab 'sValue'at X,Y. 'sValue2' specifies an animation to use when spawning. fValue = facingRot. bValue1 = use actorPrefab ID exactly (instead of zone-specific actorID)."
+    },
+    {
+      "name": "spawn_actorPrefab_point",
+      "officialDescription": "As 'spawn_actorPrefab', except X specifies what travelPoint to use, and Y specifies which set of travelPoints to use (0 red, 1 blue, 2 green, 3 brown)."
+    },
+    {
+      "name": "spawn_actorPrefab_point_specialZone",
+      "officialDescription": "PROBABLY DO NOT USE. Adds a copy of actorPrefab 'sValue' to the current specialZone, on the xValue'th travelPoint of travelPoint set yValue."
+    },
+    {
+      "name": "spawn_corpse",
+      "officialDescription": "Spawns a random corpse from partyActors_corpse either at XY or in the centermost occupiable tile in the trigger area."
+    },
+    {
+      "name": "spawn_fleet",
+      "officialDescription": "Spawns a battle fleet in the current zone using spawnData 'sValue' at TC X,Y with the commodoreID set in sValue2. fValue sets the fleetPowerLevelMod. If b1, is a merchant fleet instead. If b2, is elite."
+    },
+    {
+      "name": "spawn_g",
+      "officialDescription": "Same as 'spawn', but sValue is a globalVar to use as the spawnData."
+    },
+    {
+      "name": "spawn_g_nearPlayer",
+      "officialDescription": "Same as 'spawn', but sValue is a globalVar to use as the spawnData, and the group is placed near the player. If b2, group is placed roughly 3 tiles behind the player."
+    },
+    {
+      "name": "spawn_location",
+      "officialDescription": "Spawns actorPrefabs from the current location's auto_spawnDataID list, up the a maximum based on the current wealthLevel. Places them on the first unoccupied travelPoint set B item."
+    },
+    {
+      "name": "spawn_onItem",
+      "officialDescription": "Creates SpawnData 'sValue' actors on items with 'sValue2' specialProperty. fValue = group power level mod. If bValue1, can spawn even if group is already extant. Actors look at XY if specified."
+    },
+    {
+      "name": "spawn_seamonster",
+      "officialDescription": "Spawns a sea monster using spawnData 'sValue'. fValue specifies the desiredPowerLevel. If sValue is an empty string, finds the closest monsterBeacon item and uses 'sm' + its quantity as the spawnData ID."
+    },
+    {
+      "name": "spawnItem",
+      "officialDescription": "Adds 'fValue' num of item 'sValue' ID to X,Y (or random spot in trigger area if unspecified) and plays 'sValue2' fx if specified. If sValue is not an item type, checks globalVar for an ID. If bValue1, force item to fit. If bValue2, XY refers to a travelpoint (#X, set Y)."
+    },
+    {
+      "name": "specialKeyStatusUpdate",
+      "officialDescription": "DO NOT USE."
+    },
+    {
+      "name": "specialSpawn",
+      "officialDescription": "Applies specialSpawn 'sValue' to the zone."
+    },
+    {
+      "name": "speechFX",
+      "officialDescription": "Plays the set fxSpeech FX for the actorType of the currentActorTalkingTo (or current task actor if not in dialog)."
+    },
+    {
+      "name": "startCombatAIActing",
+      "officialDescription": "DO NOT USE. Technically does nothing."
+    },
+    {
+      "name": "stealloc",
+      "officialDescription": "Converts all port locations in the overworld that can be converted to the player's current faction, as set in globalVar 'playerFaction'."
+    },
+    {
+      "name": "stopCombatAIActing",
+      "officialDescription": "If in combat and it's not a player actor's turn, this ends the current AI actor's turn and resets its calculated action plan."
+    },
+    {
+      "name": "storeBoost",
+      "officialDescription": "Sets playerActor_storedBoost to true, which will reapply the speed boost the player's ship may have had before being interrupted by a dialog."
+    },
+    {
+      "name": "subtract10000gp",
+      "officialDescription": "Subtracts 10,000 from the player's gold."
+    },
+    {
+      "name": "subtract1000gp",
+      "officialDescription": "Subtracts 1,000 from the player's gold."
+    },
+    {
+      "name": "subtract100gp",
+      "officialDescription": "Subtracts 100 from the player's gold."
+    },
+    {
+      "name": "subtract10gp",
+      "officialDescription": "Subtracts 10 from the player's gold."
+    },
+    {
+      "name": "subtract130gp",
+      "officialDescription": "Subtracts 130 from the player's gold."
+    },
+    {
+      "name": "subtract150gp",
+      "officialDescription": "Subtracts 150 from the player's gold."
+    },
+    {
+      "name": "subtract200gp",
+      "officialDescription": "Subtracts 200 from the player's gold."
+    },
+    {
+      "name": "subtract20gp",
+      "officialDescription": "Subtracts 20 from the player's gold."
+    },
+    {
+      "name": "subtract250gp",
+      "officialDescription": "Subtracts 250 from the player's gold."
+    },
+    {
+      "name": "subtract300gp",
+      "officialDescription": "Subtracts 300 from the player's gold."
+    },
+    {
+      "name": "subtract30gp",
+      "officialDescription": "Subtracts 30 from the player's gold."
+    },
+    {
+      "name": "subtract350gp",
+      "officialDescription": "Subtracts 350 from the player's gold."
+    },
+    {
+      "name": "subtract400gp",
+      "officialDescription": "Subtracts 400 from the player's gold."
+    },
+    {
+      "name": "subtract40gp",
+      "officialDescription": "Subtracts 40 from the player's gold."
+    },
+    {
+      "name": "subtract5000gp",
+      "officialDescription": "Subtracts 5,000 from the player's gold."
+    },
+    {
+      "name": "subtract500gp",
+      "officialDescription": "Subtracts 500 from the player's gold."
+    },
+    {
+      "name": "subtract50gp",
+      "officialDescription": "Subtracts 50 from the player's gold."
+    },
+    {
+      "name": "subtract60gp",
+      "officialDescription": "Subtracts 60 from the player's gold."
+    },
+    {
+      "name": "subtract75gp",
+      "officialDescription": "Subtracts 75 from the player's gold."
+    },
+    {
+      "name": "subtract800gp",
+      "officialDescription": "Subtracts 800 from the player's gold."
+    },
+    {
+      "name": "subtractAllgp",
+      "officialDescription": "Sets the player's gold to 0."
+    },
+    {
+      "name": "subtractBribeAmount",
+      "officialDescription": "DO NOT USE. Subtracts the bribe amount used for auto dialog from the player's gold."
+    },
+    {
+      "name": "subtractgp",
+      "officialDescription": "Removes 'fValue' gold from the player. If 'sValue' is set, it should be a formula, with the result of that formula being the amount to remove."
+    },
+    {
+      "name": "swapIconForLocationID",
+      "officialDescription": "Changes an icon from a location's tooltipIcons list to another icon, specified in sValue as 'oldIcon, newIcon'. 'sValue2' is the ID of the location. If ID is not set, uses current location instead. If b1, 'newIcon' will be added to list even if 'oldIcon' doesn't exist."
+    },
+    {
+      "name": "talk",
+      "officialDescription": "Enter dialog with actor 'sValue'. 'sValue2' specifies dialogNode if assigned. If bValue1, dialog is centered on speaker. If bValue2, makes dialog fullscreen."
+    },
+    {
+      "name": "talkToCommodore",
+      "officialDescription": "Enter dialog with the commodore of the fleet the currentActorTalkingTo (or current task actor if not in dialog) is part of, using the currentDialogNodeID."
+    },
+    {
+      "name": "talkToFirstMate",
+      "officialDescription": "Enter dialog with the actor ID set in globalVar 'firstmate', using the currentDialogNodeID."
+    },
+    {
+      "name": "talkToFlagship",
+      "officialDescription": "Enter dialog with the actor that is the flagship of the fleet the currentActorTalkingTo (or current task actor if not in dialog) is part of."
+    },
+    {
+      "name": "talkToOtherActor",
+      "officialDescription": "Enters dialog with the other actor that is currently on the same tile as the currentActorTalkingTo (or current task actor if not in dialog)."
+    },
+    {
+      "name": "task",
+      "officialDescription": "execute a task set as a comma-separated string in 'sValue'"
+    },
+    {
+      "name": "task_gvar",
+      "officialDescription": "execute a comma-separated task as defined by global variable 'sValue'"
+    },
+    {
+      "name": "tc",
+      "officialDescription": "toggles being able to enter combat",
+      "consoleCommand": true
+    },
+    {
+      "name": "tcui",
+      "officialDescription": "toggles combat ui",
+      "consoleCommand": true
+    },
+    {
+      "name": "tdm",
+      "officialDescription": "toggles damage numbers",
+      "consoleCommand": true
+    },
+    {
+      "name": "test",
+      "officialDescription": "DO NOT USE."
+    },
+    {
+      "name": "testboatanim",
+      "officialDescription": "DO NOT USE."
+    },
+    {
+      "name": "testitemload",
+      "officialDescription": "puts 1 item on every tile. Default ID: toyboat.",
+      "consoleCommand": true
+    },
+    {
+      "name": "testskillcost",
+      "officialDescription": "DO NOT USE."
+    },
+    {
+      "name": "testzones",
+      "officialDescription": "DO NOT USE. Travels to all, or floats[1] number of zones found in the ZoneData folder floats[0] times, with a delay of 1.5 seconds per zone change."
+    },
+    {
+      "name": "textOverlay",
+      "officialDescription": "Sets sValue as overlaid text. If sValue = '', clears overlaid text. fValue (0-255) is the alpha of the black behind the overlay. xValue & yValue offset the text. If bValue1, centers text Xpos. Bvalue2, Ypos."
+    },
+    {
+      "name": "textOverlay_dynamic",
+      "officialDescription": "Same as 'textOverlay', except reveals text dynamically."
+    },
+    {
+      "name": "textOverlay_tween",
+      "officialDescription": "Tweens in sValue as overlaid text. If sValue = '', tweens out. fValue (0-255) is the alpha of the black behind the overlay. xValue & yValue offset the text."
+    },
+    {
+      "name": "tfl",
+      "officialDescription": "toggles 60 fps limit",
+      "consoleCommand": true
+    },
+    {
+      "name": "time",
+      "officialDescription": "advance world time by # hours (does not consume food or affect morale).",
+      "consoleCommand": true
+    },
+    {
+      "name": "timeSpeed",
+      "officialDescription": "Sets the game speed to fValue."
+    },
+    {
+      "name": "tm",
+      "officialDescription": "toggles menus & many other elements",
+      "consoleCommand": true
+    },
+    {
+      "name": "tMapTest",
+      "officialDescription": "DO NOT USE."
+    },
+    {
+      "name": "togglePause",
+      "officialDescription": "Toggles pause of all actors and actions."
+    },
+    {
+      "name": "tq",
+      "officialDescription": "toggles quickslots & charstats",
+      "consoleCommand": true
+    },
+    {
+      "name": "travel",
+      "officialDescription": "Travel-friendly trigger moves party to 'sValue' zone at X,Y. fValue = party facingRot. Autosaves unless bValue1=true"
+    },
+    {
+      "name": "travel_g",
+      "officialDescription": "Travel to the zone name stored in globalVar 'lastProcZoneEntry'."
+    },
+    {
+      "name": "travel_gVars",
+      "officialDescription": "Travel to zone gVar 'playerPrevZone' at XY 'playerX', 'playerY'. fValue = facingRot."
+    },
+    {
+      "name": "travel_leaveLocation",
+      "officialDescription": "Moves party to where the current Location is. IMPORTANT: XY determines pos offset from that Location. If !bValue1, XY of -1,-1 is treated as 0,0."
+    },
+    {
+      "name": "travel_noSave",
+      "officialDescription": "DO NOT USE. Use 'travel' task instead."
+    },
+    {
+      "name": "travel_point",
+      "officialDescription": "Travel-friendly trigger moves party to 'sValue' zone at point fValue. If bValue1, don't autosave. If bValue2, acts as if entered via console (doesn't roll loot tables, etc)."
+    },
+    {
+      "name": "travel_point_g",
+      "officialDescription": "As travel_point, but goes to zoneID of globalVar 'sValue'."
+    },
+    {
+      "name": "travel_procedural",
+      "officialDescription": "Travel-friendly trigger moves party to new procedural world made from levelData 'sValue', which leads to 'sValue2'. If bValue1, there is no way back. If XY set a specific returnXY. bValue2 uses trigger area as returnXY. If sValue2 matches a globalTriggerID the exit executes that trigger instead of a travel trigger. If sValue2 has 2 values (EX: z1, z2) the 2nd one is the zone entered from."
+    },
+    {
+      "name": "travel_procedural_point",
+      "officialDescription": "As 'travel_procedural', but fValue specifies a travelPoint to place the party on."
+    },
+    {
+      "name": "travel_setReturnPath",
+      "officialDescription": "Like 'travel', but sets the closest 'returnPath' trigger in the next zone to go back to this zone. If bValue, sets returnTC to the btm mid of the trigger area."
+    },
+    {
+      "name": "trigger",
+      "officialDescription": "Executes trigger of sValue aliasID (including globalTriggers), or of IDnum fValue. sValue2 is an additional fReq. If bValue1, then execute regardless of the trigger's fReq/Once-only. If bValue2, can't rerun a Once-Only trigger."
+    },
+    {
+      "name": "triggerEffect",
+      "officialDescription": "DO NOT USE."
+    },
+    {
+      "name": "tryDialog",
+      "officialDescription": "Checks for any dialogOverrides for nodeID sValue."
+    },
+    {
+      "name": "tryDialog_commodore",
+      "officialDescription": "DO NOT USE. Used specifically for dialog with an enemyFleet during fleet combat."
+    },
+    {
+      "name": "trySetAchievement",
+      "officialDescription": "Attempts to set Steam achievement sValue."
+    },
+    {
+      "name": "tt",
+      "officialDescription": "toggles tooltips",
+      "consoleCommand": true
+    },
+    {
+      "name": "tw",
+      "officialDescription": "toggles wires",
+      "consoleCommand": true
+    },
+    {
+      "name": "UIPartInputCommand",
+      "officialDescription": "Calls handleUIPartInput_command(string0, string1, float0, string2, float1)"
+    },
+    {
+      "name": "unlearnJournalEntry",
+      "officialDescription": "Removes the journalEntry ID in sValue from the known journals and reported journals list. If b1, doesn't remove from reported journal list."
+    },
+    {
+      "name": "unlockExtras",
+      "officialDescription": "Sets extra races and extra options to be unlocked and saves the config.ini file."
+    },
+    {
+      "name": "unlockGem",
+      "officialDescription": "DO NOT USE."
+    },
+    {
+      "name": "unlockHelpGem",
+      "officialDescription": "Unlocks use of the Help Gem and recharges it."
+    },
+    {
+      "name": "uploadmod",
+      "officialDescription": "DO NOT USE. Uploads a new mod using the mod folder 'sValue'."
+    },
+    {
+      "name": "weather",
+      "officialDescription": "sets weather (none, rain, snow, storm)",
+      "consoleCommand": true
+    },
+    {
+      "name": "win",
+      "officialDescription": "win the current combat",
+      "consoleCommand": true
+    },
+    {
+      "name": "wind",
+      "officialDescription": "sets the wind direction to # degrees (0 = East)",
+      "consoleCommand": true
+    },
+    {
+      "name": "world",
+      "officialDescription": "DO NOT USE."
+    },
+    {
+      "name": "xp",
+      "officialDescription": "add # XP in current class",
+      "consoleCommand": true
+    },
+    {
+      "name": "xpcosts",
+      "officialDescription": "lists total XP required to master each class (not including passives)",
+      "consoleCommand": true
+    },
+    {
+      "name": "z",
+      "officialDescription": "show list of all saved zones. Returns results that start w/ given param. (ex: z house)",
+      "consoleCommand": true
+    }
+  ]
+}

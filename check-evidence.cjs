@@ -327,9 +327,6 @@ function coverFormula(entry, key, ctx) {
     if (!Array.isArray(use.arguments)) {
       fail(`'${key}' use ${useIndex}: 'arguments' must be an array`);
     } else {
-      if (entry.isFunctionStyle === true && use.arguments.length > 0) {
-        fail(`'${key}' use ${useIndex}: marked function-style but declares ${use.arguments.length} argument(s)`);
-      }
       for (const arg of use.arguments) {
         if (!isNonEmptyString(arg.name)) {
           fail(`'${key}' use ${useIndex}: an argument is missing a string 'name'`);
@@ -534,6 +531,25 @@ function coverGlobalVars(entry, key, ctx) {
 }
 
 /**
+ * The review log is `out/errors.md` (raw intake) plus everything triaged out of
+ * it into `out/review/`. A name accounted for by a note is accounted for
+ * wherever that note currently lives.
+ */
+function readReviewLog() {
+  const paths = [path.join(__dirname, 'out', 'errors.md')];
+  const reviewDir = path.join(__dirname, 'out', 'review');
+  if (fs.existsSync(reviewDir)) {
+    for (const name of fs.readdirSync(reviewDir)) {
+      if (name.endsWith('.md')) paths.push(path.join(reviewDir, name));
+    }
+  }
+  return paths
+    .filter(p => fs.existsSync(p))
+    .map(p => fs.readFileSync(p, 'utf8'))
+    .join('\n');
+}
+
+/**
  * End-of-run checks for the globalvars job: every name on the worklist is
  * accounted for, and every cross-link resolves. Neither holds mid-run, which is
  * why they sit behind --complete.
@@ -557,8 +573,7 @@ function completeGlobalVars(entries, fail) {
     fail(`globalvars: out/globalvars.worklist.md is missing, so completeness cannot be checked`);
     return;
   }
-  const errorsPath = path.join(__dirname, 'out', 'errors.md');
-  const reviewLog = fs.existsSync(errorsPath) ? fs.readFileSync(errorsPath, 'utf8') : '';
+  const reviewLog = readReviewLog();
 
   const worklist = fs
     .readFileSync(worklistPath, 'utf8')

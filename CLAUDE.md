@@ -145,11 +145,21 @@ Browser application code (compiled to `public/app.bundle.js`):
 ### Build Tools
 - **extract_schema.cjs** - Extracts schema from C# source code in `/home/rcfox/code/hg/Tactics/`
 - **build-bundle.js** - Creates browser bundles using esbuild (validator.bundle.js and app.bundle.js)
+- **build-data.cjs** - Builds the reference data under `/src` from an extraction run's JSONL, unifying every job on `{ gameVersion, <collection>[] }`: `tasks`, `operators`, `tags`, `globalTriggers`, `globalVars`. Reads `src/<name>.jsonl` when present, otherwise normalises the existing `src/<name>.json` in place, so a partial re-extraction still leaves every file in the same shape. Bump `GAME_VERSION` at the top of the script when the decompiled source moves to a new build.
+  - `npm run build:data` - every job
+  - `node build-data.cjs tasks formula` - named jobs only
+  - `node build-data.cjs --check` - report what would change, write nothing
+  - Fields merged in after extraction (`officialDescription`, `consoleCommand` on tasks) come from a generated sidecar - `src/task-descriptions.json`, built by `extract-task-descriptions.cjs` - and from nowhere else, so a stale value cannot outlive the thing it described. A missing sidecar is an error rather than a silent omission. Review-only fields (`sourceLine` on global triggers) are dropped.
+- **extract-task-descriptions.cjs** - Extracts the game's own task documentation from `taskDescriptions.Add(...)` and `consoleCommandDescriptions.Add(...)` in `Tactics/Data.cs` into `src/task-descriptions.json`, which `build-data.cjs` merges onto the tasks as `officialDescription` and `consoleCommand`. Keys are resolved through task aliases, so a description written against an alias lands on the canonical entry.
+  - A task documented in **both** tables with different text is a hard error - the task form and the console form describe different behaviour, and choosing silently would hide one. Pass `--prefer=task` or `--prefer=console` to resolve, or reconcile the source. Identical text in both tables is treated as a duplicate.
+  - As of 1.6.06 three tasks conflict (`revive`, `heal`, `clearactors`); the file is currently generated with `--prefer=task`, matching what the earlier hand-merge used.
+  - `--check` reports without writing.
 - **check-evidence.cjs** - Verifies each extraction job's `src/*.jsonl` against its citation sidecar `out/*.evidence.jsonl`: every cited line must exist and contain its snippet verbatim; every claim the job's schema requires must have a supporting record; no record may support a claim that does not exist; and every input `type` must be a known primitive, named resource, job-specific type, or class/enum from `mod-schema.json`. Jobs with no data file are skipped. Run after an extraction run.
   - `node check-evidence.cjs` - every job that has output
   - `node check-evidence.cjs tasks formula` - named jobs only
   - `node check-evidence.cjs --complete` - also run the end-of-run checks (globalvars worklist coverage, `related` cross-links), which only hold once a run has finished
   - `node check-evidence.cjs --vocabulary` - print the vocabularies the run derived, to see what a schema re-extraction changed
+  - The globalvars completeness check treats a worklist name as accounted for if it is mentioned in `out/errors.md` or in any `out/review/*.md`, so triaging notes out of the intake log does not break it.
   - Trigger flags, trigger effect fields, element values and ID spaces are derived from `mod-schema.json`, and the formula context vocabulary from `Formula.calculate`'s signature, so they follow a game version update. The primitive/resource type names and the globalvars shape, lifetime and category taxonomies are fixed in the script and mirror tables in `prompts/` - edit both together.
 
 ## Key Features

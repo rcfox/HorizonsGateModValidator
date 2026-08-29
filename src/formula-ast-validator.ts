@@ -277,7 +277,8 @@ function validateParameterType(
       break;
 
     case 'formula':
-      // Formula type - any valid formula is acceptable
+      // A formula-typed argument is a trailing sub-formula body, which is
+      // validated where the body is handled rather than here.
       break;
 
     default:
@@ -366,6 +367,7 @@ function validateFunctionArg(
         break;
 
       case 'string':
+      case 'mathOperator':
         // For m: operators (and their aliases), or operators that delegate to m:,
         // check if m:value exists as an operator
         const canonicalOperatorName = resolveOperatorAlias(operatorName);
@@ -480,41 +482,41 @@ function validateFunctionArg(
     const operator = specificOperator || (baseOperatorName ? operatorMap.get(baseOperatorName) : undefined);
 
     if (operator) {
-      const firstUse = operator.uses[0];
-      if (!firstUse) {
+      if (!operator.uses[0]) {
         throw new Error(`Operator ${operator.name} somehow has zero uses.`);
       }
-      // Find the use case with the most arguments (includes parameters)
+
+      // Find the use case with the most arguments; the parenthesized value is an
+      // optional argument, so the fullest use is the one that describes it.
       const useWithParams = operator.uses.reduce(
         (max, use) => (use.arguments && use.arguments.length > (max.arguments?.length || 0) ? use : max),
-        firstUse
+        operator.uses[0]
       );
 
-      // The parameters correspond to arguments after the first one (for d:) or all arguments (for m:functionName)
+      // The parameters correspond to arguments after the first one (for d: and m:,
+      // whose first argument is the colon-separated name) or all of them.
       const paramArguments = specificOperator
-        ? useWithParams.arguments || [] // For m:distance, all arguments are parameters
-        : useWithParams.arguments?.slice(1) || []; // For d:, skip formulaName
+        ? useWithParams.arguments || []
+        : useWithParams.arguments?.slice(1) || [];
 
       if (paramArguments.length > 0) {
-        // Validate each parameter against its expected type
-        // Check if this operator is 'd' or delegates to 'd' for 'x' parameter support
+        // 'x' is only carried into a shared formula by d:, and only where the
+        // enclosing formula has an x of its own to pass on.
         const isDOperator = canonicalBaseOperatorName === 'd' || argDelegatesTo === 'd';
 
         arg.params.forEach((param, i) => {
           const expectedParamArg = paramArguments[i];
           if (expectedParamArg) {
-            // Check if the parameter is a literal that matches the expected type
             errors.push(
               ...validateParameterType(
                 param,
                 expectedParamArg,
-                specificOperatorName,
+                specificOperatorName ?? operator.name,
                 `${path}.params[${i}]`,
                 allowXParameter && isDOperator
               )
             );
           }
-          // Also recursively validate the parameter's structure
           errors.push(...validateAST(param, `${path}.params[${i}]`, allowXParameter));
         });
       } else {

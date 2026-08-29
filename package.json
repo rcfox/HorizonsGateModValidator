@@ -16,6 +16,8 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
+    "build:data": "node build-data.cjs",
+    "extract:descriptions": "node extract-task-descriptions.cjs",
     "check:evidence": "node check-evidence.cjs"
   },
   "keywords": [

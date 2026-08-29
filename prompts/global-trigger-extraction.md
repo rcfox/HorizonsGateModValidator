@@ -76,8 +76,8 @@ expect those fields to apply.
 # Where to look up effect behaviour
 
 For each `effectID`, the implementation lives in `./Tactics/Task.cs` under the
-`executeTask` switch on `TaskType` (or the parallel switch in `executeTask_old`).
-Read the case body and write the effect's description from it.
+`executeTask` switch on `TaskType`. Read the case body and write the effect's
+description from it.
 
 * If the `effectID` matches no `TaskType`, check the legacy
   `executeTriggerEffect_old` switch in `./Tactics/TriggerEffect.cs`. Note in the
@@ -249,7 +249,7 @@ Entries go into `./mod-validator/src/globalTriggers.jsonl`:
 | `flags` | when any differs | Object of flag name to non-default boolean. Omit entirely when all are default. |
 | `effects` | always | Ordered as in source. Empty `[]` only for a trigger that is a pure extension hook; say so in `summary` and note it in the review log. |
 | `effects[].effectID` | always | Task name, comma-separated task string, or a `_loop_` sentinel. May be empty for a no-op placeholder. |
-| `effects[].<parameter>` | when non-default | Any field of a trigger effect — see Effect parameters below. Omit any field at its default. |
+| `effects[].<parameter>` | when non-default | Any field of a trigger effect — see the Effect parameters section above. Omit any field at its default. |
 | `effects[].description` | always | 1-2 sentences in game terms, grounded in the task's case body. |
 | `notes` | optional | Caveats, runtime mutations, alias-ID mismatches. |
 | `sourceLine` | always | Line in `Data.cs` of this trigger's `globalTriggers.Add(...)` call. |

@@ -66,13 +66,24 @@ of the operand.
 
 ## Function-style vs operator-style
 
-An operator is function-style (`"isFunctionStyle": true`) when it takes no
-`:`-separated arguments — the whole operand is just the operator name, as in
-`m:evasionFacing`, `rank` or `x`. An operator that requires at least one argument
-is not function-style: `lessThan:50:c:HP`, `c:HP`, `geo:fire`.
+`isFunctionStyle` says **where an operator's arguments are written**, not whether
+it has any.
 
-An operator with only optional arguments is not function-style; the field
-describes what the operator accepts, not what a particular call supplied.
+* `"isFunctionStyle": true` — arguments go in parentheses after the name:
+  `m:tileDistance(3)`, `m:numAlliesWithin(2)`. An operator with no arguments at
+  all is also function-style, since that is the syntax it would use if it had
+  one: `m:evasionFacing`, `rank`, `x`.
+* `"isFunctionStyle": false` — arguments are the `:`-separated segments:
+  `lessThan:50:c:HP`, `c:HP`, `geo:fire`.
+
+The validator enforces this both ways: parentheses on a colon-style operator and
+colons on a function-style one are both reported as wrong syntax, so getting the
+flag wrong makes correct mod text fail to validate.
+
+`d` and `m` are the mixed case and the validator special-cases them: they are
+called with colons, but the value they pass on is written in parentheses attached
+to their first argument — `d:scalingDmg(5)`, `m:rand(100)`. Record them with
+`"isFunctionStyle": false`.
 
 ## The `m:` prefix
 
@@ -134,17 +145,35 @@ The dispatch roots `d` and `m` themselves do **not** get a `delegatesTo` field �
 they are the targets, not delegators. Operators that delegate to neither omit the
 field entirely.
 
-## The parameterized form
+# The parenthesized argument
 
 Inside `evaluateGlobalFormula` and `evaluateMath`, the body checks whether the
-argument contains `(` and parses a parenthesized parameter: an integer literal,
-the identifier `x`, or a sub-formula. This is a distinct input shape from the
-bare form and is recorded as a **separate use case** on `d` and on `m` — one use
-with just the ID argument, and a second with that argument followed by the
-parameter.
+argument contains `(` and parses what is in the brackets: an integer literal, the
+identifier `x` (`d` only), or a sub-formula.
 
-Delegators inherit the parameterized form through their `delegatesTo` link, so do
-not give them duplicate parameterized use cases of their own.
+**This is an ordinary argument.** Record it in the use's `arguments` array like
+any other; `isFunctionStyle` is what says it is written in parentheses rather
+than after a colon. Do not invent a separate field for it.
+
+It is **optional**: an operator that reads one still runs without it, and the
+value it works from is then zero. Mark it `"optional": true` and say in its
+description what the operator does when it is left out. One use case with an
+optional argument, not two use cases — the presence of a bracketed value is the
+ordinary optional-argument shape, not a different input shape.
+
+## Never type it `formula`
+
+The type `formula` has a specific meaning in this data: it marks the trailing
+sub-formula that an operator consumes to the end of the operand, as in
+`lessThan:50:c:HP`. The validator reads it that way — an operator with a
+formula-typed argument is one that accepts a trailing body.
+
+A parenthesized argument is not a trailing body, so typing it `formula` tells the
+validator that `d:someFormula:3` is valid usage. It is not: the engine reads only
+the first segment and silently ignores anything after it.
+
+Type the parenthesized argument by the literal it takes — `integer` or `float` —
+and note in its description that a sub-formula may be written there too.
 
 # Examples
 
@@ -193,6 +222,27 @@ Entries go into `./mod-validator/src/formula.jsonl`:
     }
   ],
   "aliases": []
+}
+{
+  "name": "m:tileDistance",
+  "isFunctionStyle": true,
+  "uses": [
+    {
+      "description": "Returns how many tiles lie between caster and target, or a 1/0 answer when a threshold is written in brackets.",
+      "returns": "float",
+      "example": "m:tileDistance(4)",
+      "arguments": [
+        {
+          "name": "threshold",
+          "type": "integer",
+          "description": "A distance to compare against; the operand is 1 when the target is at least this far away. Left out, the raw distance is returned.",
+          "optional": true
+        }
+      ],
+      "context": ["caster", "target"]
+    }
+  ],
+  "aliases": ["m:distance", "m:tiledistance"]
 }
 {
   "name": "m:evasionFacing",

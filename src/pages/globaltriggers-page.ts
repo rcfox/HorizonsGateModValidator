@@ -48,7 +48,13 @@ interface GlobalTrigger {
 
 const EFFECTS_OPEN_BY_DEFAULT_LIMIT = 5;
 
-const globalTriggersData = rawGlobalTriggersData as GlobalTrigger[];
+interface GlobalTriggersData {
+  gameVersion: string;
+  globalTriggers: GlobalTrigger[];
+}
+
+const globalTriggersFile = rawGlobalTriggersData as GlobalTriggersData;
+const globalTriggersData = globalTriggersFile.globalTriggers;
 
 export function initGlobaltriggersApp(): void {
   if (!document.getElementById('globaltriggersList')) return;
@@ -84,7 +90,7 @@ export function initGlobaltriggersApp(): void {
 
   const versionElement = document.getElementById('triggerVersion');
   if (versionElement) {
-    versionElement.textContent = `${sortedTriggers.length} triggers documented`;
+    versionElement.textContent = `Up to date for v${globalTriggersFile.gameVersion}`;
   }
 
   // Deep linking via ?trigger=...

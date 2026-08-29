@@ -391,6 +391,7 @@ export interface DynamicTextTag extends DynamicTextEntry {
  * Root structure of dynamic-text.json
  */
 export interface DynamicTextData {
+  gameVersion: string;
   tags: DynamicTextTag[];
 }
 
