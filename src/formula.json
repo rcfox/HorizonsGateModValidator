@@ -5210,7 +5210,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Gives how many world hours have passed since a global variable was last given a value. Twenty-four hours make a day. A variable that has never been set gives the whole time elapsed since the game began, since its assignment time reads as zero.",
+          "description": "Gives how many world hours have passed since a global variable was last given a value. Twenty-four hours make a day. Returns 0 if the variable has never been set.",
           "returns": "float",
           "example": "gTimeSince:lastVisitedPort",
           "arguments": [
