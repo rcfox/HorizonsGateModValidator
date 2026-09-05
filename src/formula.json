@@ -4140,7 +4140,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Gives the target's overall damage multiplier against an element, found by multiplying together the multipliers of every element reaction the target has that responds to it. A target with no reaction to that element gives 1, and so does an operand evaluated with no target at all, which makes it safe to multiply straight into a damage formula. Resistances pull the figure below 1 and weaknesses push it above.",
+          "description": "Gives the target's overall damage multiplier against an element, found by multiplying together the multipliers of every element reaction the target has that responds to it. A target with no reaction to that element gives 1, and so does an operand evaluated with no target at all, which makes it safe to multiply straight into a damage formula. Resistances pull the figure below 1 and weaknesses push it above. This counts element multipliers to damage or actor values applied with a harmful magnitude (damageMultiplier), but not element multipliers to healing or actor values applied with a beneficial magnitude (healMultiplier).",
           "returns": "float",
           "example": "ERxn:fire",
           "arguments": [
@@ -4165,7 +4165,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Adds up the flat damage adjustments from every element reaction the target has that responds to a given element. Each adjustment is worked out from its own formula and rounded down before being added. Unlike the multiplier reading, an absent target or a target with no such reaction gives 0, so this is meant to be added to a damage figure rather than multiplied into it.",
+          "description": "Adds up the flat damage adjustments from every element reaction the target has that responds to a given element. Each adjustment is worked out from its own formula and rounded down before being added. Unlike the multiplier reading, an absent target or a target with no such reaction gives 0, so this is meant to be added to a damage figure rather than multiplied into it. This counts element modifiers to damage or actor values applied with a harmful magnitude (damageMod), but not element modifiers to healing or actor values applied with a beneficial magnitude (healMod).",
           "returns": "float",
           "example": "rxnMod:fire",
           "arguments": [
@@ -4188,7 +4188,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns 1 when the target is outright immune to an element, otherwise 0. Immunity means the target's reactions to that element multiply out to zero or less, which is how the game expresses taking no damage at all. With no target the operand is 0.",
+          "description": "Returns 1 when the target is outright immune to damage from an element, otherwise 0. Immunity means the target's reactions to damage from that element multiply out to zero or less, which is how the game expresses taking no damage at all. With no target the operand is 0. This counts element multipliers to damage or actor values applied with a harmful magnitude (damageMultiplier), but not element multipliers to healing or actor values applied with a beneficial magnitude (healMultiplier).",
           "returns": "boolean",
           "example": "rxnImmune:fire",
           "arguments": [
@@ -4211,7 +4211,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Gives the caster's overall damage multiplier against an element, found by multiplying together the multipliers of every element reaction the caster has that responds to it. A caster with no reaction to that element gives 1, and so does an operand evaluated with no caster at all. Use it for effects that turn on the attacker's own resistances, such as an ability that draws on what it is immune to.",
+          "description": "Gives the caster's overall damage multiplier against an element, found by multiplying together the multipliers of every element reaction the caster has that responds to it. A caster with no reaction to damage from that element gives 1, and so does an operand evaluated with no caster at all. This counts element multipliers to damage or actor values applied with a harmful magnitude (damageMultiplier), but not element multipliers to healing or actor values applied with a beneficial magnitude (healMultiplier).",
           "returns": "float",
           "example": "rxnC:fire",
           "arguments": [
@@ -4234,7 +4234,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Adds up the flat damage adjustments from every element reaction the caster has that responds to a given element. Each adjustment is worked out from its own formula and rounded down before being added. An absent caster or a caster with no such reaction gives 0.",
+          "description": "Adds up the flat damage adjustments from every element reaction the caster has that responds to a given element. Each adjustment is worked out from its own formula and rounded down before being added. An absent caster or a caster with no such reaction gives 0. This counts element modifiers to damage or actor values applied with a harmful magnitude (damageMod), but not element modifiers to healing or actor values applied with a beneficial magnitude (healMod).",
           "returns": "float",
           "example": "rxnModC:fire",
           "arguments": [
@@ -4257,7 +4257,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Gives the target's overall multiplier against being hit with a particular actor value, found by multiplying together the multipliers of every reaction the target has to that actor value. Where the element-based reading asks about fire or lightning, this one asks about the thing being applied, such as poison or a stun. A target with no such reaction gives 1, and so does an operand evaluated with no target.",
+          "description": "Gives the target's overall multiplier against being hit with a particular actor value, found by multiplying together the multipliers of every reaction the target has to that actor value. Where the element-based reading asks about fire or lightning, this one asks about the thing being applied, such as poison or a stun. A target with no such reaction gives 1, and so does an operand evaluated with no target. This counts multipliers to damage or actor values applied with a harmful magnitude (damageMultiplier), but not multipliers to healing or actor values applied with a beneficial magnitude (healMultiplier).",
           "returns": "float",
           "example": "AVrxn:poison",
           "arguments": [
@@ -4280,7 +4280,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Adds up the flat adjustments from every reaction the target has to a particular actor value being applied to it. Each adjustment is worked out from its own formula and rounded down before being added. An absent target or a target with no such reaction gives 0, so this is meant to be added rather than multiplied.",
+          "description": "Adds up the flat adjustments from every reaction the target has to a particular actor value being applied to it harmfully. Each adjustment is worked out from its own formula and rounded down before being added. An absent target or a target with no such reaction gives 0, so this is meant to be added rather than multiplied. This counts modifiers to damage or actor values applied with a harmful magnitude (damageMod), but not modifiers to healing or actor values applied with a beneficial magnitude (healMod).",
           "returns": "float",
           "example": "AVrxnMod:poison",
           "arguments": [
@@ -4303,7 +4303,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns 1 when the target is outright immune to having a particular actor value applied to it, otherwise 0. Immunity means the target's reactions to that actor value multiply out to zero or less. Use it to ask whether a status such as poison or sleep would take hold at all. With no target the operand is 0.",
+          "description": "Returns 1 when the target is outright immune to having a particular actor value applied to it harmfully, otherwise 0. Immunity means the target's reactions to that actor value multiply out to zero or less when harmful. Use it to ask whether a status such as poison or sleep would take hold at all. With no target the operand is 0. This concerns damage or actor values applied with a harmful magnitude (damageMultiplier), but not healing or actor values applied with a beneficial magnitude (healMultiplier).",
           "returns": "boolean",
           "example": "AVrxnImmune:poison",
           "arguments": [
@@ -4326,7 +4326,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Gives the caster's overall multiplier against being hit with a particular actor value, found by multiplying together the multipliers of every reaction the caster has to that actor value. A caster with no such reaction gives 1, and so does an operand evaluated with no caster. Use it for effects that turn on the attacker's own susceptibility to a status.",
+          "description": "Gives the caster's overall multiplier against being hit with a particular actor value, found by multiplying together the multipliers of every reaction the caster has to that actor value. A caster with no such reaction gives 1, and so does an operand evaluated with no caster. This counts multipliers to damage or actor values applied with a harmful magnitude (damageMultiplier), but not multipliers to healing or actor values applied with a beneficial magnitude (healMultiplier).",
           "returns": "float",
           "example": "AVrxnC:poison",
           "arguments": [
@@ -4349,7 +4349,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Adds up the flat adjustments from every reaction the caster has to a particular actor value being applied to it. Each adjustment is worked out from its own formula and rounded down before being added. An absent caster or a caster with no such reaction gives 0.",
+          "description": "Adds up the flat adjustments from every reaction the caster has to a particular actor value being applied to it harmfully. Each adjustment is worked out from its own formula and rounded down before being added. An absent caster or a caster with no such reaction gives 0. This counts modifiers to damage or actor values applied with a harmful magnitude (damageMod), but not modifiers to healing or actor values applied with a beneficial magnitude (healMod).",
           "returns": "float",
           "example": "AVrxnModC:poison",
           "arguments": [
