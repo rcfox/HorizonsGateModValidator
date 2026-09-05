@@ -9561,7 +9561,7 @@
       "isFunctionStyle": true,
       "uses": [
         {
-          "description": "Gives how long the target's turn takes to come round, reading the countdown on its pending turn if it has one and falling back to its standing act time otherwise. Use it for effects that care about how often a foe gets to act. With no target the operand is 0.",
+          "description": "Gives how many time ticks the target has progressed towards its next turn if it is participating in an ongoing battle, falling back to its total time required to act otherwise. With no target the operand is 0.",
           "returns": "float",
           "example": "m:tActTimer",
           "arguments": [],
@@ -9577,7 +9577,7 @@
       "isFunctionStyle": true,
       "uses": [
         {
-          "description": "Gives how much of the target's wait is still to run before its turn comes round, falling back to its standing act time when it has no pending turn. Unlike the plain reading this counts down as the battle proceeds. With no target the operand is 0.",
+          "description": "Gives how much of the target's wait is still to run before its turn comes round, falling back to its standing act time when it has no pending turn (i.e. is not participating in an ongoing battle). This is equivalent to substracting current m:tActTimer from the target's full actTime stat. With no target the operand is 0.",
           "returns": "float",
           "example": "m:tActTimerLeft",
           "arguments": [],
