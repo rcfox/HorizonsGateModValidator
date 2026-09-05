@@ -6890,7 +6890,7 @@
             {
               "name": "bools[0]",
               "type": "boolean",
-              "description": "When true even actors that are unable to act, locked into a script, witless, or on the other side of a roof are made to look. Defaults to false."
+              "description": "When true even actors that are unable to act, locked into a script, have intelligence = 0, or are on the other side of a roof are made to look. Defaults to false."
             }
           ]
         }
@@ -6917,7 +6917,7 @@
             {
               "name": "bools[0]",
               "type": "boolean",
-              "description": "When true even actors that are unable to act, locked into a script, witless, or on the other side of a roof are made to look. Defaults to false."
+              "description": "When true even actors that are unable to act, locked into a script, have intelligence = 0, or are on the other side of a roof are made to look. Defaults to false."
             }
           ]
         }
