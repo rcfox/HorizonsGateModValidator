@@ -6702,7 +6702,7 @@
             {
               "name": "strings[1]",
               "type": "Actor",
-              "description": "The ID of the actor to serve as the fleet's commodore. Leave it empty for none, but the slot must still be supplied."
+              "description": "The ID of the actor to serve as the fleet's commodore."
             }
           ],
           "optional": [
