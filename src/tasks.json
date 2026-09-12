@@ -6618,7 +6618,7 @@
       "name": "spawn_onItem",
       "uses": [
         {
-          "description": "Spawns a group of actors from a named spawn definition and stands each of them on a tile that holds an item with a chosen special property, which is how spawn markers operate. The group is built to scale with the party's power level and the tiles are picked at random among the marked ones. All of them are made to give experience when defeated, and the spawn definition's own effect plays on each. ",
+          "description": "Spawns a group of actors from a named spawn definition and stands each of them on a tile that holds an item with a chosen special property, which is how spawn markers operate. The group is built to scale with the party's power level and the tiles are picked at random among those of the marked tiles that are occupiable. All of them are made to give experience when defeated, and the spawn definition's own effect plays on each. ",
           "context": [
             "player",
             "zone"
@@ -6634,7 +6634,7 @@
             {
               "name": "strings[1]",
               "type": "ItemType.specialProperty",
-              "description": "The special property a tile's item must carry for actors to be placed there, given by name or by its number. If not found, no actors are placed. If this matches the first point (numbered 0) in any of the four series of travel_point properties (travel_point0, travel_point0B, travel_point0C, travel_point0D), then provided an item with this first property exists in the zone, the list of tiles considered starts with the one closest from (1,1), and extends to each travel point of that series closest from coordinates (1,1) - for instance if the given special property is travel_point0B, the task attempts to spawn from a set of up to 10 tiles gathered from the closest items with properties travel_point0B to travel_point9B."
+              "description": "The special property a tile's item must carry for actors to be placed there, given by name or by its number. Defaults to no property, which typically places at (0,0) and disregards occupiability. If argument is a valid specialProperty but no such item is found, no actors are placed. If this matches the first point (numbered 0) in any of the four series of travel_point properties (travel_point0, travel_point0B, travel_point0C, travel_point0D), then provided an item with this first property exists in the zone, the list of tiles considered starts with the one closest from (1,1), and extends to each travel point of that series closest from coordinates (1,1) - for instance if the given special property is travel_point0B, the task attempts to spawn from a set of up to 10 tiles gathered from the closest items with properties travel_point0B to travel_point9B."
             },
             {
               "name": "floats[0]",
