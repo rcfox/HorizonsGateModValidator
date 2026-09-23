@@ -2333,7 +2333,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns 1 when the weapon in the caster's favoured hand has a given property set to a given value, otherwise 0. Only a real weapon counts: the held item must be of the weapon category and must have an attack of its own, so a shield or a tool gives 0. Properties that hold a list match when the value appears anywhere in the list.",
+          "description": "Returns 1 when the weapon in the caster's favoured hand has a given property set to a given value, otherwise 0. Only an item with itemCategory=weapon and an action defined is considered. Properties that hold a list match when the value appears anywhere in the list.",
           "returns": "boolean",
           "example": "wProp:specialProperty:twoHanded",
           "arguments": [
@@ -2362,7 +2362,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns 1 when the weapon in the caster's off hand has a given property set to a given value, otherwise 0. Only a real weapon counts: the held item must be of the weapon category and must have an attack of its own, so a shield or a tool gives 0. Properties that hold a list match when the value appears anywhere in the list.",
+          "description": "Returns 1 when the weapon in the caster's off hand has a given property set to a given value, otherwise 0. Only an item with itemCategory=weapon and an action defined is considered. Properties that hold a list match when the value appears anywhere in the list.",
           "returns": "boolean",
           "example": "w2Prop:specialProperty:parrying",
           "arguments": [
