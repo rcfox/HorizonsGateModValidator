@@ -12763,7 +12763,7 @@
       "isFunctionStyle": true,
       "uses": [
         {
-          "description": "Rolls a whole number between 0 and the ceiling supplied in brackets after the name, inclusive at both ends. A ceiling below 1 is treated as 1, so the smallest roll is a coin toss between 0 and 1. It rolls afresh every time it is worked out.",
+          "description": "Rolls a random whole number between 0 and the ceiling supplied in brackets after the name, inclusive at both ends. A ceiling below 1 is treated as 1, so the smallest roll is a coin toss between 0 and 1. It rolls afresh every time it is worked out.",
           "returns": "float",
           "example": "m:rand(6)",
           "arguments": [
