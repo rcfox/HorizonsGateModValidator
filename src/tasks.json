@@ -6217,7 +6217,7 @@
       "name": "spawn",
       "uses": [
         {
-          "description": "Creates a new copy of a named actor prefab and drops it into the zone as a fresh actor with a unique ID. The copy is given a facing, has its stat modifiers rebuilt, and can be told to play an animation the moment it appears. Prefabs are actor definitions the game keeps ready to clone, and nothing happens if the name matches neither a prefab nor a spawn group.",
+          "description": "Creates a new copy of a named actor prefab and drops it into the zone as a fresh actor with a unique ID. The copy is given a facing, has its stat modifiers rebuilt, and can be told to play an animation the moment it appears. Prefabs are actor definitions the game keeps ready to clone, and nothing happens if the name matches neither a prefab nor a SpawnData.",
           "context": [
             "zone",
             "triggerArea"
@@ -6226,7 +6226,7 @@
             {
               "name": "strings[0]",
               "type": "ActorType",
-              "description": "The name of the actor prefab to clone. If it is not a prefab, the value is tried as a spawn group instead."
+              "description": "The name of the actor prefab to clone. If it is not a prefab, the value is tried as a SpawnData instead."
             }
           ],
           "optional": [
@@ -6253,7 +6253,7 @@
           ]
         },
         {
-          "description": "Spawns a whole group of actors from a named spawn definition, choosing which and how many to create so the group's strength roughly matches the party's, then scattering them over free tiles. Each one is turned to face something sensible, has its stat modifiers rebuilt, and appears with the spawn definition's own effect. Nothing happens if the group cannot be built or there is nowhere to put them.",
+          "description": "Spawns a whole group of actors from a named SpawnData, choosing which and how many to create so the group's strength roughly matches the party's, then scattering them over free tiles. Each one is turned to face something sensible, has its stat modifiers rebuilt, and appears with the SpawnData's own effect. Nothing happens if the group cannot be built or there is nowhere to put them.",
           "context": [
             "player",
             "zone",
@@ -6263,14 +6263,14 @@
             {
               "name": "strings[0]",
               "type": "SpawnData",
-              "description": "The ID of the spawn definition to draw the group from. If it is an actor prefab name instead, a single prefab copy is created."
+              "description": "The ID of the SpawnData to draw the group from. If it is an actor prefab name instead, a single prefab copy is created."
             }
           ],
           "optional": [
             {
               "name": "strings[1]",
               "type": "string",
-              "description": "The group name within the spawn definition to spawn, which also acts as the name used to stop the same group spawning twice. Defaults to the spawn definition's own ID."
+              "description": "The group name within the SpawnData to spawn, which also acts as the name used to stop the same group spawning twice. Defaults to the SpawnData's own ID."
             },
             {
               "name": "floats[0]",
@@ -6302,7 +6302,7 @@
       "name": "spawn_actorPrefab",
       "uses": [
         {
-          "description": "Creates a new copy of a named actor prefab and drops it into the zone as a fresh actor with a unique ID. The copy is given a facing, has its stat modifiers rebuilt, and can be told to play an animation the moment it appears. Prefabs are actor definitions the game keeps ready to clone, and nothing happens if the name matches neither a prefab nor a spawn group.",
+          "description": "Creates a new copy of a named actor prefab and drops it into the zone as a fresh actor with a unique ID. The copy is given a facing, has its stat modifiers rebuilt, and can be told to play an animation the moment it appears. Prefabs are actor definitions the game keeps ready to clone, and nothing happens if the name matches neither a prefab nor a SpawnData.",
           "context": [
             "zone",
             "triggerArea"
@@ -6311,7 +6311,7 @@
             {
               "name": "strings[0]",
               "type": "ActorType",
-              "description": "The name of the actor prefab to clone. If it is not a prefab, the value is tried as a spawn group instead."
+              "description": "The name of the actor prefab to clone. If it is not a prefab, the value is tried as a SpawnData instead."
             }
           ],
           "optional": [
@@ -6338,7 +6338,7 @@
           ]
         },
         {
-          "description": "Spawns a whole group of actors from a named spawn definition, choosing which and how many to create so the group's strength roughly matches the party's, then scattering them over free tiles. Each one is turned to face something sensible, has its stat modifiers rebuilt, and appears with the spawn definition's own effect. Nothing happens if the group cannot be built or there is nowhere to put them.",
+          "description": "Spawns a whole group of actors from a named SpawnData, choosing which and how many to create so the group's strength roughly matches the party's, then scattering them over free tiles. Each one is turned to face something sensible, has its stat modifiers rebuilt, and appears with the SpawnData's own effect. Nothing happens if the group cannot be built or there is nowhere to put them.",
           "context": [
             "player",
             "zone",
@@ -6348,14 +6348,14 @@
             {
               "name": "strings[0]",
               "type": "SpawnData",
-              "description": "The ID of the spawn definition to draw the group from. If it is an actor prefab name instead, a single prefab copy is created."
+              "description": "The ID of the SpawnData to draw the group from. If it is an actor prefab name instead, a single prefab copy is created."
             }
           ],
           "optional": [
             {
               "name": "strings[1]",
               "type": "string",
-              "description": "The group name within the spawn definition to spawn, which also acts as the name used to stop the same group spawning twice. Defaults to the spawn definition's own ID."
+              "description": "The group name used for the spawned actors' IDs, which also acts as the name used to stop the same group spawning twice. Defaults to the SpawnData's own ID."
             },
             {
               "name": "floats[0]",
@@ -6387,7 +6387,7 @@
       "name": "spawn_actorPrefab_point",
       "uses": [
         {
-          "description": "Creates a new copy of a named actor prefab and drops it into the zone as a fresh actor with a unique ID. The copy is given a facing, has its stat modifiers rebuilt, and can be told to play an animation the moment it appears. Prefabs are actor definitions the game keeps ready to clone, and nothing happens if the name matches neither a prefab nor a spawn group. The destination is given as a numbered travel point rather than raw coordinates.",
+          "description": "Creates a new copy of a named actor prefab and drops it into the zone as a fresh actor with a unique ID. The copy is given a facing, has its stat modifiers rebuilt, and can be told to play an animation the moment it appears. Prefabs are actor definitions the game keeps ready to clone, and nothing happens if the name matches neither a prefab nor a SpawnData. The destination is given as a numbered travel point rather than raw coordinates.",
           "context": [
             "zone",
             "triggerArea"
@@ -6396,7 +6396,7 @@
             {
               "name": "strings[0]",
               "type": "ActorType",
-              "description": "The name of the actor prefab to clone. If it is not a prefab, the value is tried as a spawn group instead."
+              "description": "The name of the actor prefab to clone. If it is not a prefab, the value is tried as a SpawnData instead."
             },
             {
               "name": "tileCoords[0]",
@@ -6423,7 +6423,7 @@
           ]
         },
         {
-          "description": "Spawns a whole group of actors from a named spawn definition, choosing which and how many to create so the group's strength roughly matches the party's, then scattering them over free tiles. Each one is turned to face something sensible, has its stat modifiers rebuilt, and appears with the spawn definition's own effect. Nothing happens if the group cannot be built or there is nowhere to put them. The destination is given as a numbered travel point rather than raw coordinates.",
+          "description": "Spawns a whole group of actors from a named SpawnData, choosing which and how many to create so the group's strength roughly matches the party's, then scattering them over free tiles. Each one is turned to face something sensible, has its stat modifiers rebuilt, and appears with the SpawnData's own effect. Nothing happens if the group cannot be built or there is nowhere to put them. The destination is given as a numbered travel point rather than raw coordinates.",
           "context": [
             "player",
             "zone",
@@ -6433,14 +6433,14 @@
             {
               "name": "strings[0]",
               "type": "SpawnData",
-              "description": "The ID of the spawn definition to draw the group from. If it is an actor prefab name instead, a single prefab copy is created."
+              "description": "The ID of the SpawnData to draw the group from. If it is an actor prefab name instead, a single prefab copy is created."
             }
           ],
           "optional": [
             {
               "name": "strings[1]",
               "type": "string",
-              "description": "The group name within the spawn definition to spawn, which also acts as the name used to stop the same group spawning twice. Defaults to the spawn definition's own ID."
+              "description": "The group name used for the spawned actors' IDs, which also acts as the name used to stop the same group spawning twice. Defaults to the SpawnData's own ID."
             },
             {
               "name": "floats[0]",
@@ -6472,7 +6472,7 @@
       "name": "spawn_g",
       "uses": [
         {
-          "description": "Spawns a group of actors from whichever spawn definition a global variable currently names, so the group can be chosen at runtime rather than fixed when the mod is written. Everything else behaves as an ordinary group spawn: the group is built to roughly match the party's strength and scattered over free tiles. Nothing happens if the variable's contents name no spawn definition.",
+          "description": "Spawns a group of actors from whichever SpawnData a global variable currently names, so the group can be chosen at runtime rather than fixed when the mod is written. Everything else behaves as an ordinary group spawn: the group is built to roughly match the party's strength and scattered over free tiles. Nothing happens if the variable's contents name no SpawnData.",
           "context": [
             "player",
             "zone",
@@ -6482,14 +6482,14 @@
             {
               "name": "strings[0]",
               "type": "globalVar",
-              "description": "The name of the global variable holding the ID of the spawn definition to use. Its contents, not this name, choose the group."
+              "description": "The name of the global variable holding the ID of the SpawnData to use. The value contained in the global variable, not the global variable's name, identifies the SpawnData."
             }
           ],
           "optional": [
             {
               "name": "strings[1]",
               "type": "string",
-              "description": "The group name within the spawn definition to spawn. Defaults to empty, which uses the spawn definition's own ID."
+              "description": "The group name used for the spawned actors' IDs. Defaults to empty, which uses the SpawnData's own ID."
             },
             {
               "name": "floats[0]",
@@ -6521,7 +6521,7 @@
       "name": "spawn_g_nearPlayer",
       "uses": [
         {
-          "description": "Spawns a group of actors from whichever spawn definition a global variable currently names, placing them in the three-by-three block of tiles centred on the player rather than anywhere in the trigger's area. This is the ambush spawn: enemies appear right on top of the party. They can instead be placed three tiles behind the player, so they appear at the party's back.",
+          "description": "Spawns a group of actors from whichever SpawnData a global variable currently names, placing them in the three-by-three block of tiles centred on the player rather than anywhere in the trigger's area. This is the ambush spawn: enemies appear right on top of the party. They can instead be placed three tiles behind the player, so they appear at the party's back.",
           "context": [
             "player",
             "zone"
@@ -6530,14 +6530,14 @@
             {
               "name": "strings[0]",
               "type": "globalVar",
-              "description": "The name of the global variable holding the ID of the spawn definition to use. Its contents, not this name, choose the group."
+              "description": "The name of the global variable holding the ID of the SpawnData to use. The value contained in the global variable, not the global variable's name, identifies the SpawnData."
             }
           ],
           "optional": [
             {
               "name": "strings[1]",
               "type": "string",
-              "description": "The group name within the spawn definition to spawn. Defaults to empty, which uses the spawn definition's own ID."
+              "description": "The group name used for the spawned actors' IDs. Defaults to empty, which uses the SpawnData's own ID."
             },
             {
               "name": "floats[0]",
@@ -6603,7 +6603,7 @@
       "name": "spawn_location",
       "uses": [
         {
-          "description": "Populates the town or port the party is currently inside with its own regular inhabitants, drawn from the spawn groups that location lists, and stands them on the location's designated townsfolk spots. Wealthier locations get one or two extra groups. If the player owns a home here, the port's own extra scenery spawns are laid down as well.",
+          "description": "Populates the port the party is currently inside with cafe hires and supply port visitors, drawn from the SpawnData entries listed for that location (in auto_spawnDataID=), and stands them on the location's designated spots. Wealthier locations get one extra hire. If the player owns a home here, the supply port's extra visitors are spawned as well.",
           "context": [
             "zone"
           ],
@@ -6618,7 +6618,7 @@
       "name": "spawn_onItem",
       "uses": [
         {
-          "description": "Spawns a group of actors from a named spawn definition and stands each of them on a tile that holds an item with a chosen special property, which is how spawn markers operate. The group is built to scale with the party's power level and the tiles are picked at random among those of the marked tiles that are occupiable. All of them are made to give experience when defeated, and the spawn definition's own effect plays on each. ",
+          "description": "Spawns a group of actors from a named SpawnData and stands each of them on a tile that holds an item with a chosen special property, which is how spawn markers operate. The group is built to scale with the party's power level and the tiles are picked at random among those of the marked tiles that are occupiable. All of them are made to give experience when defeated, and the SpawnData's spawnFX plays on each. ",
           "context": [
             "player",
             "zone"
@@ -6627,7 +6627,7 @@
             {
               "name": "strings[0]",
               "type": "SpawnData",
-              "description": "The ID of the spawn definition to draw the group from. Nothing happens if no such definition exists."
+              "description": "The ID of the SpawnData to draw the group from. Nothing happens if no such definition exists."
             }
           ],
           "optional": [
@@ -6670,7 +6670,7 @@
             {
               "name": "strings[0]",
               "type": "SpawnData",
-              "description": "The ID of the spawn definition to draw the monsters from. Leave it empty to let the nearest monster beacon choose, falling back to the default sea monster."
+              "description": "The ID of the SpawnData to draw the monsters from. Leave it empty to let the nearest monster beacon choose, falling back to the default sea monster."
             }
           ],
           "optional": [
@@ -6691,13 +6691,13 @@
       "name": "spawn_fleet",
       "uses": [
         {
-          "description": "Spawns a whole fleet of ships from a named spawn definition and puts it on the world map, complete with a faction, a commodore, cargo drawn from that faction's trade and its own sailing behaviour. Use it to place patrols, merchant convoys and raiders. The task fails outright if the spawn definition does not exist.",
+          "description": "Spawns a whole fleet of ships from a named SpawnData and puts it on the world map, complete with a faction, a commodore, cargo drawn from that faction's trade and its own sailing behaviour. Use it to place patrols, merchant convoys and raiders. The task fails outright if the SpawnData does not exist.",
           "context": [],
           "required": [
             {
               "name": "strings[0]",
               "type": "SpawnData",
-              "description": "The ID of the spawn definition describing the fleet's ships. It must exist or the task fails."
+              "description": "The ID of the SpawnData describing the fleet's ships. It must exist or the task fails."
             },
             {
               "name": "strings[1]",
