@@ -6648,7 +6648,7 @@
           "note": "the trade being unlocked; the game uses this naming for the trades taught by masters rather than the handful anyone starts able to take up"
         }
       ],
-      "description": "Marks that the player has been taught a trade and may now put their people into it. Each advanced trade has a master somewhere in the world who will teach it for a fee, and until the lesson has been paid for and taken, that trade is greyed out on the character sheet with training listed among what it still needs. Once the mark is up, anyone in the crew who meets the trade's other demands can take it up.",
+      "description": "Marks that the player has unlocked a class and may now use it on their characters. Each advanced class has a master somewhere in the world who will teach it for a fee, and until the lesson has been paid for and taken, that class is greyed out on the character sheet where it only lists its name and XP prerequisites.",
       "valueShape": "flag",
       "lifetime": "persistent",
       "category": "player",
@@ -6656,12 +6656,12 @@
         {
           "where": "class trainer dialog flow",
           "op": "set",
-          "note": "raised as the lesson concludes, after the fee is taken, with a flourish announcing the new trade"
+          "note": "raised as the lesson concludes, after the fee is taken, with a flourish announcing the new class unlock"
         },
         {
           "where": "Task.allclass",
           "op": "set",
-          "note": "the developers' shortcut that opens every trade at once raises all of them together"
+          "note": "the developers' shortcut that unlocks every class at once"
         }
       ],
       "readBy": [
