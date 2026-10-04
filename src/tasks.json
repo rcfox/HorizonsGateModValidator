@@ -11975,7 +11975,7 @@
       "name": "formulas",
       "uses": [
         {
-          "description": "Prints every named shared formula the game has loaded on screen as a debug message, each under its own name with the expression it stands for. It is a debugging aid for seeing what the reusable formulas expand to.",
+          "description": "Prints every named shared formula (FormualGlobal) the game has loaded on screen as a debug message, each under its own name with the expression it stands for. It is a debugging aid for seeing what the reusable formulas expand to.",
           "context": [],
           "required": [],
           "optional": []
