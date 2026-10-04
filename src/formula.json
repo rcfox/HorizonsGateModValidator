@@ -3843,7 +3843,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Runs a named shared formula and yields its result, so the same piece of arithmetic can be written once and reused wherever it is needed. The caster, the target, the rank and the targeted tile all carry through, and a value written in brackets straight after the name becomes the letter x inside the shared formula. A name the game does not know reports an error and gives 0.",
+          "description": "Runs a named shared formula (FormulaGlobal) and yields its result, so the same piece of arithmetic can be written once and reused wherever it is needed. The caster, the target, the rank and the targeted tile all carry through, and a value written in brackets straight after the name becomes the letter x inside the formula. A name the game does not know reports an error and gives 0.",
           "returns": "float",
           "example": "d:gswordDmg(3)",
           "arguments": [
@@ -3856,7 +3856,7 @@
             {
               "name": "x",
               "type": "float",
-              "description": "The value the shared formula receives as its x. A whole number is used as written, the bare letter x passes on whatever value the calling formula was itself handed, and anything else is worked out as a formula first. Left out, the shared formula sees x standing at zero.",
+              "description": "The value the formula receives as its x. A whole number is used as written, the bare letter x passes on whatever value the calling formula was itself handed, and anything else is worked out as a formula first. Left out, the FormulaGlobal sees x standing at zero.",
               "optional": true
             }
           ],
@@ -3877,7 +3877,7 @@
       "delegatesTo": "d",
       "uses": [
         {
-          "description": "Runs a named shared formula and clamps its result upward at zero, so a negative outcome comes out as 0. Use it where a shared piece of arithmetic may go negative but a negative contribution would be wrong, such as a bonus that should never become a penalty.",
+          "description": "Runs a named shared formula (FormulaGlobal) and clamps its result upward at zero, so a negative outcome comes out as 0. Use it where a shared piece of arithmetic may go negative but a negative contribution would be wrong, such as a bonus that should never become a penalty.",
           "returns": "float",
           "example": "dMin0:gswordDmg",
           "arguments": [
@@ -3901,7 +3901,7 @@
       "delegatesTo": "d",
       "uses": [
         {
-          "description": "Runs a named shared formula and clamps its result downward at zero, so a positive outcome comes out as 0. Only the negative part of the result survives, which is how you keep a shared piece of arithmetic to its penalty half.",
+          "description": "Runs a named shared formula (FormulaGlobal) and clamps its result downward at zero, so a positive outcome comes out as 0. Only the negative part of the result survives, which is how you keep a shared piece of arithmetic to its penalty half.",
           "returns": "float",
           "example": "dMax0:gswordDmg",
           "arguments": [
@@ -3925,7 +3925,7 @@
       "delegatesTo": "d",
       "uses": [
         {
-          "description": "Runs a named shared formula and caps its result at 1, letting anything below that through unchanged including negatives. Use it to turn a shared count into an at-most-once contribution.",
+          "description": "Runs a named shared formula (FormulaGlobal) and caps its result at 1, letting anything below that through unchanged including negatives. Use it to turn a shared count into an at-most-once contribution.",
           "returns": "float",
           "example": "dMax1:gswordDmg",
           "arguments": [
@@ -3949,7 +3949,7 @@
       "delegatesTo": "d",
       "uses": [
         {
-          "description": "Runs a named shared formula and caps its result at -1, so anything above -1, zero and positive results included, comes out as -1. Only results already below -1 pass through unchanged.",
+          "description": "Runs a named shared formula (FormulaGlobal) and caps its result at -1, so anything above -1, zero and positive results included, comes out as -1. Only results already below -1 pass through unchanged.",
           "returns": "float",
           "example": "dMaxNeg1:gswordDmg",
           "arguments": [
@@ -3973,7 +3973,7 @@
       "delegatesTo": "d",
       "uses": [
         {
-          "description": "Runs a named shared formula and caps its result at a number you choose, returning whichever is smaller. Use it to reuse a shared piece of arithmetic while holding it to a ceiling that suits this particular action.",
+          "description": "Runs a named shared formula (FormulaGlobal) and caps its result at a number you choose, returning whichever is smaller. Use it to reuse a shared piece of arithmetic while holding it to a ceiling that suits this particular action.",
           "returns": "float",
           "example": "dMax:gswordDmg:20",
           "arguments": [
@@ -4001,7 +4001,7 @@
       "delegatesTo": "d",
       "uses": [
         {
-          "description": "Runs a named shared formula and raises its result to a number you choose, returning whichever is larger. Use it to reuse a shared piece of arithmetic while holding it to a floor that suits this particular action.",
+          "description": "Runs a named shared formula (FormulaGlobal) and raises its result to a number you choose, returning whichever is larger. Use it to reuse a shared piece of arithmetic while holding it to a floor that suits this particular action.",
           "returns": "float",
           "example": "dMin:gswordDmg:1",
           "arguments": [
@@ -4029,14 +4029,14 @@
       "delegatesTo": "d",
       "uses": [
         {
-          "description": "Runs a named shared formula only when the caster knows a given support ability, and gives 0 otherwise. It is the compact way to write a bonus that a passive unlocks, without wrapping the whole thing in a separate condition. With no caster the operand is 0.",
+          "description": "Runs a named shared formula (FormulaGlobal) only when the caster knows a given support ability, and gives 0 otherwise. It is the compact way to write a bonus that a passive unlocks, without wrapping the whole thing in a separate condition. With no caster the operand is 0.",
           "returns": "float",
           "example": "dsa:ironGrip:gripBonus",
           "arguments": [
             {
               "name": "supportAbilityID",
               "type": "SupportAbility",
-              "description": "The support ability the caster must know for the shared formula to run at all.",
+              "description": "The support ability the caster must know for the formula to run at all.",
               "optional": false
             },
             {
