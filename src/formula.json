@@ -2730,7 +2730,7 @@
         {
           "description": "Returns 1 when the target belongs to a named faction, otherwise 0. With no target the operand is 0. Use it for rules that treat the crews of different powers differently.",
           "returns": "boolean",
-          "example": "faction:navy",
+          "example": "faction:seartial",
           "arguments": [
             {
               "name": "factionID",
@@ -3042,7 +3042,7 @@
         {
           "description": "Returns 1 when a named actor belongs to one of the fleets sailing the world, otherwise 0. This finds ships and crews that are travelling as part of a fleet rather than standing in the current scene.",
           "returns": "boolean",
-          "example": "fleet:navyPatrol01",
+          "example": "fleet:comm_seartial_battle1",
           "arguments": [
             {
               "name": "actorID",
@@ -3791,7 +3791,7 @@
         {
           "description": "Returns 1 when the actor currently picked up on the cursor has a given property set to a given value, otherwise 0. This is about a character the player has literally lifted, as when rearranging crew. Properties that hold a list match when the value appears anywhere in the list.",
           "returns": "boolean",
-          "example": "holdingActorWithProperty:faction:navy",
+          "example": "holdingActorWithProperty:faction:seartial",
           "arguments": [
             {
               "name": "propertyName",
@@ -6218,9 +6218,9 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Returns 1 when a named place is set up to spawn a given kind of encounter automatically, otherwise 0. This asks about the place's standing spawn list rather than about anything currently in the world. A place the game does not know gives 0.",
+          "description": "Returns 1 when the specified location is set up to spawn actors from a given list automatically (typically cafe hires), otherwise 0. This asks about the location's standing spawn list rather than about anything currently in the world. A location the game does not know gives 0.",
           "returns": "boolean",
-          "example": "locHasSpawnData:portRoyal:navyPatrol",
+          "example": "locHasSpawnData:port6:hire_human",
           "arguments": [
             {
               "name": "locationID",
@@ -6529,7 +6529,7 @@
         {
           "description": "Gives how well a named faction stands with a named place, which is what decides whose ships are welcome in that port. A place that is sworn to its owner for good reports -9999 for any faction it has no recorded standing with, marking it as flatly unavailable rather than merely neutral. A place the game does not know gives 0.",
           "returns": "float",
-          "example": "factionFavorWithLoc:portRoyal:navy",
+          "example": "factionFavorWithLoc:portRoyal:seartial",
           "arguments": [
             {
               "name": "locationID",
@@ -6661,7 +6661,7 @@
         {
           "description": "Gives the highest standing the player can currently reach with a named faction. It starts at 20 and rises by 10 for each rank the player holds, but only with the faction the player has actually sworn to, and it never passes 99. Use it to show how much room a reputation has left to grow.",
           "returns": "float",
-          "example": "maxFavor:navy",
+          "example": "maxFavor:seartial",
           "arguments": [
             {
               "name": "factionID",
@@ -6724,7 +6724,7 @@
         {
           "description": "Gives how many ports a named faction currently holds. Since control changes hands over the course of a game, this follows the present state of the map rather than how things started.",
           "returns": "float",
-          "example": "factionPorts:navy",
+          "example": "factionPorts:seartial",
           "arguments": [
             {
               "name": "factionID",
@@ -6745,7 +6745,7 @@
         {
           "description": "Returns 1 when a named faction holds more than a given number of ports, otherwise 0. An exact match gives 0. Use it for content that turns on how far a power has spread.",
           "returns": "boolean",
-          "example": "factionPortsMoreThan:navy:5",
+          "example": "factionPortsMoreThan:seartial:5",
           "arguments": [
             {
               "name": "factionID",
@@ -6772,7 +6772,7 @@
         {
           "description": "Gives how rich a named faction currently is, taken together across everything it holds. Use it for content that turns on whether a power is thriving or failing.",
           "returns": "float",
-          "example": "factionWealth:navy",
+          "example": "factionWealth:seartial",
           "arguments": [
             {
               "name": "factionID",
@@ -6793,7 +6793,7 @@
         {
           "description": "Gives how many fleets a named faction currently has at sea, counting merchant convoys and war fleets alike.",
           "returns": "float",
-          "example": "factionFleets:navy",
+          "example": "factionFleets:seartial",
           "arguments": [
             {
               "name": "factionID",
@@ -6814,7 +6814,7 @@
         {
           "description": "Gives how many merchant convoys a named faction currently has at sea, leaving its war fleets out of the count. Use it for content about a power's trade rather than its navy.",
           "returns": "float",
-          "example": "factionMFleets:navy",
+          "example": "factionMFleets:seartial",
           "arguments": [
             {
               "name": "factionID",
@@ -6835,7 +6835,7 @@
         {
           "description": "Gives how many war fleets a named faction currently has at sea, leaving its merchant convoys out of the count. Use it for content about a power's fighting strength.",
           "returns": "float",
-          "example": "factionBFleets:navy",
+          "example": "factionBFleets:seartial",
           "arguments": [
             {
               "name": "factionID",
@@ -6856,7 +6856,7 @@
         {
           "description": "Returns 1 when a named faction has a given property set to a given value, otherwise 0. Properties that hold a list match when the value appears anywhere in the list. A faction the game does not know gives 0.",
           "returns": "boolean",
-          "example": "factionHasProperty:navy:hostileToPlayer:true",
+          "example": "factionHasProperty:pirate:hostileToPlayer:true",
           "arguments": [
             {
               "name": "factionID",
@@ -6889,7 +6889,7 @@
         {
           "description": "Reads a numeric property straight off a named faction's definition and yields it as a number. Any property whose text form parses as a number can be read this way. A faction the game does not know gives 0.",
           "returns": "float",
-          "example": "factionFloat:navy:startingWealth",
+          "example": "factionFloat:seartial:startingWealth",
           "arguments": [
             {
               "name": "factionID",
@@ -7547,7 +7547,7 @@
         {
           "description": "Returns 1 when the actor the cursor is currently over has a given property set to a given value, otherwise 0. This reads the individual character standing there, so it sees things like its faction and its current state. On a gamepad the cursor position follows the pad.",
           "returns": "boolean",
-          "example": "mousePointingAtActorWith:faction:navy",
+          "example": "mousePointingAtActorWith:faction:seartial",
           "arguments": [
             {
               "name": "propertyName",
