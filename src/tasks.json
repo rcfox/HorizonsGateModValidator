@@ -7387,7 +7387,7 @@
       "name": "enterFleetBattle",
       "uses": [
         {
-          "description": "Starts a fleet battle between two named ships, moving the fight onto the dedicated fleet-battle map. The party's position and the crew's experience are recorded first so they can be restored afterwards, and the enemy fleet is assembled around the target's flagship. Any saved copy of the battle map is thrown away so the fight starts clean.",
+          "description": "Starts a fleet battle against up to two designated fleets, moving the fight onto the dedicated fleet-battle map (zFleetBattle). The player's position on the overworld is restored afterwards; the crew's prior experience is recorded to display a post-battle XP recap. Any previous changes to the fleet-battle map are thrown away so the fight starts clean.",
           "context": [
             "player"
           ],
@@ -7395,18 +7395,18 @@
             {
               "name": "strings[0]",
               "type": "Actor",
-              "description": "The ID of the ship whose fleet is fought."
+              "description": "The ID of the ship or commodore whose fleet is fought."
             },
             {
               "name": "strings[1]",
               "type": "Actor",
-              "description": "The ID of the second ship drawn into the battle. Leave it empty for none, but the slot must still be supplied."
+              "description": "The ID of the second ship or commodore whose fleet is drawn into the battle. Leave it empty for none, but the slot must still be supplied to run this version of the task."
             }
           ],
           "optional": []
         },
         {
-          "description": "Starts a fleet battle around the ship the task is running on, working out the second party automatically from the nearest allied vessel within two tiles that shares its faction. The fight moves onto the dedicated fleet-battle map, and the party's position and crew experience are recorded first so they can be restored afterwards. The battle is recorded as one the player did not start.",
+          "description": "Starts a fleet battle against the ship the task is running on, working out a potential second party automatically from the nearest target-allied vessel within two tiles that shares its faction. The fight moves onto the dedicated fleet-battle map (zFleetBattle). The player's position on the overworld is restored afterwards; the crew's prior experience is recorded to display a post-battle XP recap.",
           "context": [
             "actor",
             "player"
@@ -7422,7 +7422,7 @@
       "name": "enterFleetBattle_player",
       "uses": [
         {
-          "description": "Starts a fleet battle between two named ships, moving the fight onto the dedicated fleet-battle map. The party's position and the crew's experience are recorded first so they can be restored afterwards, and the enemy fleet is assembled around the target's flagship. Any saved copy of the battle map is thrown away so the fight starts clean.",
+          "description": "Starts a fleet battle against up to two designated fleets, moving the fight onto the dedicated fleet-battle map (zFleetBattle). The player's position on the overworld is restored afterwards; the crew's prior experience is recorded to display a post-battle XP recap. Any previous changes to the fleet-battle map are thrown away so the fight starts clean. The battle is recorded as one the player started, which typically only affects commodore dialog (the global variable 'playerInitiatedFleetBattle' is set to 1).",
           "context": [
             "player"
           ],
@@ -7430,18 +7430,18 @@
             {
               "name": "strings[0]",
               "type": "Actor",
-              "description": "The ID of the ship whose fleet is fought."
+              "description": "The ID of the ship or commodore whose fleet is fought."
             },
             {
               "name": "strings[1]",
               "type": "Actor",
-              "description": "The ID of the second ship drawn into the battle. Leave it empty for none, but the slot must still be supplied."
+              "description": "The ID of the second ship or commodore whose fleet is drawn into the battle. Leave it empty for none, but the slot must still be supplied to run this version of the task."
             }
           ],
           "optional": []
         },
         {
-          "description": "Starts a fleet battle around the ship the task is running on, working out the second party automatically from the nearest allied vessel within two tiles that shares its faction. The fight moves onto the dedicated fleet-battle map, and the party's position and crew experience are recorded first so they can be restored afterwards. The battle is recorded as one the player started, which affects the fallout.",
+          "description": "Starts a fleet battle against the ship the task is running on, working out a potential second party automatically from the nearest target-allied vessel within two tiles that shares its faction. The fight moves onto the dedicated fleet-battle map (zFleetBattle). The player's position on the overworld is restored afterwards; the crew's prior experience is recorded to display a post-battle XP recap. The battle is recorded as one the player started, which typically only affects commodore dialog (the global variable 'playerInitiatedFleetBattle' is set to 1).",
           "context": [
             "actor",
             "player"
