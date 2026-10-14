@@ -7400,7 +7400,7 @@
             {
               "name": "strings[1]",
               "type": "Actor",
-              "description": "The ID of the second ship or commodore whose fleet is drawn into the battle. Leave it empty for none, but the slot must still be supplied to run this version of the task."
+              "description": "The ID of the second ship whose fleet is drawn into the battle (a commodore ID technically works for this argument but fails to reposition the ships in the zone presumably due to a bug). Leave it empty for none, but the slot must still be supplied to run this version of the task."
             }
           ],
           "optional": []
@@ -7422,7 +7422,7 @@
       "name": "enterFleetBattle_player",
       "uses": [
         {
-          "description": "Starts a fleet battle against up to two designated fleets, moving the fight onto the dedicated fleet-battle map (zFleetBattle). The player's position on the overworld is restored afterwards; the crew's prior experience is recorded to display a post-battle XP recap. Any previous changes to the fleet-battle map are thrown away so the fight starts clean. The battle is recorded as one the player started, which typically only affects commodore dialog (the global variable 'playerInitiatedFleetBattle' is set to 1).",
+          "description": "Starts a fleet battle against up to two designated fleets, moving the fight onto the dedicated fleet-battle map (zFleetBattle). The player's position on the overworld is restored afterwards; the crew's prior experience is recorded to display a post-battle XP recap. Any previous changes to the fleet-battle map are thrown away so the fight starts clean. The battle is NOT currently recorded as one the player started in this version of the task, so there is no difference between this task and 'enterFleetBattle' when using this task with arguments.",
           "context": [
             "player"
           ],
