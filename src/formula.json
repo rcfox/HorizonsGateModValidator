@@ -12798,7 +12798,7 @@
       "isFunctionStyle": true,
       "uses": [
         {
-          "description": "Rolls a whole number between 0 and the ceiling supplied in brackets after the name, seeded from the target so that the same target always gives the same answer. A ceiling below 1 is treated as 1. Use it to give a character a stable quirk, greeting or stock that does not change from one look to the next. With no target the operand is 0.",
+          "description": "Rolls a whole random number between 0 and the ceiling supplied in brackets after the name, seeded from the target so that the same target always gives the same answer. A ceiling below 1 is treated as 1. Use it to give a character a stable quirk, greeting or stock that does not change from one look to the next. With no target the operand is 0.",
           "returns": "float",
           "example": "m:randID(3)",
           "arguments": [
