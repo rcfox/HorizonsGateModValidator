@@ -6998,7 +6998,7 @@
       "isFunctionStyle": false,
       "uses": [
         {
-          "description": "Rolls a whole number between 0 and a given ceiling and returns 1 when it comes out equal to a value you name, otherwise 0. The roll is seeded from the target and from the current six-day stretch of world time, so it gives the same answer for the same target all week and then changes: it is how a character gets a stable but rotating mood, stock or greeting. Note that it also resets the value passed into the formula, so anything later in the same formula that uses x will see the ceiling instead. With no target the operand is 0.",
+          "description": "Rolls a whole random number between 0 and a given ceiling and returns 1 when it comes out equal to a value you name, otherwise 0. The roll is seeded from the target and from the current six-day stretch of world time, so it gives the same answer for the same target all week and then changes: it is how a character gets a stable but rotating mood, stock or greeting. Note that it also resets the value passed into the formula, so anything later in the same formula that uses x will see the ceiling instead. With no target the operand is 0.",
           "returns": "boolean",
           "example": "randIDIs:3:1",
           "arguments": [
