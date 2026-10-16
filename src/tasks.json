@@ -4580,7 +4580,7 @@
       "name": "setActorFaction",
       "uses": [
         {
-          "description": "Moves a named actor into a different faction, which changes who counts as their allies and enemies. Player-controlled actors and anyone already in the player's own faction are refused, and so is any attempt to move an actor into the player's faction, so this cannot be used to recruit. Nothing happens if the actor is not present in the zone.",
+          "description": "Moves a named actor into a different faction, which changes who counts as their allies and enemies. Player-controlled actors and anyone already in the player's own faction are refused, and so is any attempt to move an actor into the player's faction, so this cannot be used to recruit. Nothing happens if the actor is not present in the zone. This task does not change the faction property of the actor's movement (governing whether actors can move through each other), which can be updated using a different task, 'setActorMovementType' (example: 'setActorMovementType,actorID,defaultMovementType;' sets the same movement type but will update it to the actor's current faction).",
           "context": [],
           "required": [
             {
