@@ -5116,7 +5116,7 @@
             {
               "name": "bools[0]",
               "type": "boolean",
-              "description": "Passed through as the removal's own option flag. Defaults to false."
+              "description": "If false, provided this is a peaceful zone and the actor is currently in the party, the fleet version of the actor is updated (actor's current zone version is saved in the fleet version), and the actor is removed from the zone. If true, the actor is not removed from the zone nor updated in the fleet version even when these other conditions are met. Defaults to false."
             }
           ]
         }
